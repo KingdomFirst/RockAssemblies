@@ -155,13 +155,11 @@ namespace Rock.Workflow.Action.CheckIn
                         }
                     }
                 }
-                else if ( checkInState.CheckIn.SearchType.TypeName.Equals( "Group" ) )
+                else if ( checkInState.CheckIn.SearchType.Value.Equals( "Group" ) )
                 {
-                    List<int> searchIds = new List<int>();
-                    searchIds.Add( checkInState.CheckIn.SearchValue.AsInteger() );
-                    foreach ( var person in personService.GetByIds( searchIds ).AsNoTracking() )
-                    {
-                        foreach ( var group in person.Members.Where( m => m.Group.GroupType.Guid.Equals( familyGroupTypeGuid ) ).Select( m => m.Group ).ToList() )
+                    foreach ( var member in memberService.GetByGroupId( checkInState.CheckIn.SearchValue.AsInteger() ) )
+                        {
+                        foreach ( var group in member.Person.Members.Where( m => m.Group.GroupType.Guid.Equals( familyGroupTypeGuid ) ).Select( m => m.Group ).ToList() )
                         {
                             var family = checkInState.CheckIn.Families.Where( f => f.Group.Id == group.Id ).FirstOrDefault();
                             if ( family == null )
@@ -176,7 +174,7 @@ namespace Rock.Workflow.Action.CheckIn
                         }
                     }
                 }
-                else if ( checkInState.CheckIn.SearchType.TypeName.Equals( "Barcode" ) )
+                else if ( checkInState.CheckIn.SearchType.Value.Equals( "Barcode" ) )
                 {
                 }
                 else
