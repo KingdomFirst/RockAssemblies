@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Data.Entity;
 using System.Linq;
 
 using Rock;
@@ -40,6 +41,7 @@ namespace Rock.Workflow.Action.CheckIn
     [IntegerField( "Security Code Length", "The number of characters to use for the security code.", true, 3 )]
     [BooleanField( "Reuse Code For Family", "By default a unique security code is created for each person.  Select this option to use one security code per family.", false )]
     [BooleanField( "Checkout Other Groups", "By default a person can be checked into multiple groups at one time.  This will cancel other checkins for the day.", false )]
+    [BooleanField( "First Checkin Not Transit", "Keep the first checkin of the day from being marked as In Transit.", false )]
     public class SaveAttendanceInTransit : CheckInActionComponent
     {
         /// <summary>
@@ -61,6 +63,7 @@ namespace Rock.Workflow.Action.CheckIn
 
                 bool reuseCodeForFamily = GetAttributeValue( action, "ReuseCodeForFamily" ).AsBoolean();
                 bool checkoutOtherGroups = GetAttributeValue( action, "CheckoutOtherGroups" ).AsBoolean();
+                bool firstCheckinNotTransit = GetAttributeValue( action, "FirstCheckinNotTransit" ).AsBoolean();
 
                 int securityCodeLength = 3;
                 if ( !int.TryParse( GetAttributeValue( action, "SecurityCodeLength" ), out securityCodeLength ) )
@@ -133,6 +136,7 @@ namespace Rock.Workflow.Action.CheckIn
                                                     qryAttendance = qryAttendance.Where( a => a.PersonAlias.PersonId == person.Person.Id );
                                                     //qryAttendance = qryAttendance.Where( a => a.DidAttend == true );
                                                     qryAttendance = qryAttendance.Where( a => a.EndDateTime == null );
+                                                    qryAttendance = qryAttendance.Where( a => DbFunctions.TruncateTime( a.StartDateTime ) == RockDateTime.Today );
                                                     attendances.AddRange( qryAttendance );
                                                     foreach ( var otherAttendance in attendances )
                                                     {
@@ -141,6 +145,20 @@ namespace Rock.Workflow.Action.CheckIn
                                                             otherAttendance.EndDateTime = RockDateTime.Now;
                                                             otherAttendance.DidAttend = false;
                                                         }
+                                                    }
+                                                }
+
+                                                if ( firstCheckinNotTransit )
+                                                {
+                                                    List<Attendance> attendances = new List<Attendance>();
+                                                    var attendancesService = new AttendanceService( rockContext );
+                                                    var qryAttendance = attendancesService.Queryable();
+                                                    qryAttendance = qryAttendance.Where( a => a.PersonAlias.PersonId == person.Person.Id );
+                                                    qryAttendance = qryAttendance.Where( a => DbFunctions.TruncateTime( a.StartDateTime ) == RockDateTime.Today );
+                                                    attendances.AddRange( qryAttendance );
+                                                    if ( attendances.Count == 0 )
+                                                    {
+                                                        attendance.DidAttend = true;
                                                     }
                                                 }
                                             }
