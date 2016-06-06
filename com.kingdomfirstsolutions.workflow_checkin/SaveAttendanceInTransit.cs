@@ -128,26 +128,6 @@ namespace Rock.Workflow.Action.CheckIn
                                                 attendanceService.Add( attendance );
                                                 attendance.DidAttend = false;
 
-                                                if ( checkoutOtherGroups )
-                                                {
-                                                    List<Attendance> attendances = new List<Attendance>();
-                                                    var attendancesService = new AttendanceService( rockContext );
-                                                    var qryAttendance = attendancesService.Queryable();
-                                                    qryAttendance = qryAttendance.Where( a => a.PersonAlias.PersonId == person.Person.Id );
-                                                    //qryAttendance = qryAttendance.Where( a => a.DidAttend == true );
-                                                    qryAttendance = qryAttendance.Where( a => a.EndDateTime == null );
-                                                    qryAttendance = qryAttendance.Where( a => DbFunctions.TruncateTime( a.StartDateTime ) == RockDateTime.Today );
-                                                    attendances.AddRange( qryAttendance );
-                                                    foreach ( var otherAttendance in attendances )
-                                                    {
-                                                        if ( otherAttendance.Guid != attendance.Guid )
-                                                        {
-                                                            otherAttendance.EndDateTime = RockDateTime.Now;
-                                                            otherAttendance.DidAttend = false;
-                                                        }
-                                                    }
-                                                }
-
                                                 if ( firstCheckinNotTransit )
                                                 {
                                                     List<Attendance> attendances = new List<Attendance>();
@@ -168,9 +148,31 @@ namespace Rock.Workflow.Action.CheckIn
                                             attendance.DidAttend = true;
                                         }
 
+                                        if ( checkoutOtherGroups )
+                                        {
+                                            List<Attendance> attendances = new List<Attendance>();
+                                            var attendancesService = new AttendanceService( rockContext );
+                                            var qryAttendance = attendancesService.Queryable();
+                                            qryAttendance = qryAttendance.Where( a => a.PersonAlias.PersonId == person.Person.Id );
+                                            qryAttendance = qryAttendance.Where( a => a.EndDateTime == null );
+                                            qryAttendance = qryAttendance.Where( a => DbFunctions.TruncateTime( a.StartDateTime ) == RockDateTime.Today );
+                                            attendances.AddRange( qryAttendance );
+                                            foreach ( var otherAttendance in attendances )
+                                            {
+                                                if ( otherAttendance.Guid != attendance.Guid )
+                                                {
+                                                    otherAttendance.EndDateTime = RockDateTime.Now;
+                                                    otherAttendance.DidAttend = false;
+                                                }
+                                            }
+                                        }
+
                                         attendance.AttendanceCodeId = attendanceCode.Id;
                                         attendance.StartDateTime = startDateTime;
-                                        attendance.EndDateTime = null;
+                                        if ( attendance.EndDateTime == null )
+                                        {
+                                            attendance.EndDateTime = null;
+                                        }
 
                                         KioskLocationAttendance.AddAttendance( attendance );
                                     }
