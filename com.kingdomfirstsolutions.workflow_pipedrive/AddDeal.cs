@@ -37,12 +37,16 @@ namespace Rock.Workflow.Action.Pipedrive
     [ExportMetadata( "ComponentName", "Add Deal to Pipedrive" )]
     [TextField( "API Token", "Authorized API Token", true, "", "Pipedrive Settings", 0 )]
     [TextField( "Inquiry Field Token", "Custom field token to populate with Inquiry", true, "", "Pipedrive Settings", 1 )]
+    [TextField( "Topic Field Token", "Custom field token to populate with Topic", true, "", "Pipedrive Settings", 2 )]
+    [TextField( "Plan Field Token", "Custom field token to populate with Plan", true, "", "Pipedrive Settings", 1 )]
     [WorkflowAttribute( "Organization Name", "The attribute to use to populate the Organization Name.", true, "", "Field Map", 0 )]
     [WorkflowAttribute( "Person First Name", "The attribute to use to populate the Person First Name.", true, "", "Field Map", 1 )]
     [WorkflowAttribute( "Person Last Name", "The attribute to use to populate the Person Last Name.", true, "", "Field Map", 2 )]
     [WorkflowAttribute( "Person Email", "The attribute to use to populate the Person Email.", true, "", "Field Map", 3 )]
     [WorkflowAttribute( "Person Phone", "The attribute to use to populate the Person Phone.", true, "", "Field Map", 4 )]
     [WorkflowAttribute( "Inquiry", "The attribute to use to populate the initial inquiry.", true, "", "Field Map", 5 )]
+    [WorkflowAttribute( "Topic", "The attribute to use to populate the topic.", true, "", "Field Map", 6 )]
+    [WorkflowAttribute( "Plan", "The attribute to use to populate the plan.", true, "", "Field Map", 7 )]
 
     public class AddDeal : ActionComponent
     {
