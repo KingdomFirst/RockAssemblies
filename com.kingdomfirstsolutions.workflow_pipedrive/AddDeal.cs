@@ -38,7 +38,9 @@ namespace Rock.Workflow.Action.Pipedrive
     [TextField( "API Token", "Authorized API Token", true, "", "Pipedrive Settings", 0 )]
     [TextField( "Inquiry Field Token", "Custom field token to populate with Inquiry", true, "", "Pipedrive Settings", 1 )]
     [TextField( "Topic Field Token", "Custom field token to populate with Topic", true, "", "Pipedrive Settings", 2 )]
-    [TextField( "Plan Field Token", "Custom field token to populate with Plan", true, "", "Pipedrive Settings", 1 )]
+    [TextField( "Plan Field Token", "Custom field token to populate with Plan", true, "", "Pipedrive Settings", 3 )]
+    [TextField( "Platform Field Token", "Custom field token to populate with Platform", true, "", "Pipedrive Settings", 4 )]
+    [TextField( "Source Field Token", "Custom field token to populate with Source", true, "", "Pipedrive Settings", 5 )]
     [WorkflowAttribute( "Organization Name", "The attribute to use to populate the Organization Name.", true, "", "Field Map", 0 )]
     [WorkflowAttribute( "Person First Name", "The attribute to use to populate the Person First Name.", true, "", "Field Map", 1 )]
     [WorkflowAttribute( "Person Last Name", "The attribute to use to populate the Person Last Name.", true, "", "Field Map", 2 )]
@@ -47,6 +49,9 @@ namespace Rock.Workflow.Action.Pipedrive
     [WorkflowAttribute( "Inquiry", "The attribute to use to populate the initial inquiry.", true, "", "Field Map", 5 )]
     [WorkflowAttribute( "Topic", "The attribute to use to populate the topic.", true, "", "Field Map", 6 )]
     [WorkflowAttribute( "Plan", "The attribute to use to populate the plan.", true, "", "Field Map", 7 )]
+    [WorkflowAttribute( "Product", "The attribute to use to populate the product.", true, "", "Field Map", 8 )]
+    [WorkflowAttribute( "Platform", "The attribute to use to populate the platform.", true, "", "Field Map", 9 )]
+    [WorkflowAttribute( "Source", "The attribute to use to populate the source.", true, "", "Field Map", 10 )]
 
     public class AddDeal : ActionComponent
     {
@@ -69,8 +74,18 @@ namespace Rock.Workflow.Action.Pipedrive
             string personPhone = action.GetWorklowAttributeValue( GetAttributeValue( action, "PersonPhone" ).AsGuidOrNull().Value );
             string inquiry = action.GetWorklowAttributeValue( GetAttributeValue( action, "Inquiry" ).AsGuidOrNull().Value );
             string inquiryFieldToken = GetAttributeValue( action, "InquiryFieldToken" );
+            string topic = action.GetWorklowAttributeValue( GetAttributeValue( action, "Topic" ).AsGuidOrNull().Value );
+            string topicFieldToken = GetAttributeValue( action, "TopicFieldToken" );
+            string plan = action.GetWorklowAttributeValue( GetAttributeValue( action, "Plan" ).AsGuidOrNull().Value );
+            string planFieldToken = GetAttributeValue( action, "PlanFieldToken" );
+            string product = action.GetWorklowAttributeValue( GetAttributeValue( action, "Product" ).AsGuidOrNull().Value );
+            string platformFieldToken = GetAttributeValue( action, "PlatformFieldToken" );
+            string platform = action.GetWorklowAttributeValue( GetAttributeValue( action, "Platform" ).AsGuidOrNull().Value );
+            string sourceFieldToken = GetAttributeValue( action, "SourceFieldToken" );
+            string source = action.GetWorklowAttributeValue( GetAttributeValue( action, "Source" ).AsGuidOrNull().Value );
             string _orgId = "";
             string _personId = "";
+            string _dealId = "";
 
             if ( !string.IsNullOrWhiteSpace( apiToken ) )
             {
@@ -108,19 +123,27 @@ namespace Rock.Workflow.Action.Pipedrive
                 // add deal
                 using ( WebClient dealCall = new WebClient() )
                 {
-                    if ( String.IsNullOrWhiteSpace( inquiryFieldToken ) )
+                    // Topic, Plan, Platform and Inquiry are linked
+                    if ( !String.IsNullOrWhiteSpace( inquiryFieldToken ) && !String.IsNullOrWhiteSpace( topicFieldToken ) && !String.IsNullOrWhiteSpace( planFieldToken ) && !String.IsNullOrWhiteSpace( platformFieldToken ) && !String.IsNullOrWhiteSpace( sourceFieldToken ) )
                     {
                         byte[] response =
                         dealCall.UploadValues( "https://api.pipedrive.com/v1/deals?api_token=" + apiToken, new NameValueCollection()
                             {
                                 { "title", String.Format("{0} Deal",organization) },
                                 { "person_id", _personId },
-                                { "org_id", _orgId }
+                                { "org_id", _orgId },
+                                { inquiryFieldToken, inquiry },
+                                { topicFieldToken, topic },
+                                { planFieldToken, plan },
+                                { platformFieldToken, platform },
+                                { sourceFieldToken, source }
                             } );
 
-                        string result = System.Text.Encoding.UTF8.GetString( response );
+                        JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
+                        _dealId = ( string ) json["data"]["id"];
                     }
-                    else
+                    // Only Inquiry is linked
+                    else if ( !String.IsNullOrWhiteSpace( inquiryFieldToken ) && String.IsNullOrWhiteSpace( topicFieldToken ) && String.IsNullOrWhiteSpace( planFieldToken ) )
                     {
                         byte[] response =
                         dealCall.UploadValues( "https://api.pipedrive.com/v1/deals?api_token=" + apiToken, new NameValueCollection()
@@ -131,7 +154,117 @@ namespace Rock.Workflow.Action.Pipedrive
                                 { inquiryFieldToken, inquiry }
                             } );
 
-                        string result = System.Text.Encoding.UTF8.GetString( response );
+                        JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
+                        _dealId = ( string ) json["data"]["id"];
+                    }
+                    // Only Topic is linked
+                    else if ( String.IsNullOrWhiteSpace( inquiryFieldToken ) && !String.IsNullOrWhiteSpace( topicFieldToken ) && String.IsNullOrWhiteSpace( planFieldToken ) )
+                    {
+                        byte[] response =
+                        dealCall.UploadValues( "https://api.pipedrive.com/v1/deals?api_token=" + apiToken, new NameValueCollection()
+                            {
+                                { "title", String.Format("{0} Deal",organization) },
+                                { "person_id", _personId },
+                                { "org_id", _orgId },
+                                { topicFieldToken, topic }
+                            } );
+
+                        JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
+                        _dealId = ( string ) json["data"]["id"];
+                    }
+                    // Only Plan is linked
+                    else if ( String.IsNullOrWhiteSpace( inquiryFieldToken ) && String.IsNullOrWhiteSpace( topicFieldToken ) && !String.IsNullOrWhiteSpace( planFieldToken ) )
+                    {
+                        byte[] response =
+                        dealCall.UploadValues( "https://api.pipedrive.com/v1/deals?api_token=" + apiToken, new NameValueCollection()
+                            {
+                                { "title", String.Format("{0} Deal",organization) },
+                                { "person_id", _personId },
+                                { "org_id", _orgId },
+                                { planFieldToken, plan }
+                            } );
+
+                        JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
+                        _dealId = ( string ) json["data"]["id"];
+                    }
+                    // Only Inquiry Not Linked
+                    else if ( String.IsNullOrWhiteSpace( inquiryFieldToken ) && !String.IsNullOrWhiteSpace( topicFieldToken ) && !String.IsNullOrWhiteSpace( planFieldToken ) )
+                    {
+                        byte[] response =
+                        dealCall.UploadValues( "https://api.pipedrive.com/v1/deals?api_token=" + apiToken, new NameValueCollection()
+                            {
+                                { "title", String.Format("{0} Deal",organization) },
+                                { "person_id", _personId },
+                                { "org_id", _orgId },
+                                { topicFieldToken, topic },
+                                { planFieldToken, plan }
+                            } );
+
+                        JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
+                        _dealId = ( string ) json["data"]["id"];
+                    }
+                    // Only Topic Not Linked
+                    else if ( !String.IsNullOrWhiteSpace( inquiryFieldToken ) && String.IsNullOrWhiteSpace( topicFieldToken ) && !String.IsNullOrWhiteSpace( planFieldToken ) )
+                    {
+                        byte[] response =
+                        dealCall.UploadValues( "https://api.pipedrive.com/v1/deals?api_token=" + apiToken, new NameValueCollection()
+                            {
+                                { "title", String.Format("{0} Deal",organization) },
+                                { "person_id", _personId },
+                                { "org_id", _orgId },
+                                { inquiryFieldToken, inquiry },
+                                { planFieldToken, plan }
+                            } );
+
+                        JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
+                        _dealId = ( string ) json["data"]["id"];
+                    }
+                    // Only Plan Not Linked
+                    else if ( !String.IsNullOrWhiteSpace( inquiryFieldToken ) && !String.IsNullOrWhiteSpace( topicFieldToken ) && String.IsNullOrWhiteSpace( planFieldToken ) )
+                    {
+                        byte[] response =
+                        dealCall.UploadValues( "https://api.pipedrive.com/v1/deals?api_token=" + apiToken, new NameValueCollection()
+                            {
+                                { "title", String.Format("{0} Deal",organization) },
+                                { "person_id", _personId },
+                                { "org_id", _orgId },
+                                { inquiryFieldToken, inquiry },
+                                { topicFieldToken, topic }
+                            } );
+
+                        JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
+                        _dealId = ( string ) json["data"]["id"];
+                    }
+                    // Nothing is linked, why even show up for Monday?
+                    else
+                    {
+                        byte[] response =
+                        dealCall.UploadValues( "https://api.pipedrive.com/v1/deals?api_token=" + apiToken, new NameValueCollection()
+                            {
+                                { "title", String.Format("{0} Deal",organization) },
+                                { "person_id", _personId },
+                                { "org_id", _orgId }
+                            } );
+
+                        JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
+                        _dealId = ( string ) json["data"]["id"];
+                    }
+                }
+
+                if (!String.IsNullOrWhiteSpace( product ))
+                {
+                    // add products
+                    using ( WebClient productCall = new WebClient() )
+                    {
+
+                        byte[] response =
+                        productCall.UploadValues( "https://api.pipedrive.com/v1/deals/" + _dealId + "/products?api_token=" + apiToken, new NameValueCollection()
+                           {
+                               { "id", _dealId },
+                               { "product_id", product},
+                               { "item_price", "0" },
+                               { "quantity" , "1"},
+                           } );
                     }
                 }
 
