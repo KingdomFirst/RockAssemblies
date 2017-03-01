@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+
+using com.kfs.Reporting.SQLReportingServices.API;
 
 using Rock.Data;
 using Rock.Model;
@@ -13,14 +16,37 @@ namespace com.kfs.Reporting.SQLReportingServices
     public class ReportingServicesClient
     {
         #region Properties
-        public string ServerUrl { get; set; }
+        public string ServerUrl
+        {
+            get
+            {
+                return mServerUrl;
+            }
+            set
+            {
+                Uri result;
+                if ( Uri.TryCreate( value, UriKind.Absolute, out result ) )
+                {
+                    mServerUrl = result.AbsoluteUri;
+                }
+                else
+                {
+                    mServerUrl = null;
+                }
+            }
+        }
+
+
         public string ReportPath { get; set; }
         public string ContentManagerUser { get; set; }
         public string ContentManagerPassword { get; set; }
         public string BrowserUser { get; set; }
         public string BrowserPassword { get; set; }
-        public bool Configured { get; set; }
+        public bool CredentialsStored { get; set; }
+        
 
+
+        private string mServerUrl;
         private Guid ReportingServicesCategoryGuid = new Guid( "BE54A3EB-98F9-4BBE-86FD-A3F503CDADF6" );
         private const string SERVER_URL_KEY = "ReportingServiceURL";
         private const string SERVER_ROOT_PATH_KEY = "ReportingServiceRootPath";
@@ -28,6 +54,8 @@ namespace com.kfs.Reporting.SQLReportingServices
         private const string CONTENT_MANAGER_PWD_KEY = "ReportingServiceContentMangerPwd";
         private const string BROWSER_USER_KEY = "ReportingServiceBrowserUser";
         private const string BROWSER_PWD_KEY = "ReportingServiceBrowserPwd";
+        private ReportingService2010SoapClient rsClient = null;
+        private UserType rsClientUserType = UserType.Browser;
         #endregion
 
         #region Constructors
@@ -40,9 +68,17 @@ namespace com.kfs.Reporting.SQLReportingServices
         #region Public Methods
         public bool SaveCredentials( out string message )
         {
-            if ( !TestConnection( out message ) )
+            if ( !TestConnection( out message, UserType.ContentManager ) )
             {
                 return false;
+            }
+
+            if ( !String.IsNullOrWhiteSpace( BrowserUser ) && !BrowserUser.Equals( ContentManagerUser ) )
+            {
+                if ( !TestConnection( out message, UserType.Browser ) )
+                {
+                    return false;
+                }
             }
 
             using ( RockContext context = new RockContext() )
@@ -69,12 +105,91 @@ namespace com.kfs.Reporting.SQLReportingServices
 
         }
 
-        public bool TestConnection( out string message )
+        public bool TestConnection( out string message, UserType type )
         {
+            bool isSuccessful = false;
             message = string.Empty;
-            return true;
+            try
+            {
+                ReportingService2010SoapClient client = GetClient( UserType.ContentManager );
+  
+                Property[] userProperties = null;
+                var header = client.GetUserSettings( null, null, out userProperties );
 
+                if ( header != null && DateTime.Parse( header.ReportServerDateTime ) > DateTime.MinValue )
+                {
+                    message = "Succesfully connected.";
+                    isSuccessful = true;
+                }
+                else
+                {
+                    message = "Connection Error";
+                }
+
+
+
+            }
+            catch ( Exception ex )
+            {
+                bool caught = false;
+                if ( ex.InnerException != null && ex.InnerException.GetType() == typeof( System.Net.WebException ) )
+                {
+                    System.Net.WebException webEx = ( System.Net.WebException )ex.InnerException;
+                    if ( ( ( System.Net.HttpWebResponse )webEx.Response ).StatusCode == System.Net.HttpStatusCode.Unauthorized )
+                    {
+                        message = "User is not authorized.";
+                        caught = true;
+                    }
+                }
+                if ( !caught )
+                {
+                    message = string.Format( "An error has occurred when Loading Reporting Services. {0}", ex.Message );
+                }
+                isSuccessful = false;
+            }
+
+            return isSuccessful;
         }
+
+        public bool TestDataSource(out string message)
+        {
+            message = String.Empty;
+            string pathEnd = ReportPath.EndsWith("/") ? String.Empty : "/";
+            string dsPath = string.Concat( ReportPath, pathEnd, "DataSources/RockContext" );
+            string itemType = String.Empty;
+            var client = GetClient( UserType.ContentManager );
+
+            client.GetItemType( null, dsPath, out itemType );
+
+            if ( !itemType.Equals( "datasource", StringComparison.InvariantCultureIgnoreCase ) )
+            {
+                message = "Rock Context Data Source not found.";
+                return false;
+            }
+            return true;
+        }
+
+        public bool TestPath()
+        {
+            try
+            {
+                var client = GetClient( UserType.ContentManager );
+                string itemType = String.Empty;
+
+                client.GetItemType( null, ReportPath, out itemType );
+
+                if ( itemType.Equals( "folder", StringComparison.InvariantCultureIgnoreCase ) )
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch ( Exception ex  )
+            {
+                return false;
+            }
+        }
+
         #endregion
 
         #region Private Methods
@@ -89,6 +204,41 @@ namespace com.kfs.Reporting.SQLReportingServices
             BrowserPassword = null;
         }
 
+        private ReportingService2010SoapClient GetClient( UserType ut )
+        {
+
+            if ( rsClient != null && ut == rsClientUserType )
+            {
+                return rsClient;
+            }
+            var binding = new BasicHttpBinding();
+            binding.Name = "ReportingServicesBinding";
+            binding.Security.Mode = BasicHttpSecurityMode.TransportCredentialOnly;
+            binding.Security.Transport.ClientCredentialType = HttpClientCredentialType.Ntlm;
+            binding.Security.Transport.ProxyCredentialType = HttpProxyCredentialType.None;
+            binding.Security.Transport.Realm = "";
+            binding.Security.Message.ClientCredentialType = BasicHttpMessageCredentialType.UserName;
+            binding.Security.Message.AlgorithmSuite = System.ServiceModel.Security.SecurityAlgorithmSuite.Default;
+
+
+            string url = string.Format( "{0}/ReportService2010.asmx", ServerUrl );
+            var endpoint = new EndpointAddress( url );
+
+            rsClient = new ReportingService2010SoapClient( binding, endpoint );
+            rsClient.ClientCredentials.Windows.AllowedImpersonationLevel = System.Security.Principal.TokenImpersonationLevel.Impersonation;
+            if ( ut == UserType.ContentManager )
+            {
+                rsClient.ClientCredentials.Windows.ClientCredential = new System.Net.NetworkCredential( ContentManagerUser, ContentManagerPassword );
+            }
+            else
+            {
+                rsClient.ClientCredentials.Windows.ClientCredential = new System.Net.NetworkCredential( BrowserUser, BrowserPassword );
+            }
+            rsClientUserType = ut;
+            return rsClient;
+
+        }
+
         private void LoadCredentials( RockContext context )
         {
 
@@ -101,6 +251,11 @@ namespace com.kfs.Reporting.SQLReportingServices
             ContentManagerPassword = cache.GetValue( CONTENT_MANAGER_PWD_KEY, context );
             BrowserUser = cache.GetValue( BROWSER_USER_KEY, context );
             BrowserPassword = cache.GetValue( BROWSER_PWD_KEY, context );
+
+            if ( !String.IsNullOrWhiteSpace( ServerUrl ) && !String.IsNullOrWhiteSpace( ReportPath ) && !String.IsNullOrWhiteSpace( BrowserUser ) && !String.IsNullOrWhiteSpace( BrowserPassword ) )
+            {
+                CredentialsStored = true;
+            }
 
         }
 
@@ -174,6 +329,8 @@ namespace com.kfs.Reporting.SQLReportingServices
 
             context.SaveChanges();
         }
+
+
 
         private void VerifyAttributes( RockContext context, int categoryId )
         {
