@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="4ff3481a-a7ee-4903-892b-24efe1dad24d" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="912aaad2-363e-4c4b-bd81-98308be3cc76" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
@@ -22,7 +22,7 @@
     <MetadataSource Address="http://chrisdev1/reportserver/reportservice2010.asmx" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="reportservice2010.wsdl" MetadataType="Wsdl" ID="63ed9572-9cb2-491a-97cc-b0276b8044c8" SourceId="1" SourceUrl="http://chrisdev1/reportserver/reportservice2010.asmx" />
+    <MetadataFile FileName="reportservice2010.wsdl" MetadataType="Wsdl" ID="98657a34-2cd4-4603-98b3-ab9c8a9f6748" SourceId="1" SourceUrl="http://chrisdev1/reportserver/reportservice2010.asmx" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

@@ -13,7 +13,7 @@ using Rock.Web.Cache;
 
 namespace com.kfs.Reporting.SQLReportingServices
 {
-    public class ReportingServicesClient
+    public class ReportingServicesProvider
     {
         #region Properties
         public string ServerUrl
@@ -43,8 +43,7 @@ namespace com.kfs.Reporting.SQLReportingServices
         public string BrowserUser { get; set; }
         public string BrowserPassword { get; set; }
         public bool CredentialsStored { get; set; }
-        
-
+      
 
         private string mServerUrl;
         private Guid ReportingServicesCategoryGuid = new Guid( "BE54A3EB-98F9-4BBE-86FD-A3F503CDADF6" );
@@ -54,18 +53,42 @@ namespace com.kfs.Reporting.SQLReportingServices
         private const string CONTENT_MANAGER_PWD_KEY = "ReportingServiceContentMangerPwd";
         private const string BROWSER_USER_KEY = "ReportingServiceBrowserUser";
         private const string BROWSER_PWD_KEY = "ReportingServiceBrowserPwd";
+
         private ReportingService2010SoapClient rsClient = null;
-        private UserType rsClientUserType = UserType.Browser;
+        private UserType rsUserType;
         #endregion
 
         #region Constructors
-        public ReportingServicesClient()
+        public ReportingServicesProvider()
         {
             LoadCredentials( new RockContext() );
         }
         #endregion
 
         #region Public Methods
+
+
+
+        public Dictionary<string, string> GetPath( string basePath, bool listChildren )
+        {
+            var client = GetClient( UserType.Browser );
+            CatalogItem[] catalogItems;
+
+            if ( basePath == null )
+            {
+                basePath = ReportPath;
+            }
+            else if ( !basePath.StartsWith( ReportPath ) )
+            {
+                basePath = string.Concat( ReportPath, basePath );
+            }
+
+            client.ListChildren( null, basePath, listChildren, out catalogItems );
+
+            return catalogItems.Where( c => c.TypeName == "Report" ).Where( c => !c.Hidden ).ToDictionary( f => f.Path, f => f.Name );
+
+        }
+
         public bool SaveCredentials( out string message )
         {
             if ( !TestConnection( out message, UserType.ContentManager ) )
@@ -190,7 +213,37 @@ namespace com.kfs.Reporting.SQLReportingServices
             }
         }
 
+        public string GetFolderPath( string path )
+        {
+            //Aready includes root path
+            if ( path.StartsWith( ReportPath ) )
+            {
+                return path;
+            }
+
+            // no path provided
+            if ( string.IsNullOrWhiteSpace( path ) )
+            {
+                return ReportPath;
+            }
+
+            string suffix = string.Empty;
+            if ( !ReportPath.EndsWith( "/" ) )
+            {
+                suffix = "/";
+            }
+
+            return string.Concat( ReportPath, suffix, path );
+           
+            
+        }
+
         #endregion
+
+        internal ReportingService2010SoapClient GetAPIClient( UserType userType )
+        {
+            return GetClient( userType );
+        }
 
         #region Private Methods
 
@@ -207,9 +260,13 @@ namespace com.kfs.Reporting.SQLReportingServices
         private ReportingService2010SoapClient GetClient( UserType ut )
         {
 
-            if ( rsClient != null && ut == rsClientUserType )
+            if ( rsClient != null && ut ==  rsUserType)
             {
                 return rsClient;
+            }
+            else
+            {
+                rsClient = null;
             }
             var binding = new BasicHttpBinding();
             binding.Name = "ReportingServicesBinding";
@@ -234,7 +291,7 @@ namespace com.kfs.Reporting.SQLReportingServices
             {
                 rsClient.ClientCredentials.Windows.ClientCredential = new System.Net.NetworkCredential( BrowserUser, BrowserPassword );
             }
-            rsClientUserType = ut;
+            rsUserType = ut;
             return rsClient;
 
         }

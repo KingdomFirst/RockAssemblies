@@ -46,12 +46,19 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
     </Reference>
+    <Reference Include="Rock.Rest">
+      <HintPath>..\..\RockWeb\Bin\Rock.Rest.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\System.Web.Http.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -61,7 +68,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReportingServicesClient.cs" />
+    <Compile Include="ReportingServiceItem.cs" />
+    <Compile Include="ReportingServicesProvider.cs" />
+    <Compile Include="Rest\Controller\ReportingServicesController.cs" />
     <Compile Include="Service References\API\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -75,6 +84,471 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ActiveState.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.CacheRefreshPlan.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.CacheRefreshPlanState.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.CancelJobResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.CatalogItem.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ChangeSubscriptionOwnerResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.CreateCacheRefreshPlanResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.CreateCatalogItemResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.CreateDataDrivenSubscriptionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.CreateDataSourceResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.CreateFolderResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.CreateItemHistorySnapshotResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.CreateLinkedItemResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.CreateReportEditSessionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.CreateRoleResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.CreateScheduleResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.CreateSubscriptionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.DataRetrievalPlan.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.DataSetDefinition.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.DataSource.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.DataSourceDefinition.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.DataSourcePrompt.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.DeleteCacheRefreshPlanResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.DeleteItemHistorySnapshotResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.DeleteItemResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.DeleteRoleResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.DeleteScheduleResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.DeleteSubscriptionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.DisableDataSourceResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.EnableDataSourceResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.Event.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ExpirationDefinition.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.Extension.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ExtensionParameter.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ExtensionSettings.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.FindItemsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.FireEventResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.FlushCacheResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GenerateModelResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetCacheOptionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetCacheRefreshPlanPropertiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetDataDrivenSubscriptionPropertiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetDataSourceContentsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetExecutionOptionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetExtensionSettingsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetItemDataSourcePromptsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetItemDataSourcesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetItemDefinitionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetItemHistoryLimitResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetItemHistoryOptionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetItemLinkResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetItemParametersResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetItemReferencesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetItemTypeResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetModelItemPermissionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetModelItemPoliciesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetPermissionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetPoliciesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetPropertiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetReportServerConfigInfoResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetRolePropertiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetSchedulePropertiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetSubscriptionPropertiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetSystemPermissionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetSystemPoliciesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetSystemPropertiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetUserModelResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.InheritModelItemParentSecurityResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.InheritParentSecurityResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.IsSSLRequiredResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ItemHistorySnapshot.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ItemParameter.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ItemReferenceData.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.Job.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListCacheRefreshPlansResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListChildrenResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListDatabaseCredentialRetrievalOptionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListDependentItemsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListEventsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListExecutionSettingsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListExtensionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListExtensionTypesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListItemHistoryResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListItemTypesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListJobActionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListJobsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListJobStatesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListJobTypesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListModelDrillthroughReportsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListModelItemChildrenResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListModelItemTypesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListModelPerspectivesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListMySubscriptionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListParameterStatesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListParameterTypesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListParentsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListRolesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListScheduledItemsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListSchedulesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListScheduleStatesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListSecurityScopesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListSubscriptionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListSubscriptionsUsingDataSourceResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ListTasksResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.LogoffResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.LogonUserResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ModelCatalogItem.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ModelDrillthroughReport.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ModelItem.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.MoveItemResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ParameterValue.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ParameterValueOrFieldReference.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.PauseScheduleResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.Policy.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.PrepareQueryResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.Property.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.RegenerateModelResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.RemoveAllModelItemPoliciesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ResumeScheduleResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.Role.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.Schedule.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ScheduleDefinitionOrReference.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ServerInfoHeader.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetCacheOptionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetCacheRefreshPlanPropertiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetDataDrivenSubscriptionPropertiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetDataSourceContentsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetExecutionOptionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetItemDataSourcesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetItemDefinitionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetItemHistoryLimitResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetItemHistoryOptionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetItemLinkResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetItemParametersResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetItemReferencesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetModelDrillthroughReportsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetModelItemPoliciesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetPoliciesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetPropertiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetRolePropertiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetSchedulePropertiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetSubscriptionPropertiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetSystemPoliciesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetSystemPropertiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.Subscription.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.Task.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.TestConnectForDataSourceDefinitionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.TestConnectForItemDataSourceResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.UpdateItemExecutionSnapshotResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.ValidateExtensionSettingsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.Warning.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\API\reportservice2010.wsdl" />
   </ItemGroup>
   <ItemGroup>
