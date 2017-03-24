@@ -14,7 +14,7 @@ namespace com.kfs.ShelbyBatchExport.Migrations
         /// <summary>
         /// The commands to run to migrate plugin to the specific version
         /// </summary>
-        public override void Up( )
+        public override void Up()
         {
             // block and page
             RockMigrationHelper.AddBlockType( "Shelby GL Export", "Lists all financial batches and provides Shelby GL Export capability", "~/Plugins/com_kfs/Finance/ShelbyGLExport.ascx", "KFS > Finance", "1F50D804-67A0-4348-8DBB-7C1B46280025" );
@@ -34,7 +34,7 @@ namespace com.kfs.ShelbyBatchExport.Migrations
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialTransaction", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Transaction Project", "", "Designates the Project at the Transaction Level", 0, "", "365134A6-D516-48E0-AC67-A011D5D59D99", "Project" );
             RockMigrationHelper.AddAttributeQualifier( "365134A6-D516-48E0-AC67-A011D5D59D99", "allowmultiple", "False", "B2205A7A-E11A-426C-9EF1-34CCD96F5047" );
             RockMigrationHelper.AddAttributeQualifier( "365134A6-D516-48E0-AC67-A011D5D59D99", "definedtype", "", "E88DAEFC-BEAE-43CE-8A0E-DF96AFB95FC7" );
-            
+
             // transaction detail project
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialTransactionDetail", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Transaction Detail Project", "", "Designates the Project at the Transaction Detail Level", 0, "", "951FAFFD-0513-4E31-9271-87853469E85E", "Project" );
             RockMigrationHelper.AddAttributeQualifier( "951FAFFD-0513-4E31-9271-87853469E85E", "allowmultiple", "False", "BA61B518-C7B7-4F33-8E23-8D2109DA49CB" );
@@ -73,7 +73,7 @@ namespace com.kfs.ShelbyBatchExport.Migrations
         /// <summary>
         /// The commands to undo a migration from a specific version
         /// </summary>
-        public override void Down( )
+        public override void Down()
         {
             //
             // remove block, page, and block type

@@ -14,7 +14,7 @@ namespace com.kfs.ShelbyBatchExport.Migrations
         /// <summary>
         /// The commands to run to migrate plugin to the specific version
         /// </summary>
-        public override void Up( )
+        public override void Up()
         {
             // block and page
             RockMigrationHelper.AddPage( Rock.SystemGuid.Page.ADMINISTRATION_FINANCE, "D65F783D-87A9-4CC9-8110-E83466A0EADB", "Projects", "", "01DAC445-9C4A-4469-9F39-A39549D75CBF", "fa fa-clipboard", "2B630A3B-E081-4204-A3E4-17BB3A5F063D" );
@@ -25,7 +25,7 @@ namespace com.kfs.ShelbyBatchExport.Migrations
         /// <summary>
         /// The commands to undo a migration from a specific version
         /// </summary>
-        public override void Down( )
+        public override void Down()
         {
             //
             // remove block and page
