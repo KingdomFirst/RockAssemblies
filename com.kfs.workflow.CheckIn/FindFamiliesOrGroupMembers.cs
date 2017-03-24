@@ -142,7 +142,7 @@ namespace Rock.Workflow.Action.CheckIn
                 else if ( checkInState.CheckIn.SearchType.Value.Equals( "Group" ) )
                 {
                     foreach ( var member in memberService.GetByGroupId( checkInState.CheckIn.SearchValue.AsInteger() ) )
-                        {
+                    {
                         foreach ( var group in member.Person.Members.Where( m => m.Group.GroupType.Guid.Equals( familyGroupTypeGuid ) ).Select( m => m.Group ).ToList() )
                         {
                             var family = checkInState.CheckIn.Families.Where( f => f.Group.Id == group.Id ).FirstOrDefault();

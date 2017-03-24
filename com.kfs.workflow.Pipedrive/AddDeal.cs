@@ -86,7 +86,7 @@ namespace com.kfs.Workflow.Action.Pipedrive
                            } );
 
                     JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                    _orgId = ( string )json["data"]["id"];
+                    _orgId = (string)json["data"]["id"];
                 }
 
                 // add person
@@ -103,7 +103,7 @@ namespace com.kfs.Workflow.Action.Pipedrive
                            } );
 
                     JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                    _personId = ( string )json["data"]["id"];
+                    _personId = (string)json["data"]["id"];
                 }
 
                 // add deal
@@ -126,7 +126,7 @@ namespace com.kfs.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                     // Only Inquiry is linked
                     else if ( !String.IsNullOrWhiteSpace( inquiryFieldToken ) && String.IsNullOrWhiteSpace( topicFieldToken ) && String.IsNullOrWhiteSpace( planFieldToken ) )
@@ -141,7 +141,7 @@ namespace com.kfs.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                     // Only Topic is linked
                     else if ( String.IsNullOrWhiteSpace( inquiryFieldToken ) && !String.IsNullOrWhiteSpace( topicFieldToken ) && String.IsNullOrWhiteSpace( planFieldToken ) )
@@ -156,7 +156,7 @@ namespace com.kfs.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                     // Only Plan is linked
                     else if ( String.IsNullOrWhiteSpace( inquiryFieldToken ) && String.IsNullOrWhiteSpace( topicFieldToken ) && !String.IsNullOrWhiteSpace( planFieldToken ) )
@@ -171,7 +171,7 @@ namespace com.kfs.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                     // Only Inquiry Not Linked
                     else if ( String.IsNullOrWhiteSpace( inquiryFieldToken ) && !String.IsNullOrWhiteSpace( topicFieldToken ) && !String.IsNullOrWhiteSpace( planFieldToken ) )
@@ -187,7 +187,7 @@ namespace com.kfs.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                     // Only Topic Not Linked
                     else if ( !String.IsNullOrWhiteSpace( inquiryFieldToken ) && String.IsNullOrWhiteSpace( topicFieldToken ) && !String.IsNullOrWhiteSpace( planFieldToken ) )
@@ -203,7 +203,7 @@ namespace com.kfs.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                     // Only Plan Not Linked
                     else if ( !String.IsNullOrWhiteSpace( inquiryFieldToken ) && !String.IsNullOrWhiteSpace( topicFieldToken ) && String.IsNullOrWhiteSpace( planFieldToken ) )
@@ -219,7 +219,7 @@ namespace com.kfs.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                     // Nothing is linked, why even show up for Monday?
                     else
@@ -233,11 +233,11 @@ namespace com.kfs.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                 }
 
-                if (!String.IsNullOrWhiteSpace( product ))
+                if ( !String.IsNullOrWhiteSpace( product ) )
                 {
                     // add products
                     using ( WebClient productCall = new WebClient() )
