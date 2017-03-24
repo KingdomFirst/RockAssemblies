@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("com.kingdomfirstsolutions.workflow_checkin")]
+[assembly: AssemblyTitle( "KFS CheckIn Workflow Actions" )]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("com.kingdomfirstsolutions.workflow_checkin")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyProduct( "KFS CheckIn Workflow Actions" )]
+[assembly: AssemblyCopyright( "Copyright ©  2017" )]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
