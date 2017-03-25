@@ -68,6 +68,69 @@ namespace com.kfs.ShelbyBatchExport.Migrations
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Bank Account", "", "", 3, "", "FD4EF8CC-DDB7-4DBD-9FD1-601A0119850B", "GeneralLedgerExport_BankAccount" );
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Revenue Department", "", "", 4, "", "2C1EE0CC-D329-453B-B4F0-29549E24ED05", "GeneralLedgerExport_RevenueDepartment" );
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Revenue Account", "", "", 5, "", "0D114FB9-B1AA-4D6D-B0F3-9BB739710992", "GeneralLedgerExport_RevenueAccount" );
+
+            RockMigrationHelper.UpdateCategory( "5997C8D3-8840-4591-99A5-552919F90CBD", "GL Export", "fa fa-calculator", "", "C19D547F-CD02-45C1-9962-FA1DBCEC2897" ); // batch
+            RockMigrationHelper.UpdateCategory( "5997C8D3-8840-4591-99A5-552919F90CBD", "GL Export", "fa fa-calculator", "", "DD221639-4EFF-4C16-9E7B-BE318E9E9F55" ); // transaction
+            RockMigrationHelper.UpdateCategory( "5997C8D3-8840-4591-99A5-552919F90CBD", "GL Export", "fa fa-calculator", "", "B097F23D-00D2-4216-916F-DA14335DA9CE" ); // transaction detail
+            RockMigrationHelper.UpdateCategory( "5997C8D3-8840-4591-99A5-552919F90CBD", "GL Export", "fa fa-calculator", "", "F8893830-B331-4C9F-AA4C-470F0C9B0D18" ); // account
+
+            Sql( @"
+                DECLARE @BatchEntityTypeId int = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Guid] = 'BDD09C8E-2C52-4D08-9062-BE7D52D190C2' )
+                DECLARE @BatchCategoryId int = ( SELECT TOP 1 [Id] FROM [Category] WHERE [Guid] = 'C19D547F-CD02-45C1-9962-FA1DBCEC2897' )
+
+                UPDATE [Category]
+                SET [EntityTypeQualifierColumn] = 'EntityTypeId',  [EntityTypeQualifierValue] = @BatchEntityTypeId
+                WHERE [Id] = @BatchCategoryId
+                
+                INSERT INTO [AttributeCategory]
+                SELECT [Id], @BatchCategoryId
+                FROM [Attribute]
+                WHERE [Guid] = '4B6576DD-82F6-419F-8DF0-467D2636822D'
+
+
+                DECLARE @TransactionEntityTypeId int = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Guid] = '2C1CB26B-AB22-42D0-8164-AEDEE0DAE667' )
+                DECLARE @TransactionCategoryId int = ( SELECT TOP 1 [Id] FROM [Category] WHERE [Guid] = 'DD221639-4EFF-4C16-9E7B-BE318E9E9F55' )
+
+                UPDATE [Category]
+                SET [EntityTypeQualifierColumn] = 'EntityTypeId',  [EntityTypeQualifierValue] = @TransactionEntityTypeId
+                WHERE [Id] = @TransactionCategoryId
+                
+                INSERT INTO [AttributeCategory]
+                SELECT [Id], @TransactionCategoryId
+                FROM [Attribute]
+                WHERE [Guid] = '365134A6-D516-48E0-AC67-A011D5D59D99'
+
+
+                DECLARE @TransactionDetailEntityTypeId int = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Guid] = 'AC4AC28B-8E7E-4D7E-85DB-DFFB4F3ADCCE' )
+                DECLARE @TransactionDetailCategoryId int = ( SELECT TOP 1 [Id] FROM [Category] WHERE [Guid] = 'B097F23D-00D2-4216-916F-DA14335DA9CE' )
+
+                UPDATE [Category]
+                SET [EntityTypeQualifierColumn] = 'EntityTypeId',  [EntityTypeQualifierValue] = @TransactionDetailEntityTypeId
+                WHERE [Id] = @TransactionDetailCategoryId
+
+                INSERT INTO [AttributeCategory]
+                SELECT [Id], @TransactionDetailCategoryId
+                FROM [Attribute]
+                WHERE [Guid] = '951FAFFD-0513-4E31-9271-87853469E85E'
+
+                
+                DECLARE @AccountEntityTypeId int = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Guid] = '798BCE48-6AA7-4983-9214-F9BCEFB4521D' )
+                DECLARE @AccountCategoryId int = ( SELECT TOP 1 [Id] FROM [Category] WHERE [Guid] = 'F8893830-B331-4C9F-AA4C-470F0C9B0D18' )
+
+                UPDATE [Category]
+                SET [EntityTypeQualifierColumn] = 'EntityTypeId',  [EntityTypeQualifierValue] = @AccountEntityTypeId
+                WHERE [Id] = @AccountCategoryId
+
+                INSERT INTO [AttributeCategory]
+                SELECT [Id], @AccountCategoryId
+                FROM [Attribute]
+                WHERE [Guid] = '85422EA2-AC4E-44E5-99B9-30C131116734'
+                   OR [Guid] = 'A211D2C9-249D-4D33-B120-A3EAB37C1EDF'
+                   OR [Guid] = 'B83D7934-F85A-42B7-AD0E-B4E16D63C189'
+                   OR [Guid] = 'FD4EF8CC-DDB7-4DBD-9FD1-601A0119850B'
+                   OR [Guid] = '2C1EE0CC-D329-453B-B4F0-29549E24ED05'
+                   OR [Guid] = '0D114FB9-B1AA-4D6D-B0F3-9BB739710992'
+            " );
         }
 
         /// <summary>
