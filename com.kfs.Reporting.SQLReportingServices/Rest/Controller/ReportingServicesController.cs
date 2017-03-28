@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Http;
-
+using Rock.Rest.Filters;
 
 namespace com.kfs.Reporting.SQLReportingServices.Rest.Controller
 {
@@ -16,6 +16,7 @@ namespace com.kfs.Reporting.SQLReportingServices.Rest.Controller
         public ReportingServicesController() { }
 
         [HttpGet]
+        [Authenticate, Secured]
         [Route( "api/com.kfs/ReportingServices/GetFolderList" )]
         public ReportingServiceItem GetFolderTree()
         {
@@ -23,6 +24,7 @@ namespace com.kfs.Reporting.SQLReportingServices.Rest.Controller
         }
 
         [HttpGet]
+        [Authenticate, Secured]
         [Route( "api/com.kfs/ReportingServices/GetFolderList" )]
         public ReportingServiceItem GetFolderTree( string rootPath, bool getChildren, bool includeHidden )
         {
@@ -30,6 +32,7 @@ namespace com.kfs.Reporting.SQLReportingServices.Rest.Controller
         }
 
         [HttpGet]
+        [Authenticate, Secured]
         [Route( "api/com.kfs/ReportingServices/GetReportTree" )]
         public ReportingServiceItem GetReportTree()
         {
@@ -37,6 +40,7 @@ namespace com.kfs.Reporting.SQLReportingServices.Rest.Controller
         }
 
         [HttpGet]
+        [Authenticate, Secured]
         [Route( "api/com.kfs/ReportingServices/GetReportTree" )]
         public ReportingServiceItem GetReportTree( string rootPath, bool getChildren, bool includeHidden )
         {
