@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Migrations\001_CreateShelbyGLAssets.cs" />
+    <Compile Include="Migrations\003_BatchExportDetailsBlock.cs" />
     <Compile Include="Migrations\002_ProjectsPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
