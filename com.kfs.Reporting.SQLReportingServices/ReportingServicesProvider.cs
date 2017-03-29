@@ -215,6 +215,10 @@ namespace com.kfs.Reporting.SQLReportingServices
 
         public string GetFolderPath( string path )
         {
+            if ( path.EndsWith( "/" ) )
+            {
+                path = path.Substring( 0, path.Length - 1 );
+            }
             //Aready includes root path
             if ( path.StartsWith( ReportPath ) )
             {
@@ -227,13 +231,8 @@ namespace com.kfs.Reporting.SQLReportingServices
                 return ReportPath;
             }
 
-            string suffix = string.Empty;
-            if ( !ReportPath.EndsWith( "/" ) )
-            {
-                suffix = "/";
-            }
 
-            return string.Concat( ReportPath, suffix, path );
+            return string.Concat( ReportPath, path );
            
             
         }
