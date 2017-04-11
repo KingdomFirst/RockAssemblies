@@ -67,7 +67,10 @@ namespace com.kfs.Reporting.SQLReportingServices
 
         #region Public Methods
 
-
+        public ReportingServicesCredentials GetBrowserCredentials()
+        {
+            return new ReportingServicesCredentials( BrowserUser, BrowserPassword );
+        }
 
         public Dictionary<string, string> GetPath( string basePath, bool listChildren )
         {
@@ -88,6 +91,8 @@ namespace com.kfs.Reporting.SQLReportingServices
             return catalogItems.Where( c => c.TypeName == "Report" ).Where( c => !c.Hidden ).ToDictionary( f => f.Path, f => f.Name );
 
         }
+
+
 
         public bool SaveCredentials( out string message )
         {
