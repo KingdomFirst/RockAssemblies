@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using com.kfs.Reporting.SQLReportingServices.API;
 
 namespace com.kfs.Reporting.SQLReportingServices
 {
@@ -115,6 +116,39 @@ namespace com.kfs.Reporting.SQLReportingServices
 
         }
 
+        public static List<string> GetReportParameterList( string reportPath )
+        {
+            return GetReportParameterList( new ReportingServicesProvider(), reportPath );
+        }
+
+        public static List<string> GetReportParameterList( ReportingServicesProvider provider, string reportPath )
+        {
+            var client = provider.GetAPIClient( UserType.Browser );
+            ItemParameter[] reportParams = null;
+            client.GetItemParameters( null, reportPath, null, true, null, null, out reportParams );
+
+            var paramNames = new List<string>();
+            foreach ( var p in reportParams )
+            {
+                paramNames.Add( p.Name );
+            }
+
+            return paramNames;
+
+        }
+
+        public static ReportingServiceItem GetItemByPath( string path )
+        {
+            ReportingServicesProvider provider = new ReportingServicesProvider();
+            path = provider.GetFolderPath( path );
+
+
+            ReportingServiceItem rsItem = GetItemsFlat( provider.ReportPath, true, true )
+                .Where( i => i.Path.Equals( path, StringComparison.InvariantCultureIgnoreCase ) )
+                .FirstOrDefault();
+            return rsItem;
+        }
+
         private static List<ReportingServiceItem> LoadChildren( List<ReportingServiceItem> rawItems, string parentPath )
         {
             List<ReportingServiceItem> items = new List<ReportingServiceItem>();
@@ -144,6 +178,7 @@ namespace com.kfs.Reporting.SQLReportingServices
             
             
         }
+
     }
 
 

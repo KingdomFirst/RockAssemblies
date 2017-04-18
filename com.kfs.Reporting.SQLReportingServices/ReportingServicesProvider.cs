@@ -133,6 +133,7 @@ namespace com.kfs.Reporting.SQLReportingServices
 
         }
 
+
         public bool TestConnection( out string message, UserType type )
         {
             bool isSuccessful = false;
