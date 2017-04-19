@@ -100,8 +100,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attribute\ReportingServicesFolderAttribute.cs" />
-    <Compile Include="Field\Type\ReportItemFieldType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportingServiceItem.cs" />
     <Compile Include="ReportingServicesCredentials.cs" />
