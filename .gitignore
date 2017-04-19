@@ -24,3 +24,7 @@
 # Jobs Debug Files #
 ####################
 **/[Dd]ebug/*
+
+# Reporting Sevices Files #
+###########################
+**/SqlServerTypes/*
