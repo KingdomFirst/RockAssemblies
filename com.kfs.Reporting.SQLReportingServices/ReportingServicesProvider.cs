@@ -455,7 +455,7 @@ namespace com.kfs.Reporting.SQLReportingServices
             if ( contentManagerPwd == null )
             {
                 contentManagerPwd = new Rock.Model.Attribute();
-                contentManagerPwd.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.ENCRYPTED_TEXT ).Id;
+                contentManagerPwd.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.TEXT ).Id;
                 contentManagerPwd.Name = "Reporting Service - Content Manager Password";
                 contentManagerPwd.Key = CONTENT_MANAGER_PWD_KEY;
                 contentManagerPwd.Description = "The Content Manager Password.";
@@ -486,7 +486,7 @@ namespace com.kfs.Reporting.SQLReportingServices
             if ( browserPwd == null )
             {
                 browserPwd = new Rock.Model.Attribute();
-                browserPwd.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.ENCRYPTED_TEXT ).Id;
+                browserPwd.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.TEXT ).Id;
                 browserPwd.Name = "Reporting Service - Browser Password";
                 browserPwd.Key = BROWSER_PWD_KEY;
                 browserPwd.Description = "The Reporting Server Browser Password.";
