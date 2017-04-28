@@ -19,10 +19,10 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="http://chrisdev1/reportserver/reportservice2010.asmx" Protocol="http" SourceId="1" />
+    <MetadataSource Address="http://rockdev1/reportserver/reportservice2010.asmx" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="reportservice2010.wsdl" MetadataType="Wsdl" ID="98657a34-2cd4-4603-98b3-ab9c8a9f6748" SourceId="1" SourceUrl="http://chrisdev1/reportserver/reportservice2010.asmx" />
+    <MetadataFile FileName="reportservice20101.wsdl" MetadataType="Wsdl" ID="0aee42e7-f98c-4448-ac2b-73de801c6b09" SourceId="1" SourceUrl="http://rockdev1/reportserver/reportservice2010.asmx" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

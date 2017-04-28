@@ -323,34 +323,6 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
             "rivenSubscriptionProperties", ReplyAction="*")]
         System.Threading.Tasks.Task<com.kfs.Reporting.SQLReportingServices.API.GetDataDrivenSubscriptionPropertiesResponse> GetDataDrivenSubscriptionPropertiesAsync(com.kfs.Reporting.SQLReportingServices.API.GetDataDrivenSubscriptionPropertiesRequest request);
         
-        // CODEGEN: Generating message contract since message DisableSubscriptionRequest has headers
-        [System.ServiceModel.OperationContractAttribute(Action="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/DisableS" +
-            "ubscription", ReplyAction="*")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ExpirationDefinition))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RecurrencePattern))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ScheduleDefinitionOrReference))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(DataSourceDefinitionOrReference))]
-        com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionResponse DisableSubscription(com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/DisableS" +
-            "ubscription", ReplyAction="*")]
-        System.Threading.Tasks.Task<com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionResponse> DisableSubscriptionAsync(com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionRequest request);
-        
-        // CODEGEN: Generating message contract since message EnableSubscriptionRequest has headers
-        [System.ServiceModel.OperationContractAttribute(Action="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/EnableSu" +
-            "bscription", ReplyAction="*")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ExpirationDefinition))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RecurrencePattern))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ScheduleDefinitionOrReference))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(DataSourceDefinitionOrReference))]
-        com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionResponse EnableSubscription(com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/EnableSu" +
-            "bscription", ReplyAction="*")]
-        System.Threading.Tasks.Task<com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionResponse> EnableSubscriptionAsync(com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionRequest request);
-        
         // CODEGEN: Generating message contract since message DeleteSubscriptionRequest has headers
         [System.ServiceModel.OperationContractAttribute(Action="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/DeleteSu" +
             "bscription", ReplyAction="*")]
@@ -1415,34 +1387,6 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
             "mProperties", ReplyAction="*")]
         System.Threading.Tasks.Task<com.kfs.Reporting.SQLReportingServices.API.GetSystemPropertiesResponse> GetSystemPropertiesAsync(com.kfs.Reporting.SQLReportingServices.API.GetSystemPropertiesRequest request);
         
-        // CODEGEN: Generating message contract since message SetUserSettingsRequest has headers
-        [System.ServiceModel.OperationContractAttribute(Action="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/SetUserS" +
-            "ettings", ReplyAction="*")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ExpirationDefinition))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RecurrencePattern))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ScheduleDefinitionOrReference))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(DataSourceDefinitionOrReference))]
-        com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsResponse SetUserSettings(com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/SetUserS" +
-            "ettings", ReplyAction="*")]
-        System.Threading.Tasks.Task<com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsResponse> SetUserSettingsAsync(com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsRequest request);
-        
-        // CODEGEN: Generating message contract since message GetUserSettingsRequest has headers
-        [System.ServiceModel.OperationContractAttribute(Action="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/GetUserS" +
-            "ettings", ReplyAction="*")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ExpirationDefinition))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RecurrencePattern))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ScheduleDefinitionOrReference))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(DataSourceDefinitionOrReference))]
-        com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsResponse GetUserSettings(com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/GetUserS" +
-            "ettings", ReplyAction="*")]
-        System.Threading.Tasks.Task<com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsResponse> GetUserSettingsAsync(com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsRequest request);
-        
         // CODEGEN: Generating message contract since message SetSystemPoliciesRequest has headers
         [System.ServiceModel.OperationContractAttribute(Action="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/SetSyste" +
             "mPolicies", ReplyAction="*")]
@@ -2415,11 +2359,11 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
     }
     
     /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(MinuteRecurrence))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(DailyRecurrence))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(WeeklyRecurrence))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(MonthlyRecurrence))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(MonthlyDOWRecurrence))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(MinuteRecurrence))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(DailyRecurrence))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2433,6 +2377,29 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
             System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
             if ((propertyChanged != null)) {
                 propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer")]
+    public partial class MinuteRecurrence : RecurrencePattern {
+        
+        private int minutesIntervalField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public int MinutesInterval {
+            get {
+                return this.minutesIntervalField;
+            }
+            set {
+                this.minutesIntervalField = value;
+                this.RaisePropertyChanged("MinutesInterval");
             }
         }
     }
@@ -2915,31 +2882,8 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer")]
-    public partial class MinuteRecurrence : RecurrencePattern {
-        
-        private int minutesIntervalField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public int MinutesInterval {
-            get {
-                return this.minutesIntervalField;
-            }
-            set {
-                this.minutesIntervalField = value;
-                this.RaisePropertyChanged("MinutesInterval");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(NoSchedule))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ScheduleReference))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(NoSchedule))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ScheduleDefinition))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
     [System.SerializableAttribute()]
@@ -2956,15 +2900,6 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
                 propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
             }
         }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer")]
-    public partial class NoSchedule : ScheduleDefinitionOrReference {
     }
     
     /// <remarks/>
@@ -3002,6 +2937,15 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
                 this.RaisePropertyChanged("Definition");
             }
         }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer")]
+    public partial class NoSchedule : ScheduleDefinitionOrReference {
     }
     
     /// <remarks/>
@@ -4371,8 +4315,8 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(DataSourceReference))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(InvalidDataSourceReference))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(DataSourceReference))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(DataSourceDefinition))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
     [System.SerializableAttribute()]
@@ -4397,6 +4341,15 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer")]
+    public partial class InvalidDataSourceReference : DataSourceDefinitionOrReference {
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer")]
     public partial class DataSourceReference : DataSourceDefinitionOrReference {
         
         private string referenceField;
@@ -4412,15 +4365,6 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
                 this.RaisePropertyChanged("Reference");
             }
         }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer")]
-    public partial class InvalidDataSourceReference : DataSourceDefinitionOrReference {
     }
     
     /// <remarks/>
@@ -4737,8 +4681,8 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParameterValue))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParameterFieldReference))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParameterValue))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4834,10 +4778,6 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
         private bool unknownReportParameterField;
         
         private bool unknownReportParameterFieldSpecified;
-        
-        private bool disabledByUserField;
-        
-        private bool disabledByUserFieldSpecified;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
@@ -4956,30 +4896,6 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
             set {
                 this.unknownReportParameterFieldSpecified = value;
                 this.RaisePropertyChanged("UnknownReportParameterSpecified");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=5)]
-        public bool DisabledByUser {
-            get {
-                return this.disabledByUserField;
-            }
-            set {
-                this.disabledByUserField = value;
-                this.RaisePropertyChanged("DisabledByUser");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool DisabledByUserSpecified {
-            get {
-                return this.disabledByUserFieldSpecified;
-            }
-            set {
-                this.disabledByUserFieldSpecified = value;
-                this.RaisePropertyChanged("DisabledByUserSpecified");
             }
         }
         
@@ -7634,82 +7550,6 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
             this.EventType = EventType;
             this.MatchData = MatchData;
             this.Parameters = Parameters;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="DisableSubscription", WrapperNamespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer", IsWrapped=true)]
-    public partial class DisableSubscriptionRequest {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer")]
-        public com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer", Order=0)]
-        public string SubscriptionID;
-        
-        public DisableSubscriptionRequest() {
-        }
-        
-        public DisableSubscriptionRequest(com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader, string SubscriptionID) {
-            this.TrustedUserHeader = TrustedUserHeader;
-            this.SubscriptionID = SubscriptionID;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="DisableSubscriptionResponse", WrapperNamespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer", IsWrapped=true)]
-    public partial class DisableSubscriptionResponse {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer")]
-        public com.kfs.Reporting.SQLReportingServices.API.ServerInfoHeader ServerInfoHeader;
-        
-        public DisableSubscriptionResponse() {
-        }
-        
-        public DisableSubscriptionResponse(com.kfs.Reporting.SQLReportingServices.API.ServerInfoHeader ServerInfoHeader) {
-            this.ServerInfoHeader = ServerInfoHeader;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="EnableSubscription", WrapperNamespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer", IsWrapped=true)]
-    public partial class EnableSubscriptionRequest {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer")]
-        public com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer", Order=0)]
-        public string SubscriptionID;
-        
-        public EnableSubscriptionRequest() {
-        }
-        
-        public EnableSubscriptionRequest(com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader, string SubscriptionID) {
-            this.TrustedUserHeader = TrustedUserHeader;
-            this.SubscriptionID = SubscriptionID;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="EnableSubscriptionResponse", WrapperNamespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer", IsWrapped=true)]
-    public partial class EnableSubscriptionResponse {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer")]
-        public com.kfs.Reporting.SQLReportingServices.API.ServerInfoHeader ServerInfoHeader;
-        
-        public EnableSubscriptionResponse() {
-        }
-        
-        public EnableSubscriptionResponse(com.kfs.Reporting.SQLReportingServices.API.ServerInfoHeader ServerInfoHeader) {
-            this.ServerInfoHeader = ServerInfoHeader;
         }
     }
     
@@ -11108,86 +10948,6 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="SetUserSettings", WrapperNamespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer", IsWrapped=true)]
-    public partial class SetUserSettingsRequest {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer")]
-        public com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer", Order=0)]
-        public com.kfs.Reporting.SQLReportingServices.API.Property[] Properties;
-        
-        public SetUserSettingsRequest() {
-        }
-        
-        public SetUserSettingsRequest(com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader, com.kfs.Reporting.SQLReportingServices.API.Property[] Properties) {
-            this.TrustedUserHeader = TrustedUserHeader;
-            this.Properties = Properties;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="SetUserSettingsResponse", WrapperNamespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer", IsWrapped=true)]
-    public partial class SetUserSettingsResponse {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer")]
-        public com.kfs.Reporting.SQLReportingServices.API.ServerInfoHeader ServerInfoHeader;
-        
-        public SetUserSettingsResponse() {
-        }
-        
-        public SetUserSettingsResponse(com.kfs.Reporting.SQLReportingServices.API.ServerInfoHeader ServerInfoHeader) {
-            this.ServerInfoHeader = ServerInfoHeader;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="GetUserSettings", WrapperNamespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer", IsWrapped=true)]
-    public partial class GetUserSettingsRequest {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer")]
-        public com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer", Order=0)]
-        public com.kfs.Reporting.SQLReportingServices.API.Property[] Properties;
-        
-        public GetUserSettingsRequest() {
-        }
-        
-        public GetUserSettingsRequest(com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader, com.kfs.Reporting.SQLReportingServices.API.Property[] Properties) {
-            this.TrustedUserHeader = TrustedUserHeader;
-            this.Properties = Properties;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="GetUserSettingsResponse", WrapperNamespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer", IsWrapped=true)]
-    public partial class GetUserSettingsResponse {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer")]
-        public com.kfs.Reporting.SQLReportingServices.API.ServerInfoHeader ServerInfoHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer", Order=0)]
-        public com.kfs.Reporting.SQLReportingServices.API.Property[] Values;
-        
-        public GetUserSettingsResponse() {
-        }
-        
-        public GetUserSettingsResponse(com.kfs.Reporting.SQLReportingServices.API.ServerInfoHeader ServerInfoHeader, com.kfs.Reporting.SQLReportingServices.API.Property[] Values) {
-            this.ServerInfoHeader = ServerInfoHeader;
-            this.Values = Values;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(WrapperName="SetSystemPolicies", WrapperNamespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer", IsWrapped=true)]
     public partial class SetSystemPoliciesRequest {
         
@@ -12706,56 +12466,6 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
         
         public System.Threading.Tasks.Task<com.kfs.Reporting.SQLReportingServices.API.GetDataDrivenSubscriptionPropertiesResponse> GetDataDrivenSubscriptionPropertiesAsync(com.kfs.Reporting.SQLReportingServices.API.GetDataDrivenSubscriptionPropertiesRequest request) {
             return base.Channel.GetDataDrivenSubscriptionPropertiesAsync(request);
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionResponse com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap.DisableSubscription(com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionRequest request) {
-            return base.Channel.DisableSubscription(request);
-        }
-        
-        public com.kfs.Reporting.SQLReportingServices.API.ServerInfoHeader DisableSubscription(com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader, string SubscriptionID) {
-            com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionRequest inValue = new com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionRequest();
-            inValue.TrustedUserHeader = TrustedUserHeader;
-            inValue.SubscriptionID = SubscriptionID;
-            com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionResponse retVal = ((com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap)(this)).DisableSubscription(inValue);
-            return retVal.ServerInfoHeader;
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionResponse> com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap.DisableSubscriptionAsync(com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionRequest request) {
-            return base.Channel.DisableSubscriptionAsync(request);
-        }
-        
-        public System.Threading.Tasks.Task<com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionResponse> DisableSubscriptionAsync(com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader, string SubscriptionID) {
-            com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionRequest inValue = new com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionRequest();
-            inValue.TrustedUserHeader = TrustedUserHeader;
-            inValue.SubscriptionID = SubscriptionID;
-            return ((com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap)(this)).DisableSubscriptionAsync(inValue);
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionResponse com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap.EnableSubscription(com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionRequest request) {
-            return base.Channel.EnableSubscription(request);
-        }
-        
-        public com.kfs.Reporting.SQLReportingServices.API.ServerInfoHeader EnableSubscription(com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader, string SubscriptionID) {
-            com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionRequest inValue = new com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionRequest();
-            inValue.TrustedUserHeader = TrustedUserHeader;
-            inValue.SubscriptionID = SubscriptionID;
-            com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionResponse retVal = ((com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap)(this)).EnableSubscription(inValue);
-            return retVal.ServerInfoHeader;
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionResponse> com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap.EnableSubscriptionAsync(com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionRequest request) {
-            return base.Channel.EnableSubscriptionAsync(request);
-        }
-        
-        public System.Threading.Tasks.Task<com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionResponse> EnableSubscriptionAsync(com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader, string SubscriptionID) {
-            com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionRequest inValue = new com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionRequest();
-            inValue.TrustedUserHeader = TrustedUserHeader;
-            inValue.SubscriptionID = SubscriptionID;
-            return ((com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap)(this)).EnableSubscriptionAsync(inValue);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -14732,57 +14442,6 @@ namespace com.kfs.Reporting.SQLReportingServices.API {
             inValue.TrustedUserHeader = TrustedUserHeader;
             inValue.Properties = Properties;
             return ((com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap)(this)).GetSystemPropertiesAsync(inValue);
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsResponse com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap.SetUserSettings(com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsRequest request) {
-            return base.Channel.SetUserSettings(request);
-        }
-        
-        public com.kfs.Reporting.SQLReportingServices.API.ServerInfoHeader SetUserSettings(com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader, com.kfs.Reporting.SQLReportingServices.API.Property[] Properties) {
-            com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsRequest inValue = new com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsRequest();
-            inValue.TrustedUserHeader = TrustedUserHeader;
-            inValue.Properties = Properties;
-            com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsResponse retVal = ((com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap)(this)).SetUserSettings(inValue);
-            return retVal.ServerInfoHeader;
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsResponse> com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap.SetUserSettingsAsync(com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsRequest request) {
-            return base.Channel.SetUserSettingsAsync(request);
-        }
-        
-        public System.Threading.Tasks.Task<com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsResponse> SetUserSettingsAsync(com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader, com.kfs.Reporting.SQLReportingServices.API.Property[] Properties) {
-            com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsRequest inValue = new com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsRequest();
-            inValue.TrustedUserHeader = TrustedUserHeader;
-            inValue.Properties = Properties;
-            return ((com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap)(this)).SetUserSettingsAsync(inValue);
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsResponse com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap.GetUserSettings(com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsRequest request) {
-            return base.Channel.GetUserSettings(request);
-        }
-        
-        public com.kfs.Reporting.SQLReportingServices.API.ServerInfoHeader GetUserSettings(com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader, com.kfs.Reporting.SQLReportingServices.API.Property[] Properties, out com.kfs.Reporting.SQLReportingServices.API.Property[] Values) {
-            com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsRequest inValue = new com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsRequest();
-            inValue.TrustedUserHeader = TrustedUserHeader;
-            inValue.Properties = Properties;
-            com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsResponse retVal = ((com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap)(this)).GetUserSettings(inValue);
-            Values = retVal.Values;
-            return retVal.ServerInfoHeader;
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsResponse> com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap.GetUserSettingsAsync(com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsRequest request) {
-            return base.Channel.GetUserSettingsAsync(request);
-        }
-        
-        public System.Threading.Tasks.Task<com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsResponse> GetUserSettingsAsync(com.kfs.Reporting.SQLReportingServices.API.TrustedUserHeader TrustedUserHeader, com.kfs.Reporting.SQLReportingServices.API.Property[] Properties) {
-            com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsRequest inValue = new com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsRequest();
-            inValue.TrustedUserHeader = TrustedUserHeader;
-            inValue.Properties = Properties;
-            return ((com.kfs.Reporting.SQLReportingServices.API.ReportingService2010Soap)(this)).GetUserSettingsAsync(inValue);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]

@@ -143,9 +143,9 @@ namespace com.kfs.Reporting.SQLReportingServices
                 ReportingService2010SoapClient client = GetClient( UserType.ContentManager );
   
                 Property[] userProperties = null;
-                var header = client.GetUserSettings( null, null, out userProperties );
+                
 
-                if ( header != null && DateTime.Parse( header.ReportServerDateTime ) > DateTime.MinValue )
+                if ( TestPath() )
                 {
                     message = "Succesfully connected.";
                     isSuccessful = true;

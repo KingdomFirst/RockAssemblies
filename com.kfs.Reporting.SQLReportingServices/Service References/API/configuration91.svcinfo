@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="1SY+1LnRu/svj5UD1KibJiKPu4k=">
+<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="eGSXuC1pWiOwgAm+Xs/0zTAby5c=">
   <bindingConfigurations>
     <bindingConfiguration bindingType="basicHttpBinding" name="ReportingService2010Soap">
       <properties>
@@ -112,10 +112,10 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="ReportingService2010Soap" contract="API.ReportingService2010Soap" bindingType="basicHttpBinding" address="http://chrisdev1/ReportServer/ReportService2010.asmx" bindingConfiguration="ReportingService2010Soap">
+    <endpoint name="ReportingService2010Soap" contract="API.ReportingService2010Soap" bindingType="basicHttpBinding" address="http://rockdev1/ReportServer/ReportService2010.asmx" bindingConfiguration="ReportingService2010Soap">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>http://chrisdev1:80/ReportServer/ReportService2010.asmx</serializedValue>
+          <serializedValue>http://rockdev1:80/ReportServer/ReportService2010.asmx</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />

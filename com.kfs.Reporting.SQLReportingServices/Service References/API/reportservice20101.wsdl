@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+<wsdl:definitions xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">The Reporting Services Web Service enables you to manage a report server and its contents including server settings, security, reports, subscriptions, and data sources.</wsdl:documentation>
   <wsdl:types>
     <s:schema elementFormDefault="qualified" targetNamespace="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer">
@@ -441,21 +441,10 @@
       </s:complexType>
       <s:complexType name="ArrayOfChoice1">
         <s:choice minOccurs="0" maxOccurs="unbounded">
-          <s:element minOccurs="1" maxOccurs="1" name="ParameterFieldReference" nillable="true" type="tns:ParameterFieldReference" />
           <s:element minOccurs="1" maxOccurs="1" name="ParameterValue" nillable="true" type="tns:ParameterValue" />
+          <s:element minOccurs="1" maxOccurs="1" name="ParameterFieldReference" nillable="true" type="tns:ParameterFieldReference" />
         </s:choice>
       </s:complexType>
-      <s:complexType name="ParameterFieldReference">
-        <s:complexContent mixed="false">
-          <s:extension base="tns:ParameterValueOrFieldReference">
-            <s:sequence>
-              <s:element minOccurs="0" maxOccurs="1" name="ParameterName" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="FieldAlias" type="s:string" />
-            </s:sequence>
-          </s:extension>
-        </s:complexContent>
-      </s:complexType>
-      <s:complexType name="ParameterValueOrFieldReference" />
       <s:complexType name="ParameterValue">
         <s:complexContent mixed="false">
           <s:extension base="tns:ParameterValueOrFieldReference">
@@ -463,6 +452,17 @@
               <s:element minOccurs="0" maxOccurs="1" name="Name" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="Value" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="Label" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="ParameterValueOrFieldReference" />
+      <s:complexType name="ParameterFieldReference">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:ParameterValueOrFieldReference">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="ParameterName" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="FieldAlias" type="s:string" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -503,7 +503,6 @@
           <s:element minOccurs="0" maxOccurs="1" name="MissingParameterValue" type="s:boolean" />
           <s:element minOccurs="0" maxOccurs="1" name="InvalidParameterValue" type="s:boolean" />
           <s:element minOccurs="0" maxOccurs="1" name="UnknownReportParameter" type="s:boolean" />
-          <s:element minOccurs="0" maxOccurs="1" name="DisabledByUser" type="s:boolean" />
         </s:sequence>
       </s:complexType>
       <s:element name="SetDataDrivenSubscriptionProperties">
@@ -523,8 +522,8 @@
         <s:sequence>
           <s:choice minOccurs="1" maxOccurs="1">
             <s:element minOccurs="0" maxOccurs="1" name="DataSourceDefinition" type="tns:DataSourceDefinition" />
-            <s:element minOccurs="0" maxOccurs="1" name="DataSourceReference" type="tns:DataSourceReference" />
             <s:element minOccurs="0" maxOccurs="1" name="InvalidDataSourceReference" type="tns:InvalidDataSourceReference" />
+            <s:element minOccurs="0" maxOccurs="1" name="DataSourceReference" type="tns:DataSourceReference" />
           </s:choice>
           <s:element minOccurs="0" maxOccurs="1" name="DataSet" type="tns:DataSetDefinition" />
         </s:sequence>
@@ -549,11 +548,6 @@
         </s:complexContent>
       </s:complexType>
       <s:complexType name="DataSourceDefinitionOrReference" />
-      <s:complexType name="InvalidDataSourceReference">
-        <s:complexContent mixed="false">
-          <s:extension base="tns:DataSourceDefinitionOrReference" />
-        </s:complexContent>
-      </s:complexType>
       <s:complexType name="DataSourceReference">
         <s:complexContent mixed="false">
           <s:extension base="tns:DataSourceDefinitionOrReference">
@@ -561,6 +555,11 @@
               <s:element minOccurs="0" maxOccurs="1" name="Reference" type="s:string" />
             </s:sequence>
           </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="InvalidDataSourceReference">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DataSourceDefinitionOrReference" />
         </s:complexContent>
       </s:complexType>
       <s:simpleType name="CredentialRetrievalEnum">
@@ -637,26 +636,6 @@
             <s:element minOccurs="0" maxOccurs="1" name="Parameters" type="tns:ArrayOfParameterValueOrFieldReference" />
           </s:sequence>
         </s:complexType>
-      </s:element>
-      <s:element name="DisableSubscription">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="SubscriptionID" type="s:string" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
-      <s:element name="DisableSubscriptionResponse">
-        <s:complexType />
-      </s:element>
-      <s:element name="EnableSubscription">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="SubscriptionID" type="s:string" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
-      <s:element name="EnableSubscriptionResponse">
-        <s:complexType />
       </s:element>
       <s:element name="DeleteSubscription">
         <s:complexType>
@@ -872,9 +851,9 @@
         <s:sequence>
           <s:element minOccurs="0" maxOccurs="1" name="Name" type="s:string" />
           <s:choice minOccurs="1" maxOccurs="1">
-            <s:element minOccurs="0" maxOccurs="1" name="DataSourceDefinition" type="tns:DataSourceDefinition" />
             <s:element minOccurs="0" maxOccurs="1" name="DataSourceReference" type="tns:DataSourceReference" />
             <s:element minOccurs="0" maxOccurs="1" name="InvalidDataSourceReference" type="tns:InvalidDataSourceReference" />
+            <s:element minOccurs="0" maxOccurs="1" name="DataSourceDefinition" type="tns:DataSourceDefinition" />
           </s:choice>
         </s:sequence>
       </s:complexType>
@@ -1421,36 +1400,17 @@
               <s:element minOccurs="1" maxOccurs="1" name="StartDateTime" type="s:dateTime" />
               <s:element minOccurs="0" maxOccurs="1" name="EndDate" type="s:dateTime" />
               <s:choice minOccurs="1" maxOccurs="1">
+                <s:element minOccurs="0" maxOccurs="1" name="MonthlyDOWRecurrence" type="tns:MonthlyDOWRecurrence" />
+                <s:element minOccurs="0" maxOccurs="1" name="MinuteRecurrence" type="tns:MinuteRecurrence" />
                 <s:element minOccurs="0" maxOccurs="1" name="DailyRecurrence" type="tns:DailyRecurrence" />
                 <s:element minOccurs="0" maxOccurs="1" name="WeeklyRecurrence" type="tns:WeeklyRecurrence" />
                 <s:element minOccurs="0" maxOccurs="1" name="MonthlyRecurrence" type="tns:MonthlyRecurrence" />
-                <s:element minOccurs="0" maxOccurs="1" name="MonthlyDOWRecurrence" type="tns:MonthlyDOWRecurrence" />
-                <s:element minOccurs="0" maxOccurs="1" name="MinuteRecurrence" type="tns:MinuteRecurrence" />
               </s:choice>
             </s:sequence>
           </s:extension>
         </s:complexContent>
       </s:complexType>
       <s:complexType name="ScheduleDefinitionOrReference" />
-      <s:complexType name="DailyRecurrence">
-        <s:complexContent mixed="false">
-          <s:extension base="tns:RecurrencePattern">
-            <s:sequence>
-              <s:element minOccurs="1" maxOccurs="1" name="DaysInterval" type="s:int" />
-            </s:sequence>
-          </s:extension>
-        </s:complexContent>
-      </s:complexType>
-      <s:complexType name="RecurrencePattern" />
-      <s:complexType name="MinuteRecurrence">
-        <s:complexContent mixed="false">
-          <s:extension base="tns:RecurrencePattern">
-            <s:sequence>
-              <s:element minOccurs="1" maxOccurs="1" name="MinutesInterval" type="s:int" />
-            </s:sequence>
-          </s:extension>
-        </s:complexContent>
-      </s:complexType>
       <s:complexType name="MonthlyDOWRecurrence">
         <s:complexContent mixed="false">
           <s:extension base="tns:RecurrencePattern">
@@ -1462,25 +1422,16 @@
           </s:extension>
         </s:complexContent>
       </s:complexType>
-      <s:simpleType name="WeekNumberEnum">
-        <s:restriction base="s:string">
-          <s:enumeration value="FirstWeek" />
-          <s:enumeration value="SecondWeek" />
-          <s:enumeration value="ThirdWeek" />
-          <s:enumeration value="FourthWeek" />
-          <s:enumeration value="LastWeek" />
-        </s:restriction>
-      </s:simpleType>
-      <s:complexType name="DaysOfWeekSelector">
-        <s:sequence>
-          <s:element minOccurs="1" maxOccurs="1" name="Sunday" type="s:boolean" />
-          <s:element minOccurs="1" maxOccurs="1" name="Monday" type="s:boolean" />
-          <s:element minOccurs="1" maxOccurs="1" name="Tuesday" type="s:boolean" />
-          <s:element minOccurs="1" maxOccurs="1" name="Wednesday" type="s:boolean" />
-          <s:element minOccurs="1" maxOccurs="1" name="Thursday" type="s:boolean" />
-          <s:element minOccurs="1" maxOccurs="1" name="Friday" type="s:boolean" />
-          <s:element minOccurs="1" maxOccurs="1" name="Saturday" type="s:boolean" />
-        </s:sequence>
+      <s:complexType name="RecurrencePattern" />
+      <s:complexType name="MonthlyRecurrence">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:RecurrencePattern">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="Days" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="MonthsOfYear" type="tns:MonthsOfYearSelector" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
       </s:complexType>
       <s:complexType name="MonthsOfYearSelector">
         <s:sequence>
@@ -1498,16 +1449,6 @@
           <s:element minOccurs="1" maxOccurs="1" name="December" type="s:boolean" />
         </s:sequence>
       </s:complexType>
-      <s:complexType name="MonthlyRecurrence">
-        <s:complexContent mixed="false">
-          <s:extension base="tns:RecurrencePattern">
-            <s:sequence>
-              <s:element minOccurs="0" maxOccurs="1" name="Days" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="MonthsOfYear" type="tns:MonthsOfYearSelector" />
-            </s:sequence>
-          </s:extension>
-        </s:complexContent>
-      </s:complexType>
       <s:complexType name="WeeklyRecurrence">
         <s:complexContent mixed="false">
           <s:extension base="tns:RecurrencePattern">
@@ -1518,6 +1459,44 @@
           </s:extension>
         </s:complexContent>
       </s:complexType>
+      <s:complexType name="DaysOfWeekSelector">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Sunday" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="Monday" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="Tuesday" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="Wednesday" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="Thursday" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="Friday" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="Saturday" type="s:boolean" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="DailyRecurrence">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:RecurrencePattern">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="DaysInterval" type="s:int" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="MinuteRecurrence">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:RecurrencePattern">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="MinutesInterval" type="s:int" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:simpleType name="WeekNumberEnum">
+        <s:restriction base="s:string">
+          <s:enumeration value="FirstWeek" />
+          <s:enumeration value="SecondWeek" />
+          <s:enumeration value="ThirdWeek" />
+          <s:enumeration value="FourthWeek" />
+          <s:enumeration value="LastWeek" />
+        </s:restriction>
+      </s:simpleType>
       <s:element name="CreateScheduleResponse">
         <s:complexType>
           <s:sequence>
@@ -1803,13 +1782,18 @@
             <s:element minOccurs="0" maxOccurs="1" name="ItemPath" type="s:string" />
             <s:element minOccurs="0" maxOccurs="1" name="ExecutionSetting" type="s:string" />
             <s:choice minOccurs="1" maxOccurs="1">
-              <s:element minOccurs="0" maxOccurs="1" name="ScheduleReference" type="tns:ScheduleReference" />
-              <s:element minOccurs="0" maxOccurs="1" name="ScheduleDefinition" type="tns:ScheduleDefinition" />
               <s:element minOccurs="0" maxOccurs="1" name="NoSchedule" type="tns:NoSchedule" />
+              <s:element minOccurs="0" maxOccurs="1" name="ScheduleDefinition" type="tns:ScheduleDefinition" />
+              <s:element minOccurs="0" maxOccurs="1" name="ScheduleReference" type="tns:ScheduleReference" />
             </s:choice>
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:complexType name="NoSchedule">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:ScheduleDefinitionOrReference" />
+        </s:complexContent>
+      </s:complexType>
       <s:complexType name="ScheduleReference">
         <s:complexContent mixed="false">
           <s:extension base="tns:ScheduleDefinitionOrReference">
@@ -1818,11 +1802,6 @@
               <s:element minOccurs="0" maxOccurs="1" name="Definition" type="tns:ScheduleDefinition" />
             </s:sequence>
           </s:extension>
-        </s:complexContent>
-      </s:complexType>
-      <s:complexType name="NoSchedule">
-        <s:complexContent mixed="false">
-          <s:extension base="tns:ScheduleDefinitionOrReference" />
         </s:complexContent>
       </s:complexType>
       <s:element name="SetExecutionOptionsResponse">
@@ -1840,8 +1819,8 @@
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="ExecutionSetting" type="s:string" />
             <s:choice minOccurs="1" maxOccurs="1">
-              <s:element minOccurs="0" maxOccurs="1" name="NoSchedule" type="tns:NoSchedule" />
               <s:element minOccurs="0" maxOccurs="1" name="ScheduleDefinition" type="tns:ScheduleDefinition" />
+              <s:element minOccurs="0" maxOccurs="1" name="NoSchedule" type="tns:NoSchedule" />
               <s:element minOccurs="0" maxOccurs="1" name="ScheduleReference" type="tns:ScheduleReference" />
             </s:choice>
           </s:sequence>
@@ -1906,8 +1885,8 @@
           <s:sequence>
             <s:element minOccurs="1" maxOccurs="1" name="CacheItem" type="s:boolean" />
             <s:choice minOccurs="1" maxOccurs="1">
-              <s:element minOccurs="0" maxOccurs="1" name="TimeExpiration" type="tns:TimeExpiration" />
               <s:element minOccurs="0" maxOccurs="1" name="ScheduleExpiration" type="tns:ScheduleExpiration" />
+              <s:element minOccurs="0" maxOccurs="1" name="TimeExpiration" type="tns:TimeExpiration" />
             </s:choice>
           </s:sequence>
         </s:complexType>
@@ -1983,9 +1962,9 @@
             <s:element minOccurs="1" maxOccurs="1" name="EnableManualSnapshotCreation" type="s:boolean" />
             <s:element minOccurs="1" maxOccurs="1" name="KeepExecutionSnapshots" type="s:boolean" />
             <s:choice minOccurs="1" maxOccurs="1">
-              <s:element minOccurs="0" maxOccurs="1" name="ScheduleReference" type="tns:ScheduleReference" />
-              <s:element minOccurs="0" maxOccurs="1" name="NoSchedule" type="tns:NoSchedule" />
               <s:element minOccurs="0" maxOccurs="1" name="ScheduleDefinition" type="tns:ScheduleDefinition" />
+              <s:element minOccurs="0" maxOccurs="1" name="NoSchedule" type="tns:NoSchedule" />
+              <s:element minOccurs="0" maxOccurs="1" name="ScheduleReference" type="tns:ScheduleReference" />
             </s:choice>
           </s:sequence>
         </s:complexType>
@@ -2007,8 +1986,8 @@
             <s:element minOccurs="1" maxOccurs="1" name="KeepExecutionSnapshots" type="s:boolean" />
             <s:choice minOccurs="1" maxOccurs="1">
               <s:element minOccurs="0" maxOccurs="1" name="NoSchedule" type="tns:NoSchedule" />
-              <s:element minOccurs="0" maxOccurs="1" name="ScheduleDefinition" type="tns:ScheduleDefinition" />
               <s:element minOccurs="0" maxOccurs="1" name="ScheduleReference" type="tns:ScheduleReference" />
+              <s:element minOccurs="0" maxOccurs="1" name="ScheduleDefinition" type="tns:ScheduleDefinition" />
             </s:choice>
           </s:sequence>
         </s:complexType>
@@ -2055,30 +2034,6 @@
         </s:complexType>
       </s:element>
       <s:element name="GetSystemPropertiesResponse">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="Values" type="tns:ArrayOfProperty" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
-      <s:element name="SetUserSettings">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="Properties" type="tns:ArrayOfProperty" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
-      <s:element name="SetUserSettingsResponse">
-        <s:complexType />
-      </s:element>
-      <s:element name="GetUserSettings">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="Properties" type="tns:ArrayOfProperty" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
-      <s:element name="GetUserSettingsResponse">
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="Values" type="tns:ArrayOfProperty" />
@@ -2672,30 +2627,6 @@
     <wsdl:part name="ServerInfoHeader" element="tns:ServerInfoHeader" />
   </wsdl:message>
   <wsdl:message name="GetDataDrivenSubscriptionPropertiesTrustedUserHeader">
-    <wsdl:part name="TrustedUserHeader" element="tns:TrustedUserHeader" />
-  </wsdl:message>
-  <wsdl:message name="DisableSubscriptionSoapIn">
-    <wsdl:part name="parameters" element="tns:DisableSubscription" />
-  </wsdl:message>
-  <wsdl:message name="DisableSubscriptionSoapOut">
-    <wsdl:part name="parameters" element="tns:DisableSubscriptionResponse" />
-  </wsdl:message>
-  <wsdl:message name="DisableSubscriptionServerInfoHeader">
-    <wsdl:part name="ServerInfoHeader" element="tns:ServerInfoHeader" />
-  </wsdl:message>
-  <wsdl:message name="DisableSubscriptionTrustedUserHeader">
-    <wsdl:part name="TrustedUserHeader" element="tns:TrustedUserHeader" />
-  </wsdl:message>
-  <wsdl:message name="EnableSubscriptionSoapIn">
-    <wsdl:part name="parameters" element="tns:EnableSubscription" />
-  </wsdl:message>
-  <wsdl:message name="EnableSubscriptionSoapOut">
-    <wsdl:part name="parameters" element="tns:EnableSubscriptionResponse" />
-  </wsdl:message>
-  <wsdl:message name="EnableSubscriptionServerInfoHeader">
-    <wsdl:part name="ServerInfoHeader" element="tns:ServerInfoHeader" />
-  </wsdl:message>
-  <wsdl:message name="EnableSubscriptionTrustedUserHeader">
     <wsdl:part name="TrustedUserHeader" element="tns:TrustedUserHeader" />
   </wsdl:message>
   <wsdl:message name="DeleteSubscriptionSoapIn">
@@ -3610,30 +3541,6 @@
   <wsdl:message name="GetSystemPropertiesTrustedUserHeader">
     <wsdl:part name="TrustedUserHeader" element="tns:TrustedUserHeader" />
   </wsdl:message>
-  <wsdl:message name="SetUserSettingsSoapIn">
-    <wsdl:part name="parameters" element="tns:SetUserSettings" />
-  </wsdl:message>
-  <wsdl:message name="SetUserSettingsSoapOut">
-    <wsdl:part name="parameters" element="tns:SetUserSettingsResponse" />
-  </wsdl:message>
-  <wsdl:message name="SetUserSettingsServerInfoHeader">
-    <wsdl:part name="ServerInfoHeader" element="tns:ServerInfoHeader" />
-  </wsdl:message>
-  <wsdl:message name="SetUserSettingsTrustedUserHeader">
-    <wsdl:part name="TrustedUserHeader" element="tns:TrustedUserHeader" />
-  </wsdl:message>
-  <wsdl:message name="GetUserSettingsSoapIn">
-    <wsdl:part name="parameters" element="tns:GetUserSettings" />
-  </wsdl:message>
-  <wsdl:message name="GetUserSettingsSoapOut">
-    <wsdl:part name="parameters" element="tns:GetUserSettingsResponse" />
-  </wsdl:message>
-  <wsdl:message name="GetUserSettingsServerInfoHeader">
-    <wsdl:part name="ServerInfoHeader" element="tns:ServerInfoHeader" />
-  </wsdl:message>
-  <wsdl:message name="GetUserSettingsTrustedUserHeader">
-    <wsdl:part name="TrustedUserHeader" element="tns:TrustedUserHeader" />
-  </wsdl:message>
   <wsdl:message name="SetSystemPoliciesSoapIn">
     <wsdl:part name="parameters" element="tns:SetSystemPolicies" />
   </wsdl:message>
@@ -3975,14 +3882,6 @@
       <wsdl:input message="tns:GetDataDrivenSubscriptionPropertiesSoapIn" />
       <wsdl:output message="tns:GetDataDrivenSubscriptionPropertiesSoapOut" />
     </wsdl:operation>
-    <wsdl:operation name="DisableSubscription">
-      <wsdl:input message="tns:DisableSubscriptionSoapIn" />
-      <wsdl:output message="tns:DisableSubscriptionSoapOut" />
-    </wsdl:operation>
-    <wsdl:operation name="EnableSubscription">
-      <wsdl:input message="tns:EnableSubscriptionSoapIn" />
-      <wsdl:output message="tns:EnableSubscriptionSoapOut" />
-    </wsdl:operation>
     <wsdl:operation name="DeleteSubscription">
       <wsdl:input message="tns:DeleteSubscriptionSoapIn" />
       <wsdl:output message="tns:DeleteSubscriptionSoapOut" />
@@ -4286,14 +4185,6 @@
     <wsdl:operation name="GetSystemProperties">
       <wsdl:input message="tns:GetSystemPropertiesSoapIn" />
       <wsdl:output message="tns:GetSystemPropertiesSoapOut" />
-    </wsdl:operation>
-    <wsdl:operation name="SetUserSettings">
-      <wsdl:input message="tns:SetUserSettingsSoapIn" />
-      <wsdl:output message="tns:SetUserSettingsSoapOut" />
-    </wsdl:operation>
-    <wsdl:operation name="GetUserSettings">
-      <wsdl:input message="tns:GetUserSettingsSoapIn" />
-      <wsdl:output message="tns:GetUserSettingsSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="SetSystemPolicies">
       <wsdl:input message="tns:SetSystemPoliciesSoapIn" />
@@ -4623,28 +4514,6 @@
       <wsdl:output>
         <soap:body use="literal" />
         <soap:header message="tns:GetDataDrivenSubscriptionPropertiesServerInfoHeader" part="ServerInfoHeader" use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="DisableSubscription">
-      <soap:operation soapAction="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/DisableSubscription" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-        <soap:header message="tns:DisableSubscriptionTrustedUserHeader" part="TrustedUserHeader" use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-        <soap:header message="tns:DisableSubscriptionServerInfoHeader" part="ServerInfoHeader" use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="EnableSubscription">
-      <soap:operation soapAction="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/EnableSubscription" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-        <soap:header message="tns:EnableSubscriptionTrustedUserHeader" part="TrustedUserHeader" use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-        <soap:header message="tns:EnableSubscriptionServerInfoHeader" part="ServerInfoHeader" use="literal" />
       </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="DeleteSubscription">
@@ -5483,28 +5352,6 @@
         <soap:header message="tns:GetSystemPropertiesServerInfoHeader" part="ServerInfoHeader" use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="SetUserSettings">
-      <soap:operation soapAction="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/SetUserSettings" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-        <soap:header message="tns:SetUserSettingsTrustedUserHeader" part="TrustedUserHeader" use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-        <soap:header message="tns:SetUserSettingsServerInfoHeader" part="ServerInfoHeader" use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="GetUserSettings">
-      <soap:operation soapAction="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/GetUserSettings" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-        <soap:header message="tns:GetUserSettingsTrustedUserHeader" part="TrustedUserHeader" use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-        <soap:header message="tns:GetUserSettingsServerInfoHeader" part="ServerInfoHeader" use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="SetSystemPolicies">
       <soap:operation soapAction="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/SetSystemPolicies" style="document" />
       <wsdl:input>
@@ -5980,28 +5827,6 @@
       <wsdl:output>
         <soap12:body use="literal" />
         <soap12:header message="tns:GetDataDrivenSubscriptionPropertiesServerInfoHeader" part="ServerInfoHeader" use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="DisableSubscription">
-      <soap12:operation soapAction="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/DisableSubscription" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-        <soap12:header message="tns:DisableSubscriptionTrustedUserHeader" part="TrustedUserHeader" use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-        <soap12:header message="tns:DisableSubscriptionServerInfoHeader" part="ServerInfoHeader" use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="EnableSubscription">
-      <soap12:operation soapAction="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/EnableSubscription" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-        <soap12:header message="tns:EnableSubscriptionTrustedUserHeader" part="TrustedUserHeader" use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-        <soap12:header message="tns:EnableSubscriptionServerInfoHeader" part="ServerInfoHeader" use="literal" />
       </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="DeleteSubscription">
@@ -6840,28 +6665,6 @@
         <soap12:header message="tns:GetSystemPropertiesServerInfoHeader" part="ServerInfoHeader" use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="SetUserSettings">
-      <soap12:operation soapAction="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/SetUserSettings" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-        <soap12:header message="tns:SetUserSettingsTrustedUserHeader" part="TrustedUserHeader" use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-        <soap12:header message="tns:SetUserSettingsServerInfoHeader" part="ServerInfoHeader" use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="GetUserSettings">
-      <soap12:operation soapAction="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/GetUserSettings" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-        <soap12:header message="tns:GetUserSettingsTrustedUserHeader" part="TrustedUserHeader" use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-        <soap12:header message="tns:GetUserSettingsServerInfoHeader" part="ServerInfoHeader" use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="SetSystemPolicies">
       <soap12:operation soapAction="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer/SetSystemPolicies" style="document" />
       <wsdl:input>
@@ -7097,10 +6900,10 @@
   <wsdl:service name="ReportingService2010">
     <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">The Reporting Services Web Service enables you to manage a report server and its contents including server settings, security, reports, subscriptions, and data sources.</wsdl:documentation>
     <wsdl:port name="ReportingService2010Soap" binding="tns:ReportingService2010Soap">
-      <soap:address location="http://chrisdev1:80/ReportServer/ReportService2010.asmx" />
+      <soap:address location="http://rockdev1:80/ReportServer/ReportService2010.asmx" />
     </wsdl:port>
     <wsdl:port name="ReportingService2010Soap12" binding="tns:ReportingService2010Soap12">
-      <soap12:address location="http://chrisdev1:80/ReportServer/ReportService2010.asmx" />
+      <soap12:address location="http://rockdev1:80/ReportServer/ReportService2010.asmx" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

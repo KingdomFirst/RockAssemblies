@@ -206,13 +206,7 @@
     <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.DisableDataSourceResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.DisableSubscriptionResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
     <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.EnableDataSourceResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.EnableSubscriptionResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.Event.datasource">
@@ -324,9 +318,6 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetUserModelResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.GetUserSettingsResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.InheritModelItemParentSecurityResponse.datasource">
@@ -560,9 +551,6 @@
     <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetSystemPropertiesResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.SetUserSettingsResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
     <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.Subscription.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -584,7 +572,7 @@
     <None Include="Service References\API\com.kfs.Reporting.SQLReportingServices.API.Warning.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\API\reportservice2010.wsdl" />
+    <None Include="Service References\API\reportservice20101.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\API\" />
