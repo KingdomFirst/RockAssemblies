@@ -128,7 +128,7 @@ namespace com.kfs.Reporting.SQLReportingServices
 
 
             }
-
+            GlobalAttributesCache.Flush();
             return true;
 
         }
