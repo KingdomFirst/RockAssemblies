@@ -9,6 +9,7 @@ using com.kfs.Reporting.SQLReportingServices.API;
 
 using Rock.Data;
 using Rock.Model;
+using Rock.Security;
 using Rock.Web.Cache;
 
 namespace com.kfs.Reporting.SQLReportingServices
@@ -122,9 +123,9 @@ namespace com.kfs.Reporting.SQLReportingServices
                 SaveAttributeValue( context, SERVER_URL_KEY, ServerUrl );
                 SaveAttributeValue( context, SERVER_ROOT_PATH_KEY, ReportPath );
                 SaveAttributeValue( context, CONTENT_MANAGER_USER_KEY, ContentManagerUser );
-                SaveAttributeValue( context, CONTENT_MANAGER_PWD_KEY, ContentManagerPassword );
+                SaveAttributeValue( context, CONTENT_MANAGER_PWD_KEY, Encryption.EncryptString( ContentManagerPassword ) );
                 SaveAttributeValue( context, BROWSER_USER_KEY, BrowserUser );
-                SaveAttributeValue( context, BROWSER_PWD_KEY, BrowserPassword );
+                SaveAttributeValue( context, BROWSER_PWD_KEY, Encryption.EncryptString( BrowserPassword ) );
 
 
             }
@@ -310,9 +311,9 @@ namespace com.kfs.Reporting.SQLReportingServices
             ServerUrl = cache.GetValue( SERVER_URL_KEY, context );
             ReportPath = cache.GetValue( SERVER_ROOT_PATH_KEY, context );
             ContentManagerUser = cache.GetValue( CONTENT_MANAGER_USER_KEY, context );
-            ContentManagerPassword = cache.GetValue( CONTENT_MANAGER_PWD_KEY, context );
+            ContentManagerPassword = Encryption.DecryptString( cache.GetValue( CONTENT_MANAGER_PWD_KEY, context ) );
             BrowserUser = cache.GetValue( BROWSER_USER_KEY, context );
-            BrowserPassword = cache.GetValue( BROWSER_PWD_KEY, context );
+            BrowserPassword = Encryption.DecryptString( cache.GetValue( BROWSER_PWD_KEY, context ) );
 
             if ( !String.IsNullOrWhiteSpace( ServerUrl ) && !String.IsNullOrWhiteSpace( ReportPath ) && !String.IsNullOrWhiteSpace( BrowserUser ) && !String.IsNullOrWhiteSpace( BrowserPassword ) )
             {
@@ -455,7 +456,7 @@ namespace com.kfs.Reporting.SQLReportingServices
             if ( contentManagerPwd == null )
             {
                 contentManagerPwd = new Rock.Model.Attribute();
-                contentManagerPwd.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.TEXT ).Id;
+                contentManagerPwd.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.ENCRYPTED_TEXT ).Id;
                 contentManagerPwd.Name = "Reporting Service - Content Manager Password";
                 contentManagerPwd.Key = CONTENT_MANAGER_PWD_KEY;
                 contentManagerPwd.Description = "The Content Manager Password.";
@@ -472,7 +473,7 @@ namespace com.kfs.Reporting.SQLReportingServices
             if ( browserUser == null )
             {
                 browserUser = new Rock.Model.Attribute();
-                browserUser.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.TEXT ).Id;
+                browserUser.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.ENCRYPTED_TEXT ).Id;
                 browserUser.Name = "Reporting Service - Browser User";
                 browserUser.Key = BROWSER_USER_KEY;
                 browserUser.Description = "The Reporting Server Browser (Report Viewer) User Name. (i.e. domain\\user format)";
@@ -486,7 +487,7 @@ namespace com.kfs.Reporting.SQLReportingServices
             if ( browserPwd == null )
             {
                 browserPwd = new Rock.Model.Attribute();
-                browserPwd.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.TEXT ).Id;
+                browserPwd.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.ENCRYPTED_TEXT ).Id;
                 browserPwd.Name = "Reporting Service - Browser Password";
                 browserPwd.Key = BROWSER_PWD_KEY;
                 browserPwd.Description = "The Reporting Server Browser Password.";
