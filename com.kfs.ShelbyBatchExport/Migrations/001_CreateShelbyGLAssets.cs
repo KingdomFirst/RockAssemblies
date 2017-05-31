@@ -31,17 +31,17 @@ namespace com.kfs.ShelbyBatchExport.Migrations
             RockMigrationHelper.AddAttributeQualifier( "4B6576DD-82F6-419F-8DF0-467D2636822D", "format", "", "6AFC0F07-4706-4279-BDA4-204D57A4CC93" );
 
             // transaction project
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialTransaction", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Transaction Project", "", "Designates the Project at the Transaction Level", 0, "", "365134A6-D516-48E0-AC67-A011D5D59D99", "Project" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialTransaction", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Transaction Project", "", "Designates the Project at the Financial Transaction Level", 0, "", "365134A6-D516-48E0-AC67-A011D5D59D99", "Project" );
             RockMigrationHelper.AddAttributeQualifier( "365134A6-D516-48E0-AC67-A011D5D59D99", "allowmultiple", "False", "B2205A7A-E11A-426C-9EF1-34CCD96F5047" );
             RockMigrationHelper.AddAttributeQualifier( "365134A6-D516-48E0-AC67-A011D5D59D99", "definedtype", "", "E88DAEFC-BEAE-43CE-8A0E-DF96AFB95FC7" );
 
             // transaction detail project
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialTransactionDetail", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Transaction Detail Project", "", "Designates the Project at the Transaction Detail Level", 0, "", "951FAFFD-0513-4E31-9271-87853469E85E", "Project" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialTransactionDetail", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Transaction Detail Project", "", "Designates the Project at the Financial Transaction Detail Level", 0, "", "951FAFFD-0513-4E31-9271-87853469E85E", "Project" );
             RockMigrationHelper.AddAttributeQualifier( "951FAFFD-0513-4E31-9271-87853469E85E", "allowmultiple", "False", "BA61B518-C7B7-4F33-8E23-8D2109DA49CB" );
             RockMigrationHelper.AddAttributeQualifier( "951FAFFD-0513-4E31-9271-87853469E85E", "definedtype", "", "408068EE-949F-41F5-8CC8-13C2DA6574FB" );
 
             // account default project
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Default Project", "", "Designates the Project at the Transaction Detail Level", 0, "", "85422EA2-AC4E-44E5-99B9-30C131116734", "Project" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Default Project", "", "Designates the Project at the Financial Account Level", 0, "", "85422EA2-AC4E-44E5-99B9-30C131116734", "Project" );
             RockMigrationHelper.AddAttributeQualifier( "85422EA2-AC4E-44E5-99B9-30C131116734", "allowmultiple", "False", "7B25D6C9-7182-4617-A561-1A52F8140110" );
             RockMigrationHelper.AddAttributeQualifier( "85422EA2-AC4E-44E5-99B9-30C131116734", "definedtype", "", "354F659B-06C1-4FEF-A88E-B9C0B1E64C08" );
 
