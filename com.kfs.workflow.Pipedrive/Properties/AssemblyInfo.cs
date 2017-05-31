@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle( "KFS Pipedrive Actions" )]
 [assembly: AssemblyDescription( "" )]
 [assembly: AssemblyConfiguration( "" )]
-[assembly: AssemblyCompany( "" )]
+[assembly: AssemblyCompany( "Kingdom First Solutions" )]
 [assembly: AssemblyProduct( "KFS Pipedrive Actions" )]
 [assembly: AssemblyCopyright( "Copyright ©  2017" )]
 [assembly: AssemblyTrademark( "" )]
