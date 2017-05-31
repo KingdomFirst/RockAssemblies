@@ -1,20 +1,4 @@
-﻿// <copyright>
-// Copyright by the Spark Development Network
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -22,11 +6,13 @@ using System.ComponentModel.Composition;
 using System.Net;
 
 using Newtonsoft.Json.Linq;
+using Rock;
 using Rock.Attribute;
 using Rock.Data;
 using Rock.Model;
+using Rock.Workflow;
 
-namespace Rock.Workflow.Action.Pipedrive
+namespace com.kfs.Workflow.Action.Pipedrive
 {
     /// <summary>
     /// Adds a Deal to Pipedrive using workflow form
@@ -100,7 +86,7 @@ namespace Rock.Workflow.Action.Pipedrive
                            } );
 
                     JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                    _orgId = ( string )json["data"]["id"];
+                    _orgId = (string)json["data"]["id"];
                 }
 
                 // add person
@@ -117,7 +103,7 @@ namespace Rock.Workflow.Action.Pipedrive
                            } );
 
                     JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                    _personId = ( string )json["data"]["id"];
+                    _personId = (string)json["data"]["id"];
                 }
 
                 // add deal
@@ -140,7 +126,7 @@ namespace Rock.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                     // Only Inquiry is linked
                     else if ( !String.IsNullOrWhiteSpace( inquiryFieldToken ) && String.IsNullOrWhiteSpace( topicFieldToken ) && String.IsNullOrWhiteSpace( planFieldToken ) )
@@ -155,7 +141,7 @@ namespace Rock.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                     // Only Topic is linked
                     else if ( String.IsNullOrWhiteSpace( inquiryFieldToken ) && !String.IsNullOrWhiteSpace( topicFieldToken ) && String.IsNullOrWhiteSpace( planFieldToken ) )
@@ -170,7 +156,7 @@ namespace Rock.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                     // Only Plan is linked
                     else if ( String.IsNullOrWhiteSpace( inquiryFieldToken ) && String.IsNullOrWhiteSpace( topicFieldToken ) && !String.IsNullOrWhiteSpace( planFieldToken ) )
@@ -185,7 +171,7 @@ namespace Rock.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                     // Only Inquiry Not Linked
                     else if ( String.IsNullOrWhiteSpace( inquiryFieldToken ) && !String.IsNullOrWhiteSpace( topicFieldToken ) && !String.IsNullOrWhiteSpace( planFieldToken ) )
@@ -201,7 +187,7 @@ namespace Rock.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                     // Only Topic Not Linked
                     else if ( !String.IsNullOrWhiteSpace( inquiryFieldToken ) && String.IsNullOrWhiteSpace( topicFieldToken ) && !String.IsNullOrWhiteSpace( planFieldToken ) )
@@ -217,7 +203,7 @@ namespace Rock.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                     // Only Plan Not Linked
                     else if ( !String.IsNullOrWhiteSpace( inquiryFieldToken ) && !String.IsNullOrWhiteSpace( topicFieldToken ) && String.IsNullOrWhiteSpace( planFieldToken ) )
@@ -233,7 +219,7 @@ namespace Rock.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                     // Nothing is linked, why even show up for Monday?
                     else
@@ -247,11 +233,11 @@ namespace Rock.Workflow.Action.Pipedrive
                             } );
 
                         JObject json = JObject.Parse( System.Text.Encoding.UTF8.GetString( response ) );
-                        _dealId = ( string ) json["data"]["id"];
+                        _dealId = (string)json["data"]["id"];
                     }
                 }
 
-                if (!String.IsNullOrWhiteSpace( product ))
+                if ( !String.IsNullOrWhiteSpace( product ) )
                 {
                     // add products
                     using ( WebClient productCall = new WebClient() )
