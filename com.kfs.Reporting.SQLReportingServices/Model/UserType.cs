@@ -1,6 +1,4 @@
-﻿
-
-namespace com.kfs.Reporting.SQLReportingServices
+﻿namespace com.kfs.Reporting.SQLReportingServices
 {
     public enum UserType
     {
