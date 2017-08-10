@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 using com.kfs.Reporting.SQLReportingServices.API;
 
@@ -14,9 +12,19 @@ using Rock.Web.Cache;
 
 namespace com.kfs.Reporting.SQLReportingServices
 {
+    /// <summary>
+    /// The Reporting Service Provider
+    /// </summary>
     public class ReportingServicesProvider
     {
         #region Properties
+
+        /// <summary>
+        /// Gets or sets the server URL.
+        /// </summary>
+        /// <value>
+        /// The server URL.
+        /// </value>
         public string ServerUrl
         {
             get
@@ -37,14 +45,12 @@ namespace com.kfs.Reporting.SQLReportingServices
             }
         }
 
-
         public string ReportPath { get; set; }
         public string ContentManagerUser { get; set; }
         public string ContentManagerPassword { get; set; }
         public string BrowserUser { get; set; }
         public string BrowserPassword { get; set; }
         public bool CredentialsStored { get; set; }
-      
 
         private string mServerUrl;
         private Guid ReportingServicesCategoryGuid = new Guid( "BE54A3EB-98F9-4BBE-86FD-A3F503CDADF6" );
@@ -57,22 +63,38 @@ namespace com.kfs.Reporting.SQLReportingServices
 
         private ReportingService2010SoapClient rsClient = null;
         private UserType rsUserType;
+
         #endregion
 
         #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReportingServicesProvider"/> class.
+        /// </summary>
         public ReportingServicesProvider()
         {
             LoadCredentials( new RockContext() );
         }
+
         #endregion
 
         #region Public Methods
 
+        /// <summary>
+        /// Gets the browser credentials.
+        /// </summary>
+        /// <returns></returns>
         public ReportingServicesCredentials GetBrowserCredentials()
         {
             return new ReportingServicesCredentials( BrowserUser, BrowserPassword );
         }
 
+        /// <summary>
+        /// Gets the path.
+        /// </summary>
+        /// <param name="basePath">The base path.</param>
+        /// <param name="listChildren">if set to <c>true</c> [list children].</param>
+        /// <returns></returns>
         public Dictionary<string, string> GetPath( string basePath, bool listChildren )
         {
             var client = GetClient( UserType.Browser );
@@ -90,11 +112,13 @@ namespace com.kfs.Reporting.SQLReportingServices
             client.ListChildren( null, basePath, listChildren, out catalogItems );
 
             return catalogItems.Where( c => c.TypeName == "Report" ).Where( c => !c.Hidden ).ToDictionary( f => f.Path, f => f.Name );
-
         }
 
-
-
+        /// <summary>
+        /// Saves the credentials.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <returns></returns>
         public bool SaveCredentials( out string message )
         {
             if ( !TestConnection( out message, UserType.ContentManager ) )
@@ -126,15 +150,17 @@ namespace com.kfs.Reporting.SQLReportingServices
                 SaveAttributeValue( context, CONTENT_MANAGER_PWD_KEY, Encryption.EncryptString( ContentManagerPassword ) );
                 SaveAttributeValue( context, BROWSER_USER_KEY, BrowserUser );
                 SaveAttributeValue( context, BROWSER_PWD_KEY, Encryption.EncryptString( BrowserPassword ) );
-
-
             }
             GlobalAttributesCache.Flush();
             return true;
-
         }
 
-
+        /// <summary>
+        /// Tests the connection.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
         public bool TestConnection( out string message, UserType type )
         {
             bool isSuccessful = false;
@@ -142,9 +168,8 @@ namespace com.kfs.Reporting.SQLReportingServices
             try
             {
                 ReportingService2010SoapClient client = GetClient( UserType.ContentManager );
-  
+
                 Property[] userProperties = null;
-                
 
                 if ( TestPath() )
                 {
@@ -155,17 +180,14 @@ namespace com.kfs.Reporting.SQLReportingServices
                 {
                     message = "Connection Error";
                 }
-
-
-
             }
             catch ( Exception ex )
             {
                 bool caught = false;
                 if ( ex.InnerException != null && ex.InnerException.GetType() == typeof( System.Net.WebException ) )
                 {
-                    System.Net.WebException webEx = ( System.Net.WebException )ex.InnerException;
-                    if ( ( ( System.Net.HttpWebResponse )webEx.Response ).StatusCode == System.Net.HttpStatusCode.Unauthorized )
+                    System.Net.WebException webEx = (System.Net.WebException)ex.InnerException;
+                    if ( ( (System.Net.HttpWebResponse)webEx.Response ).StatusCode == System.Net.HttpStatusCode.Unauthorized )
                     {
                         message = "User is not authorized.";
                         caught = true;
@@ -181,10 +203,15 @@ namespace com.kfs.Reporting.SQLReportingServices
             return isSuccessful;
         }
 
-        public bool TestDataSource(out string message)
+        /// <summary>
+        /// Tests the data source.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <returns></returns>
+        public bool TestDataSource( out string message )
         {
             message = String.Empty;
-            string pathEnd = ReportPath.EndsWith("/") ? String.Empty : "/";
+            string pathEnd = ReportPath.EndsWith( "/" ) ? String.Empty : "/";
             string dsPath = string.Concat( ReportPath, pathEnd, "DataSources/RockContext" );
             string itemType = String.Empty;
             var client = GetClient( UserType.ContentManager );
@@ -199,6 +226,10 @@ namespace com.kfs.Reporting.SQLReportingServices
             return true;
         }
 
+        /// <summary>
+        /// Tests the path.
+        /// </summary>
+        /// <returns></returns>
         public bool TestPath()
         {
             try
@@ -214,12 +245,17 @@ namespace com.kfs.Reporting.SQLReportingServices
                 }
                 return false;
             }
-            catch ( Exception ex  )
+            catch ( Exception ex )
             {
                 return false;
             }
         }
 
+        /// <summary>
+        /// Gets the folder path.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns></returns>
         public string GetFolderPath( string path )
         {
             if ( path.EndsWith( "/" ) )
@@ -238,14 +274,16 @@ namespace com.kfs.Reporting.SQLReportingServices
                 return ReportPath;
             }
 
-
             return string.Concat( ReportPath, path );
-           
-            
         }
 
         #endregion
 
+        /// <summary>
+        /// Gets the API client.
+        /// </summary>
+        /// <param name="userType">Type of the user.</param>
+        /// <returns></returns>
         internal ReportingService2010SoapClient GetAPIClient( UserType userType )
         {
             return GetClient( userType );
@@ -253,6 +291,9 @@ namespace com.kfs.Reporting.SQLReportingServices
 
         #region Private Methods
 
+        /// <summary>
+        /// Clears the properties.
+        /// </summary>
         private void ClearProperties()
         {
             ServerUrl = null;
@@ -263,10 +304,14 @@ namespace com.kfs.Reporting.SQLReportingServices
             BrowserPassword = null;
         }
 
+        /// <summary>
+        /// Gets the client.
+        /// </summary>
+        /// <param name="ut">The ut.</param>
+        /// <returns></returns>
         private ReportingService2010SoapClient GetClient( UserType ut )
         {
-
-            if ( rsClient != null && ut ==  rsUserType)
+            if ( rsClient != null && ut == rsUserType )
             {
                 return rsClient;
             }
@@ -283,7 +328,6 @@ namespace com.kfs.Reporting.SQLReportingServices
             binding.Security.Message.ClientCredentialType = BasicHttpMessageCredentialType.UserName;
             binding.Security.Message.AlgorithmSuite = System.ServiceModel.Security.SecurityAlgorithmSuite.Default;
 
-
             string url = string.Format( "{0}/ReportService2010.asmx", ServerUrl );
             var endpoint = new EndpointAddress( url );
 
@@ -299,12 +343,14 @@ namespace com.kfs.Reporting.SQLReportingServices
             }
             rsUserType = ut;
             return rsClient;
-
         }
 
+        /// <summary>
+        /// Loads the credentials.
+        /// </summary>
+        /// <param name="context">The context.</param>
         private void LoadCredentials( RockContext context )
         {
-
             ClearProperties();
             GlobalAttributesCache cache = GlobalAttributesCache.Read();
 
@@ -319,9 +365,13 @@ namespace com.kfs.Reporting.SQLReportingServices
             {
                 CredentialsStored = true;
             }
-
         }
 
+        /// <summary>
+        /// Creates the reporting services category.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <returns></returns>
         private int CreateReportingServicesCategory( RockContext context )
         {
             var service = new CategoryService( context );
@@ -342,13 +392,16 @@ namespace com.kfs.Reporting.SQLReportingServices
             context.SaveChanges();
 
             return category.Id;
-
         }
 
+        /// <summary>
+        /// Gets the reporting services category.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <returns></returns>
         private int GetReportingServicesCategory( RockContext context )
         {
             Category cat = new CategoryService( context ).Get( ReportingServicesCategoryGuid );
-
 
             if ( cat == null )
             {
@@ -360,13 +413,18 @@ namespace com.kfs.Reporting.SQLReportingServices
             }
         }
 
+        /// <summary>
+        /// Saves the attribute value.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
         private void SaveAttributeValue( RockContext context, string key, string value )
         {
             var attributeSvc = new AttributeService( context );
             var attribute = attributeSvc.GetGlobalAttribute( key );
             var attributeValueSvc = new AttributeValueService( context );
             var attributeValue = attributeValueSvc.GetByAttributeIdAndEntityId( attribute.Id, null );
-
 
             if ( attributeValue == null && !String.IsNullOrWhiteSpace( value ) )
             {
@@ -393,8 +451,11 @@ namespace com.kfs.Reporting.SQLReportingServices
             context.SaveChanges();
         }
 
-
-
+        /// <summary>
+        /// Verifies the attributes.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="categoryId">The category identifier.</param>
         private void VerifyAttributes( RockContext context, int categoryId )
         {
             var attributeService = new AttributeService( context );
@@ -410,7 +471,6 @@ namespace com.kfs.Reporting.SQLReportingServices
 
             if ( serverUrl == null )
             {
-
                 serverUrl = new Rock.Model.Attribute();
                 serverUrl.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.URL_LINK ).Id;
                 serverUrl.IsSystem = false;
@@ -466,8 +526,6 @@ namespace com.kfs.Reporting.SQLReportingServices
                 contentManagerPwd.AttributeQualifiers.Add( new AttributeQualifier { IsSystem = false, Key = "ispassword", Value = bool.TrueString } );
                 attributeService.Add( contentManagerPwd );
                 hasChanges = true;
-
-
             }
 
             if ( browserUser == null )
@@ -504,11 +562,8 @@ namespace com.kfs.Reporting.SQLReportingServices
                 context.SaveChanges();
                 GlobalAttributesCache.Flush();
             }
-
         }
 
         #endregion
-
-
     }
 }
