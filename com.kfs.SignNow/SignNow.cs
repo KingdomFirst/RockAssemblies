@@ -10,6 +10,7 @@ using Rock.Attribute;
 using Rock.Model;
 using Rock.Web.Cache;
 
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Web;
 using Rock.Communication;
@@ -240,41 +241,48 @@ namespace com.kfs.SignNow
                 string message = string.Format( "{0} has requested a digital signature for a '{1}' document for {2}.",
                     GlobalAttributesCache.Value( "OrganizationName" ), documentTemplate.Name, appliesTo != null ? appliesTo.FullName : assignedTo.FullName );
 
-                // Get merge fields
-                var mergeKey = GetAttributeValue( "MergeFieldAttributeKey" );
-                if ( !string.IsNullOrWhiteSpace( mergeKey ) )
+                // Sign Now Sandbox does not support Smart Fields
+                if ( !GetAttributeValue( "UseAPISandbox" ).AsBoolean() )
                 {
-                    documentTemplate.LoadAttributes();
-                    var mergeFieldPairs = documentTemplate.GetAttributeValue( mergeKey );
-                    
-                    if ( !string.IsNullOrWhiteSpace( mergeFieldPairs ) )
+                    // Get merge fields
+                    var mergeKey = GetAttributeValue( "MergeFieldAttributeKey" );
+                    if ( !string.IsNullOrWhiteSpace( mergeKey ) )
                     {
-                        var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null );
-                        mergeFields.Add( "DocumentTemplate", documentTemplate );
-                        mergeFields.Add( "AppliesTo", appliesTo );
-                        mergeFields.Add( "AssignedTo", assignedTo );
+                        documentTemplate.LoadAttributes();
+                        var mergeFieldPairs = documentTemplate.GetAttributeValue( mergeKey );
 
-                        Dictionary<string, string> sourceKeyMap = null;
-                        sourceKeyMap = mergeFieldPairs.ResolveMergeFields( mergeFields, GetAttributeValue( "EnabledLavaCommands" ) ).AsDictionaryOrNull();
+                        if ( !string.IsNullOrWhiteSpace( mergeFieldPairs ) )
+                        {
 
-                        //
-                        // TODO: Build SignNow Merge Fields JSON here
-                        //
-                        // This works for creating new form fields in the document for user to fill.  Note: Form fields are not the same as Smart Fields.
-                        // var texts = new { texts = new[] { new { x = 10, y = 10, size = 8, page_number = 0, font = "Arial", data = "please work!", line_height = 9.075 } } };
-                        //
+                            var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null );
+                            mergeFields.Add( "DocumentTemplate", documentTemplate );
+                            mergeFields.Add( "AppliesTo", appliesTo );
+                            mergeFields.Add( "AssignedTo", assignedTo );
 
-                        //
-                        // This is the SignNow SDK Update method to be used once the DataObj structure is finalized
-                        //    
-                        //var data = string.Empty;
-                        //JObject mergeDocumentFields = SignNowSDK.Document.Update( accessToken, documentId, data );
-                        //errors = ParseErrors( mergeDocumentFields );
-                        //if ( errors.Any() )
-                        //{
-                        //    errorMessage = errors.AsDelimited( "; " );
-                        //    return null;
-                        //}
+                            Dictionary<string, string> sourceKeyMap = null;
+                            sourceKeyMap = mergeFieldPairs.ResolveMergeFields( mergeFields, GetAttributeValue( "EnabledLavaCommands" ) ).AsDictionaryOrNull();
+
+                            JObject json = new JObject(
+                                                new JProperty( "data",
+                                                    new JArray(
+                                                        from sf in sourceKeyMap
+                                                        select new JObject(
+                                                            new JProperty( sf.Key, sf.Value )
+                                                        )
+                                                    )
+                                                )
+                                            );
+
+                            var documentIdWithIntegration = $"{ documentId }/integration/object/smartfields";
+
+                            JObject mergeDocumentFields = SignNowSDK.Document.Update( accessToken, documentIdWithIntegration, json );
+                            errors = ParseErrors( mergeDocumentFields );
+                            if ( errors.Any() )
+                            {
+                                errorMessage = errors.AsDelimited( "; " );
+                                return null;
+                            }
+                        }
                     }
                 }
 
