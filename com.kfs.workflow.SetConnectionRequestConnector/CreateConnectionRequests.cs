@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-
+using Rock;
 using Rock.Attribute;
 using Rock.Data;
 using Rock.Model;
@@ -23,8 +23,7 @@ namespace com.kfs.Workflow.Action
 
     [WorkflowAttribute( "Person Attribute", "The Person attribute that contains the person that connection request should be created for.", true, "", "", 0, null,
         new string[] { "Rock.Field.Types.PersonFieldType" } )]
-    [WorkflowAttribute( "Connection Opportunity Attribute", "The attribute that contains the type of connection opportunity to create.", true, "", "", 1, null,
-        new string[] { "Rock.Field.Types.ConnectionOpportunityFieldType" } )]
+    [WorkflowAttribute( "Connection Opportunities Attribute", "The attribute that contains the types of connection opportunity to create. Expecting guid1^name1,guid2^name2,guid3^name3,.... Sample SQL: <code>SELECT co.[Guid] AS[Value], ct.[Name] + ': ' + co.[Name] AS[Text] FROM ConnectionOpportunity co JOIN ConnectionType ct ON co.ConnectionTypeId = ct.Id ORDER BY ct.[Name], co.[Name]</code>", true, "", "", 1, null )]
     [WorkflowAttribute( "Connection Status Attribute", "The attribute that contains the connection status to use for the new request.", false, "", "", 2, null,
         new string[] { "Rock.Field.Types.ConnectionStatusFieldType" } )]
     [ConnectionStatusField( "Connection Status", "The connection status to use for the new request (when Connection Status Attribute is not specified or invalid). If neither this setting or the Connection Status Attribute setting are set, the default status will be used.", false, "", "", 3 )]
@@ -32,9 +31,6 @@ namespace com.kfs.Workflow.Action
         new string[] { "Rock.Field.Types.CampusFieldType" } )]
     [WorkflowAttribute( "Connection Comment Attribute", "An optional attribute that contains the comment to use for the request.", false, "", "", 5, null,
         new string[] { "Rock.Field.Types.TextFieldType", "Rock.Field.Types.MemoFieldType" } )]
-    [WorkflowAttribute( "Connection Request Attribute", "An optional connection request attribute to store the request that is created.", false, "", "", 6, null,
-        new string[] { "Rock.Field.Types.ConnectionRequestFieldType" } )]
-
 
     public class CreateConnectionRequests : ActionComponent
     {
@@ -60,90 +56,86 @@ namespace com.kfs.Workflow.Action
                 return false;
             }
 
-            // Get the opportunity
-            ConnectionOpportunity opportunity = null;
-            Guid opportunityTypeGuid = action.GetWorklowAttributeValue( GetAttributeValue( action, "ConnectionOpportunityAttribute" ).AsGuid() ).AsGuid();
-            opportunity = new ConnectionOpportunityService( rockContext ).Get( opportunityTypeGuid );
-            if ( opportunity == null )
-            {
-                errorMessages.Add( "Invalid Connection Opportunity Attribute or Value!" );
-                return false;
-            }
-
-            // Get connection status
-            ConnectionStatus status = null;
-            Guid? connectionStatusGuid = null;
-            Guid? connectionStatusAttributeGuid = GetAttributeValue( action, "ConnectionStatusAttribute" ).AsGuidOrNull();
-            if ( connectionStatusAttributeGuid.HasValue )
-            {
-                connectionStatusGuid = action.GetWorklowAttributeValue( connectionStatusAttributeGuid.Value ).AsGuidOrNull();
-                if ( connectionStatusGuid.HasValue )
-                {
-                    status = opportunity.ConnectionType.ConnectionStatuses
-                        .Where( s => s.Guid.Equals( connectionStatusGuid.Value ) )
-                        .FirstOrDefault();
-                }
-            }
-            if ( status == null )
-            {
-                connectionStatusGuid = GetAttributeValue( action, "ConnectionStatus" ).AsGuidOrNull();
-                if ( connectionStatusGuid.HasValue )
-                {
-                    status = opportunity.ConnectionType.ConnectionStatuses
-                        .Where( s => s.Guid.Equals( connectionStatusGuid.Value ) )
-                        .FirstOrDefault();
-                }
-            }
-            if ( status == null )
-            {
-                status = opportunity.ConnectionType.ConnectionStatuses
-                    .Where( s => s.IsDefault )
-                    .FirstOrDefault();
-            }
-
-            // Get Campus
-            int? campusId = null;
-            Guid? campusAttributeGuid = GetAttributeValue( action, "CampusAttribute" ).AsGuidOrNull();
-            if ( campusAttributeGuid.HasValue )
-            {
-                Guid? campusGuid = action.GetWorklowAttributeValue( campusAttributeGuid.Value ).AsGuidOrNull();
-                if ( campusGuid.HasValue )
-                {
-                    var campus = CampusCache.Read( campusGuid.Value );
-                    if ( campus != null )
-                    {
-                        campusId = campus.Id;
-                    }
-                }
-            }
-
-            // Get the Comment
-            String comment = action.GetWorklowAttributeValue( GetAttributeValue( action, "ConnectionCommentAttribute" ).AsGuid() );
-
             var connectionRequestService = new ConnectionRequestService( rockContext );
 
-            var connectionRequest = new ConnectionRequest();
-            connectionRequest.PersonAliasId = personAlias.Id;
-            connectionRequest.ConnectionOpportunityId = opportunity.Id;
-            connectionRequest.ConnectionState = ConnectionState.Active;
-            connectionRequest.ConnectionStatusId = status.Id;
-            connectionRequest.CampusId = campusId;
-            connectionRequest.ConnectorPersonAliasId = opportunity.GetDefaultConnectorPersonAliasId( campusId );
-            connectionRequest.Comments = comment;
+            // Get the opportunity
+            List<Guid> opportunityTypeGuids = Array.ConvertAll( action.GetWorklowAttributeValue( GetAttributeValue( action, "ConnectionOpportunitiesAttribute" ).AsGuid() ).Split( ',' ), s => new Guid( s ) ).ToList();
 
-            connectionRequestService.Add( connectionRequest );
-            rockContext.SaveChanges();
-
-            // If request attribute was specified, requery the request and set the attribute's value
-            Guid? connectionRequestAttributeGuid = GetAttributeValue( action, "ConnectionRequestAttribute" ).AsGuidOrNull();
-            if ( connectionRequestAttributeGuid.HasValue )
+            foreach (var opportunityTypeGuid in opportunityTypeGuids)
             {
-                connectionRequest = connectionRequestService.Get( connectionRequest.Id );
-                if ( connectionRequest != null )
+                ConnectionOpportunity opportunity = null;
+                opportunity = new ConnectionOpportunityService( rockContext ).Get( opportunityTypeGuid );
+                if ( opportunity == null )
                 {
-                    SetWorkflowAttributeValue( action, connectionRequestAttributeGuid.Value, connectionRequest.Guid.ToString() );
+                    errorMessages.Add( "Invalid Connection Opportunity Attribute or Value!" );
+                    return false;
                 }
+
+                // Get connection status
+                ConnectionStatus status = null;
+                Guid? connectionStatusGuid = null;
+                Guid? connectionStatusAttributeGuid = GetAttributeValue( action, "ConnectionStatusAttribute" ).AsGuidOrNull();
+                if ( connectionStatusAttributeGuid.HasValue )
+                {
+                    connectionStatusGuid = action.GetWorklowAttributeValue( connectionStatusAttributeGuid.Value ).AsGuidOrNull();
+                    if ( connectionStatusGuid.HasValue )
+                    {
+                        status = opportunity.ConnectionType.ConnectionStatuses
+                            .Where( s => s.Guid.Equals( connectionStatusGuid.Value ) )
+                            .FirstOrDefault();
+                    }
+                }
+                if ( status == null )
+                {
+                    connectionStatusGuid = GetAttributeValue( action, "ConnectionStatus" ).AsGuidOrNull();
+                    if ( connectionStatusGuid.HasValue )
+                    {
+                        status = opportunity.ConnectionType.ConnectionStatuses
+                            .Where( s => s.Guid.Equals( connectionStatusGuid.Value ) )
+                            .FirstOrDefault();
+                    }
+                }
+                if ( status == null )
+                {
+                    status = opportunity.ConnectionType.ConnectionStatuses
+                        .Where( s => s.IsDefault )
+                        .FirstOrDefault();
+                }
+
+                // Get Campus
+                int? campusId = null;
+                Guid? campusAttributeGuid = GetAttributeValue( action, "CampusAttribute" ).AsGuidOrNull();
+                if ( campusAttributeGuid.HasValue )
+                {
+                    Guid? campusGuid = action.GetWorklowAttributeValue( campusAttributeGuid.Value ).AsGuidOrNull();
+                    if ( campusGuid.HasValue )
+                    {
+                        var campus = CampusCache.Read( campusGuid.Value );
+                        if ( campus != null )
+                        {
+                            campusId = campus.Id;
+                        }
+                    }
+                }
+
+                // Get the Comment
+                String comment = action.GetWorklowAttributeValue( GetAttributeValue( action, "ConnectionCommentAttribute" ).AsGuid() );
+
+                //var connectionRequestService = new ConnectionRequestService( rockContext );
+
+                var connectionRequest = new ConnectionRequest();
+                connectionRequest.PersonAliasId = personAlias.Id;
+                connectionRequest.ConnectionOpportunityId = opportunity.Id;
+                connectionRequest.ConnectionState = ConnectionState.Active;
+                connectionRequest.ConnectionStatusId = status.Id;
+                connectionRequest.CampusId = campusId;
+                connectionRequest.ConnectorPersonAliasId = opportunity.GetDefaultConnectorPersonAliasId( campusId );
+                connectionRequest.Comments = comment;
+
+                connectionRequestService.Add( connectionRequest );
             }
+
+            rockContext.SaveChanges();
 
             return true;
         }
