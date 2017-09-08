@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using com.kfs.Reporting.SQLReportingServices.API;
 
 namespace com.kfs.Reporting.SQLReportingServices
 {
+    /// <summary>
+    /// The Report Service Item
+    /// </summary>
     public class ReportingServiceItem
     {
         public string Name { get; set; }
@@ -14,6 +15,7 @@ namespace com.kfs.Reporting.SQLReportingServices
         public ItemType Type { get; set; }
         public List<ReportingServiceItem> Children { get; set; }
         public bool Hidden { get; set; }
+
         internal string ParentPath
         {
             get
@@ -22,8 +24,16 @@ namespace com.kfs.Reporting.SQLReportingServices
                 return Path.Substring( 0, ix - 1 );
             }
         }
+
         private static List<ReportingServiceItem> rawItems = null;
 
+        /// <summary>
+        /// Gets the folders in a flat list.
+        /// </summary>
+        /// <param name="rootPath">The root path.</param>
+        /// <param name="recursive">if set to <c>true</c> [recursive].</param>
+        /// <param name="includeHidden">if set to <c>true</c> [include hidden].</param>
+        /// <returns></returns>
         public static List<ReportingServiceItem> GetFoldersFlat( string rootPath, bool recursive, bool includeHidden )
         {
             rawItems = new List<ReportingServiceItem>();
@@ -46,6 +56,13 @@ namespace com.kfs.Reporting.SQLReportingServices
             return rawItems;
         }
 
+        /// <summary>
+        /// Gets the folder tree.
+        /// </summary>
+        /// <param name="rootPath">The root path.</param>
+        /// <param name="recursive">if set to <c>true</c> [recursive].</param>
+        /// <param name="includeHidden">if set to <c>true</c> [include hidden].</param>
+        /// <returns></returns>
         public static ReportingServiceItem GetFoldersTree( string rootPath, bool recursive, bool includeHidden )
         {
             var rawItems = GetFoldersFlat( rootPath, recursive, includeHidden );
@@ -56,6 +73,13 @@ namespace com.kfs.Reporting.SQLReportingServices
             return rsi;
         }
 
+        /// <summary>
+        /// Gets the items in a flat list.
+        /// </summary>
+        /// <param name="rootPath">The root path.</param>
+        /// <param name="recursive">if set to <c>true</c> [recursive].</param>
+        /// <param name="includeHidden">if set to <c>true</c> [include hidden].</param>
+        /// <returns></returns>
         private static List<ReportingServiceItem> GetItemsFlat( string rootPath, bool recursive, bool includeHidden )
         {
             var apiItems = GetCatalogItems( rootPath, recursive )
@@ -75,12 +99,15 @@ namespace com.kfs.Reporting.SQLReportingServices
                     case "folder":
                         i.Type = ItemType.Folder;
                         break;
+
                     case "report":
                         i.Type = ItemType.Report;
                         break;
+
                     case "datasource":
                         i.Type = ItemType.DataSource;
                         break;
+
                     default:
                         break;
                 }
@@ -88,9 +115,15 @@ namespace com.kfs.Reporting.SQLReportingServices
                 rawItems.Add( i );
             }
             return rawItems;
-
         }
 
+        /// <summary>
+        /// Gets the report in a flat list.
+        /// </summary>
+        /// <param name="rootPath">The root path.</param>
+        /// <param name="recursive">if set to <c>true</c> [recursive].</param>
+        /// <param name="includeHidden">if set to <c>true</c> [include hidden].</param>
+        /// <returns></returns>
         public static List<ReportingServiceItem> GetReportFlat( string rootPath, bool recursive, bool includeHidden )
         {
             var rawitems = GetItemsFlat( rootPath, recursive, includeHidden );
@@ -98,6 +131,13 @@ namespace com.kfs.Reporting.SQLReportingServices
                 .Where( r => includeHidden || r.Hidden == false ).ToList();
         }
 
+        /// <summary>
+        /// Gets the report tree.
+        /// </summary>
+        /// <param name="rootPath">The root path.</param>
+        /// <param name="recursive">if set to <c>true</c> [recursive].</param>
+        /// <param name="includeHidden">if set to <c>true</c> [include hidden].</param>
+        /// <returns></returns>
         public static ReportingServiceItem GetReportTree( string rootPath, bool recursive, bool includeHidden )
         {
             var rawItems = GetItemsFlat( rootPath, recursive, includeHidden );
@@ -113,14 +153,24 @@ namespace com.kfs.Reporting.SQLReportingServices
             rsi.Children = LoadChildren( rawItems, rsi.Path );
 
             return rsi;
-
         }
 
+        /// <summary>
+        /// Gets the report parameter list.
+        /// </summary>
+        /// <param name="reportPath">The report path.</param>
+        /// <returns></returns>
         public static List<string> GetReportParameterList( string reportPath )
         {
             return GetReportParameterList( new ReportingServicesProvider(), reportPath );
         }
 
+        /// <summary>
+        /// Gets the report parameter list.
+        /// </summary>
+        /// <param name="provider">The provider.</param>
+        /// <param name="reportPath">The report path.</param>
+        /// <returns></returns>
         public static List<string> GetReportParameterList( ReportingServicesProvider provider, string reportPath )
         {
             var client = provider.GetAPIClient( UserType.Browser );
@@ -134,14 +184,17 @@ namespace com.kfs.Reporting.SQLReportingServices
             }
 
             return paramNames;
-
         }
 
+        /// <summary>
+        /// Gets the item by path.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns></returns>
         public static ReportingServiceItem GetItemByPath( string path )
         {
             ReportingServicesProvider provider = new ReportingServicesProvider();
             path = provider.GetFolderPath( path );
-
 
             ReportingServiceItem rsItem = GetItemsFlat( provider.ReportPath, true, true )
                 .Where( i => i.Path.Equals( path, StringComparison.InvariantCultureIgnoreCase ) )
@@ -149,11 +202,17 @@ namespace com.kfs.Reporting.SQLReportingServices
             return rsItem;
         }
 
+        /// <summary>
+        /// Loads the children.
+        /// </summary>
+        /// <param name="rawItems">The raw items.</param>
+        /// <param name="parentPath">The parent path.</param>
+        /// <returns></returns>
         private static List<ReportingServiceItem> LoadChildren( List<ReportingServiceItem> rawItems, string parentPath )
         {
             List<ReportingServiceItem> items = new List<ReportingServiceItem>();
 
-            foreach ( var item in rawItems.Where(i => i.ParentPath == parentPath) )
+            foreach ( var item in rawItems.Where( i => i.ParentPath == parentPath ) )
             {
                 if ( item.Type == ItemType.Folder )
                 {
@@ -165,6 +224,12 @@ namespace com.kfs.Reporting.SQLReportingServices
             return items;
         }
 
+        /// <summary>
+        /// Gets the catalog items.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <param name="recursive">if set to <c>true</c> [recursive].</param>
+        /// <returns></returns>
         private static API.CatalogItem[] GetCatalogItems( string path, bool recursive )
         {
             ReportingServicesProvider provider = new ReportingServicesProvider();
@@ -175,19 +240,16 @@ namespace com.kfs.Reporting.SQLReportingServices
             apiClient.ListChildren( null, path, recursive, out catalog );
 
             return catalog;
-            
-            
         }
-
     }
 
-
-
+    /// <summary>
+    ///
+    /// </summary>
     public enum ItemType
     {
         Folder = 0,
-        Report = 1, 
+        Report = 1,
         DataSource = 2
-
     }
 }
