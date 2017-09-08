@@ -25,8 +25,6 @@ namespace com.kfs.AdobeSign
     [Description( "Adobe Sign Digital Signature Provider" )]
     [Export( typeof( DigitalSignatureComponent ) )]
     [ExportMetadata( "ComponentName", "Adobe Sign" )]
-
-    [TextField( "Cookie Initialization Url", "The URL of the Adobe Sign page to use for setting an initial cookie.", true, "https://mw.signnow.com/setcookie", "Advanced", 0 )]
     
     public class AdobeSign : DigitalSignatureComponent
     {
@@ -41,7 +39,7 @@ namespace com.kfs.AdobeSign
         {
             get
             {
-                return GetAttributeValue( "CookieInitializationUrl" );
+                return string.Empty;
             }
         }
 
