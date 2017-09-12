@@ -15,6 +15,9 @@ using Newtonsoft.Json.Linq;
 using System.Web;
 using Rock.Communication;
 using Rock;
+using RestSharp;
+using System.Net;
+using RestSharp.Serializers;
 
 namespace com.kfs.SignNow
 {
@@ -278,7 +281,47 @@ namespace com.kfs.SignNow
 
                             var documentIdWithIntegration = $"{ documentId }/integration/object/smartfields";
 
-                            JObject mergeDocumentFields = SignNowSDK.Document.Update( accessToken, documentIdWithIntegration, json );
+                            //
+                            // begin sign now sdk workaround
+                            //
+                            // sign now update uses PUT rather than POST
+                            // also, the object was not be serialized properly
+                            //
+                            
+                            var useAPISandbox = GetAttributeValue( "UseAPISandbox" ).AsBoolean();
+                            
+                            var client = new RestClient();
+                            client.BaseUrl = new Uri( useAPISandbox ? "https://api-eval.signnow.com/" : "https://api.signnow.com/" );
+
+                            var request = new RestRequest( "/document/" + documentIdWithIntegration, Method.POST )
+                                .AddHeader( "Accept", "application/json" )
+                                .AddHeader( "Authorization", "Bearer " + accessToken );
+
+                            request.JsonSerializer = new JsonDotNetSerializer();
+                            request.RequestFormat = DataFormat.Json;
+                            request.AddBody( json );
+
+                            var response = client.Execute( request );
+
+                            dynamic results = "";
+
+                            if ( response.StatusCode == HttpStatusCode.OK )
+                            {
+                                results = response.Content;
+                            }
+                            else
+                            {
+                                Console.WriteLine( response.Content.ToString() );
+                                results = response.Content.ToString();
+                            }
+
+                            var mergeDocumentFields = JsonConvert.DeserializeObject( results );
+
+                            //
+                            // end sign now sdk work around
+                            //
+
+                            //JObject mergeDocumentFields = SignNowSDK.Document.Update( accessToken, documentIdWithIntegration, data, method: Method.POST );
                             errors = ParseErrors( mergeDocumentFields );
                             if ( errors.Any() )
                             {
@@ -737,4 +780,71 @@ namespace com.kfs.SignNow
 
 
     }
+}
+
+public class JsonDotNetSerializer : ISerializer
+{
+    private readonly Newtonsoft.Json.JsonSerializer _serializer;
+
+    /// <summary>
+    /// Default serializer
+    /// </summary>
+    public JsonDotNetSerializer()
+    {
+        ContentType = "application/json";
+        _serializer = new Newtonsoft.Json.JsonSerializer
+        {
+            MissingMemberHandling = MissingMemberHandling.Ignore,
+            NullValueHandling = NullValueHandling.Include,
+            DefaultValueHandling = DefaultValueHandling.Include
+        };
+    }
+
+    /// <summary>
+    /// Default serializer with overload for allowing custom Json.NET settings
+    /// </summary>
+    public JsonDotNetSerializer( Newtonsoft.Json.JsonSerializer serializer )
+    {
+        ContentType = "application/json";
+        _serializer = serializer;
+    }
+
+    /// <summary>
+    /// Serialize the object as JSON
+    /// </summary>
+    /// <param name="obj">Object to serialize</param>
+    /// <returns>JSON as String</returns>
+    public string Serialize( object obj )
+    {
+        using ( var stringWriter = new StringWriter() )
+        {
+            using ( var jsonTextWriter = new JsonTextWriter( stringWriter ) )
+            {
+                jsonTextWriter.Formatting = Newtonsoft.Json.Formatting.Indented;
+                jsonTextWriter.QuoteChar = '"';
+
+                _serializer.Serialize( jsonTextWriter, obj );
+
+                var result = stringWriter.ToString();
+                return result;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Unused for JSON Serialization
+    /// </summary>
+    public string DateFormat { get; set; }
+    /// <summary>
+    /// Unused for JSON Serialization
+    /// </summary>
+    public string RootElement { get; set; }
+    /// <summary>
+    /// Unused for JSON Serialization
+    /// </summary>
+    public string Namespace { get; set; }
+    /// <summary>
+    /// Content type for serialized content
+    /// </summary>
+    public string ContentType { get; set; }
 }
