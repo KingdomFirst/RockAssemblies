@@ -243,77 +243,73 @@ namespace com.kfs.SignNow
                 string message = string.Format( "{0} has requested a digital signature for a '{1}' document for {2}.",
                     GlobalAttributesCache.Value( "OrganizationName" ), documentTemplate.Name, appliesTo != null ? appliesTo.FullName : assignedTo.FullName );
 
-                // Sign Now Sandbox does not support Smart Fields
-                if ( !GetAttributeValue( "UseAPISandbox" ).AsBoolean() )
+                // Get merge fields
+                var mergeKey = GetAttributeValue( "MergeFieldAttributeKey" );
+                if ( !string.IsNullOrWhiteSpace( mergeKey ) )
                 {
-                    // Get merge fields
-                    var mergeKey = GetAttributeValue( "MergeFieldAttributeKey" );
-                    if ( !string.IsNullOrWhiteSpace( mergeKey ) )
+                    documentTemplate.LoadAttributes();
+                    var mergeFieldPairs = documentTemplate.GetAttributeValue( mergeKey );
+
+                    if ( !string.IsNullOrWhiteSpace( mergeFieldPairs ) )
                     {
-                        documentTemplate.LoadAttributes();
-                        var mergeFieldPairs = documentTemplate.GetAttributeValue( mergeKey );
 
-                        if ( !string.IsNullOrWhiteSpace( mergeFieldPairs ) )
+                        var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null );
+                        mergeFields.Add( "DocumentTemplate", documentTemplate );
+                        mergeFields.Add( "AppliesTo", appliesTo );
+                        mergeFields.Add( "AssignedTo", assignedTo );
+
+                        Dictionary<string, string> sourceKeyMap = null;
+                        sourceKeyMap = mergeFieldPairs.ResolveMergeFields( mergeFields, GetAttributeValue( "EnabledLavaCommands" ) ).AsDictionaryOrNull();
+
+                        TimeSpan t = DateTime.UtcNow - new DateTime( 1970, 1, 1 );
+                        int secondsSinceEpoch = ( int ) t.TotalSeconds;
+
+                        dynamic json = new { data = new[] { sourceKeyMap }, client_timestamp = secondsSinceEpoch.ToString() };
+
+                        var documentIdWithIntegration = $"{ documentId }/integration/object/smartfields";
+
+                        //
+                        // begin sign now sdk workaround
+                        // sign now Update() uses PUT rather than POST
+                        //
+                            
+                        var useAPISandbox = GetAttributeValue( "UseAPISandbox" ).AsBoolean();
+                            
+                        var client = new RestClient();
+                        client.BaseUrl = new Uri( useAPISandbox ? "https://api-eval.signnow.com/" : "https://api.signnow.com/" );
+
+                        var request = new RestRequest( "/document/" + documentIdWithIntegration, Method.POST )
+                            .AddHeader( "Accept", "application/json" )
+                            .AddHeader( "Authorization", "Bearer " + accessToken );
+
+                        request.RequestFormat = DataFormat.Json;
+                        request.AddJsonBody( json );
+
+                        var response = client.Execute( request );
+
+                        dynamic results = "";
+
+                        if ( response.StatusCode == HttpStatusCode.OK )
                         {
+                            results = response.Content;
+                        }
+                        else
+                        {
+                            Console.WriteLine( response.Content.ToString() );
+                            results = response.Content.ToString();
+                        }
 
-                            var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null );
-                            mergeFields.Add( "DocumentTemplate", documentTemplate );
-                            mergeFields.Add( "AppliesTo", appliesTo );
-                            mergeFields.Add( "AssignedTo", assignedTo );
+                        var mergeDocumentFields = JsonConvert.DeserializeObject( results );
 
-                            Dictionary<string, string> sourceKeyMap = null;
-                            sourceKeyMap = mergeFieldPairs.ResolveMergeFields( mergeFields, GetAttributeValue( "EnabledLavaCommands" ) ).AsDictionaryOrNull();
+                        //
+                        // end sign now sdk work around
+                        //
 
-                            TimeSpan t = DateTime.UtcNow - new DateTime( 1970, 1, 1 );
-                            int secondsSinceEpoch = ( int ) t.TotalSeconds;
-
-                            dynamic json = new { data = new[] { sourceKeyMap }, client_timestamp = secondsSinceEpoch.ToString() };
-
-                            var documentIdWithIntegration = $"{ documentId }/integration/object/smartfields";
-
-                            //
-                            // begin sign now sdk workaround
-                            // sign now Update() uses PUT rather than POST
-                            //
-                            
-                            var useAPISandbox = GetAttributeValue( "UseAPISandbox" ).AsBoolean();
-                            
-                            var client = new RestClient();
-                            client.BaseUrl = new Uri( useAPISandbox ? "https://api-eval.signnow.com/" : "https://api.signnow.com/" );
-
-                            var request = new RestRequest( "/document/" + documentIdWithIntegration, Method.POST )
-                                .AddHeader( "Accept", "application/json" )
-                                .AddHeader( "Authorization", "Bearer " + accessToken );
-
-                            request.RequestFormat = DataFormat.Json;
-                            request.AddJsonBody( json );
-
-                            var response = client.Execute( request );
-
-                            dynamic results = "";
-
-                            if ( response.StatusCode == HttpStatusCode.OK )
-                            {
-                                results = response.Content;
-                            }
-                            else
-                            {
-                                Console.WriteLine( response.Content.ToString() );
-                                results = response.Content.ToString();
-                            }
-
-                            var mergeDocumentFields = JsonConvert.DeserializeObject( results );
-
-                            //
-                            // end sign now sdk work around
-                            //
-
-                            errors = ParseErrors( mergeDocumentFields );
-                            if ( errors.Any() )
-                            {
-                                errorMessage = errors.AsDelimited( "; " );
-                                return null;
-                            }
+                        errors = ParseErrors( mergeDocumentFields );
+                        if ( errors.Any() )
+                        {
+                            errorMessage = errors.AsDelimited( "; " );
+                            return null;
                         }
                     }
                 }
