@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\001_AddEventPages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rock\Web\UI\Controls\Resource Controls\ResourceArea.cs" />
     <Compile Include="Rock\Web\UI\Controls\Resource Controls\ResourceAreaRow.cs" />
@@ -62,11 +63,11 @@
     <Compile Include="Rock\Web\UI\Controls\Resource Controls\ResourceGroupRow.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Rock\DotLiquid\DotLiquid.csproj">
+    <ProjectReference Include="..\..\DotLiquid\DotLiquid.csproj">
       <Project>{00EDCB8D-EF33-459C-AD62-02876BD24DFF}</Project>
       <Name>DotLiquid</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Rock\Rock\Rock.csproj">
+    <ProjectReference Include="..\..\Rock\Rock.csproj">
       <Project>{185a31d7-3037-4dae-8797-0459849a84bd}</Project>
       <Name>Rock</Name>
     </ProjectReference>
