@@ -4,20 +4,19 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-
-using Rock.Security;
-using Rock.Attribute;
-using Rock.Model;
-using Rock.Web.Cache;
+using System.Net;
+using System.Web;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Web;
-using Rock.Communication;
-using Rock;
 using RestSharp;
-using System.Net;
-using RestSharp.Serializers;
+
+using Rock;
+using Rock.Attribute;
+using Rock.Communication;
+using Rock.Model;
+using Rock.Security;
+using Rock.Web.Cache;
 
 namespace com.kfs.SignNow
 {
