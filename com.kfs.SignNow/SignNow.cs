@@ -262,6 +262,9 @@ namespace com.kfs.SignNow
                             Dictionary<string, string> sourceKeyMap = null;
                             sourceKeyMap = mergeFieldPairs.ResolveMergeFields( mergeFields, GetAttributeValue( "EnabledLavaCommands" ) ).AsDictionaryOrNull();
 
+                            TimeSpan t = DateTime.UtcNow - new DateTime( 1970, 1, 1 );
+                            int secondsSinceEpoch = ( int ) t.TotalSeconds;
+
                             JObject json = new JObject(
                                                 new JProperty( "data",
                                                     new JArray(
@@ -270,7 +273,7 @@ namespace com.kfs.SignNow
                                                             new JProperty( sf.Key, sf.Value )
                                                         )
                                                     )
-                                                )
+                                                ), new JProperty( "client_timestamp", secondsSinceEpoch.ToString() )
                                             );
 
                             var documentIdWithIntegration = $"{ documentId }/integration/object/smartfields";
