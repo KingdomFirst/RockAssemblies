@@ -20,6 +20,10 @@
 **/desktop.ini
 **/ehthumbs.db
 **/Thumbs.db
+*.user
+*.suo
+*/bin/*
+*/obj/*
 
 # Jobs Debug Files #
 ####################
