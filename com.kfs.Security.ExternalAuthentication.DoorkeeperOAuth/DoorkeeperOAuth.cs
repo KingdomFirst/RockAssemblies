@@ -1,20 +1,4 @@
-﻿// <copyright>
-// Copyright by the Spark Development Network
-//
-// Licensed under the Rock Community License (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.rockrms.com/license
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -27,25 +11,39 @@ using System.Web.Security;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using RestSharp;
+using Rock;
 using Rock.Attribute;
 using Rock.Data;
 using Rock.Model;
+using Rock.Security;
 using Rock.Web.Cache;
 
-namespace Rock.Security.ExternalAuthentication
+namespace com.kfs.Security.ExternalAuthentication
 {
     /// <summary>
-    /// Authenticates a user using Google
+    /// Authenticates a user using a provided Doorkeeper OAuth Server
     /// </summary>
-    [Description( "Google Authentication Provider" )]
+    [Description( "OAuth Authentication Provider for Doorkeeper" )]
     [Export( typeof( AuthenticationComponent ) )]
-    [ExportMetadata( "ComponentName", "Google" )]
+    [ExportMetadata( "ComponentName", "Doorkeeper OAuth" )]
 
-    [TextField( "Client ID", "The Google Client ID" )]
-    [TextField( "Client Secret", "The Google Client Secret" )]
+    [TextField( "Client ID", "The Doorkeeper OAuth Client ID" )]
+    [TextField( "Client Secret", "The Doorkeeper OAuth Client Secret" )]
+    [UrlLinkField( "Doorkeeper Server Url", "The base Url of the local Doorkeeper server. Example: https://login.mychurch.org/" )]
+    [UrlLinkField( "User Info Url", "The Url location of the 'me.json' data. Example: https://login.mychurch.org/api/v1/me.json" )]   /// https://www.googleapis.com/oauth2/v2/userinfo
 
-    public class Google : AuthenticationComponent
+    public class DoorkeeperOAuth : AuthenticationComponent
     {
+        /// <summary>
+        /// The _baseUrl
+        /// </summary>
+        private string _baseUrl = null;
+
+        /// <summary>
+        /// The _return URL
+        /// </summary>
+        private string _returnUrl = null;
+
         /// <summary>
         /// Gets the type of the service.
         /// </summary>
@@ -88,12 +86,25 @@ namespace Rock.Security.ExternalAuthentication
         /// <returns></returns>
         public override Uri GenerateLoginUrl( HttpRequest request )
         {
-            string returnUrl = request.QueryString["returnurl"];
-            string redirectUri = GetRedirectUrl( request );
+            _baseUrl = GetAttributeValue( "DoorkeeperServerUrl" );
+            if ( !_baseUrl.EndsWith( "/" ) && _baseUrl != "" )
+            {
+                _baseUrl = _baseUrl + "/";
+            }
 
-            return new Uri( string.Format( "https://accounts.google.com/o/oauth2/auth?response_type=code&client_id={0}&redirect_uri={1}&state={2}&scope=email profile",
+            string returnUrl = request.QueryString["returnurl"];
+            //string redirectUri = GetRedirectUrl( request );
+
+            _returnUrl = FormsAuthentication.DefaultUrl;
+            if ( !string.IsNullOrWhiteSpace( request.QueryString.ToString() ) )
+            {
+                _returnUrl = HttpUtility.UrlDecode( request.Url.GetLeftPart( UriPartial.Authority ) + request.QueryString["returnurl"] );
+            }
+
+            return new Uri( string.Format( "{0}oauth/authorize?client_id={1}&redirect_uri={2}",
+                _baseUrl,
                 GetAttributeValue( "ClientID" ),
-                HttpUtility.UrlEncode( redirectUri ),
+                //HttpUtility.UrlEncode( redirectUri ),
                 HttpUtility.UrlEncode( returnUrl ?? FormsAuthentication.DefaultUrl ) ) );
         }
 
@@ -137,18 +148,20 @@ namespace Rock.Security.ExternalAuthentication
         public override Boolean Authenticate( HttpRequest request, out string username, out string returnUrl )
         {
             username = string.Empty;
-            returnUrl = request.QueryString["State"];
+            //returnUrl = request.QueryString["State"];
+            returnUrl = _returnUrl;
             string redirectUri = GetRedirectUrl( request );
 
             try
             {
-                // Get a new OAuth Access Token for the 'code' that was returned from the Google user consent redirect
+                // Get a new OAuth Access Token for the 'code' that was returned from the OAuth user consent redirect
                 var restClient = new RestClient(
-                    string.Format( "https://www.googleapis.com/oauth2/v3/token?client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&grant_type=authorization_code",
-                        GetAttributeValue( "ClientID" ),
+                    string.Format( "{0}oauth/token?grant_type=authorization_code&code={1}&redirect_uri={2}&client_id={3}&client_secret={4}",
+                        _baseUrl,
+                        request.QueryString["code"],
                         HttpUtility.UrlEncode( redirectUri ),
-                        GetAttributeValue( "ClientSecret" ),
-                        request.QueryString["code"] ) );
+                        GetAttributeValue( "ClientID" ),
+                        GetAttributeValue( "ClientSecret" ) ) );
                 var restRequest = new RestRequest( Method.POST );
                 var restResponse = restClient.Execute( restRequest );
 
@@ -157,20 +170,20 @@ namespace Rock.Security.ExternalAuthentication
                     var accesstokenresponse = JsonConvert.DeserializeObject<accesstokenresponse>( restResponse.Content );
                     string accessToken = accesstokenresponse.access_token;
 
-                    // Get information about the person who logged in using Google
+                    // Get information about the person who logged in using OAuth
                     restRequest = new RestRequest( Method.GET );
                     restRequest.AddParameter( "access_token", accessToken );
                     restRequest.AddParameter( "fields", "id,hd,email,family_name,gender,given_name" );
                     restRequest.AddParameter( "key", GetAttributeValue( "ClientID" ) );
                     restRequest.RequestFormat = DataFormat.Json;
                     restRequest.AddHeader( "Accept", "application/json" );
-                    restClient = new RestClient( "https://www.googleapis.com/oauth2/v2/userinfo" );
+                    restClient = new RestClient( GetAttributeValue( "UserInfoUrl" ) );
                     restResponse = restClient.Execute( restRequest );
 
                     if ( restResponse.StatusCode == HttpStatusCode.OK )
                     {
-                        GoogleUser googleUser = JsonConvert.DeserializeObject<GoogleUser>( restResponse.Content );
-                        username = GetGoogleUser( googleUser, accessToken );
+                        OAuthUser oauthUser = JsonConvert.DeserializeObject<OAuthUser>( restResponse.Content );
+                        username = GetOAuthUser( oauthUser, accessToken );
                     }
                 }
             }
@@ -264,9 +277,9 @@ namespace Rock.Security.ExternalAuthentication
         }
 
         /// <summary>
-        /// Google User Object
+        /// OAuth User Object
         /// </summary>
-        public class GoogleUser
+        public class OAuthUser
         {
             /// <summary>
             /// Gets or sets the family_name.
@@ -349,7 +362,7 @@ namespace Rock.Security.ExternalAuthentication
             public string hd { get; set; }
 
             /// <summary>
-            /// Gets or sets a value indicating whether this <see cref="GoogleUser"/> is verified_email.
+            /// Gets or sets a value indicating whether this <see cref="OAuthUser"/> is verified_email.
             /// </summary>
             /// <value>
             ///   <c>true</c> if verified_email; otherwise, <c>false</c>.
@@ -358,18 +371,18 @@ namespace Rock.Security.ExternalAuthentication
         }
 
         /// <summary>
-        /// Gets the name of the Google user.
+        /// Gets the name of the OAuth user.
         /// </summary>
-        /// <param name="googleUser">The Google user.</param>
+        /// <param name="oauthUser">The OAuth user.</param>
         /// <param name="accessToken">The access token.</param>
         /// <returns></returns>
-        public static string GetGoogleUser( GoogleUser googleUser, string accessToken = "" )
+        public static string GetOAuthUser( OAuthUser oauthUser, string accessToken = "" )
         {
             string username = string.Empty;
-            string googleId = googleUser.id;
-            string googleLink = googleUser.link;
+            string oauthId = oauthUser.id;
+            string oauthLink = oauthUser.link;
 
-            string userName = "Google_" + googleId;
+            string userName = "OAuth_" + oauthId;
             UserLogin user = null;
 
             using ( var rockContext = new RockContext() )
@@ -382,12 +395,12 @@ namespace Rock.Security.ExternalAuthentication
                 // If no user was found, see if we can find a match in the person table
                 if ( user == null )
                 {
-                    // Get name/email from Google login
-                    string lastName = googleUser.family_name.ToString();
-                    string firstName = googleUser.given_name.ToString();
+                    // Get name/email from OAuth login
+                    string lastName = oauthUser.family_name.ToString();
+                    string firstName = oauthUser.given_name.ToString();
                     string email = string.Empty;
                     try
-                    { email = googleUser.email.ToString(); }
+                    { email = oauthUser.email.ToString(); }
                     catch { }
 
                     Person person = null;
@@ -403,8 +416,8 @@ namespace Rock.Security.ExternalAuthentication
                         }
                     }
 
-                    var personRecordTypeId = DefinedValueCache.Read( SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() ).Id;
-                    var personStatusPending = DefinedValueCache.Read( SystemGuid.DefinedValue.PERSON_RECORD_STATUS_PENDING.AsGuid() ).Id;
+                    var personRecordTypeId = DefinedValueCache.Read( Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() ).Id;
+                    var personStatusPending = DefinedValueCache.Read( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_PENDING.AsGuid() ).Id;
 
                     rockContext.WrapTransaction( () =>
                     {
@@ -421,11 +434,11 @@ namespace Rock.Security.ExternalAuthentication
                             person.EmailPreference = EmailPreference.EmailAllowed;
                             try
                             {
-                                if ( googleUser.gender.ToString() == "male" )
+                                if ( oauthUser.gender.ToString() == "male" )
                                 {
                                     person.Gender = Gender.Male;
                                 }
-                                else if ( googleUser.gender.ToString() == "female" )
+                                else if ( oauthUser.gender.ToString() == "female" )
                                 {
                                     person.Gender = Gender.Female;
                                 }
@@ -444,7 +457,7 @@ namespace Rock.Security.ExternalAuthentication
 
                         if ( person != null )
                         {
-                            int typeId = EntityTypeCache.Read( typeof( Google ) ).Id;
+                            int typeId = EntityTypeCache.Read( typeof( DoorkeeperOAuth ) ).Id;
                             user = UserLoginService.Create( rockContext, person, AuthenticationServiceType.External, typeId, userName, "goog", true );
                         }
 
