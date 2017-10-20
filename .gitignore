@@ -21,9 +21,10 @@
 **/ehthumbs.db
 **/Thumbs.db
 
-# Jobs Debug Files #
-####################
+# Compiled Files #
+##################
 **/[Dd]ebug/*
+**/[Rr]elease/*
 
 # Reporting Sevices Files #
 ###########################
