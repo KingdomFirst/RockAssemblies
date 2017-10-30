@@ -40,11 +40,6 @@ namespace com.kfs.Security.ExternalAuthentication
         private string _baseUrl = null;
 
         /// <summary>
-        /// The _return URL
-        /// </summary>
-        private string _returnUrl = null;
-
-        /// <summary>
         /// Gets the type of the service.
         /// </summary>
         /// <value>
@@ -93,18 +88,12 @@ namespace com.kfs.Security.ExternalAuthentication
             }
 
             string returnUrl = request.QueryString["returnurl"];
-            //string redirectUri = GetRedirectUrl( request );
+            string redirectUri = GetRedirectUrl( request );
 
-            _returnUrl = FormsAuthentication.DefaultUrl;
-            if ( !string.IsNullOrWhiteSpace( request.QueryString.ToString() ) )
-            {
-                _returnUrl = HttpUtility.UrlDecode( request.Url.GetLeftPart( UriPartial.Authority ) + request.QueryString["returnurl"] );
-            }
-
-            return new Uri( string.Format( "{0}oauth/authorize?client_id={1}&redirect_uri={2}",
+            return new Uri( string.Format( "{0}oauth/authorize?client_id={1}&response_type=code&redirect_uri={2}&state={3}",
                 _baseUrl,
                 GetAttributeValue( "ClientID" ),
-                //HttpUtility.UrlEncode( redirectUri ),
+                HttpUtility.UrlEncode( redirectUri ),
                 HttpUtility.UrlEncode( returnUrl ?? FormsAuthentication.DefaultUrl ) ) );
         }
 
@@ -148,8 +137,7 @@ namespace com.kfs.Security.ExternalAuthentication
         public override Boolean Authenticate( HttpRequest request, out string username, out string returnUrl )
         {
             username = string.Empty;
-            //returnUrl = request.QueryString["State"];
-            returnUrl = _returnUrl;
+            returnUrl = request.QueryString["State"];
             string redirectUri = GetRedirectUrl( request );
 
             try
@@ -173,7 +161,7 @@ namespace com.kfs.Security.ExternalAuthentication
                     // Get information about the person who logged in using OAuth
                     restRequest = new RestRequest( Method.GET );
                     restRequest.AddParameter( "access_token", accessToken );
-                    restRequest.AddParameter( "fields", "id,hd,email,family_name,gender,given_name" );
+                    restRequest.AddParameter( "fields", "id,first_name,last_name,email" );
                     restRequest.AddParameter( "key", GetAttributeValue( "ClientID" ) );
                     restRequest.RequestFormat = DataFormat.Json;
                     restRequest.AddHeader( "Accept", "application/json" );
