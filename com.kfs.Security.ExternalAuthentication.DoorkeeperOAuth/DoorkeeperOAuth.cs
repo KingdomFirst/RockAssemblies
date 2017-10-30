@@ -282,70 +282,6 @@ namespace com.kfs.Security.ExternalAuthentication
         public class OAuthUser
         {
             /// <summary>
-            /// Gets or sets the family_name.
-            /// </summary>
-            /// <value>
-            /// The family_name.
-            /// </value>
-            public string family_name { get; set; }
-
-            /// <summary>
-            /// Gets or sets the name.
-            /// </summary>
-            /// <value>
-            /// The name.
-            /// </value>
-            public string name { get; set; }
-
-            /// <summary>
-            /// Gets or sets the picture.
-            /// </summary>
-            /// <value>
-            /// The picture.
-            /// </value>
-            public string picture { get; set; }
-
-            /// <summary>
-            /// Gets or sets the locale.
-            /// </summary>
-            /// <value>
-            /// The locale.
-            /// </value>
-            public string locale { get; set; }
-
-            /// <summary>
-            /// Gets or sets the gender.
-            /// </summary>
-            /// <value>
-            /// The gender.
-            /// </value>
-            public string gender { get; set; }
-
-            /// <summary>
-            /// Gets or sets the email.
-            /// </summary>
-            /// <value>
-            /// The email.
-            /// </value>
-            public string email { get; set; }
-
-            /// <summary>
-            /// Gets or sets the link.
-            /// </summary>
-            /// <value>
-            /// The link.
-            /// </value>
-            public string link { get; set; }
-
-            /// <summary>
-            /// Gets or sets the given_name.
-            /// </summary>
-            /// <value>
-            /// The given_name.
-            /// </value>
-            public string given_name { get; set; }
-
-            /// <summary>
             /// Gets or sets the identifier.
             /// </summary>
             /// <value>
@@ -354,20 +290,28 @@ namespace com.kfs.Security.ExternalAuthentication
             public string id { get; set; }
 
             /// <summary>
-            /// Gets or sets the hd.
+            /// Gets or sets the name.
             /// </summary>
             /// <value>
-            /// The hd.
+            /// The name.
             /// </value>
-            public string hd { get; set; }
+            public string first_name { get; set; }
 
             /// <summary>
-            /// Gets or sets a value indicating whether this <see cref="OAuthUser"/> is verified_email.
+            /// Gets or sets the family_name.
             /// </summary>
             /// <value>
-            ///   <c>true</c> if verified_email; otherwise, <c>false</c>.
+            /// The family_name.
             /// </value>
-            public bool verified_email { get; set; }
+            public string last_name { get; set; }
+            
+            /// <summary>
+            /// Gets or sets the email.
+            /// </summary>
+            /// <value>
+            /// The email.
+            /// </value>
+            public string email { get; set; }
         }
 
         /// <summary>
@@ -380,7 +324,6 @@ namespace com.kfs.Security.ExternalAuthentication
         {
             string username = string.Empty;
             string oauthId = oauthUser.id;
-            string oauthLink = oauthUser.link;
 
             string userName = "OAuth_" + oauthId;
             UserLogin user = null;
@@ -396,8 +339,8 @@ namespace com.kfs.Security.ExternalAuthentication
                 if ( user == null )
                 {
                     // Get name/email from OAuth login
-                    string lastName = oauthUser.family_name.ToString();
-                    string firstName = oauthUser.given_name.ToString();
+                    string lastName = oauthUser.last_name.ToString();
+                    string firstName = oauthUser.first_name.ToString();
                     string email = string.Empty;
                     try
                     { email = oauthUser.email.ToString(); }
@@ -432,23 +375,8 @@ namespace com.kfs.Security.ExternalAuthentication
                             person.Email = email;
                             person.IsEmailActive = true;
                             person.EmailPreference = EmailPreference.EmailAllowed;
-                            try
-                            {
-                                if ( oauthUser.gender.ToString() == "male" )
-                                {
-                                    person.Gender = Gender.Male;
-                                }
-                                else if ( oauthUser.gender.ToString() == "female" )
-                                {
-                                    person.Gender = Gender.Female;
-                                }
-                                else
-                                {
-                                    person.Gender = Gender.Unknown;
-                                }
-                            }
-                            catch { }
-
+                            person.Gender = Gender.Unknown;
+                            
                             if ( person != null )
                             {
                                 PersonService.SaveNewPerson( person, rockContext, null, false );
