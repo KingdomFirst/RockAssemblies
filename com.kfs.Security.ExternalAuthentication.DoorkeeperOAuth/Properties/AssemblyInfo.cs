@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("com.kfs.Security.Authentication.OAuth")]
+[assembly: AssemblyTitle( "com.kfs.Security.ExternalAuthentication.DoorkeeperOAuth" )]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("com.kfs.Security.Authentication.OAuth")]
+[assembly: AssemblyProduct( "com.kfs.Security.ExternalAuthentication.DoorkeeperOAuth" )]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
