@@ -252,14 +252,24 @@ namespace com.kfs.SignNow
 
                     if ( !string.IsNullOrWhiteSpace( mergeFieldPairs ) )
                     {
-
                         var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null );
                         mergeFields.Add( "DocumentTemplate", documentTemplate );
                         mergeFields.Add( "AppliesTo", appliesTo );
                         mergeFields.Add( "AssignedTo", assignedTo );
 
+                        var enabledLavaCommands = GetAttributeValue( "EnabledLavaCommands" );
+
                         Dictionary<string, string> sourceKeyMap = null;
-                        sourceKeyMap = mergeFieldPairs.ResolveMergeFields( mergeFields, GetAttributeValue( "EnabledLavaCommands" ) ).AsDictionaryOrNull();
+                        string[] nameValues = mergeFieldPairs.Split( new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries );
+                        if ( nameValues != null )
+                        {
+                            foreach ( string nameValue in nameValues )
+                            {
+                                string[] nameAndValue = nameValue.Split( new char[] { '^' } );
+                                nameAndValue = nameAndValue.Select( s => HttpUtility.UrlDecode( s ) ).ToArray(); // url decode array items
+                                sourceKeyMap.Add( nameAndValue[0].ResolveMergeFields( mergeFields, enabledLavaCommands ), nameAndValue[1].ResolveMergeFields( mergeFields, enabledLavaCommands ) );
+                            }
+                        }
 
                         TimeSpan t = DateTime.UtcNow - new DateTime( 1970, 1, 1 );
                         int secondsSinceEpoch = ( int ) t.TotalSeconds;
