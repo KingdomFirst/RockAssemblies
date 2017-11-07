@@ -263,11 +263,17 @@ namespace com.kfs.SignNow
                         string[] nameValues = mergeFieldPairs.Split( new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries );
                         if ( nameValues != null )
                         {
+                            if ( sourceKeyMap == null )
+                            {
+                                sourceKeyMap = new Dictionary<string, string>();
+                            }
                             foreach ( string nameValue in nameValues )
                             {
                                 string[] nameAndValue = nameValue.Split( new char[] { '^' } );
                                 nameAndValue = nameAndValue.Select( s => HttpUtility.UrlDecode( s ) ).ToArray(); // url decode array items
-                                sourceKeyMap.Add( nameAndValue[0].ResolveMergeFields( mergeFields, enabledLavaCommands ), nameAndValue[1].ResolveMergeFields( mergeFields, enabledLavaCommands ) );
+                                var sf = nameAndValue[0].ResolveMergeFields( mergeFields, enabledLavaCommands );
+                                var val = nameAndValue[1].ResolveMergeFields( mergeFields, enabledLavaCommands );
+                                sourceKeyMap.Add( sf, val );
                             }
                         }
 
