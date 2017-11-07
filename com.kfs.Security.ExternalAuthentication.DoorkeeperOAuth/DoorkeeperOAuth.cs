@@ -31,6 +31,7 @@ namespace com.kfs.Security.ExternalAuthentication
     [TextField( "Client Secret", "The Doorkeeper OAuth Client Secret" )]
     [UrlLinkField( "Doorkeeper Server Url", "The base Url of the local Doorkeeper server. Example: https://login.mychurch.org/" )]
     [UrlLinkField( "User Info Url", "The Url location of the 'me.json' data. Example: https://login.mychurch.org/api/v1/me.json" )]   /// https://www.googleapis.com/oauth2/v2/userinfo
+    [DefinedValueField( "2E6540EA-63F0-40FE-BE50-F2A84735E600", "Connection Status", "The connection status to use for new individuals (default: 'Web Prospect'.)", true, false, "368DD475-242C-49C4-A42C-7278BE690CC2" )]
 
     public class DoorkeeperOAuth : AuthenticationComponent
     {
@@ -171,7 +172,7 @@ namespace com.kfs.Security.ExternalAuthentication
                     if ( restResponse.StatusCode == HttpStatusCode.OK )
                     {
                         OAuthUser oauthUser = JsonConvert.DeserializeObject<OAuthUser>( restResponse.Content );
-                        username = GetOAuthUser( oauthUser, accessToken );
+                        username = GetOAuthUser( GetAttributeValue( "ConnectionStatus" ).AsGuid(), oauthUser, accessToken );
                     }
                 }
             }
@@ -308,7 +309,7 @@ namespace com.kfs.Security.ExternalAuthentication
         /// <param name="oauthUser">The OAuth user.</param>
         /// <param name="accessToken">The access token.</param>
         /// <returns></returns>
-        public static string GetOAuthUser( OAuthUser oauthUser, string accessToken = "" )
+        public static string GetOAuthUser( Guid connectionStatusGuid, OAuthUser oauthUser, string accessToken = "" )
         {
             string username = string.Empty;
             string oauthId = oauthUser.id;
@@ -348,7 +349,8 @@ namespace com.kfs.Security.ExternalAuthentication
                     }
 
                     var personRecordTypeId = DefinedValueCache.Read( Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() ).Id;
-                    var personStatusPending = DefinedValueCache.Read( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_PENDING.AsGuid() ).Id;
+                    var personStatusPendingId = DefinedValueCache.Read( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_PENDING.AsGuid() ).Id;
+                    var personConnectionStatusId = DefinedValueCache.Read( connectionStatusGuid ).Id;
 
                     rockContext.WrapTransaction( () =>
                     {
@@ -357,7 +359,8 @@ namespace com.kfs.Security.ExternalAuthentication
                             person = new Person();
                             person.IsSystem = false;
                             person.RecordTypeValueId = personRecordTypeId;
-                            person.RecordStatusValueId = personStatusPending;
+                            person.RecordStatusValueId = personStatusPendingId;
+                            person.ConnectionStatusValueId = personConnectionStatusId;
                             person.FirstName = firstName;
                             person.LastName = lastName;
                             person.Email = email;
