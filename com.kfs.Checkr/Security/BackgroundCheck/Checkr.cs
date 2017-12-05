@@ -28,7 +28,7 @@ namespace com.kfs.Checkr.Security.BackgroundCheck
     [EncryptedTextField( "API Key", "Your Checkr API Key", true, "", "", 0, null, true )]
     
 
-    class Checkr : BackgroundCheckComponent
+    public class Checkr : BackgroundCheckComponent
     {
         /// <summary>
         /// Sends a background request to Checkr
