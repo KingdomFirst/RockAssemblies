@@ -162,7 +162,7 @@ namespace com.kfs.Security.ExternalAuthentication
                     // Get information about the person who logged in using OAuth
                     restRequest = new RestRequest( Method.GET );
                     restRequest.AddParameter( "access_token", accessToken );
-                    restRequest.AddParameter( "fields", "id,first_name,last_name,email" );
+                    restRequest.AddParameter( "fields", "id,first_name,last_name,email,contact,address" );
                     restRequest.AddParameter( "key", GetAttributeValue( "ClientID" ) );
                     restRequest.RequestFormat = DataFormat.Json;
                     restRequest.AddHeader( "Accept", "application/json" );
@@ -293,7 +293,7 @@ namespace com.kfs.Security.ExternalAuthentication
             /// The family_name.
             /// </value>
             public string last_name { get; set; }
-            
+
             /// <summary>
             /// Gets or sets the email.
             /// </summary>
@@ -301,6 +301,32 @@ namespace com.kfs.Security.ExternalAuthentication
             /// The email.
             /// </value>
             public string email { get; set; }
+
+            public OAuthContact contact { get; set; }
+
+            public OAuthAddress address { get; set; }
+        }
+
+        public class OAuthContact
+        {
+            public string first_name { get; set; }          // "first_name": "First",
+            public string last_name { get; set; }           // "last_name": "Last",
+            public string email { get; set; }               // "email": "user1@example.org",
+            public string phone { get; set; }               // "phone": "123-456-7890",
+            public string birthday { get; set; }            // "birthday": "2015-11-09",
+            public string marital_status_id { get; set; }   // "marital_status_id": 1,
+            public string gender_id { get; set; }           // "gender_id": 1                   [ 1 = male; 2 = female ]
+        }
+
+        public class OAuthAddress
+        {
+            public string street1 { get; set; }             // "street1": "123 MyAwesome St",
+            public string street2 { get; set; }             // "street2": null,
+            public string city { get; set; }                // "city": "Dallas",
+            public string state { get; set; }               // "state": "TX",
+            public string zip { get; set; }                 // "zip": "12345",
+            public string latitude { get; set; }            // "latitude": 1.5,
+            public string longitude { get; set; }           // "longitude": 1.5
         }
 
         /// <summary>
@@ -351,6 +377,7 @@ namespace com.kfs.Security.ExternalAuthentication
                     var personRecordTypeId = DefinedValueCache.Read( Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() ).Id;
                     var personStatusPendingId = DefinedValueCache.Read( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_PENDING.AsGuid() ).Id;
                     var personConnectionStatusId = DefinedValueCache.Read( connectionStatusGuid ).Id;
+                    var phoneNumberTypeId = DefinedValueCache.Read( Rock.SystemGuid.DefinedValue.PERSON_PHONE_TYPE_HOME.AsGuid() ).Id;
 
                     rockContext.WrapTransaction( () =>
                     {
@@ -367,10 +394,56 @@ namespace com.kfs.Security.ExternalAuthentication
                             person.IsEmailActive = true;
                             person.EmailPreference = EmailPreference.EmailAllowed;
                             person.Gender = Gender.Unknown;
-                            
+
+                            var phoneNumber = new PhoneNumber { NumberTypeValueId = phoneNumberTypeId };
+                            person.PhoneNumbers.Add( phoneNumber );
+                            phoneNumber.Number = PhoneNumber.CleanNumber( oauthUser.contact.phone.AsNumeric() );
+
+                            var birthday = oauthUser.contact.birthday.Split( ( new char[] { '-' } ) );
+                            if ( birthday.Length == 3 )
+                            {
+                                person.BirthYear = birthday[0].AsIntegerOrNull();
+                                person.BirthMonth = birthday[1].AsIntegerOrNull();
+                                person.BirthDay = birthday[2].AsIntegerOrNull();
+                            }
+
+                            var gender = oauthUser.contact.gender_id.AsIntegerOrNull();
+                            if ( gender != null )
+                            {
+                                person.Gender = ( Gender ) gender;
+                            }
+
                             if ( person != null )
                             {
                                 PersonService.SaveNewPerson( person, rockContext, null, false );
+                            }
+
+                            // save address
+                            var personLocation = new LocationService( rockContext )
+                                                    .Get( oauthUser.address.street1, oauthUser.address.street2,
+                                                        oauthUser.address.city, oauthUser.address.state, oauthUser.address.zip, "" );
+                            if ( personLocation != null )
+                            {
+                                Guid locationTypeGuid = Rock.SystemGuid.DefinedValue.GROUP_LOCATION_TYPE_HOME.AsGuid();
+                                if ( locationTypeGuid != Guid.Empty )
+                                {
+                                    Guid familyGroupTypeGuid = Rock.SystemGuid.GroupType.GROUPTYPE_FAMILY.AsGuid();
+                                    GroupService groupService = new GroupService( rockContext );
+                                    GroupLocationService groupLocationService = new GroupLocationService( rockContext );
+                                    var family = groupService.Queryable().Where( g => g.GroupType.Guid == familyGroupTypeGuid && g.Members.Any( m => m.PersonId == person.Id ) ).FirstOrDefault();
+
+                                    var groupLocation = new GroupLocation();
+                                    groupLocation.GroupId = family.Id;
+                                    groupLocationService.Add( groupLocation );
+
+                                    groupLocation.Location = personLocation;
+
+                                    groupLocation.GroupLocationTypeValueId = DefinedValueCache.Read( locationTypeGuid ).Id;
+                                    groupLocation.IsMailingLocation = true;
+                                    groupLocation.IsMappedLocation = true;
+
+                                    rockContext.SaveChanges();
+                                }
                             }
                         }
 
