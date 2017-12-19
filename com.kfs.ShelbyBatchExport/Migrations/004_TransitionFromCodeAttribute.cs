@@ -9,7 +9,7 @@ using Rock.Plugin;
 namespace com.kfs.ShelbyBatchExport.Migrations
 {
     [MigrationNumber( 4, "1.6.9" )]
-    public class RansitionFromCodeAttribute : Migration
+    public class TransitionFromCodeAttribute : Migration
     {
         /// <summary>
         /// The commands to run to migrate plugin to the specific version
