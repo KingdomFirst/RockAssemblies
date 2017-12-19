@@ -35,6 +35,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Migrations\001_CreateShelbyGLAssets.cs" />
+    <Compile Include="Migrations\004_TransitionFromCodeAttribute.cs" />
     <Compile Include="Migrations\003_BatchExportDetailsBlock.cs" />
     <Compile Include="Migrations\002_ProjectsPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
