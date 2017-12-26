@@ -10,37 +10,11 @@ namespace com.kfs.Vimeo
     public class Video
     {
         /// <summary>
-        /// Returns the link of a picture having the closest width.
-        /// </summary>
-        /// <param name="client">The VimeoClient to use.</param>
-        /// <param name="videoId">The Vimeo Id of the video.</param>
-        /// <param name="width">The desired width of the picture.</param>
-        public string GetPicture( VimeoClient client, long videoId, int width = 1920 )
-        {
-            var link = string.Empty;
-
-            var pictureList = new List<VimeoDotNet.Models.Picture>();
-            var task = Task.Run( async () =>
-            {
-                var pictures = await client.GetPicturesAsync( videoId );
-                pictureList = pictures.data.ToList();
-            } );
-            task.Wait();
-            if ( pictureList.Count > 0 )
-            {
-                var picSizes = new List<VimeoDotNet.Models.Size>();
-                picSizes = pictureList.FirstOrDefault().sizes.ToList();
-                link = picSizes.Aggregate( ( x, y ) => Math.Abs( x.width - width ) < Math.Abs( y.width - width ) ? x : y ).link;
-            }
-            return link;
-        }
-
-        /// <summary>
         /// Returns a VideoInfo object with video info.
         /// </summary>
         /// <param name="client">The VimeoClient to use.</param>
         /// <param name="videoId">The Vimeo Id of the video.</param>
-        public VideoInfo GetVideoInfo( VimeoClient client, long videoId )
+        public VideoInfo GetVideoInfo( VimeoClient client, long videoId, int width = 1920 )
         {
             var videoInfo = new VideoInfo();
 
@@ -54,6 +28,23 @@ namespace com.kfs.Vimeo
                 videoInfo.hdLink = video.HighDefinitionVideoSecureLink;
                 videoInfo.sdLink = video.StandardVideoSecureLink;
                 videoInfo.hlsLink = video.StreamingVideoSecureLink;
+
+                
+                //
+                // for 0.8.x structure
+                //
+                var pictures = video.pictures.ToList();
+                var picSizes = pictures.FirstOrDefault( p => p.active == true ).sizes.ToList();
+
+                //
+                // for > 0.8.x vimeo dot net structure
+                //
+                //var picSizes = video.pictures.sizes.ToList();
+
+                if ( picSizes.Count > 0 )
+                {
+                    videoInfo.imageUrl = picSizes.Aggregate( ( x, y ) => Math.Abs( x.width - width ) < Math.Abs( y.width - width ) ? x : y ).link;
+                }
             } );
             task.Wait();
 
@@ -68,6 +59,7 @@ namespace com.kfs.Vimeo
             public long vimeoId;
             public string name;
             public string description;
+            public string imageUrl;
             public int duration;
             public string hdLink;
             public string sdLink;
