@@ -30,7 +30,7 @@ namespace com.kfs.Security.ExternalAuthentication
     [TextField( "Client ID", "The Doorkeeper OAuth Client ID" )]
     [TextField( "Client Secret", "The Doorkeeper OAuth Client Secret" )]
     [UrlLinkField( "Doorkeeper Server Url", "The base Url of the local Doorkeeper server. Example: https://login.mychurch.org/" )]
-    [UrlLinkField( "User Info Url", "The Url location of the 'me.json' data. Example: https://login.mychurch.org/api/v1/me.json" )]   /// https://www.googleapis.com/oauth2/v2/userinfo
+    [UrlLinkField( "User Info Url", "The Url location of the 'me.json' data. Example: https://login.mychurch.org/api/v1/me.json" )]
     [DefinedValueField( "2E6540EA-63F0-40FE-BE50-F2A84735E600", "Connection Status", "The connection status to use for new individuals (default: 'Web Prospect'.)", true, false, "368DD475-242C-49C4-A42C-7278BE690CC2" )]
 
     public class DoorkeeperOAuth : AuthenticationComponent
@@ -450,7 +450,7 @@ namespace com.kfs.Security.ExternalAuthentication
                         if ( person != null )
                         {
                             int typeId = EntityTypeCache.Read( typeof( DoorkeeperOAuth ) ).Id;
-                            user = UserLoginService.Create( rockContext, person, AuthenticationServiceType.External, typeId, userName, "goog", true );
+                            user = UserLoginService.Create( rockContext, person, AuthenticationServiceType.External, typeId, userName, "KFSRocksRock", true );
                         }
 
                     } );
