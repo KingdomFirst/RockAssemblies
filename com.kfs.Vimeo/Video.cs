@@ -14,6 +14,7 @@ namespace com.kfs.Vimeo
         /// </summary>
         /// <param name="client">The VimeoClient to use.</param>
         /// <param name="videoId">The Vimeo Id of the video.</param>
+        /// <param name="width">The closest width of the image url to return. Default is 1920px.</param>
         public VideoInfo GetVideoInfo( VimeoClient client, long videoId, int width = 1920 )
         {
             var videoInfo = new VideoInfo();
@@ -29,9 +30,8 @@ namespace com.kfs.Vimeo
                 videoInfo.sdLink = video.StandardVideoSecureLink;
                 videoInfo.hlsLink = video.StreamingVideoSecureLink;
 
-                
                 //
-                // for 0.8.x structure
+                // for 0.8.x vimeo dot net structure
                 //
                 var pictures = video.pictures.ToList();
                 var picSizes = pictures.FirstOrDefault( p => p.active == true ).sizes.ToList();
@@ -52,7 +52,7 @@ namespace com.kfs.Vimeo
         }
 
         /// <summary>
-        /// An object to hold the links to the video files.
+        /// An object to hold the returned data for a Vimeo API call.
         /// </summary>
         public class VideoInfo
         {
