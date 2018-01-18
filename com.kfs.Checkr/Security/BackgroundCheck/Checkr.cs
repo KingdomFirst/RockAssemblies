@@ -5,6 +5,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Serialization;
 using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 using Rock;
@@ -27,7 +28,6 @@ namespace com.kfs.Checkr.Security.BackgroundCheck
 
     [EncryptedTextField( "API Key", "Your Checkr API Key", true, "", "", 0, null, true )]
     
-
     public class Checkr : BackgroundCheckComponent
     {
         /// <summary>
@@ -213,20 +213,7 @@ Invitation JSON:
                 return false;
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
         
-
         /// <summary>
         /// Saves the results.
         /// </summary>
@@ -234,7 +221,8 @@ Invitation JSON:
         /// <param name="workflow">The workflow.</param>
         /// <param name="rockContext">The rock context.</param>
         /// <param name="saveResponse">if set to <c>true</c> [save response].</param>
-        public static void SaveResults( XDocument xResult, Rock.Model.Workflow workflow, RockContext rockContext, bool saveResponse = true )
+        //public static void SaveResults( XDocument xResult, Rock.Model.Workflow workflow, RockContext rockContext, bool saveResponse = true )
+        public static void SaveResults( RootObject rootObject, Rock.Model.Workflow workflow, RockContext rockContext, bool saveResponse = true )
         {
             bool createdNewAttribute = false;
 
@@ -248,77 +236,40 @@ Invitation JSON:
 
             if ( backgroundCheck != null && saveResponse )
             {
-                // Clear any SSN nodes before saving XML to record
-                foreach ( var xSSNElement in xResult.Descendants( "SSN" ) )
-                {
-                    xSSNElement.Value = "XXX-XX-XXXX";
-                }
 
                 backgroundCheck.ResponseXml = backgroundCheck.ResponseXml + string.Format( @"
 Response XML ({0}): 
 ------------------------ 
 {1}
 
-", RockDateTime.Now.ToString(), xResult.ToString() );
+", RockDateTime.Now.ToString(), rootObject.ToString() );
             }
 
-            var xOrderXML = xResult.Elements( "OrderXML" ).FirstOrDefault();
-            if ( xOrderXML != null )
+            var reportStatus = string.Empty;
+            if ( rootObject.data.@object.status.Equals( "clear", StringComparison.CurrentCultureIgnoreCase ) )
             {
-                var xOrder = xOrderXML.Elements( "Order" ).FirstOrDefault();
-                if ( xOrder != null )
-                {
-                    bool resultFound = false;
-
-                    // Find any order details with a status element
-                    string reportStatus = "Pass";
-                    foreach ( var xOrderDetail in xOrder.Elements( "OrderDetail" ) )
-                    {
-                        var xStatus = xOrderDetail.Elements( "Status" ).FirstOrDefault();
-                        if ( xStatus != null )
-                        {
-                            resultFound = true;
-                            if ( xStatus.Value != "NO RECORD" )
-                            {
-                                reportStatus = "Review";
-                                break;
-                            }
-                        }
-                    }
-
-                    if ( resultFound )
-                    {
-                        // If no records found, still double-check for any alerts
-                        if ( reportStatus != "Review" )
-                        {
-                            var xAlerts = xOrder.Elements( "Alerts" ).FirstOrDefault();
-                            if ( xAlerts != null )
-                            {
-                                if ( xAlerts.Elements( "OrderId" ).Any() )
-                                {
-                                    reportStatus = "Review";
-                                }
-                            }
-                        }
-                                                
-                        // Save the status
-                        if ( SaveAttributeValue( workflow, "ReportStatus", reportStatus,
-                            FieldTypeCache.Read( Rock.SystemGuid.FieldType.SINGLE_SELECT.AsGuid() ), rockContext,
-                            new Dictionary<string, string> { { "fieldtype", "ddl" }, { "values", "Pass,Fail,Review" } } ) )
-                        {
-                            createdNewAttribute = true;
-                        }
-
-                        // Update the background check file
-                        if ( backgroundCheck != null )
-                        {
-                            backgroundCheck.ResponseDate = RockDateTime.Now;
-                            backgroundCheck.RecordFound = reportStatus == "Review";
-                        }
-                    }
-                }
+                reportStatus = "Pass";
+            }
+            else if ( rootObject.data.@object.status.Equals( "clear", StringComparison.CurrentCultureIgnoreCase ) )
+            {
+                reportStatus = "Review";
             }
 
+            // Save the status
+            if ( SaveAttributeValue( workflow, "ReportStatus", reportStatus,
+            FieldTypeCache.Read( Rock.SystemGuid.FieldType.SINGLE_SELECT.AsGuid() ), rockContext,
+            new Dictionary<string, string> { { "fieldtype", "ddl" }, { "values", "Pass,Fail,Review" } } ) )
+            {
+                createdNewAttribute = true;
+            }
+
+            // Update the background check file
+            if ( backgroundCheck != null )
+            {
+                backgroundCheck.ResponseDate = RockDateTime.Now;
+                backgroundCheck.RecordFound = reportStatus == "Review";
+            }
+            
             newRockContext.SaveChanges();
 
             if ( createdNewAttribute )
@@ -327,16 +278,7 @@ Response XML ({0}):
             }
 
         }
-
-
-
-
-
-
-
-
-
-
+        
         /// <summary>
         /// Saves the attribute value.
         /// </summary>
@@ -453,5 +395,38 @@ Response XML ({0}):
 
             return null;
         }
+    }
+
+    public class Object
+    {
+        public string id { get; set; }
+        public string @object { get; set; }
+        public string uri { get; set; }
+        public DateTime created_at { get; set; }
+        public DateTime received_at { get; set; }
+        public string status { get; set; }
+        public string package { get; set; }
+        public string candidate_id { get; set; }
+        public string ssn_trace_id { get; set; }
+        public string sex_offender_search_id { get; set; }
+        public string national_criminal_search_id { get; set; }
+        public List<string> county_criminal_search_ids { get; set; }
+        public List<string> state_criminal_search_ids { get; set; }
+        public string motor_vehicle_report_id { get; set; }
+    }
+
+    public class Data
+    {
+        public Object @object { get; set; }
+    }
+
+    public class RootObject
+    {
+        public string id { get; set; }
+        public string @object { get; set; }
+        public string type { get; set; }
+        public DateTime created_at { get; set; }
+        public string webhook_url { get; set; }
+        public Data data { get; set; }
     }
 }
