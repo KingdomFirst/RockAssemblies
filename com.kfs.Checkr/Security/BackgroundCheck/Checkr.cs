@@ -402,17 +402,31 @@ Response XML ({0}):
         public string id { get; set; }
         public string @object { get; set; }
         public string uri { get; set; }
-        public DateTime created_at { get; set; }
-        public DateTime received_at { get; set; }
         public string status { get; set; }
+        public DateTime? created_at { get; set; }
+        public DateTime? completed_at { get; set; }
+        public DateTime? revised_at { get; set; }
+        public DateTime? upgraded_at { get; set; }
+        public int? turnaround_time { get; set; }
+        public DateTime? due_time { get; set; }
         public string package { get; set; }
+        public List<string> tags { get; set; }
+        public string adjudication { get; set; }
+        public string assessment { get; set; }
         public string candidate_id { get; set; }
-        public string ssn_trace_id { get; set; }
-        public string sex_offender_search_id { get; set; }
-        public string national_criminal_search_id { get; set; }
         public List<string> county_criminal_search_ids { get; set; }
-        public List<string> state_criminal_search_ids { get; set; }
+        public List<string> document_ids { get; set; }
+        public string federal_criminal_search_id { get; set; }
+        public string global_watchlist_search_id { get; set; }
         public string motor_vehicle_report_id { get; set; }
+        public string national_criminal_search_id { get; set; }
+        public List<string> personal_reference_verification_ids { get; set; }
+        public List<string> professional_reference_verification_ids { get; set; }
+        public string sex_offender_search_id { get; set; }
+        public string ssn_trace_id { get; set; }
+        public List<string> state_criminal_search_ids { get; set; }
+        public string terrorist_watchlist_search_id { get; set; }
+        public string facis_search_id { get; set; }
     }
 
     public class Data
@@ -425,8 +439,8 @@ Response XML ({0}):
         public string id { get; set; }
         public string @object { get; set; }
         public string type { get; set; }
-        public DateTime created_at { get; set; }
-        public string webhook_url { get; set; }
+        public DateTime? created_at { get; set; }
         public Data data { get; set; }
+        public string account_id { get; set; }
     }
 }
