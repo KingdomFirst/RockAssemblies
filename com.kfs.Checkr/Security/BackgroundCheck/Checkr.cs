@@ -221,7 +221,6 @@ Invitation JSON:
         /// <param name="workflow">The workflow.</param>
         /// <param name="rockContext">The rock context.</param>
         /// <param name="saveResponse">if set to <c>true</c> [save response].</param>
-        //public static void SaveResults( XDocument xResult, Rock.Model.Workflow workflow, RockContext rockContext, bool saveResponse = true )
         public static void SaveResults( RootObject rootObject, Rock.Model.Workflow workflow, RockContext rockContext, bool saveResponse = true )
         {
             bool createdNewAttribute = false;
