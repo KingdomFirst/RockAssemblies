@@ -254,10 +254,44 @@ Response XML ({0}):
                 reportStatus = "Review";
             }
 
+            // Save the report link 
+            var checkr = BackgroundCheckContainer.GetComponent( "com.kfs.Checkr.Security.BackgroundCheck.Checkr" );
+            var apiKey = string.Empty;
+            if ( checkr != null )
+            {
+                apiKey = Encryption.DecryptString( checkr.GetAttributeValue( "APIKey" ) );
+            }
+
+            Guid? binaryFileGuid = null;
+            
+            JObject document = Document.RetrieveDocument( apiKey, rootObject.data.@object.document_ids[0] );
+            var reportLink = document.Value<string>( "download_uri" );
+
+            if ( !string.IsNullOrWhiteSpace( reportLink ) )
+            {
+                if ( SaveAttributeValue( workflow, "ReportLink", reportLink,
+                    FieldTypeCache.Read( Rock.SystemGuid.FieldType.URL_LINK.AsGuid() ), rockContext ) )
+                {
+                    createdNewAttribute = true;
+                }
+
+                // Save the report
+                binaryFileGuid = SaveFile( workflow.Attributes["Report"], reportLink, workflow.Id.ToString() + ".pdf" );
+                if ( binaryFileGuid.HasValue )
+                {
+                    if ( SaveAttributeValue( workflow, "Report", binaryFileGuid.Value.ToString(),
+                        FieldTypeCache.Read( Rock.SystemGuid.FieldType.BINARY_FILE.AsGuid() ), rockContext,
+                        new Dictionary<string, string> { { "binaryFileType", "" } } ) )
+                    {
+                        createdNewAttribute = true;
+                    }
+                }
+            }
+
             // Save the status
             if ( SaveAttributeValue( workflow, "ReportStatus", reportStatus,
-            FieldTypeCache.Read( Rock.SystemGuid.FieldType.SINGLE_SELECT.AsGuid() ), rockContext,
-            new Dictionary<string, string> { { "fieldtype", "ddl" }, { "values", "Pass,Fail,Review" } } ) )
+                FieldTypeCache.Read( Rock.SystemGuid.FieldType.SINGLE_SELECT.AsGuid() ), rockContext,
+                new Dictionary<string, string> { { "fieldtype", "ddl" }, { "values", "Pass,Fail,Review" } } ) )
             {
                 createdNewAttribute = true;
             }
@@ -267,6 +301,15 @@ Response XML ({0}):
             {
                 backgroundCheck.ResponseDate = RockDateTime.Now;
                 backgroundCheck.RecordFound = reportStatus == "Review";
+
+                if ( binaryFileGuid.HasValue )
+                {
+                    var binaryFile = new BinaryFileService( newRockContext ).Get( binaryFileGuid.Value );
+                    if ( binaryFile != null )
+                    {
+                        backgroundCheck.ResponseDocumentId = binaryFile.Id;
+                    }
+                }
             }
             
             newRockContext.SaveChanges();
