@@ -249,7 +249,7 @@ Response XML ({0}):
             {
                 reportStatus = "Pass";
             }
-            else if ( rootObject.data.@object.status.Equals( "clear", StringComparison.CurrentCultureIgnoreCase ) )
+            else if ( rootObject.data.@object.status.Equals( "consider", StringComparison.CurrentCultureIgnoreCase ) )
             {
                 reportStatus = "Review";
             }
