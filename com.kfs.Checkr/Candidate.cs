@@ -44,9 +44,9 @@ namespace com.kfs.Checkr
 
             if ( Person.BirthDate != null && Person.BirthDate > DateTime.MinValue )
             {
-                candidateKeyMap.Add( "dob", Person.BirthDate.ToString() );
+                candidateKeyMap.Add( "dob", ( ( DateTime ) Person.BirthDate ).ToString( "yyyy-MM-dd" ) );
             }
-            
+
             dynamic json = new { candidateKeyMap };
 
             var request = new RestRequest( path, Method.POST )
