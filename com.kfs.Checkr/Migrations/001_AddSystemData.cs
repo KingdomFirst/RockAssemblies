@@ -16,7 +16,7 @@ namespace com.kfs.Checkr.Migrations
         /// </summary>
         public override void Up()
         {
-            RockMigrationHelper.AddDefinedType( "Global", "Background Check Types (Checkr)", "The type of background checks that are available to be used with Checkr.", SystemGuid.DefinedType.CHECKR_PACKAGES );
+            RockMigrationHelper.AddDefinedType( "Global", "Background Check Types (Checkr)", "The type of background checks that are available to be used with Checkr. Packages are specific per account, use the name provided on the Checkr Dashboard Home as a guide. i.e. 'Basic criminal' would be added here as Value: 'basic_criminal' Description: 'Basic Criminal'.", SystemGuid.DefinedType.CHECKR_PACKAGES );
             RockMigrationHelper.AddDefinedValue( SystemGuid.DefinedType.CHECKR_PACKAGES, "tasker_standard", "Tasker Standard", "50cf25d8-9409-4164-b426-480abdfe11b9", false );
             RockMigrationHelper.AddDefinedValue( SystemGuid.DefinedType.CHECKR_PACKAGES, "tasker_pro", "Tasker Pro", "fb84e91d-3485-4e26-af96-7404147805d8", false );
             RockMigrationHelper.AddDefinedValue( SystemGuid.DefinedType.CHECKR_PACKAGES, "driver_standard", "Driver Standard", "9782e533-4938-4f85-a027-daa26be51bc7", false );
