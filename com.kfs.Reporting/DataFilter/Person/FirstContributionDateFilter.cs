@@ -15,7 +15,7 @@ namespace com.kfs.Reporting.DataFilter.Person
     /// <summary>
     /// 
     /// </summary>
-    [Description( "Filter people based on the date of their first contribution - evaluates giving unit, not individual " )]
+    [Description( "Filter people based on the date of their first contribution (with option to combine giving) " )]
     [Export( typeof( DataFilterComponent ) )]
     [ExportMetadata( "ComponentName", "First Contribution Date Filter KFS" )]
     public class FirstContributionDateFilter : DataFilterComponent
@@ -58,7 +58,7 @@ namespace com.kfs.Reporting.DataFilter.Person
         /// </value>
         public override string GetTitle( Type entityType )
         {
-            return "First Contribution Date";
+            return "First Contribution Date KFS";
         }
 
         /// <summary>
@@ -76,10 +76,23 @@ namespace com.kfs.Reporting.DataFilter.Person
 function() {
     
     var dateRangeText = $('.js-slidingdaterange-text-value', $content).val()
+    var combineGiving = $('[id$=""_cbCombineGiving""]', $content).is(':checked')
     var accountPicker = $('.js-account-picker', $content);
     var accountNames = accountPicker.find('.selected-names').text() 
 
-   return 'First contribution date to accounts ' + accountNames  + '. DateRange: ' + dateRangeText;
+    var result = '';    
+    if (combineGiving) {
+        result += 'Giving Group First contribution date to accounts ';
+    }
+    else {
+        result += 'First contribution date to accounts ';
+    }
+
+    result += accountNames;
+    result += '. DateRange: ';
+    result += dateRangeText;
+
+    return result;
 }
 ";
         }
@@ -99,10 +112,10 @@ function() {
             {
                 SlidingDateRangePicker fakeSlidingDateRangePicker = new SlidingDateRangePicker();
 
-                if ( selectionValues.Length >= 4 )
+                if ( selectionValues.Length >= 5 )
                 {
                     // convert comma delimited to pipe
-                    fakeSlidingDateRangePicker.DelimitedValues = selectionValues[3].Replace( ',', '|' );
+                    fakeSlidingDateRangePicker.DelimitedValues = selectionValues[4].Replace( ',', '|' );
                 }
                 else
                 {
@@ -118,10 +131,17 @@ function() {
                 var accountGuids = selectionValues[2].Split( ',' ).Select( a => a.AsGuid() ).ToList();
                 accountNames = new FinancialAccountService( new RockContext() ).GetByGuids( accountGuids ).Select( a => a.Name ).ToList().AsDelimited( "," );
 
+                bool combineGiving = false;
+                if ( selectionValues.Length >= 4 )
+                {
+                    combineGiving = selectionValues[3].AsBooleanOrNull() ?? false;
+                }
+
                 result = string.Format(
-                    "First contribution date{0}. Date Range: {1}",
+                    "{2}First contribution date{0}. Date Range: {1}",
                     !string.IsNullOrWhiteSpace( accountNames ) ? " to accounts:" + accountNames : string.Empty,
-                    SlidingDateRangePicker.FormatDelimitedValues( fakeSlidingDateRangePicker.DelimitedValues )
+                    SlidingDateRangePicker.FormatDelimitedValues( fakeSlidingDateRangePicker.DelimitedValues ),
+                    combineGiving ? "Giving Group " : string.Empty
                     )
                     ;
             }
@@ -150,7 +170,14 @@ function() {
             slidingDateRangePicker.Required = true;
             filterControl.Controls.Add( slidingDateRangePicker );
 
-            var controls = new Control[2] { accountPicker, slidingDateRangePicker };
+            RockCheckBox cbCombineGiving = new RockCheckBox();
+            cbCombineGiving.ID = filterControl.ID + "_cbCombineGiving";
+            cbCombineGiving.Label = "Combine Giving";
+            cbCombineGiving.CssClass = "js-combine-giving";
+            cbCombineGiving.Help = "Combine individuals in the same giving group when calculating first contribution date and reporting the list of individuals.";
+            filterControl.Controls.Add( cbCombineGiving );
+
+            var controls = new Control[3] { accountPicker, slidingDateRangePicker, cbCombineGiving };
 
             return controls;
         }
@@ -188,8 +215,10 @@ function() {
             // convert pipe to comma delimited
             var delimitedValues = slidingDateRangePicker.DelimitedValues.Replace( "|", "," );
 
+            RockCheckBox cbCombineGiving = controls[2] as RockCheckBox;
+
             // {1} and {2} used to store the DateRange before, but now we using the SlidingDateRangePicker
-            return string.Format( "{0}|{1}|{2}|{3}", string.Empty, string.Empty, accountGuids, delimitedValues );
+            return string.Format( "{0}|{1}|{2}|{3}|{4}", string.Empty, string.Empty, accountGuids, cbCombineGiving.Checked, delimitedValues );
         }
 
         /// <summary>
@@ -206,10 +235,10 @@ function() {
                 var accountPicker = controls[0] as AccountPicker;
                 var slidingDateRangePicker = controls[1] as SlidingDateRangePicker;
 
-                if ( selectionValues.Length >= 4 )
+                if ( selectionValues.Length >= 5 )
                 {
                     // convert comma delimited to pipe
-                    slidingDateRangePicker.DelimitedValues = selectionValues[3].Replace( ',', '|' );
+                    slidingDateRangePicker.DelimitedValues = selectionValues[4].Replace( ',', '|' );
                 }
                 else
                 {
@@ -226,6 +255,13 @@ function() {
                 if ( accounts != null && accounts.Any() )
                 {
                     accountPicker.SetValues( accounts );
+                }
+
+                var cbCombineGiving = controls[2] as RockCheckBox;
+
+                if ( selectionValues.Length >= 4 )
+                {
+                    cbCombineGiving.Checked = selectionValues[3].AsBooleanOrNull() ?? false;
                 }
             }
         }
@@ -250,9 +286,9 @@ function() {
 
             DateRange dateRange;
 
-            if ( selectionValues.Length >= 4 )
+            if ( selectionValues.Length >= 5 )
             {
-                string slidingDelimitedValues = selectionValues[3].Replace( ',', '|' );
+                string slidingDelimitedValues = selectionValues[4].Replace( ',', '|' );
                 dateRange = SlidingDateRangePicker.CalculateDateRangeFromDelimitedValues( slidingDelimitedValues );
             }
             else
@@ -272,6 +308,12 @@ function() {
             var accountGuids = selectionValues[2].Split( ',' ).Select( a => a.AsGuid() ).ToList();
             var accountIdList = new FinancialAccountService( ( RockContext ) serviceInstance.Context ).GetByGuids( accountGuids ).Select( a => a.Id ).ToList();
 
+            bool combineGiving = false;
+            if ( selectionValues.Length >= 4 )
+            {
+                combineGiving = selectionValues[3].AsBooleanOrNull() ?? false;
+            }
+
             int transactionTypeContributionId = Rock.Web.Cache.DefinedValueCache.Read( Rock.SystemGuid.DefinedValue.TRANSACTION_TYPE_CONTRIBUTION.AsGuid() ).Id;
 
             var financialTransactionsQry = new FinancialTransactionService( rockContext ).Queryable()
@@ -290,32 +332,62 @@ function() {
                 }
             }
 
-            var firstContributionDateQry = financialTransactionsQry
-                .GroupBy( xx => xx.AuthorizedPersonAlias.PersonId )
-                .Select( ss => new
+            if ( combineGiving )
+            {
+                var firstContributionDateQry = financialTransactionsQry.GroupBy( xx => xx.AuthorizedPersonAlias.Person.GivingLeaderId )
+                    .Select( ss => new
+                    {
+                        GivingLeaderId = ss.Key,
+                        FirstTransactionSundayDate = ss.Min( a => a.SundayDate )
+                    } );
+                
+                if ( dateRange.Start.HasValue )
                 {
-                    PersonId = ss.Key,
-                    FirstTransactionSundayDate = ss.Min( a => a.SundayDate )
-                } );
+                    firstContributionDateQry = firstContributionDateQry.Where( xx => xx.FirstTransactionSundayDate >= dateRange.Start.Value );
+                }
 
-            if ( dateRange.Start.HasValue )
-            {
-                firstContributionDateQry = firstContributionDateQry.Where( xx => xx.FirstTransactionSundayDate >= dateRange.Start.Value );
+                if ( dateRange.End.HasValue )
+                {
+                    firstContributionDateQry = firstContributionDateQry.Where( xx => xx.FirstTransactionSundayDate < dateRange.End.Value );
+                }
+
+                var innerQry = firstContributionDateQry.Select( xx => xx.GivingLeaderId ).AsQueryable();
+
+                var qry = new PersonService( rockContext ).Queryable()
+                    .Where( p => innerQry.Any( xx => xx == p.Id ) );
+
+                Expression extractedFilterExpression = FilterExpressionExtractor.Extract<Rock.Model.Person>( qry, parameterExpression, "p" );
+
+                return extractedFilterExpression;
             }
-
-            if ( dateRange.End.HasValue )
+            else
             {
-                firstContributionDateQry = firstContributionDateQry.Where( xx => xx.FirstTransactionSundayDate < dateRange.End.Value );
+                var firstContributionDateQry = financialTransactionsQry.GroupBy( xx => xx.AuthorizedPersonAlias.PersonId )
+                    .Select( ss => new
+                    {
+                        PersonId = ss.Key,
+                        FirstTransactionSundayDate = ss.Min( a => a.SundayDate )
+                    } );
+
+                if ( dateRange.Start.HasValue )
+                {
+                    firstContributionDateQry = firstContributionDateQry.Where( xx => xx.FirstTransactionSundayDate >= dateRange.Start.Value );
+                }
+
+                if ( dateRange.End.HasValue )
+                {
+                    firstContributionDateQry = firstContributionDateQry.Where( xx => xx.FirstTransactionSundayDate < dateRange.End.Value );
+                }
+
+                var innerQry = firstContributionDateQry.Select( xx => xx.PersonId ).AsQueryable();
+
+                var qry = new PersonService( rockContext ).Queryable()
+                    .Where( p => innerQry.Any( xx => xx == p.Id ) );
+
+                Expression extractedFilterExpression = FilterExpressionExtractor.Extract<Rock.Model.Person>( qry, parameterExpression, "p" );
+
+                return extractedFilterExpression;
             }
-
-            var innerQry = firstContributionDateQry.Select( xx => xx.PersonId ).AsQueryable();
-
-            var qry = new PersonService( rockContext ).Queryable()
-                .Where( p => innerQry.Any( xx => xx == p.Id ) );
-
-            Expression extractedFilterExpression = FilterExpressionExtractor.Extract<Rock.Model.Person>( qry, parameterExpression, "p" );
-
-            return extractedFilterExpression;
         }
 
         #endregion
