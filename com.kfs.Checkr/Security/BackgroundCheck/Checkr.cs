@@ -185,21 +185,21 @@ Invitation JSON:
                         }
                         else
                         {
-                            var ex = new Exception( "There was a problem creating the Invitation." );
+                            var ex = new Exception( string.Format( "There was a problem creating the Invitation. {0}", invitation ) );
                             ExceptionLogService.LogException( ex, null );
                             return false;
                         }
                     }
                     else
                     {
-                        var ex = new Exception( "The Package Id cannot be blank." );
+                        var ex = new Exception( "The Package Id cannot be blank. Check the Defined Value's Value to ensure it is a valid Package Slug name and not blank. i.e. tasker_basic" );
                         ExceptionLogService.LogException( ex, null );
                         return false;
                     }
                 }
                 else
                 {
-                    var ex = new Exception( "There was a problem creating the Candidate." );
+                    var ex = new Exception( string.Format( "There was a problem creating the Candidate. {0}", candidate ) );
                     ExceptionLogService.LogException( ex, null );
                     return false;
                 }
