@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json;
 using RestSharp;
+using Rock;
 
 namespace com.kfs.Checkr
 {
@@ -27,19 +28,22 @@ namespace com.kfs.Checkr
             candidateKeyMap.Add( "email", Person.Email );
             candidateKeyMap.Add( "custom_id", Person.PrimaryAliasId.ToString() );
 
-            if ( !string.IsNullOrWhiteSpace( Person.FirstName ) )
+            var firstName = Checkr.safeString( Person.FirstName );
+            if ( !string.IsNullOrWhiteSpace( firstName ) )
             {
-                candidateKeyMap.Add( "first_name", Person.FirstName );
+                candidateKeyMap.Add( "first_name", firstName );
             }
 
-            if ( !string.IsNullOrWhiteSpace( Person.MiddleName ) )
+            var middleName = Checkr.safeString( Person.MiddleName );
+            if ( !string.IsNullOrWhiteSpace( middleName ) )
             {
-                candidateKeyMap.Add( "middle_name", Person.MiddleName );
+                candidateKeyMap.Add( "middle_name", middleName );
             }
 
-            if ( !string.IsNullOrWhiteSpace( Person.LastName ) )
+            var lastName = Checkr.safeString( Person.LastName );
+            if ( !string.IsNullOrWhiteSpace( lastName ) )
             {
-                candidateKeyMap.Add( "last_name", Person.LastName );
+                candidateKeyMap.Add( "last_name", lastName );
             }
 
             if ( Person.BirthDate != null && Person.BirthDate > DateTime.MinValue )

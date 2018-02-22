@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace com.kfs.Checkr
 {
@@ -12,5 +13,14 @@ namespace com.kfs.Checkr
         }
 
         public static Uri checkrBaseUrl = new Uri( "https://api.checkr.com/" );
+
+        public static string safeString( string inputString )
+        {
+            var safeString = string.Empty;
+
+            safeString = Regex.Replace( inputString, @"[^a-zA-Z0-9\-,.' ]", "" );
+
+            return safeString;
+        }
     }
 }
