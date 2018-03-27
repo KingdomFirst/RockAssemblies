@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="Migrations\001_AddMinistrySafeElements.cs" />
     <Compile Include="Migrations\002_CreateWorkflow.cs" />
+    <Compile Include="Migrations\003_AddActionBlockSetting.cs" />
     <Compile Include="MinistrySafe.cs" />
     <Compile Include="SystemGuid\Attribute.cs" />
     <Compile Include="SystemGuid\Category.cs" />
