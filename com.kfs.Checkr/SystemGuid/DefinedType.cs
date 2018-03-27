@@ -8,7 +8,7 @@ namespace com.kfs.Checkr.SystemGuid
     public static class DefinedType
     {
         /// <summary>
-        /// Type's of Checkr Packager
+        /// Type's of Checkr Packages
         /// </summary>
         public const string CHECKR_PACKAGES = "55ea25ac-45dc-4f49-8d0f-4b8951402aa5";
     }
