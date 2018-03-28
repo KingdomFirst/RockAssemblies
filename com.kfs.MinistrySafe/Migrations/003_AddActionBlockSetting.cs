@@ -41,8 +41,8 @@ namespace com.kfs.MinistrySafe.Migrations
         IF CHARINDEX( 'AE617426-E1E3-4E06-B3D8-B7AB1A7B4892', @OldValue ) != 0
         BEGIN
             SET @NewValue = REPLACE(@OldValue, ',AE617426-E1E3-4E06-B3D8-B7AB1A7B4892', '') -- if not first item
-	       SET @NewValue = REPLACE(@OldValue, 'AE617426-E1E3-4E06-B3D8-B7AB1A7B4892,', '') -- if first item
-	       SET @NewValue = REPLACE(@OldValue, 'AE617426-E1E3-4E06-B3D8-B7AB1A7B4892', '') -- if only item
+            SET @NewValue = REPLACE(@NewValue, 'AE617426-E1E3-4E06-B3D8-B7AB1A7B4892,', '') -- if first item
+            SET @NewValue = REPLACE(@NewValue, 'AE617426-E1E3-4E06-B3D8-B7AB1A7B4892', '') -- if only item
 
 	       UPDATE [AttributeValue]
 	       SET [Value] = @NewValue
