@@ -18,7 +18,10 @@ namespace com.kfs.Checkr
         {
             var safeString = string.Empty;
 
-            safeString = Regex.Replace( inputString, @"[^a-zA-Z0-9\-,.' ]", "" );
+            if ( !string.IsNullOrWhiteSpace( inputString ) )
+            {
+                safeString = Regex.Replace( inputString, @"[^a-zA-Z0-9\-,.' ]", "" );
+            }
 
             return safeString;
         }
