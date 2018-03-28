@@ -51,9 +51,9 @@ namespace com.kfs.MinistrySafe.Migrations
             RockMigrationHelper.UpdateWorkflowTypeAttribute( "E7D5B3F9-45FD-4091-971A-BD5D4BD80538", "1B71FEF4-201F-4D53-8C60-2DF21F1985ED", "Campus", "Campus", "", 1, @"", "C93D7901-A1A6-4DA8-BA7E-F4054DC44C1B", false ); // Ministry Safe Connection:Campus
             RockMigrationHelper.UpdateWorkflowTypeAttribute( "E7D5B3F9-45FD-4091-971A-BD5D4BD80538", "9C204CD0-1233-41C5-818A-C5DA439445AA", "Reason", "Reason", "", 2, @"Ministry Safe Training requested via Connection Request", "EE2F92D8-FDD0-4AD4-8E80-9C4D1EBBAE85", false ); // Ministry Safe Connection:Reason
             RockMigrationHelper.UpdateWorkflowTypeAttribute( "E7D5B3F9-45FD-4091-971A-BD5D4BD80538", "A75DFC58-7A1B-4799-BF31-451B2BBE38FF", "Connection Request Id", "ConnectionRequestId", "", 3, @"0", "04F0BFBA-F5E6-46E4-8F1B-711E5E8BAA35", false ); // Ministry Safe Connection:Connection Request Id
-            RockMigrationHelper.UpdateAttributeQualifier( "AE8F3513-6B55-486D-AA3E-5E84613607F0", "EnableSelfSelection", @"False", "41D5F2C7-DEB3-43B0-B894-7D314E750A0F" ); // Ministry Safe Connection:Person:EnableSelfSelection
-            RockMigrationHelper.UpdateAttributeQualifier( "C93D7901-A1A6-4DA8-BA7E-F4054DC44C1B", "includeInactive", @"False", "FAFEC056-54FD-4951-8DB8-2DBC30795F3A" ); // Ministry Safe Connection:Campus:includeInactive
-            RockMigrationHelper.UpdateAttributeQualifier( "EE2F92D8-FDD0-4AD4-8E80-9C4D1EBBAE85", "ispassword", @"False", "714616BD-9003-460A-B1F6-EA320CCF4293" ); // Ministry Safe Connection:Reason:ispassword
+            RockMigrationHelper.AddAttributeQualifier( "AE8F3513-6B55-486D-AA3E-5E84613607F0", "EnableSelfSelection", @"False", "41D5F2C7-DEB3-43B0-B894-7D314E750A0F" ); // Ministry Safe Connection:Person:EnableSelfSelection
+            RockMigrationHelper.AddAttributeQualifier( "C93D7901-A1A6-4DA8-BA7E-F4054DC44C1B", "includeInactive", @"False", "FAFEC056-54FD-4951-8DB8-2DBC30795F3A" ); // Ministry Safe Connection:Campus:includeInactive
+            RockMigrationHelper.AddAttributeQualifier( "EE2F92D8-FDD0-4AD4-8E80-9C4D1EBBAE85", "ispassword", @"False", "714616BD-9003-460A-B1F6-EA320CCF4293" ); // Ministry Safe Connection:Reason:ispassword
             RockMigrationHelper.UpdateWorkflowActivityType( "E7D5B3F9-45FD-4091-971A-BD5D4BD80538", true, "Start", "", true, 0, "2AB25A27-6097-4B27-A414-49975A0FC740" ); // Ministry Safe Connection:Start
             RockMigrationHelper.UpdateWorkflowActionType( "2AB25A27-6097-4B27-A414-49975A0FC740", "Set Person", 0, "972F19B9-598B-474B-97A4-50E56E7B59D2", true, false, "", "", 1, "", "2F6D1E4E-925A-4DEB-8C66-F0859A19D35A" ); // Ministry Safe Connection:Start:Set Person
             RockMigrationHelper.UpdateWorkflowActionType( "2AB25A27-6097-4B27-A414-49975A0FC740", "Set Campus", 1, "972F19B9-598B-474B-97A4-50E56E7B59D2", true, false, "", "", 1, "", "BDFE1843-FB92-4E55-A86D-6497C2457DE6" ); // Ministry Safe Connection:Start:Set Campus
@@ -82,12 +82,6 @@ namespace com.kfs.MinistrySafe.Migrations
             RockMigrationHelper.AddActionTypeAttributeValue( "BEEA2051-6799-463A-9F65-9EB517D08554", "111C1C46-1FE2-44EB-89DE-806F0F13659B", @"Person^Person|Reason^Reason|Campus^Campus|ConnectionRequestId^ConnectionRequestId" ); // Ministry Safe Connection:Start:Initiate Ministry Safe Training Workflow:Workflow Attribute Key
             RockMigrationHelper.AddActionTypeAttributeValue( "BEEA2051-6799-463A-9F65-9EB517D08554", "150499F8-74E7-4362-8B6F-E1A4F25693BA", @"" ); // Ministry Safe Connection:Start:Initiate Ministry Safe Training Workflow:Order
             RockMigrationHelper.AddActionTypeAttributeValue( "BEEA2051-6799-463A-9F65-9EB517D08554", "742C0566-6CBB-4C42-8DCC-E7AA5EDA49EB", @"False" ); // Ministry Safe Connection:Start:Initiate Ministry Safe Training Workflow:Active
-
-            #endregion
-
-            #region DefinedValue AttributeType qualifier helper
-
-            Sql( @"     UPDATE [aq] SET [key] = 'definedtype', [Value] = CAST( [dt].[Id] as varchar(5) )     FROM [AttributeQualifier] [aq]     INNER JOIN [Attribute] [a] ON [a].[Id] = [aq].[AttributeId]     INNER JOIN [FieldType] [ft] ON [ft].[Id] = [a].[FieldTypeId]     INNER JOIN [DefinedType] [dt] ON CAST([dt].[guid] AS varchar(50) ) = [aq].[value]     WHERE [ft].[class] = 'Rock.Field.Types.DefinedValueFieldType'     AND [aq].[key] = 'definedtypeguid'    " );
 
             #endregion
         }
