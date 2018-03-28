@@ -76,9 +76,12 @@
     <Compile Include="Candidate.cs" />
     <Compile Include="Checkr.cs" />
     <Compile Include="Invitation.cs" />
+    <Compile Include="Migrations\005_AddActionBlockSetting.cs" />
     <Compile Include="Migrations\002_AddBasicCriminalPackage.cs" />
     <Compile Include="Migrations\001_AddSystemData.cs" />
     <Compile Include="Document.cs" />
+    <Compile Include="Migrations\003_AddCheckrRequestWorkflow.cs" />
+    <Compile Include="Migrations\004_AddConnectionCheckrRequestWorkflow.cs" />
     <Compile Include="Package.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\BackgroundCheck\Checkr.cs" />
