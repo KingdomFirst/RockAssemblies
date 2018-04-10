@@ -46,7 +46,7 @@ namespace com.kfs.Checkr
                 candidateKeyMap.Add( "last_name", lastName );
             }
 
-            if ( Person.BirthDate != null && Person.BirthDate > DateTime.MinValue )
+            if ( Person.BirthDate != null && Person.BirthDate > DateTime.MinValue && Person.Age > 18 )
             {
                 candidateKeyMap.Add( "dob", ( ( DateTime ) Person.BirthDate ).ToString( "yyyy-MM-dd" ) );
             }
