@@ -30,6 +30,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="dotless.Core, Version=1.5.2.0, Culture=neutral, PublicKeyToken=96b446c9e63eae34, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\dotless.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DotLiquid, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="EntityFramework">
       <HintPath>..\..\RockWeb\Bin\EntityFramework.dll</HintPath>
     </Reference>
@@ -38,6 +43,9 @@
     </Reference>
     <Reference Include="EntityFramework.Utilities">
       <HintPath>..\..\RockWeb\Bin\EntityFramework.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin">
+      <HintPath>..\..\RockWeb\Bin\Microsoft.Owin.dll</HintPath>
     </Reference>
     <Reference Include="RestSharp">
       <HintPath>..\..\RockWeb\Bin\RestSharp.dll</HintPath>
@@ -55,9 +63,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Intacct.cs" />
+    <Compile Include="IntacctJournal.cs" />
+    <Compile Include="IntacctModels.cs" />
     <Compile Include="Migrations\001_AddIntacctAttributes.cs" />
     <Compile Include="Migrations\002_AddDefinedTypeDetail.cs" />
+    <Compile Include="IntacctEndpoint.cs" />
+    <Compile Include="Migrations\003_AddBlockToBatchDetails.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
