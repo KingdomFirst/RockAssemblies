@@ -22,6 +22,7 @@
 **/Thumbs.db
 *.user
 *.suo
+.vs/*
 */bin/*
 */obj/*
 
