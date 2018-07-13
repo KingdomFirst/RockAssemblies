@@ -93,7 +93,7 @@ namespace com.kfs.Intacct
             return response;
         }
 
-        public bool ParseEndpointResonse( XmlDocument xmlDocument, int BatchId, bool Log = false )
+        public bool ParseEndpointResponse( XmlDocument xmlDocument, int BatchId, bool Log = false )
         {
             var resultX = XDocument.Load( new XmlNodeReader( xmlDocument ) );
 
