@@ -31,19 +31,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotLiquid">
-      <HintPath>..\..\RockWeb\Bin\DotLiquid.dll</HintPath>
+      <HintPath>..\..\Rock\RockWeb\Bin\DotLiquid.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework">
-      <HintPath>..\..\RockWeb\Bin\EntityFramework.dll</HintPath>
+      <HintPath>..\..\Rock\RockWeb\Bin\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer">
-      <HintPath>..\..\RockWeb\Bin\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\..\Rock\RockWeb\Bin\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.Infrastructure">
-      <HintPath>..\..\RockWeb\Bin\Microsoft.Web.Infrastructure.dll</HintPath>
+      <HintPath>..\..\Rock\RockWeb\Bin\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
     <Reference Include="Rock">
-      <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
+      <HintPath>..\..\Rock\RockWeb\Bin\Rock.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -69,8 +69,12 @@
     <Compile Include="Rock\Web\UI\Controls\Resource Controls\ResourceGroupRow.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
