@@ -404,7 +404,7 @@ namespace com.kfs.EventRegistration.Advanced
 
             if ( group != null )
             {
-                var selectedRequirement = group.GroupRequirements.Select( r => r.Id ).FirstOrDefault();
+                var selectedRequirement = group.GroupRequirements.Select( r => r.GroupRequirementTypeId ).FirstOrDefault();
                 var groupRequirements = new GroupRequirementTypeService( rockContext ).Queryable().ToList();
 
                 _ddlGroupRequirement.Items.Add( Rock.Constants.None.ListItem );
@@ -412,10 +412,11 @@ namespace com.kfs.EventRegistration.Advanced
                     groupRequirements.Select( r => new ListItem
                     {
                         Text = r.Name,
-                        Value = r.Id.ToString(),
-                        Selected = r.Id == selectedRequirement
+                        Value = r.Id.ToString()
                     } ).ToArray()
                 );
+
+                _ddlGroupRequirement.Items.FindByValue( selectedRequirement.ToString() ).Selected = true;
             }
         }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-
+using Newtonsoft.Json.Linq;
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
@@ -11,8 +11,6 @@ using Rock.Model;
 using Rock.Security;
 using Rock.Web.Cache;
 using Rock.Workflow;
-
-using Newtonsoft.Json.Linq;
 
 namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
 {
@@ -23,17 +21,14 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
     [Description( "Creates a user at Ministry Safe for the selected person." )]
     [Export( typeof( ActionComponent ) )]
     [ExportMetadata( "ComponentName", "Ministry Safe Create User" )]
-
     [WorkflowAttribute( "Person", "Workflow attribute that contains the person to update.", true, "", "", 0, null,
         new string[] { "Rock.Field.Types.PersonFieldType" } )]
     [WorkflowAttribute( "Ministry Safe Id", "Workflow attribute to store the Ministry Safe User Id.", true, "", "", 1 )]
     [WorkflowAttribute( "Direct Login Url", "Workflow attribute to store the Ministry Safe Direct Login Url.", true, "", "", 2 )]
     [WorkflowTextOrAttribute( "Training Type", "Attribute Value", "The training type that should be assigned to the User.  If left blank or none selected, the Standard Survey will be assigned.", false, "", "", 3, "TType" )]
-
     [EncryptedTextField( "API Key", "Optional API Key to override Global Attribute.", false, "", "Advanced", 0 )]
     [BooleanField( "Staging Mode", "Flag indicating if Ministry Safe Staging Mode should be used.", false, "Advanced", 1 )]
     [BooleanField( "Use Workflow Id", "Flag indicating if the Workflow Id should be used as the Ministry Safe External Id.", true, "Advanced", 2 )]
-
     public class MinistrySafeCreateUser : ActionComponent
     {
         /// <summary>
@@ -83,8 +78,8 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
 
                                         // Create Ministry Safe User
                                         JObject user = Users.CreateUser( Encryption.DecryptString( apiKey ), person, externalId, stagingMode );
-                                        var userId = user.Value<string>( "id" );
-                                        if ( !string.IsNullOrWhiteSpace( userId ) )
+                                        var userId = user?.Value<string>( "id" );
+                                        if ( user != null && !string.IsNullOrWhiteSpace( userId ) )
                                         {
                                             // Save Ministry Safe User Id
                                             SetWorkflowAttributeValue( action, attributeMinistrySafeId.Guid, userId );

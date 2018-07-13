@@ -16,7 +16,7 @@ namespace com.kfs.MinistrySafe
             }
             else
             {
-                return new Uri( "https://ministrysafe.com/api/" );
+                return new Uri( "https://safetysystem.ministrysafe.com/api/" );
             }
         }
     }
