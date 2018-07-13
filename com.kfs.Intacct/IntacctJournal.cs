@@ -27,7 +27,7 @@ namespace com.kfs.Intacct
             if ( financialBatch.Id > 0 )
             {
                 var lines = GetGlEntries( financialBatch );
-                if ( lines.Count > 0 )
+                if ( lines.Any() )
                 {
                     var batchDate = financialBatch.BatchStartDateTime == null ? RockDateTime.Now.ToShortDateString() : ( ( System.DateTime ) financialBatch.BatchStartDateTime ).ToShortDateString();
 
