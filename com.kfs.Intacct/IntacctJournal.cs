@@ -185,17 +185,20 @@ namespace com.kfs.Intacct
                 transaction.LoadAttributes();
                 foreach ( var transactionDetail in transaction.TransactionDetails )
                 {
-                    transactionDetail.Account.LoadAttributes();
                     transactionDetail.LoadAttributes();
+                    transactionDetail.Account.LoadAttributes();
+
+                    var detailProject = transactionDetail.GetAttributeValue( "com.kfs.Intacct.PROJECTID" ).AsGuidOrNull();
+                    var accountProject = transactionDetail.Account.GetAttributeValue( "com.kfs.Intacct.PROJECTID" ).AsGuidOrNull();
 
                     var projectCode = string.Empty;
-                    if ( !string.IsNullOrWhiteSpace( transactionDetail.GetAttributeValue( "com.kfs.Intacct.PROJECTID" ) ) )
+                    if ( detailProject != null )
                     {
-                        projectCode = transactionDetail.GetAttributeValue( "com.kfs.Intacct.PROJECTID" );
+                        projectCode = DefinedValueCache.Read( ( Guid ) detailProject ).Value;
                     }
-                    else
+                    else if ( accountProject != null )
                     {
-                        projectCode = transactionDetail.Account.GetAttributeValue( "com.kfs.Intacct.PROJECTID" );
+                        projectCode = DefinedValueCache.Read( ( Guid ) accountProject ).Value;
                     }
 
                     var customDimensionValues = new Dictionary<string, dynamic>();
@@ -276,21 +279,6 @@ namespace com.kfs.Intacct
             var returnList = new List<JournalEntryLine>();
             foreach ( var transaction in transactionItems )
             {
-                string projectCode = string.Empty;
-
-                if ( !string.IsNullOrWhiteSpace( transaction.Project ) )
-                {
-                    var dt = DefinedValueCache.Read( transaction.Project );
-                    var projects = DefinedTypeCache.Read( dt.DefinedTypeId );
-                    if ( projects != null )
-                    {
-                        foreach ( var project in projects.DefinedValues.OrderByDescending( a => a.Value.AsInteger() ).Where( p => p.Guid.Equals( transaction.Project.AsGuid() ) ) )
-                        {
-                            projectCode = project.Value;
-                        }
-                    }
-                }
-
                 var creditLine = new JournalEntryLine()
                 {
                     GlAccountNumber = transaction.CreditAccount,
