@@ -61,6 +61,13 @@ namespace com.kfs.Intacct
     public class GLTransaction
     {
         public decimal Amount;
+        public int FinancialAccountId;
+        public string Project;
+    }
+
+    public class GLBatchTotals
+    {
+        public decimal Amount;
         public string CreditAccount;
         public string DebitAccount;
         public string Class;

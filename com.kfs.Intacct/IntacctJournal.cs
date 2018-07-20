@@ -173,14 +173,15 @@ namespace com.kfs.Intacct
             return doc;
         }
 
-        private List<JournalEntryLine> GetGlEntries( FinancialBatch Batch )
+        private List<JournalEntryLine> GetGlEntries( FinancialBatch financialBatch )
         {
-            var customDimensions = GetCustomDimensions();
-
+            var rockContext = new RockContext();
+            
+            //
+            // Group/Sum Transactions by Account and Project since Project can come from Account or Transaction Details
+            //
             var batchTransactions = new List<GLTransaction>();
-
-            Batch.LoadAttributes();
-            foreach ( var transaction in Batch.Transactions )
+            foreach ( var transaction in financialBatch.Transactions )
             {
                 transaction.LoadAttributes();
                 foreach ( var transactionDetail in transaction.TransactionDetails )
@@ -201,49 +202,64 @@ namespace com.kfs.Intacct
                         projectCode = DefinedValueCache.Read( ( Guid ) accountProject ).Value;
                     }
 
-                    var customDimensionValues = new Dictionary<string, dynamic>();
-
-                    if ( customDimensions.Count > 0 )
-                    {
-                        foreach ( var rockKey in customDimensions )
-                        {
-                            var dimension = rockKey.Split( '.' ).Last();
-                            customDimensionValues.Add( dimension, transactionDetail.Account.GetAttributeValue( rockKey ) );
-                        }
-                    }
-
                     var transactionItem = new GLTransaction()
                     {
                         Amount = transactionDetail.Amount,
-                        CreditAccount = transactionDetail.Account.GetAttributeValue( "com.kfs.Intacct.ACCOUNTNO" ),
-                        DebitAccount = transactionDetail.Account.GetAttributeValue( "com.kfs.Intacct.DEBITACCOUNTNO" ),
-                        Class = transactionDetail.Account.GetAttributeValue( "com.kfs.Intacct.CLASSID" ),
-                        Department = transactionDetail.Account.GetAttributeValue( "com.kfs.Intacct.DEPARTMENT" ),
-                        Location = transactionDetail.Account.GetAttributeValue( "com.kfs.Intacct.LOCATION" ),
-                        Project = projectCode,
-                        CustomDimensions = customDimensionValues
+                        FinancialAccountId = transactionDetail.AccountId,
+                        Project = projectCode
                     };
 
                     batchTransactions.Add( transactionItem );
                 }
             }
 
-            var groupedTransactions = batchTransactions
-                .GroupBy( d => new { d.DebitAccount, d.Class, d.Department, d.CreditAccount, d.Location, d.Project, d.CustomDimensions } )
-                .Select( t => new GLTransaction
+            var batchTransactionsSummary = batchTransactions
+                .GroupBy( d => new { d.FinancialAccountId, d.Project } )
+                .Select( s => new GLTransaction
                 {
-                    DebitAccount = t.Key.DebitAccount,
-                    Class = t.Key.Class,
-                    Department = t.Key.Department,
-                    CreditAccount = t.Key.CreditAccount,
-                    Location = t.Key.Location,
-                    Project = t.Key.Project,
-                    Amount = t.Sum( f => ( decimal? ) f.Amount ) ?? 0.0M,
-                    CustomDimensions = t.Key.CustomDimensions
+                    FinancialAccountId = s.Key.FinancialAccountId,
+                    Project = s.Key.Project,
+                    Amount = s.Sum( f => ( decimal? ) f.Amount ) ?? 0.0M
                 } )
                 .ToList();
 
-            return GenerateLineItems( groupedTransactions );
+            //
+            // Get the Dimensions from the Account since the Transaction Detials have been Grouped already
+            //
+            var customDimensions = GetCustomDimensions();
+            var batchSummary = new List<GLBatchTotals>();
+            foreach ( var summary in batchTransactionsSummary )
+            {
+                var account = new FinancialAccountService( rockContext ).Get( summary.FinancialAccountId );
+                account.LoadAttributes();
+
+                var customDimensionValues = new Dictionary<string, dynamic>();
+
+                if ( customDimensions.Count > 0 )
+                {
+                    foreach ( var rockKey in customDimensions )
+                    {
+                        var dimension = rockKey.Split( '.' ).Last();
+                        customDimensionValues.Add( dimension, account.GetAttributeValue( rockKey ) );
+                    }
+                }
+
+                var batchSummaryItem = new GLBatchTotals()
+                {
+                    Amount = summary.Amount,
+                    CreditAccount = account.GetAttributeValue( "com.kfs.Intacct.ACCOUNTNO" ),
+                    DebitAccount = account.GetAttributeValue( "com.kfs.Intacct.DEBITACCOUNTNO" ),
+                    Class = account.GetAttributeValue( "com.kfs.Intacct.CLASSID" ),
+                    Department = account.GetAttributeValue( "com.kfs.Intacct.DEPARTMENT" ),
+                    Location =account.GetAttributeValue( "com.kfs.Intacct.LOCATION" ),
+                    Project = summary.Project,
+                    CustomDimensions = customDimensionValues
+                };
+
+                batchSummary.Add( batchSummaryItem );
+            }
+
+            return GenerateLineItems( batchSummary );
         }
 
         private List<string> GetCustomDimensions()
@@ -274,7 +290,7 @@ namespace com.kfs.Intacct
             return customDimensions;
         }
 
-        private List<JournalEntryLine> GenerateLineItems( List<GLTransaction> transactionItems )
+        private List<JournalEntryLine> GenerateLineItems( List<GLBatchTotals> transactionItems )
         {
             var returnList = new List<JournalEntryLine>();
             foreach ( var transaction in transactionItems )
