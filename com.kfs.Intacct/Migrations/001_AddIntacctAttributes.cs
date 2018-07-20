@@ -23,12 +23,14 @@ namespace com.kfs.Intacct.Migrations
             RockMigrationHelper.AddAttributeQualifier( "1615E093-51DF-4857-AED7-4F80DD36BE8B", "allowmultiple", "False", "9D39DBC5-E9EF-4AD6-995A-3512403A4AF6" );
             RockMigrationHelper.AddAttributeQualifier( "1615E093-51DF-4857-AED7-4F80DD36BE8B", "definedtype", "", "02BAC8C6-D45B-4CC1-9DE2-7D4B3DBABF64" );
             RockMigrationHelper.AddAttributeQualifier( "1615E093-51DF-4857-AED7-4F80DD36BE8B", "displaydescription", "True", "8955E6D0-9905-4923-9501-5BEEC69DFA49" );
+            RockMigrationHelper.AddAttributeQualifier( "1615E093-51DF-4857-AED7-4F80DD36BE8B", "enhancedselection", "True", "D99AF6BA-C6E6-40AA-90A3-4C30E1A76DAE" );
 
             // account project
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Default Project", "", "Designates the Project at the Financial Account Level", 0, "", "115519C9-EDFA-4BB5-A512-102C798F17F4", "com.kfs.Intacct.PROJECTID" );
             RockMigrationHelper.AddAttributeQualifier( "115519C9-EDFA-4BB5-A512-102C798F17F4", "allowmultiple", "False", "C87D26C4-DB81-4CDE-8890-5AB739424331" );
             RockMigrationHelper.AddAttributeQualifier( "115519C9-EDFA-4BB5-A512-102C798F17F4", "definedtype", "", "E2702E6F-0C1E-4EE4-9F0D-991877E75754" );
             RockMigrationHelper.AddAttributeQualifier( "115519C9-EDFA-4BB5-A512-102C798F17F4", "displaydescription", "True", "4BF01113-77B8-4628-B3A9-8286654DE65E" );
+            RockMigrationHelper.AddAttributeQualifier( "115519C9-EDFA-4BB5-A512-102C798F17F4", "enhancedselection", "True", "40BC40C5-91B1-41E3-87F2-D51610FA8CCE" );
 
             // set defined type qualifers
             Sql( @"
