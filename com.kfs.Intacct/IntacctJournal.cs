@@ -61,6 +61,7 @@ namespace com.kfs.Intacct
                         writer.WriteStartElement( "create" );
                         writer.WriteStartElement( "GLBATCH" );
                         writer.WriteElementString( "JOURNAL", JournalId );
+                        writer.WriteElementString( "REFERENCENO", financialBatch.Id.ToString() );
                         writer.WriteElementString( "BATCH_DATE", batchDate );
                         writer.WriteElementString( "BATCH_TITLE", financialBatch.Name );
                         writer.WriteElementString( "HISTORY_COMMENT", "Imported from RockRMS" );
