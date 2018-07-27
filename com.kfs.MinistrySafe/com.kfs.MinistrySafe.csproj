@@ -63,6 +63,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\009_UpdateTrainingWorfkflowPending.cs" />
+    <Compile Include="Migrations\008_ChangeTestResultPersonAttribute.cs" />
     <Compile Include="Migrations\007_UpdateTrainingWorkflowResults.cs" />
     <Compile Include="Migrations\006_AddTestResultPersonAttribute.cs" />
     <Compile Include="Migrations\001_AddMinistrySafeElements.cs" />

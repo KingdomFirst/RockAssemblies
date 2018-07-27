@@ -68,7 +68,6 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
                     JObject user = Users.GetUser( Encryption.DecryptString( apiKey ), userId, stagingMode );
                     var dateCompleted = user.Value<string>( "complete_date" );
                     var score = user.Value<string>( "score" );
-                    var result = user.Value<string>( "winner" );
 
                     if ( !string.IsNullOrWhiteSpace( dateCompleted ) && !string.IsNullOrWhiteSpace( score ) )
                     {
@@ -83,14 +82,14 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
                         // Save Result
                         if ( attributePassScore != null && attributeResult != null )
                         {
-                            var pass = false;
+                            var result = "Fail";
                             if ( score.AsInteger() >= attributePassScore )
                             {
-                                pass = true;
+                                result = "Pass";
                             }
 
-                            SetWorkflowAttributeValue( action, attributeResult.Guid, pass.ToString() );
-                            action.AddLogEntry( string.Format( "Set '{0}' attribute to '{1}'.", attributeResult.Name, pass.ToString() ) );
+                            SetWorkflowAttributeValue( action, attributeResult.Guid, result );
+                            action.AddLogEntry( string.Format( "Set '{0}' attribute to '{1}'.", attributeResult.Name, result ) );
                         }  
 
                         return true;
