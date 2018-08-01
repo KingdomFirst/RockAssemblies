@@ -27,9 +27,12 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
     [WorkflowAttribute( "Ministry Safe Id", "The User Id in the Ministry Safe system.", true, "", "", 0 )]
     [WorkflowAttribute( "Date Completed", "Workflow attribute to store the Date Completed.", true, "", "", 1 )]
     [WorkflowAttribute( "Score", "Workflow attribute to store the Score.", true, "", "", 2 )]
-    
+    [IntegerField( "Pass Score", "The minimum score to consider a pass.", true, 80, "", 3 )]
+    [WorkflowAttribute( "Result", "Workflow attribute to store the Result.", true, "", "", 4 )]
+
     [EncryptedTextField( "API Key", "Optional API Key to override Global Attribute.", false, "", "Advanced", 0 )]
     [BooleanField( "Staging Mode", "Flag indicating if Ministry Safe Staging Mode should be used.", false, "Advanced", 1 )]
+    
 
     class MinistrySafeGetUserResults : ActionComponent
     {
@@ -48,6 +51,8 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
             var attributeMinistrySafeId = AttributeCache.Read( GetAttributeValue( action, "MinistrySafeId" ).AsGuid(), rockContext );
             var attributeDateCompleted = AttributeCache.Read( GetAttributeValue( action, "DateCompleted" ).AsGuid(), rockContext );
             var attributeScore = AttributeCache.Read( GetAttributeValue( action, "Score" ).AsGuid(), rockContext );
+            var attributePassScore = GetAttributeValue( action, "PassScore" ).AsIntegerOrNull();
+            var attributeResult = AttributeCache.Read( GetAttributeValue( action, "Result" ).AsGuid(), rockContext );
 
             if ( attributeMinistrySafeId != null && attributeDateCompleted != null && attributeScore != null )
             {
@@ -73,6 +78,19 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
                         // Save Score
                         SetWorkflowAttributeValue( action, attributeScore.Guid, score );
                         action.AddLogEntry( string.Format( "Set '{0}' attribute to '{1}'.", attributeScore.Name, score ) );
+
+                        // Save Result
+                        if ( attributePassScore != null && attributeResult != null )
+                        {
+                            var result = "Fail";
+                            if ( score.AsInteger() >= attributePassScore )
+                            {
+                                result = "Pass";
+                            }
+
+                            SetWorkflowAttributeValue( action, attributeResult.Guid, result );
+                            action.AddLogEntry( string.Format( "Set '{0}' attribute to '{1}'.", attributeResult.Name, result ) );
+                        }  
 
                         return true;
                     }

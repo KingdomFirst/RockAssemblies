@@ -22,5 +22,10 @@ namespace com.kfs.MinistrySafe.SystemGuid
         /// Ministry Safe Person Attribute for Test Score
         /// </summary>
         public const string MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_SCORE = "E04B15E3-BEBD-4B98-A919-80FCB0E479D1";
+
+        /// <summary>
+        /// Ministry Safe Person Attribute for Test Result
+        /// </summary>
+        public const string MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_RESULT = "DB9D8876-4550-424D-A019-1AA71F8ADC1D";
     }
 }
