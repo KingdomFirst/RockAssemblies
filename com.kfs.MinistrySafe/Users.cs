@@ -18,10 +18,10 @@ namespace com.kfs.MinistrySafe
         /// <param name="ExternalId">Optional Id to use as the External Id (i.e. WorkflowId).  If left blank, Person.PrimaryAliasId will be used (i.e. 'P1234').</param>
         /// <param name="StagingMode">Optional flag indicating if the Staging API should be used.</param>
         /// <returns>Returns true or error.</returns>
-        public static dynamic CreateUser( string APIKey, Rock.Model.Person Person, string ExternalId = "", bool StagingMode = false )
+        public static dynamic CreateUser( string APIKey, Rock.Model.Person Person, string msUserType = "volunteer", string ExternalId = "", bool StagingMode = false )
         {   
             var externalId = string.IsNullOrWhiteSpace( ExternalId ) ? $"P{ Person.PrimaryAliasId.ToString() }" : ExternalId;
-            var body = $"user[first_name]={ Person.FirstName }&user[last_name]={ Person.LastName }&user[email]={ Person.Email }&user[external_id]={ externalId }";
+            var body = $"user[first_name]={ Person.FirstName }&user[last_name]={ Person.LastName }&user[email]={ Person.Email }&user[external_id]={ externalId }&user[user_type]={ msUserType }";
 
             var client = new RestClient();
             client.BaseUrl = MinistrySafe.BaseUrl( StagingMode );
