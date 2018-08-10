@@ -63,7 +63,9 @@ namespace com.kfs.FinancialEdge
                 } )
                 .ToList();
 
-            return GenerateLineItems( rockContext, batchSummary, financialBatch.BatchStartDateTime, journal, financialBatch.Name, referenceStyle, encumbranceStatus );
+            var batchName = string.Format( "{0} ({1})", financialBatch.Name, financialBatch.Id );
+
+            return GenerateLineItems( rockContext, batchSummary, financialBatch.BatchStartDateTime, journal, batchName, referenceStyle, encumbranceStatus );
         }
 
         private List<JournalEntryLine> GenerateLineItems( RockContext rockContext, List<GLTransaction> transactionItems, DateTime? batchDate, string journal, string batchName, ReferenceStyle referenceStyle, string encumbranceStatus )
