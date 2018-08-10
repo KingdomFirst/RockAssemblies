@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Web;
 
 using Rock;
 using Rock.Data;
@@ -112,6 +114,30 @@ namespace com.kfs.FinancialEdge
             }
 
             return returnList;
+        }
+
+        public void SetFinancialEdgeSessions( List<JournalEntryLine> items, string fileId )
+        {
+            if ( HttpContext.Current.Session["FinancialEdgeCsvExport"] != null )
+            {
+                HttpContext.Current.Session["FinancialEdgeCsvExport"] = string.Empty;
+            }
+            if ( HttpContext.Current.Session["FinancialEdgeFileId"] != null )
+            {
+                HttpContext.Current.Session["FinancialEdgeFileId"] = string.Empty;
+            }
+
+            var output = new StringBuilder();
+            output.Append( "Account number, Post Date, Encumbrance Status, Type, Journal, Journal Reference, Amount, Project ID" );
+            var num = 0;
+            foreach ( var item in items )
+            {
+                output.Append( Environment.NewLine );
+                output.Append( string.Format( "{0},{1},{2},{3},{4},\"{5}\",{6},{7}", item.AccountNumber, item.PostDate.ToString( "MM/dd/yyyy" ), item.EncumbranceStatus, item.Type, item.Journal, item.JournalReference, item.Amount, item.ProjectId ) );
+                num++;
+            }
+            HttpContext.Current.Session["FinancialEdgeCsvExport"] = output.ToString();
+            HttpContext.Current.Session["FinancialEdgeFileId"] = fileId;
         }
     }
 
