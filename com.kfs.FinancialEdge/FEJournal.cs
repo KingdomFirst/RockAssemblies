@@ -81,7 +81,18 @@ namespace com.kfs.FinancialEdge
                 {
                     var accountName = new FinancialAccountService( rockContext ).Get( transaction.FinancialAccountId ).Name;
                     var project = DefinedValueCache.Read( transaction.Project.AsGuid() );
-                    var projectName = string.IsNullOrWhiteSpace( project.Description ) ? string.Empty : string.Format( " - {0}", project.Description );
+                    var projectName = string.Empty;
+                    if ( project != null )
+                    {
+                        if ( !string.IsNullOrWhiteSpace( project.Description ) )
+                        {
+                            projectName = string.Format( " - {0}", project.Description );
+                        }
+                        else
+                        {
+                            projectName = string.Format( " - {0}", project.Value );
+                        }
+                    }
                     journalReference = string.Format( "{0}{1}", accountName, projectName );
                 }
                 var creditLine = new JournalEntryLine()
