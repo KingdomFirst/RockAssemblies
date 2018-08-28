@@ -26,7 +26,7 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
     [WorkflowAttribute( "Ministry Safe Id", "Workflow attribute to store the Ministry Safe User Id.", true, "", "", 1 )]
     [WorkflowAttribute( "Direct Login Url", "Workflow attribute to store the Ministry Safe Direct Login Url.", true, "", "", 2 )]
     [WorkflowTextOrAttribute( "Training Type", "Attribute Value", "The training type that should be assigned to the User.  If left blank or none selected, the Standard Survey will be assigned.", false, "", "", 3, "TType" )]
-    [WorkflowTextOrAttribute( "User Type", "User Type", "The user type the Person will be assigned at Ministry Safe. Current options are 'volunteer' or ''employee. Default is 'volunteer'", false, order: 4 )]
+    [WorkflowTextOrAttribute( "User Type", "Attribute Value", "The user type the Person will be assigned at Ministry Safe. Current options are 'volunteer' or 'employee'. Default is 'volunteer'", false, order: 4 )]
     [EncryptedTextField( "API Key", "Optional API Key to override Global Attribute.", false, "", "Advanced", 0 )]
     [BooleanField( "Staging Mode", "Flag indicating if Ministry Safe Staging Mode should be used.", false, "Advanced", 1 )]
     [BooleanField( "Use Workflow Id", "Flag indicating if the Workflow Id should be used as the Ministry Safe External Id.", true, "Advanced", 2 )]
