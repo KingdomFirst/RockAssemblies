@@ -337,6 +337,12 @@ namespace com.kfs.Security.ExternalAuthentication
         /// <returns></returns>
         public static string GetOAuthUser( Guid connectionStatusGuid, OAuthUser oauthUser, string accessToken = "" )
         {
+            // accessToken is required
+            if ( accessToken.IsNullOrWhiteSpace() )
+            {
+                return null;
+            }
+
             string username = string.Empty;
             string oauthId = oauthUser.id;
 
