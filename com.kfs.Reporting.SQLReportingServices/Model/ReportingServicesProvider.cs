@@ -151,7 +151,7 @@ namespace com.kfs.Reporting.SQLReportingServices
                 SaveAttributeValue( context, BROWSER_USER_KEY, BrowserUser );
                 SaveAttributeValue( context, BROWSER_PWD_KEY, Encryption.EncryptString( BrowserPassword ) );
             }
-            GlobalAttributesCache.Flush();
+            GlobalAttributesCache.Clear();
             return true;
         }
 
@@ -560,7 +560,7 @@ namespace com.kfs.Reporting.SQLReportingServices
             if ( hasChanges )
             {
                 context.SaveChanges();
-                GlobalAttributesCache.Flush();
+                GlobalAttributesCache.Clear();
             }
         }
 
