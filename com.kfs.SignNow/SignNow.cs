@@ -738,7 +738,7 @@ namespace com.kfs.SignNow
             if ( string.IsNullOrWhiteSpace( errorMessage ) )
             {
                 accessToken = OAuthRes.Value<string>( "access_token" );
-                GlobalAttributesCache globalCache = GlobalAttributesCache.Read();
+                GlobalAttributesCache globalCache = GlobalAttributesCache.Get();
                 globalCache.SetValue( "SignNowAccessToken", accessToken, true );
             }
 

@@ -48,11 +48,11 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
         {
             errorMessages = new List<string>();
 
-            var attributeMinistrySafeId = AttributeCache.Read( GetAttributeValue( action, "MinistrySafeId" ).AsGuid(), rockContext );
-            var attributeDateCompleted = AttributeCache.Read( GetAttributeValue( action, "DateCompleted" ).AsGuid(), rockContext );
-            var attributeScore = AttributeCache.Read( GetAttributeValue( action, "Score" ).AsGuid(), rockContext );
+            var attributeMinistrySafeId = AttributeCache.Get( GetAttributeValue( action, "MinistrySafeId" ).AsGuid(), rockContext );
+            var attributeDateCompleted = AttributeCache.Get( GetAttributeValue( action, "DateCompleted" ).AsGuid(), rockContext );
+            var attributeScore = AttributeCache.Get( GetAttributeValue( action, "Score" ).AsGuid(), rockContext );
             var attributePassScore = GetAttributeValue( action, "PassScore" ).AsIntegerOrNull();
-            var attributeResult = AttributeCache.Read( GetAttributeValue( action, "Result" ).AsGuid(), rockContext );
+            var attributeResult = AttributeCache.Get( GetAttributeValue( action, "Result" ).AsGuid(), rockContext );
 
             if ( attributeMinistrySafeId != null && attributeDateCompleted != null && attributeScore != null )
             {
@@ -61,7 +61,7 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
                 {
                     // Process Workflow Action settings
                     var apiKeySetting = GetAttributeValue( action, "APIKey" );
-                    var apiKey = string.IsNullOrWhiteSpace( apiKeySetting ) ? GlobalAttributesCache.Read( rockContext ).GetValue( "MinistrySafeAPIKey" ) : apiKeySetting;
+                    var apiKey = string.IsNullOrWhiteSpace( apiKeySetting ) ? GlobalAttributesCache.Value( "MinistrySafeAPIKey" ) : apiKeySetting;
                     var stagingMode = GetAttributeValue( action, "StagingMode" ).AsBoolean( false );
 
                     // Get User

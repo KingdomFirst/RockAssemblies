@@ -57,7 +57,7 @@ namespace com.kfs.GroupScheduledEmails.Jobs
             var beginDateTime = lastRunDateTime ?? RockDateTime.Now.AddDays( -1 );
 
             // get the date attributes
-            var dateAttribute = Rock.Web.Cache.AttributeCache.Read( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SEND_DATE.AsGuid() );
+            var dateAttribute = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SEND_DATE.AsGuid() );
             var dateAttributes = new AttributeValueService( rockContext ).Queryable()
                                         .Where( d => d.AttributeId == dateAttribute.Id &&
                                                 d.ValueAsDateTime >= beginDateTime && d.ValueAsDateTime <= RockDateTime.Now )
@@ -81,22 +81,22 @@ namespace com.kfs.GroupScheduledEmails.Jobs
             {
                 try
                 {
-                    var fromEmailAttributeId = Rock.Web.Cache.AttributeCache.Read( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_FROM_EMAIL.AsGuid() ).Id;
+                    var fromEmailAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_FROM_EMAIL.AsGuid() ).Id;
                     var fromEmail = new AttributeValueService( rockContext ).Queryable()
                                                 .FirstOrDefault( v => v.AttributeId == fromEmailAttributeId &&
                                                         v.EntityId == groupAndAttributeMatrixItemId.Value ).Value;
 
-                    var fromNameAttributeId = Rock.Web.Cache.AttributeCache.Read( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_FROM_NAME.AsGuid() ).Id;
+                    var fromNameAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_FROM_NAME.AsGuid() ).Id;
                     var fromName = new AttributeValueService( rockContext ).Queryable()
                                                 .FirstOrDefault( v => v.AttributeId == fromNameAttributeId &&
                                                         v.EntityId == groupAndAttributeMatrixItemId.Value ).Value;
 
-                    var subjectAttributeId = Rock.Web.Cache.AttributeCache.Read( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SUBJECT.AsGuid() ).Id;
+                    var subjectAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SUBJECT.AsGuid() ).Id;
                     var subject = new AttributeValueService( rockContext ).Queryable()
                                                 .FirstOrDefault( v => v.AttributeId == subjectAttributeId &&
                                                         v.EntityId == groupAndAttributeMatrixItemId.Value ).Value;
 
-                    var messageAttributeId = Rock.Web.Cache.AttributeCache.Read( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_MESSAGE.AsGuid() ).Id;
+                    var messageAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_MESSAGE.AsGuid() ).Id;
                     var message = new AttributeValueService( rockContext ).Queryable()
                                                 .FirstOrDefault( v => v.AttributeId == messageAttributeId &&
                                                         v.EntityId == groupAndAttributeMatrixItemId.Value ).Value;
@@ -174,7 +174,7 @@ namespace com.kfs.GroupScheduledEmails.Jobs
             }
 
             emailMessage.CreateCommunicationRecord = createCommunicationRecord;
-            emailMessage.AppRoot = Rock.Web.Cache.GlobalAttributesCache.Read().GetValue( "InternalApplicationRoot" ) ?? string.Empty;
+            emailMessage.AppRoot = Rock.Web.Cache.GlobalAttributesCache.Get().GetValue( "InternalApplicationRoot" ) ?? string.Empty;
 
             emailMessage.Send();
         }

@@ -44,8 +44,8 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
         {
             errorMessages = new List<string>();
 
-            var attributeMinistrySafeId = AttributeCache.Read( GetAttributeValue( action, "MinistrySafeId" ).AsGuid(), rockContext );
-            var attributeDirectLoginUrl = AttributeCache.Read( GetAttributeValue( action, "DirectLoginUrl" ).AsGuid(), rockContext );
+            var attributeMinistrySafeId = AttributeCache.Get( GetAttributeValue( action, "MinistrySafeId" ).AsGuid(), rockContext );
+            var attributeDirectLoginUrl = AttributeCache.Get( GetAttributeValue( action, "DirectLoginUrl" ).AsGuid(), rockContext );
 
             if ( attributeMinistrySafeId != null && attributeDirectLoginUrl != null )
             {
@@ -54,7 +54,7 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
 
                 if ( !guid.IsEmpty() )
                 {
-                    var attributePerson = AttributeCache.Read( guid, rockContext );
+                    var attributePerson = AttributeCache.Get( guid, rockContext );
                     if ( attributePerson != null )
                     {
                         string attributePersonValue = action.GetWorklowAttributeValue( guid );
@@ -73,7 +73,7 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
                                     {
                                         // Process Workflow Action settings
                                         var apiKeySetting = GetAttributeValue( action, "APIKey" );
-                                        var apiKey = string.IsNullOrWhiteSpace( apiKeySetting ) ? GlobalAttributesCache.Read( rockContext ).GetValue( "MinistrySafeAPIKey" ) : apiKeySetting;
+                                        var apiKey = string.IsNullOrWhiteSpace( apiKeySetting ) ? GlobalAttributesCache.Value( "MinistrySafeAPIKey" ) : apiKeySetting;
                                         var externalId = GetAttributeValue( action, "UseWorkflowId" ).AsBoolean( true ) ? action.Activity.Workflow.Id.ToString() : string.Empty;
                                         var userTypeSetting = GetAttributeValue( action, "UserType" );
                                         var userType = string.IsNullOrWhiteSpace( userTypeSetting ) ? "volunteer" : userTypeSetting;
@@ -95,7 +95,7 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
 
                                             // Assign training type to user if provided
                                             var attributeTrainingType = GetAttributeValue( action, "TType", true );
-                                            var surveyCode = DefinedValueCache.Read( attributeTrainingType );
+                                            var surveyCode = DefinedValueCache.Get( attributeTrainingType );
                                             if ( surveyCode != null )
                                             {
                                                 JObject training = Trainings.AssignTraining( Encryption.DecryptString( apiKey ), userId, surveyCode.Value, stagingMode );

@@ -373,17 +373,13 @@ namespace com.kfs.Security.ExternalAuthentication
                     if ( !string.IsNullOrWhiteSpace( email ) )
                     {
                         var personService = new PersonService( rockContext );
-                        var people = personService.GetByMatch( firstName, lastName, email );
-                        if ( people.Count() == 1 )
-                        {
-                            person = people.First();
-                        }
+                        person = personService.FindPerson( firstName, lastName, email, true );
                     }
 
-                    var personRecordTypeId = DefinedValueCache.Read( Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() ).Id;
-                    var personStatusPendingId = DefinedValueCache.Read( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_PENDING.AsGuid() ).Id;
-                    var personConnectionStatusId = DefinedValueCache.Read( connectionStatusGuid ).Id;
-                    var phoneNumberTypeId = DefinedValueCache.Read( Rock.SystemGuid.DefinedValue.PERSON_PHONE_TYPE_HOME.AsGuid() ).Id;
+                    var personRecordTypeId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() ).Id;
+                    var personStatusPendingId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_PENDING.AsGuid() ).Id;
+                    var personConnectionStatusId = DefinedValueCache.Get( connectionStatusGuid ).Id;
+                    var phoneNumberTypeId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_PHONE_TYPE_HOME.AsGuid() ).Id;
 
                     rockContext.WrapTransaction( () =>
                     {
@@ -444,7 +440,7 @@ namespace com.kfs.Security.ExternalAuthentication
 
                                     groupLocation.Location = personLocation;
 
-                                    groupLocation.GroupLocationTypeValueId = DefinedValueCache.Read( locationTypeGuid ).Id;
+                                    groupLocation.GroupLocationTypeValueId = DefinedValueCache.Get( locationTypeGuid ).Id;
                                     groupLocation.IsMailingLocation = true;
                                     groupLocation.IsMappedLocation = true;
 
@@ -455,7 +451,7 @@ namespace com.kfs.Security.ExternalAuthentication
 
                         if ( person != null )
                         {
-                            int typeId = EntityTypeCache.Read( typeof( DoorkeeperOAuth ) ).Id;
+                            int typeId = EntityTypeCache.Get( typeof( DoorkeeperOAuth ) ).Id;
                             user = UserLoginService.Create( rockContext, person, AuthenticationServiceType.External, typeId, userName, "KFSRocksRock", true );
                         }
 

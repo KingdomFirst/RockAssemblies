@@ -196,11 +196,11 @@ namespace com.kfs.Intacct
                     var projectCode = string.Empty;
                     if ( detailProject != null )
                     {
-                        projectCode = DefinedValueCache.Read( ( Guid ) detailProject ).Value;
+                        projectCode = DefinedValueCache.Get( ( Guid ) detailProject ).Value;
                     }
                     else if ( accountProject != null )
                     {
-                        projectCode = DefinedValueCache.Read( ( Guid ) accountProject ).Value;
+                        projectCode = DefinedValueCache.Get( ( Guid ) accountProject ).Value;
                     }
 
                     var transactionItem = new GLTransaction()
