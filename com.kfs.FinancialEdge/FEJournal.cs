@@ -104,7 +104,7 @@ namespace com.kfs.FinancialEdge
                     Journal = journal,
                     JournalReference = journalReference,
                     Amount = transaction.Amount,
-                    ProjectId = DefinedValueCache.Get( transaction.Project.AsGuid() ).Value
+                    ProjectId = DefinedValueCache.Get( transaction.Project.AsGuid() )?.Value
                 };
 
                 returnList.Add( creditLine );
@@ -118,7 +118,7 @@ namespace com.kfs.FinancialEdge
                     Journal = journal,
                     JournalReference = journalReference,
                     Amount = transaction.Amount,
-                    ProjectId = DefinedValueCache.Get( transaction.Project.AsGuid() ).Value
+                    ProjectId = DefinedValueCache.Get( transaction.Project.AsGuid() )?.Value
                 };
 
                 returnList.Add( debitLine );
