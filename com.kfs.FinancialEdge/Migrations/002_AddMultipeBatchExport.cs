@@ -19,7 +19,7 @@ namespace com.kfs.FinancialEdge.Migrations
                 WHERE [Id] = @BatchExportDateAttributeId
             " );
 
-            // create page for project defined type
+            // create page for FE batches export
             RockMigrationHelper.AddPage( Rock.SystemGuid.Page.FUNCTIONS_FINANCE, "D65F783D-87A9-4CC9-8110-E83466A0EADB", "Financial Edge Batch Export", "", "2DD5ECDF-AF5B-4CB5-B747-490E47BBDE8E", "fa fa-archive", Rock.SystemGuid.Page.BATCHES );
 
             // block type
