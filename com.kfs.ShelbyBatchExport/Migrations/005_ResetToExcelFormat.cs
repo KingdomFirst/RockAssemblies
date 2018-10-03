@@ -8,7 +8,7 @@ using Rock.Plugin;
 
 namespace com.kfs.ShelbyBatchExport.Migrations
 {
-    [MigrationNumber( 5, "1.6.9" )]
+    [MigrationNumber( 5, "1.8.0" )]
     class ResetToExcelFormat : Migration
     {
         /// <summary>

@@ -8,7 +8,7 @@ using Rock.Plugin;
 
 namespace com.kfs.ShelbyBatchExport.Migrations
 {
-    [MigrationNumber( 6, "1.6.9" )]
+    [MigrationNumber( 6, "1.8.0" )]
     class SetCategoriesOnNewAttributes : Migration
     {
         /// <summary>

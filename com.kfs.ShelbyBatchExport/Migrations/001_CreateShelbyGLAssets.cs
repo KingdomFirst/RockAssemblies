@@ -8,7 +8,7 @@ using Rock.Plugin;
 
 namespace com.kfs.ShelbyBatchExport.Migrations
 {
-    [MigrationNumber( 1, "1.6.1" )]
+    [MigrationNumber( 1, "1.8.0" )]
     public class CreateShelbyGLAssets : Migration
     {
         /// <summary>
