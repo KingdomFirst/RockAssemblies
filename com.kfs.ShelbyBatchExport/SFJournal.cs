@@ -123,7 +123,7 @@ namespace com.kfs.ShelbyBatchExport
                     Amount = summary.Amount,
                     Project = summary.Project,
                     JournalNumber = financialBatch.Id,
-                    JournalDescription = financialBatch.Name,
+                    JournalDescription = string.Format("{0}: {1}", financialBatch.Id, financialBatch.Name),
                     Date = financialBatch.BatchStartDateTime ?? RockDateTime.Now,
                     Note = financialBatch.Note
                 };
@@ -168,7 +168,7 @@ namespace com.kfs.ShelbyBatchExport
                     FundNumber = transaction.FundNumber,
                     LocationNumber = transaction.LocationNumber,
                     CostCenterNumber = transaction.CostCenterNumber,
-                    DepartmentNumber = transaction.DepartmentNumber,
+                    DepartmentNumber = "0",
                     AccountNumber = transaction.DebitAccountNumber,
                     AccountSub = transaction.AccountSub,
                     Amount = transaction.Amount,
