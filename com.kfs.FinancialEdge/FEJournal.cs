@@ -13,7 +13,7 @@ namespace com.kfs.FinancialEdge
 {
     public class FEJournal
     {
-        public List<JournalEntryLine> GetGlEntries( RockContext rockContext, FinancialBatch financialBatch, string journal, ReferenceStyle referenceStyle, string encumbranceStatus = "Regular" )
+        public List<JournalEntryLine> GetGlEntries( RockContext rockContext, FinancialBatch financialBatch, string journal, string encumbranceStatus = "Regular" )
         {
             //
             // Group/Sum Transactions by Account and Project since Project can come from Account or Transaction Details
@@ -46,58 +46,50 @@ namespace com.kfs.FinancialEdge
                         CreditAccount = transactionDetail.Account.GetAttributeValue( "com.kfs.FinancialEdge.ACCOUNTNO" ),
                         DebitAccount = transactionDetail.Account.GetAttributeValue( "com.kfs.FinancialEdge.DEBITACCOUNTNO" ),
                         Project = projectCode,
-                        FinancialAccountId = transactionDetail.Account.Id
+                        FinancialAccountId = transactionDetail.Account.Id,
+                        DebitProject = transactionDetail.Account.GetAttributeValue( "com.kfs.FinancialEdge.DEBITPROJECTID" ),
                     };
 
                     batchTransactions.Add( transactionItem );
                 }
             }
 
-            var batchSummary = batchTransactions
-                .GroupBy( d => new { d.FinancialAccountId, d.CreditAccount, d.DebitAccount, d.Project } )
-                .Select( s => new GLTransaction
+            var creditLines = batchTransactions
+                .GroupBy( d => new { d.CreditAccount, d.Project } )
+                .Select( s => new GLTransactionLine
                 {
-                    FinancialAccountId = s.Key.FinancialAccountId,
-                    CreditAccount = s.Key.CreditAccount,
-                    DebitAccount = s.Key.DebitAccount,
+                    Account = s.Key.CreditAccount,
                     Project = s.Key.Project,
                     Amount = s.Sum( f => ( decimal? ) f.Amount ) ?? 0.0M
                 } )
                 .ToList();
 
+            var debitLines = batchTransactions
+                .GroupBy( d => new { d.DebitAccount, d.DebitProject } )
+                .Select( s => new GLTransactionLine
+                {
+                    Account = s.Key.DebitAccount,
+                    Project = s.Key.DebitProject,
+                    Amount = s.Sum( f => ( decimal? ) f.Amount ) ?? 0.0M,
+                } )
+                .ToList();
+
             var batchName = string.Format( "{0} ({1})", financialBatch.Name, financialBatch.Id );
 
-            return GenerateLineItems( rockContext, batchSummary, financialBatch.BatchStartDateTime, journal, batchName, referenceStyle, encumbranceStatus );
+            return GenerateLineItems( rockContext, creditLines, debitLines, financialBatch.BatchStartDateTime, journal, batchName, encumbranceStatus );
         }
 
-        private List<JournalEntryLine> GenerateLineItems( RockContext rockContext, List<GLTransaction> transactionItems, DateTime? batchDate, string journal, string batchName, ReferenceStyle referenceStyle, string encumbranceStatus )
+        private List<JournalEntryLine> GenerateLineItems( RockContext rockContext, List<GLTransactionLine> creditLines, List<GLTransactionLine> debitLines, DateTime? batchDate, string journal, string batchName, string encumbranceStatus )
         {
             var journalReference = batchName;
 
             var returnList = new List<JournalEntryLine>();
-            foreach ( var transaction in transactionItems )
+
+            foreach ( var transaction in creditLines )
             {
-                if ( referenceStyle.Equals( ReferenceStyle.AccountName ) )
-                {
-                    var accountName = new FinancialAccountService( rockContext ).Get( transaction.FinancialAccountId ).Name;
-                    var project = DefinedValueCache.Get( transaction.Project.AsGuid() );
-                    var projectName = string.Empty;
-                    if ( project != null )
-                    {
-                        if ( !string.IsNullOrWhiteSpace( project.Description ) )
-                        {
-                            projectName = string.Format( " - {0}", project.Description );
-                        }
-                        else
-                        {
-                            projectName = string.Format( " - {0}", project.Value );
-                        }
-                    }
-                    journalReference = string.Format( "{0}{1}", accountName, projectName );
-                }
                 var creditLine = new JournalEntryLine()
                 {
-                    AccountNumber = transaction.CreditAccount,
+                    AccountNumber = transaction.Account,
                     PostDate = batchDate ?? RockDateTime.Now,
                     EncumbranceStatus = encumbranceStatus,
                     Type = "C",
@@ -108,10 +100,13 @@ namespace com.kfs.FinancialEdge
                 };
 
                 returnList.Add( creditLine );
+            }
 
+            foreach ( var transaction in debitLines )
+            {
                 var debitLine = new JournalEntryLine()
                 {
-                    AccountNumber = transaction.DebitAccount,
+                    AccountNumber = transaction.Account,
                     PostDate = batchDate ?? RockDateTime.Now,
                     EncumbranceStatus = encumbranceStatus,
                     Type = "D",
@@ -159,6 +154,14 @@ namespace com.kfs.FinancialEdge
         public string DebitAccount;
         public string Project;
         public int FinancialAccountId;
+        public string DebitProject;
+    }
+
+    public class GLTransactionLine
+    {
+        public decimal Amount;
+        public string Account;
+        public string Project;
     }
 
     public class JournalEntryLine
@@ -171,11 +174,5 @@ namespace com.kfs.FinancialEdge
         public string JournalReference;
         public decimal? Amount;
         public string ProjectId;
-    }
-
-    public enum ReferenceStyle
-    {
-        BatchName,
-        AccountName
     }
 }
