@@ -8,7 +8,7 @@ using Rock.Plugin;
 
 namespace com.kfs.ShelbyBatchExport.Migrations
 {
-    [MigrationNumber( 3, "1.6.1" )]
+    [MigrationNumber( 3, "1.8.0" )]
     public class BatchExportDetailsBlock : Migration
     {
         /// <summary>
