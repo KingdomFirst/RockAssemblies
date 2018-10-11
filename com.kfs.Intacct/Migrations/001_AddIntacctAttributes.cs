@@ -46,9 +46,9 @@ namespace com.kfs.Intacct.Migrations
             // account gl attributes
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Credit Account", "", "Account number to use for credit column. Required by Intacct.", 1, "", "8D790DD0-D84F-4DE2-9C7A-356D4590439E", "com.kfs.Intacct.ACCOUNTNO" );
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Account", "", "Account number to use for debit column. Required by Intacct.", 2, "", "48E1B80E-5E8D-4016-B64E-F2527F328EA7", "com.kfs.Intacct.DEBITACCOUNTNO" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Class", "", "", 3, "", "76EFF760-B5B5-4053-8EBD-C329ECB85032", "com.kfs.Intacct.CLASSID" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Department", "", "", 4, "", "CD56CBD9-CA3B-49F2-BCA5-73A7C3F19328", "com.kfs.Intacct.DEPARTMENT" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Location", "", "", 4, "", "CFA818F9-3163-45FE-AA03-AAF8DEDCF48D", "com.kfs.Intacct.LOCATION" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Class", "", "The Intacct dimension for Class Id.", 3, "", "76EFF760-B5B5-4053-8EBD-C329ECB85032", "com.kfs.Intacct.CLASSID" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Department", "", "The Intacct dimension for Department Id.", 4, "", "CD56CBD9-CA3B-49F2-BCA5-73A7C3F19328", "com.kfs.Intacct.DEPARTMENT" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Location", "", "The Intacct dimension for Location Id. Required if multi-entity enabled.", 4, "", "CFA818F9-3163-45FE-AA03-AAF8DEDCF48D", "com.kfs.Intacct.LOCATION" );
 
             RockMigrationHelper.UpdateCategory( "5997C8D3-8840-4591-99A5-552919F90CBD", "Intacct Export", "fa fa-calculator", "", "BD629E8D-10D9-4C9F-9796-6358F2127483" ); // batch
             RockMigrationHelper.UpdateCategory( "5997C8D3-8840-4591-99A5-552919F90CBD", "Intacct Export", "fa fa-calculator", "", "48CC8F06-B299-434A-9D2A-8D83CC5B2EE5" ); // transaction detail
