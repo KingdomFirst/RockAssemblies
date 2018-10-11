@@ -80,7 +80,7 @@ namespace com.kfs.FinancialEdge
                 if ( referenceStyle.Equals( ReferenceStyle.AccountName ) )
                 {
                     var accountName = new FinancialAccountService( rockContext ).Get( transaction.FinancialAccountId ).Name;
-                    var project = DefinedValueCache.Read( transaction.Project.AsGuid() );
+                    var project = DefinedValueCache.Get( transaction.Project.AsGuid() );
                     var projectName = string.Empty;
                     if ( project != null )
                     {
@@ -104,7 +104,7 @@ namespace com.kfs.FinancialEdge
                     Journal = journal,
                     JournalReference = journalReference,
                     Amount = transaction.Amount,
-                    ProjectId = DefinedValueCache.Read( transaction.Project.AsGuid() ).Value
+                    ProjectId = DefinedValueCache.Get( transaction.Project.AsGuid() )?.Value
                 };
 
                 returnList.Add( creditLine );
@@ -118,7 +118,7 @@ namespace com.kfs.FinancialEdge
                     Journal = journal,
                     JournalReference = journalReference,
                     Amount = transaction.Amount,
-                    ProjectId = DefinedValueCache.Read( transaction.Project.AsGuid() ).Value
+                    ProjectId = DefinedValueCache.Get( transaction.Project.AsGuid() )?.Value
                 };
 
                 returnList.Add( debitLine );

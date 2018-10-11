@@ -110,7 +110,7 @@ namespace com.kfs.Workflow.Action
                     Guid? campusGuid = action.GetWorklowAttributeValue( campusAttributeGuid.Value ).AsGuidOrNull();
                     if ( campusGuid.HasValue )
                     {
-                        var campus = CampusCache.Read( campusGuid.Value );
+                        var campus = CampusCache.Get( campusGuid.Value );
                         if ( campus != null )
                         {
                             campusId = campus.Id;

@@ -100,7 +100,7 @@ namespace com.kfs.Intacct
             if ( Log )
             {
                 var financialBatch = new FinancialBatchService( new RockContext() ).Get( BatchId );
-                var changes = new List<string>();
+                var changes = new History.HistoryChangeList();
                 var oldValue = string.Empty;
                 var newValue = resultX.ToString();
 

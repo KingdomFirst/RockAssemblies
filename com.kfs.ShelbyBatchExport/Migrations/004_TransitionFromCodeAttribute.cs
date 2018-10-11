@@ -26,7 +26,7 @@ namespace com.kfs.ShelbyBatchExport.Migrations
             RockMigrationHelper.UpdateAttributeQualifier( "85422EA2-AC4E-44E5-99B9-30C131116734", "displaydescription", "True", "DA83FED2-1E06-44A7-8E40-AAECE75169D4" );
 
             // Clear all cached items
-            Rock.Web.Cache.RockMemoryCache.Clear();
+            Rock.Web.Cache.RockCache.ClearAllCachedItems();
         }
 
         /// <summary>

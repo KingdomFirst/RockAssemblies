@@ -151,7 +151,7 @@ namespace com.kfs.Reporting.SQLReportingServices
                 SaveAttributeValue( context, BROWSER_USER_KEY, BrowserUser );
                 SaveAttributeValue( context, BROWSER_PWD_KEY, Encryption.EncryptString( BrowserPassword ) );
             }
-            GlobalAttributesCache.Flush();
+            GlobalAttributesCache.Clear();
             return true;
         }
 
@@ -352,7 +352,7 @@ namespace com.kfs.Reporting.SQLReportingServices
         private void LoadCredentials( RockContext context )
         {
             ClearProperties();
-            GlobalAttributesCache cache = GlobalAttributesCache.Read();
+            GlobalAttributesCache cache = GlobalAttributesCache.Get();
 
             ServerUrl = cache.GetValue( SERVER_URL_KEY, context );
             ReportPath = cache.GetValue( SERVER_ROOT_PATH_KEY, context );
@@ -376,7 +376,7 @@ namespace com.kfs.Reporting.SQLReportingServices
         {
             var service = new CategoryService( context );
             Category category = new Category();
-            category.EntityTypeId = EntityTypeCache.Read( typeof( Rock.Model.Attribute ) ).Id;
+            category.EntityTypeId = EntityTypeCache.Get( typeof( Rock.Model.Attribute ) ).Id;
             category.EntityTypeQualifierColumn = "EntityTypeId";
 
             category.Order = new CategoryService( context ).Queryable()
@@ -472,7 +472,7 @@ namespace com.kfs.Reporting.SQLReportingServices
             if ( serverUrl == null )
             {
                 serverUrl = new Rock.Model.Attribute();
-                serverUrl.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.URL_LINK ).Id;
+                serverUrl.FieldTypeId = FieldTypeCache.Get( Rock.SystemGuid.FieldType.URL_LINK ).Id;
                 serverUrl.IsSystem = false;
                 serverUrl.Name = "Reporting Service URL";
                 serverUrl.Description = "URL to the SQL Reporting Services Reporting Server endpoint.";
@@ -487,7 +487,7 @@ namespace com.kfs.Reporting.SQLReportingServices
             if ( serverRootPath == null )
             {
                 serverRootPath = new Rock.Model.Attribute();
-                serverRootPath.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.TEXT ).Id;
+                serverRootPath.FieldTypeId = FieldTypeCache.Get( Rock.SystemGuid.FieldType.TEXT ).Id;
                 serverRootPath.IsSystem = false;
                 serverRootPath.Name = "Reporting Service Root Folder.";
                 serverRootPath.Key = SERVER_ROOT_PATH_KEY;
@@ -502,7 +502,7 @@ namespace com.kfs.Reporting.SQLReportingServices
             if ( contentManagerUser == null )
             {
                 contentManagerUser = new Rock.Model.Attribute();
-                contentManagerUser.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.TEXT ).Id;
+                contentManagerUser.FieldTypeId = FieldTypeCache.Get( Rock.SystemGuid.FieldType.TEXT ).Id;
                 contentManagerUser.Name = "Reporting Service - Content Manager Username";
                 contentManagerUser.Key = CONTENT_MANAGER_USER_KEY;
                 contentManagerUser.Description = "The Reporting Server Content Manager (Report Administrator) User Name. (i.e. domain\\user format)";
@@ -516,7 +516,7 @@ namespace com.kfs.Reporting.SQLReportingServices
             if ( contentManagerPwd == null )
             {
                 contentManagerPwd = new Rock.Model.Attribute();
-                contentManagerPwd.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.ENCRYPTED_TEXT ).Id;
+                contentManagerPwd.FieldTypeId = FieldTypeCache.Get( Rock.SystemGuid.FieldType.ENCRYPTED_TEXT ).Id;
                 contentManagerPwd.Name = "Reporting Service - Content Manager Password";
                 contentManagerPwd.Key = CONTENT_MANAGER_PWD_KEY;
                 contentManagerPwd.Description = "The Content Manager Password.";
@@ -531,7 +531,7 @@ namespace com.kfs.Reporting.SQLReportingServices
             if ( browserUser == null )
             {
                 browserUser = new Rock.Model.Attribute();
-                browserUser.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.ENCRYPTED_TEXT ).Id;
+                browserUser.FieldTypeId = FieldTypeCache.Get( Rock.SystemGuid.FieldType.ENCRYPTED_TEXT ).Id;
                 browserUser.Name = "Reporting Service - Browser User";
                 browserUser.Key = BROWSER_USER_KEY;
                 browserUser.Description = "The Reporting Server Browser (Report Viewer) User Name. (i.e. domain\\user format)";
@@ -545,7 +545,7 @@ namespace com.kfs.Reporting.SQLReportingServices
             if ( browserPwd == null )
             {
                 browserPwd = new Rock.Model.Attribute();
-                browserPwd.FieldTypeId = FieldTypeCache.Read( Rock.SystemGuid.FieldType.ENCRYPTED_TEXT ).Id;
+                browserPwd.FieldTypeId = FieldTypeCache.Get( Rock.SystemGuid.FieldType.ENCRYPTED_TEXT ).Id;
                 browserPwd.Name = "Reporting Service - Browser Password";
                 browserPwd.Key = BROWSER_PWD_KEY;
                 browserPwd.Description = "The Reporting Server Browser Password.";
@@ -560,7 +560,7 @@ namespace com.kfs.Reporting.SQLReportingServices
             if ( hasChanges )
             {
                 context.SaveChanges();
-                GlobalAttributesCache.Flush();
+                GlobalAttributesCache.Clear();
             }
         }
 

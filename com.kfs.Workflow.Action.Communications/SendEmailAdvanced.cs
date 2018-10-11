@@ -73,7 +73,7 @@ namespace com.kfs.Workflow.Action.Communications
             AttributeCache attachmentAttribute = null;
             if ( attachmentGuid.HasValue )
             {
-                attachmentAttribute = AttributeCache.Read( attachmentGuid.Value, rockContext );
+                attachmentAttribute = AttributeCache.Get( attachmentGuid.Value, rockContext );
             }
 
             if ( attachmentAttribute != null )
@@ -135,7 +135,7 @@ namespace com.kfs.Workflow.Action.Communications
             Guid? fromGuid = fromValue.AsGuidOrNull();
             if ( fromGuid.HasValue )
             {
-                var attribute = AttributeCache.Read( fromGuid.Value, rockContext );
+                var attribute = AttributeCache.Get( fromGuid.Value, rockContext );
                 if ( attribute != null )
                 {
                     string fromAttributeValue = action.GetWorklowAttributeValue( fromGuid.Value );
@@ -172,7 +172,7 @@ namespace com.kfs.Workflow.Action.Communications
             Guid? replytoGuid = replytoValue.AsGuidOrNull();
             if ( replytoGuid.HasValue )
             {
-                var attribute = AttributeCache.Read( replytoGuid.Value, rockContext );
+                var attribute = AttributeCache.Get( replytoGuid.Value, rockContext );
                 if ( attribute != null )
                 {
                     string replytoAttributeValue = action.GetWorklowAttributeValue( replytoGuid.Value );
@@ -204,7 +204,7 @@ namespace com.kfs.Workflow.Action.Communications
             Guid? ccguid = cc.AsGuidOrNull();
             if ( ccguid.HasValue )
             {
-                var attribute = AttributeCache.Read( ccguid.Value, rockContext );
+                var attribute = AttributeCache.Get( ccguid.Value, rockContext );
                 if ( attribute != null )
                 {
                     string ccValue = action.GetWorklowAttributeValue( ccguid.Value );
@@ -310,7 +310,7 @@ namespace com.kfs.Workflow.Action.Communications
             Guid? bccguid = bcc.AsGuidOrNull();
             if ( bccguid.HasValue )
             {
-                var attribute = AttributeCache.Read( bccguid.Value, rockContext );
+                var attribute = AttributeCache.Get( bccguid.Value, rockContext );
                 if ( attribute != null )
                 {
                     string bccValue = action.GetWorklowAttributeValue( bccguid.Value );
@@ -416,7 +416,7 @@ namespace com.kfs.Workflow.Action.Communications
             Guid? guid = to.AsGuidOrNull();
             if ( guid.HasValue )
             {
-                var attribute = AttributeCache.Read( guid.Value, rockContext );
+                var attribute = AttributeCache.Get( guid.Value, rockContext );
                 if ( attribute != null )
                 {
                     string toValue = action.GetWorklowAttributeValue( guid.Value );
