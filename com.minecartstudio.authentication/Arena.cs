@@ -62,7 +62,7 @@ namespace com.minecartstudio.Authentication
 
             if ( valid && GetAttributeValue( "ConvertToDatabaseLogin" ).AsBoolean() )
             {
-                var databaseAuthEntityType = Rock.Web.Cache.EntityTypeCache.Read( "Rock.Security.Authentication.Database" );
+                var databaseAuthEntityType = Rock.Web.Cache.EntityTypeCache.Get( "Rock.Security.Authentication.Database" );
                 if ( databaseAuthEntityType != null )
                 {
                     // Convert to database type
@@ -235,7 +235,7 @@ namespace com.minecartstudio.Authentication
         {
             if ( GetAttributeValue( "ConvertToDatabaseLogin" ).AsBoolean() )
             {
-                var databaseAuthEntityType = Rock.Web.Cache.EntityTypeCache.Read( "Rock.Security.Authentication.Database" );
+                var databaseAuthEntityType = Rock.Web.Cache.EntityTypeCache.Get( "Rock.Security.Authentication.Database" );
                 if ( databaseAuthEntityType != null )
                 {
                     // Convert to database type
