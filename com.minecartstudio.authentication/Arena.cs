@@ -8,6 +8,7 @@ using System.Configuration;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
+
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
@@ -32,7 +33,7 @@ namespace com.minecartstudio.Authentication
         /// Initializes the <see cref="Arena" /> class.
         /// </summary>
         /// <exception cref="System.Configuration.ConfigurationErrorsException">Authentication requires a 'PasswordKey' app setting</exception>
-        static Arena( )
+        static Arena()
         {
             var passwordKey = ConfigurationManager.AppSettings["PasswordKey"];
             if ( String.IsNullOrWhiteSpace( passwordKey ) )
@@ -57,7 +58,7 @@ namespace com.minecartstudio.Authentication
             string encodedPassword1 = EncodePassword1( password );
             string encodedPassword256 = EncodePassword256( password );
 
-            bool valid = (encodedPassword1 == passwordBase64 || encodedPassword256 == passwordBase64);
+            bool valid = ( encodedPassword1 == passwordBase64 || encodedPassword256 == passwordBase64 );
 
             if ( valid && GetAttributeValue( "ConvertToDatabaseLogin" ).AsBoolean() )
             {
@@ -146,11 +147,11 @@ namespace com.minecartstudio.Authentication
             else
             {
                 int string_length = value.Length;
-                int character_index = (value.StartsWith( "0x", StringComparison.Ordinal )) ? 2 : 0; // Does the string define leading HEX indicator '0x'. Adjust starting index accordingly.               
+                int character_index = ( value.StartsWith( "0x", StringComparison.Ordinal ) ) ? 2 : 0; // Does the string define leading HEX indicator '0x'. Adjust starting index accordingly.
                 int number_of_characters = string_length - character_index;
 
                 bool add_leading_zero = false;
-                if ( 0 != (number_of_characters % 2) )
+                if ( 0 != ( number_of_characters % 2 ) )
                 {
                     add_leading_zero = true;
 
@@ -171,7 +172,7 @@ namespace com.minecartstudio.Authentication
                     byte upper = FromCharacterToByte( value[read_index], read_index, 4 );
                     byte lower = FromCharacterToByte( value[read_index + 1], read_index + 1 );
 
-                    bytes[write_index++] = ( byte )(upper | lower);
+                    bytes[write_index++] = ( byte ) ( upper | lower );
                 }
             }
 
@@ -180,19 +181,19 @@ namespace com.minecartstudio.Authentication
 
         private static byte FromCharacterToByte( char character, int index, int shift = 0 )
         {
-            byte value = ( byte )character;
-            if ( ((0x40 < value) && (0x47 > value)) || ((0x60 < value) && (0x67 > value)) )
+            byte value = ( byte ) character;
+            if ( ( ( 0x40 < value ) && ( 0x47 > value ) ) || ( ( 0x60 < value ) && ( 0x67 > value ) ) )
             {
-                if ( 0x40 == (0x40 & value) )
+                if ( 0x40 == ( 0x40 & value ) )
                 {
-                    if ( 0x20 == (0x20 & value) )
-                        value = ( byte )(((value + 0xA) - 0x61) << shift);
+                    if ( 0x20 == ( 0x20 & value ) )
+                        value = ( byte ) ( ( ( value + 0xA ) - 0x61 ) << shift );
                     else
-                        value = ( byte )(((value + 0xA) - 0x41) << shift);
+                        value = ( byte ) ( ( ( value + 0xA ) - 0x41 ) << shift );
                 }
             }
-            else if ( (0x29 < value) && (0x40 > value) )
-                value = ( byte )((value - 0x30) << shift);
+            else if ( ( 0x29 < value ) && ( 0x40 > value ) )
+                value = ( byte ) ( ( value - 0x30 ) << shift );
             else
                 throw new InvalidOperationException( String.Format( "Character '{0}' at index '{1}' is not valid alphanumeric character.", character, index ) );
 
@@ -206,7 +207,6 @@ namespace com.minecartstudio.Authentication
                 returnBytes[i] = Convert.ToByte( hexString.Substring( i * 2, 2 ), 16 );
             return returnBytes;
         }
-
 
         public override bool Authenticate( HttpRequest request, out string userName, out string returnUrl )
         {
@@ -251,7 +251,7 @@ namespace com.minecartstudio.Authentication
             throw new NotImplementedException();
         }
 
-        public override string ImageUrl( )
+        public override string ImageUrl()
         {
             throw new NotImplementedException();
         }
