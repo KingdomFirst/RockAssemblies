@@ -57,6 +57,7 @@
     <Compile Include="Migrations\004_TransitionFromCodeAttribute.cs" />
     <Compile Include="Migrations\003_BatchExportDetailsBlock.cs" />
     <Compile Include="Migrations\002_ProjectsPage.cs" />
+    <Compile Include="Migrations\007_RemoveOldBlocks.cs" />
     <Compile Include="Migrations\006_SetCategoriesOnNewAttributes.cs" />
     <Compile Include="Migrations\005_ResetToExcelFormat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
