@@ -27,8 +27,6 @@ namespace com.minecartstudio.Authentication
     [BooleanField( "Use Retired Arena Encrytion", "YES will use SHA 1 encrytion and NO will use SHA 256 encryption when creating a new user account." )]
     public class Arena : AuthenticationComponent
     {
-        private static byte[] encryptionKey;
-
         /// <summary>
         /// Initializes the <see cref="Arena" /> class.
         /// </summary>
@@ -40,8 +38,6 @@ namespace com.minecartstudio.Authentication
             {
                 throw new ConfigurationErrorsException( "Authentication requires a 'PasswordKey' app setting" );
             }
-
-            encryptionKey = HexToByte( passwordKey );
         }
 
         /// <summary>
@@ -71,8 +67,7 @@ namespace com.minecartstudio.Authentication
                     var rockUser = service.GetByUserName( user.UserName );
                     if ( rockUser != null )
                     {
-                        rockUser.Password = DatabaseEncodePassword( rockUser.Guid, password, encryptionKey );
-                        rockUser.EntityTypeId = databaseAuthEntityType.Id;
+                        SetPassword( rockUser, password );
                         rockContext.SaveChanges();
                     }
                 }
@@ -126,17 +121,6 @@ namespace com.minecartstudio.Authentication
         {
             SHA256 hash = SHA256.Create();
             return Convert.ToBase64String( hash.ComputeHash( Encoding.Unicode.GetBytes( password ) ) );
-        }
-
-        private string DatabaseEncodePassword( Guid guid, string password, byte[] encryptionKey )
-        {
-            HMACSHA1 hash = new HMACSHA1();
-            hash.Key = encryptionKey;
-
-            HMACSHA1 uniqueHash = new HMACSHA1();
-            uniqueHash.Key = Encryption.HexToByte( guid.ToString().Replace( "-", "" ) );
-
-            return Convert.ToBase64String( uniqueHash.ComputeHash( hash.ComputeHash( Encoding.Unicode.GetBytes( password ) ) ) );
         }
 
         private static byte[] ConvertToByteArray( string value )
@@ -200,14 +184,6 @@ namespace com.minecartstudio.Authentication
             return value;
         }
 
-        private static byte[] HexToByte( string hexString )
-        {
-            byte[] returnBytes = new byte[hexString.Length / 2];
-            for ( int i = 0; i < returnBytes.Length; i++ )
-                returnBytes[i] = Convert.ToByte( hexString.Substring( i * 2, 2 ), 16 );
-            return returnBytes;
-        }
-
         public override bool Authenticate( HttpRequest request, out string userName, out string returnUrl )
         {
             throw new NotImplementedException();
@@ -217,7 +193,7 @@ namespace com.minecartstudio.Authentication
         {
             warningMessage = null;
 
-            if ( Authenticate( user, oldPassword ) )
+            if ( Authenticate( user, oldPassword ) && GetAttributeValue( "ConvertToDatabaseLogin" ).AsBoolean() )
             {
                 SetPassword( user, newPassword );
                 return true;
@@ -233,16 +209,14 @@ namespace com.minecartstudio.Authentication
         /// <param name="password">The password.</param>
         public override void SetPassword( UserLogin user, string password )
         {
-            if ( GetAttributeValue( "ConvertToDatabaseLogin" ).AsBoolean() )
+            var databaseAuthEntityType = Rock.Web.Cache.EntityTypeCache.Get( "Rock.Security.Authentication.Database" );
+            if ( databaseAuthEntityType != null )
             {
-                var databaseAuthEntityType = Rock.Web.Cache.EntityTypeCache.Get( "Rock.Security.Authentication.Database" );
-                if ( databaseAuthEntityType != null )
-                {
-                    // Convert to database type
-                    user.Password = DatabaseEncodePassword( user.Guid, password, encryptionKey );
-                    user.EntityTypeId = databaseAuthEntityType.Id;
-                    user.LastPasswordChangedDateTime = RockDateTime.Now;
-                }
+                // Convert to database type
+                var rockDbAuth = new Rock.Security.Authentication.Database();
+                user.Password = rockDbAuth.EncodePassword( user, password );
+                user.EntityTypeId = databaseAuthEntityType.Id;
+                user.LastPasswordChangedDateTime = RockDateTime.Now;
             }
         }
 
