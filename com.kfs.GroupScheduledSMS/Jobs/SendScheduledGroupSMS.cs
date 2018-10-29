@@ -47,15 +47,15 @@ namespace com.kfs.GroupScheduledSMS.Jobs
             int communicationsSent = 0;
 
             // get the last run date or yesterday
-            DateTime? lastRunDateTime = null;
+            DateTime? lastSuccessfulRunDateTime = null;
             var jobId = context.JobDetail.Description.AsInteger();
             var jobService = new ServiceJobService( rockContext );
             var job = jobService.Get( jobId );
             if ( job != null && job.Guid != Rock.SystemGuid.ServiceJob.JOB_PULSE.AsGuid() )
             {
-                lastRunDateTime = job.LastRunDateTime;
+                lastSuccessfulRunDateTime = job.LastSuccessfulRunDateTime;
             }
-            var beginDateTime = lastRunDateTime ?? RockDateTime.Now.AddDays( -1 );
+            var beginDateTime = lastSuccessfulRunDateTime ?? RockDateTime.Now.AddDays( -1 );
 
             // get the date attributes
             var dateAttribute = AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_SEND_DATE.AsGuid() );
