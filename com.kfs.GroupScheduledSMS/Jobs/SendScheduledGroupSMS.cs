@@ -73,7 +73,7 @@ namespace com.kfs.GroupScheduledSMS.Jobs
                     var groupId = new AttributeValueService( rockContext ).Queryable().FirstOrDefault( a => a.Value.Equals( attributeMatrixGuid, StringComparison.CurrentCultureIgnoreCase ) ).EntityId;
                     if ( groupId.HasValue )
                     {
-                        dGroupAndAttributeMatrixItemIds.Add( groupId.Value, d.EntityId.Value );
+                        dGroupAndAttributeMatrixItemIds.Add( d.EntityId.Value, groupId.Value );
                     }
                 }
             }
@@ -85,17 +85,17 @@ namespace com.kfs.GroupScheduledSMS.Jobs
                     var fromNumberAttributeId = AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_FROM_NUMBER.AsGuid() ).Id;
                     var fromNumberGuid = new AttributeValueService( rockContext ).Queryable()
                                                 .FirstOrDefault( v => v.AttributeId == fromNumberAttributeId &&
-                                                        v.EntityId == groupAndAttributeMatrixItemId.Value ).Value;
+                                                        v.EntityId == groupAndAttributeMatrixItemId.Key ).Value;
                     var fromNumber = DefinedValueCache.Get( fromNumberGuid.AsGuid() );
                     
                     var messageAttributeId = AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_MESSAGE.AsGuid() ).Id;
                     var message = new AttributeValueService( rockContext ).Queryable()
                                                 .FirstOrDefault( v => v.AttributeId == messageAttributeId &&
-                                                        v.EntityId == groupAndAttributeMatrixItemId.Value ).Value;
+                                                        v.EntityId == groupAndAttributeMatrixItemId.Key ).Value;
 
                     var attachments = new List<BinaryFile>();
 
-                    var group = new GroupService( rockContext ).Queryable().Where( g => g.Id == groupAndAttributeMatrixItemId.Key ).FirstOrDefault();
+                    var group = new GroupService( rockContext ).Queryable().Where( g => g.Id == groupAndAttributeMatrixItemId.Value ).FirstOrDefault();
 
                     var mergeFields = new Dictionary<string, object>()
                     {
@@ -104,7 +104,7 @@ namespace com.kfs.GroupScheduledSMS.Jobs
 
                     if ( !message.IsNullOrWhiteSpace() )
                     {
-                        IQueryable<GroupMember> qry = new GroupMemberService( rockContext ).GetByGroupId( groupAndAttributeMatrixItemId.Key );
+                        IQueryable<GroupMember> qry = new GroupMemberService( rockContext ).GetByGroupId( groupAndAttributeMatrixItemId.Value ).AsNoTracking();
 
                         if ( qry != null )
                         {
@@ -147,7 +147,7 @@ namespace com.kfs.GroupScheduledSMS.Jobs
 
                 catch ( Exception ex )
                 {
-                    exceptionMsgs.Add( string.Format( "Exception occurred sending message from group {0}:{1}    {2}", groupAndAttributeMatrixItemId.Key, Environment.NewLine, ex.Messages().AsDelimited( Environment.NewLine + "   " ) ) );
+                    exceptionMsgs.Add( string.Format( "Exception occurred sending message from group {0}:{1}    {2}", groupAndAttributeMatrixItemId.Value, Environment.NewLine, ex.Messages().AsDelimited( Environment.NewLine + "   " ) ) );
                     ExceptionLogService.LogException( ex, System.Web.HttpContext.Current );
                 }
             }
