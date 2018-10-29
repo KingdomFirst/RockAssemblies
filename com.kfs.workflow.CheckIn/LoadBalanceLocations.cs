@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Data.Entity;
 using System.Linq;
 
 using Rock;
@@ -54,6 +55,16 @@ namespace com.kfs.Workflow.Action.CheckIn
                             {
                                 foreach ( var group in groupType.GetGroups( !loadAll ) )
                                 {
+                                    var closedGroupLocationIds = new AttendanceOccurrenceService( rockContext )
+                                                    .Queryable()
+                                                    .AsNoTracking()
+                                                    .Where( o => 
+                                                        o.GroupId == group.Group.Id && 
+                                                        o.OccurrenceDate == RockDateTime.Today )
+                                                    .WhereAttributeValue(rockContext, "com.kfs.OccurrenceClosed", "True")
+                                                    .Select( l => l.LocationId )
+                                                    .ToList();
+
                                     var loadBalance = group.Group.GetAttributeValue( "com.kfs.LoadBalanceLocations" ).AsBoolean();
                                     if ( loadBalance && loadAll )
                                     {
@@ -66,7 +77,7 @@ namespace com.kfs.Workflow.Action.CheckIn
                                         .Where( g => g.Group.Id == group.Group.Id && g.IsCheckInActive )
                                         .ToList() )
                                     {
-                                        foreach ( var kioskLocation in kioskGroup.KioskLocations.Where( l => l.IsCheckInActive && l.IsActiveAndNotFull ) )
+                                        foreach ( var kioskLocation in kioskGroup.KioskLocations.Where( l => l.IsCheckInActive && l.IsActiveAndNotFull && !closedGroupLocationIds.Contains( l.Location.Id ) ) )
                                         {
                                             if ( !group.Locations.Any( l => l.Location.Id == kioskLocation.Location.Id ) )
                                             {
