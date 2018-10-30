@@ -46,15 +46,15 @@ namespace com.kfs.GroupScheduledEmails.Jobs
             int communicationsSent = 0;
 
             // get the last run date or yesterday
-            DateTime? lastRunDateTime = null;
+            DateTime? lastSuccessfulRunDateTime = null;
             var jobId = context.JobDetail.Description.AsInteger();
             var jobService = new ServiceJobService( rockContext );
             var job = jobService.Get( jobId );
             if ( job != null && job.Guid != Rock.SystemGuid.ServiceJob.JOB_PULSE.AsGuid() )
             {
-                lastRunDateTime = job.LastRunDateTime;
+                lastSuccessfulRunDateTime = job.LastSuccessfulRunDateTime;
             }
-            var beginDateTime = lastRunDateTime ?? RockDateTime.Now.AddDays( -1 );
+            var beginDateTime = lastSuccessfulRunDateTime ?? RockDateTime.Now.AddDays( -1 );
 
             // get the date attributes
             var dateAttribute = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SEND_DATE.AsGuid() );
@@ -72,7 +72,7 @@ namespace com.kfs.GroupScheduledEmails.Jobs
                     var groupId = new AttributeValueService( rockContext ).Queryable().FirstOrDefault( a => a.Value.Equals( attributeMatrixGuid, StringComparison.CurrentCultureIgnoreCase ) ).EntityId;
                     if ( groupId.HasValue )
                     {
-                        dGroupAndAttributeMatrixItemIds.Add( groupId.Value, d.EntityId.Value );
+                        dGroupAndAttributeMatrixItemIds.Add( d.EntityId.Value, groupId.Value );
                     }
                 }
             }
@@ -84,33 +84,33 @@ namespace com.kfs.GroupScheduledEmails.Jobs
                     var fromEmailAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_FROM_EMAIL.AsGuid() ).Id;
                     var fromEmail = new AttributeValueService( rockContext ).Queryable()
                                                 .FirstOrDefault( v => v.AttributeId == fromEmailAttributeId &&
-                                                        v.EntityId == groupAndAttributeMatrixItemId.Value ).Value;
+                                                        v.EntityId == groupAndAttributeMatrixItemId.Key ).Value;
 
                     var fromNameAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_FROM_NAME.AsGuid() ).Id;
                     var fromName = new AttributeValueService( rockContext ).Queryable()
                                                 .FirstOrDefault( v => v.AttributeId == fromNameAttributeId &&
-                                                        v.EntityId == groupAndAttributeMatrixItemId.Value ).Value;
+                                                        v.EntityId == groupAndAttributeMatrixItemId.Key ).Value;
 
                     var subjectAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SUBJECT.AsGuid() ).Id;
                     var subject = new AttributeValueService( rockContext ).Queryable()
                                                 .FirstOrDefault( v => v.AttributeId == subjectAttributeId &&
-                                                        v.EntityId == groupAndAttributeMatrixItemId.Value ).Value;
+                                                        v.EntityId == groupAndAttributeMatrixItemId.Key ).Value;
 
                     var messageAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_MESSAGE.AsGuid() ).Id;
                     var message = new AttributeValueService( rockContext ).Queryable()
                                                 .FirstOrDefault( v => v.AttributeId == messageAttributeId &&
-                                                        v.EntityId == groupAndAttributeMatrixItemId.Value ).Value;
+                                                        v.EntityId == groupAndAttributeMatrixItemId.Key ).Value;
 
                     var attachments = new List<BinaryFile>();
 
-                    var group = new GroupService( rockContext ).Queryable().Where( g => g.Id == groupAndAttributeMatrixItemId.Key ).FirstOrDefault();
+                    var group = new GroupService( rockContext ).Queryable().Where( g => g.Id == groupAndAttributeMatrixItemId.Value ).FirstOrDefault();
 
                     var mergeFields = new Dictionary<string, object>()
                     {
                         {"Group", group}
                     };
 
-                    IQueryable<GroupMember> qry = new GroupMemberService( rockContext ).GetByGroupId( groupAndAttributeMatrixItemId.Key );
+                    IQueryable<GroupMember> qry = new GroupMemberService( rockContext ).GetByGroupId( groupAndAttributeMatrixItemId.Value ).AsNoTracking();
 
                     if ( qry != null )
                     {
@@ -135,7 +135,7 @@ namespace com.kfs.GroupScheduledEmails.Jobs
 
                 catch ( Exception ex )
                 {
-                    exceptionMsgs.Add( string.Format( "Exception occurred sending message from group {0}:{1}    {2}", groupAndAttributeMatrixItemId.Key, Environment.NewLine, ex.Messages().AsDelimited( Environment.NewLine + "   " ) ) );
+                    exceptionMsgs.Add( string.Format( "Exception occurred sending message from group {0}:{1}    {2}", groupAndAttributeMatrixItemId.Value, Environment.NewLine, ex.Messages().AsDelimited( Environment.NewLine + "   " ) ) );
                     ExceptionLogService.LogException( ex, System.Web.HttpContext.Current );
                 }
             }
