@@ -24,7 +24,7 @@ namespace com.minecartstudio.Authentication
     [Export( typeof( AuthenticationComponent ) )]
     [ExportMetadata( "ComponentName", "Arena" )]
     [BooleanField( "Convert To Database Login", "Should the Arena user be converted to use the Rock Database service after first succesful authentication?" )]
-    [BooleanField( "Use Retired Arena Encrytion", "YES will use SHA 1 encrytion and NO will use SHA 256 encryption when creating a new user account." )]
+    [BooleanField( "Use Retired Arena Encryption", "YES will use SHA 1 encryption and NO will use SHA 256 encryption when creating a new user account." )]
     public class Arena : AuthenticationComponent
     {
         /// <summary>
@@ -85,7 +85,7 @@ namespace com.minecartstudio.Authentication
         public override String EncodePassword( UserLogin user, string password )
         {
             string encodedPassword = string.Empty;
-            if ( GetAttributeValue( "UseRetiredArenaEncrytion" ).AsBoolean() )
+            if ( GetAttributeValue( "UseRetiredArenaEncryption" ).AsBoolean() )
             {
                 // use SHA1 Password
                 encodedPassword = "0x" + BitConverter.ToString( Convert.FromBase64String( EncodePassword1( password ) ) ).Replace( "-", "" );
