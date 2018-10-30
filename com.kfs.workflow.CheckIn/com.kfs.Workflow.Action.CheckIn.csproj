@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LoadBalanceLocations.cs" />
+    <Compile Include="Migrations\002_AddOccurrenceClosedAttribute.cs" />
     <Compile Include="Migrations\001_AddLoadBalanceAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

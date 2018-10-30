@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Data.Entity;
 using System.Linq;
 
 using Rock;
@@ -52,26 +53,18 @@ namespace com.kfs.Workflow.Action.CheckIn
 
                             if ( kioskGroupType != null )
                             {
-                                var groups = groupType.GetGroups( !loadAll );
-                                var groupIds = groups.Select( g => g.Group.Id ).ToList();
-                                var dayStart = RockDateTime.Today;
-                                var now = RockDateTime.Now;
-                                var schedules = new List<Schedule>();
-
-                                var attendanceQry = new AttendanceService( rockContext ).Queryable()
-                                    .Where( a =>
-                                        a.Occurrence.ScheduleId.HasValue &&
-                                        a.Occurrence.GroupId.HasValue &&
-                                        a.Occurrence.LocationId.HasValue &&
-                                        a.StartDateTime > dayStart &&
-                                        a.StartDateTime < now &&
-                                        !a.EndDateTime.HasValue &&
-                                        a.DidAttend.HasValue &&
-                                        a.DidAttend.Value &&
-                                        groupIds.Contains( a.Occurrence.GroupId.Value ) );
-
-                                foreach ( var group in groups )
+                                foreach ( var group in groupType.GetGroups( !loadAll ) )
                                 {
+                                    var closedGroupLocationIds = new AttendanceOccurrenceService( rockContext )
+                                                    .Queryable()
+                                                    .AsNoTracking()
+                                                    .Where( o => 
+                                                        o.GroupId == group.Group.Id && 
+                                                        o.OccurrenceDate == RockDateTime.Today )
+                                                    .WhereAttributeValue(rockContext, "com.kfs.OccurrenceClosed", "True")
+                                                    .Select( l => l.LocationId )
+                                                    .ToList();
+
                                     var loadBalance = group.Group.GetAttributeValue( "com.kfs.LoadBalanceLocations" ).AsBoolean();
                                     if ( loadBalance && loadAll )
                                     {
@@ -84,7 +77,7 @@ namespace com.kfs.Workflow.Action.CheckIn
                                         .Where( g => g.Group.Id == group.Group.Id && g.IsCheckInActive )
                                         .ToList() )
                                     {
-                                        foreach ( var kioskLocation in kioskGroup.KioskLocations.Where( l => l.IsCheckInActive && l.IsActiveAndNotFull ) )
+                                        foreach ( var kioskLocation in kioskGroup.KioskLocations.Where( l => l.IsCheckInActive && l.IsActiveAndNotFull && !closedGroupLocationIds.Contains( l.Location.Id ) ) )
                                         {
                                             if ( !group.Locations.Any( l => l.Location.Id == kioskLocation.Location.Id ) )
                                             {
@@ -93,37 +86,7 @@ namespace com.kfs.Workflow.Action.CheckIn
                                                 checkInLocation.Location.CopyAttributesFrom( kioskLocation.Location );
                                                 checkInLocation.CampusId = kioskLocation.CampusId;
                                                 checkInLocation.Order = kioskLocation.Order;
-
-                                                var activeSchedules = kioskLocation.KioskSchedules.Select( s => s.Schedule.Id ).ToList();
-
-                                                var attendanceList = attendanceQry.Where( a => a.Occurrence.LocationId.Value == kioskLocation.Location.Id ).ToList();
-                                                if ( !loadBalance || !attendanceList.Any() )
-                                                {
-                                                    locationAttendance.Add( checkInLocation, 0 );
-                                                }
-                                                else
-                                                {
-                                                    foreach ( var groupLocSched in attendanceList
-                                                        .Where( a =>
-                                                            a.PersonAlias != null &&
-                                                            activeSchedules.Contains( a.Occurrence.ScheduleId.Value ) )
-                                                        .GroupBy( a => new
-                                                        {
-                                                            ScheduleId = a.Occurrence.ScheduleId.Value,
-                                                            GroupId = a.Occurrence.GroupId.Value,
-                                                            LocationId = a.Occurrence.LocationId.Value
-                                                        } )
-                                                        .Select( g => new
-                                                        {
-                                                            ScheduleId = g.Key.ScheduleId,
-                                                            GroupId = g.Key.GroupId,
-                                                            LocationId = g.Key.LocationId,
-                                                            PersonIds = g.Select( a => a.PersonAlias.PersonId ).Distinct().ToList()
-                                                        } ) )
-                                                    {
-                                                        locationAttendance.Add( checkInLocation, groupLocSched.PersonIds.Count() );
-                                                    }
-                                                }
+                                                locationAttendance.Add( checkInLocation, KioskLocationAttendance.Get( checkInLocation.Location.Id ).CurrentCount );
                                             }
                                         }
                                     }
