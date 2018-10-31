@@ -18,6 +18,8 @@ using Rock.Model;
 using Rock.Web.Cache;
 using Rock.Security;
 using Rock;
+using RestSharp.Authenticators;
+using Rock.Data;
 
 namespace com.kfs.Tithely
 {
@@ -29,16 +31,18 @@ namespace com.kfs.Tithely
     [ExportMetadata( "ComponentName", "Tithely Gateway" )]
 
     [TextField( "Security Key", "The API key", true, "", "", 0 )]
-    [TextField( "Admin Username", "The username of an Tithely user", true, "", "", 1 )]
-    [TextField( "Admin Password", "The password of an Tithely user", true, "", "", 2, "AdminPassword", true )]
-    [TextField( "Three Step API URL", "The URL of the Tithely Three Step API", true, "https://tithelydev.com/", "", 3, "APIUrl" )]
-    [TextField( "Query API URL", "The URL of the Tithely Query API", true, "https://secure.networkmerchants.com/api/query.php", "", 4, "QueryUrl" )]
-    [BooleanField( "Prompt for Name On Card", "Should users be prompted to enter name on the card", false, "", 5, "PromptForName" )]
-    [BooleanField( "Prompt for Billing Address", "Should users be prompted to enter billing address", false, "", 7, "PromptForAddress" )]
+    [TextField( "Public Key", "The public key for your Tithely account", true, "", "", 1, "", true )]
+    [TextField( "Secret Key", "The secret key for your Tithely account", true, "", "", 2, "", true )]
+    [BooleanField( "Use Live Mode", "By default the gateway will be in test mode. Toggle this to go live.", false, "" )]
+    [BooleanField( "Prompt for Billing Name", "Should users be prompted to enter name on the card", false, "" )]
+    [BooleanField( "Prompt for Billing Address", "Should users be prompted to enter billing address", false, "" )]
     public class Gateway : ThreeStepGatewayComponent
     {
 
         #region Gateway Component Implementation
+
+        private const string LiveURL = "https://tithe.ly/api/v1/";
+        private const string TestURL = "http://tithelydev.com/api/v1/";
 
         /// <summary>
         /// Gets the step2 form URL.
@@ -64,7 +68,7 @@ namespace com.kfs.Tithely
         /// </value>
         public override bool PromptForNameOnCard( FinancialGateway financialGateway )
         {
-            return GetAttributeValue( financialGateway, "PromptForName" ).AsBoolean();
+            return GetAttributeValue( financialGateway, "PromptForBillingName" ).AsBoolean();
         }
 
         /// <summary>
@@ -77,7 +81,7 @@ namespace com.kfs.Tithely
         {
             get
             {
-                return true;
+                return false;
             }
         }
 
@@ -101,7 +105,7 @@ namespace com.kfs.Tithely
         /// </value>
         public override bool PromptForBillingAddress( FinancialGateway financialGateway )
         {
-            return GetAttributeValue( financialGateway, "PromptForAddress" ).AsBoolean();
+            return GetAttributeValue( financialGateway, "PromptForBillingAddress" ).AsBoolean();
         }
 
         /// <summary>
@@ -118,6 +122,7 @@ namespace com.kfs.Tithely
                 values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_ONE_TIME ) );
                 values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_WEEKLY ) );
                 values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_BIWEEKLY ) );
+                values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_TWICEMONTHLY ) );
                 values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_MONTHLY ) );
                 return values;
             }
@@ -130,7 +135,7 @@ namespace com.kfs.Tithely
         /// <returns></returns>
         public override bool SupportsSavedAccount( bool isRepeating )
         {
-            return !isRepeating;
+            return true;
         }
 
         /// <summary>
@@ -140,8 +145,37 @@ namespace com.kfs.Tithely
         /// <returns></returns>
         public override Dictionary<string, string> GetStep1Parameters( string redirectUrl )
         {
-            var parameters = new Dictionary<string, string>();
-            parameters.Add( "redirect-url", redirectUrl );
+            // For this gateway, returns the signed value of parameters that are passed in.
+            // If a transaction doesn't pass parameters to this method, return null
+            // When creating an actual billable transaction, ChargeStep1 should be used.
+            Dictionary<string, string> parameters = Utility.ParseQueryString( redirectUrl );
+            if ( parameters == null )
+            {
+                return null;
+            }
+
+            var fieldsToSign = new Dictionary<string, string>();
+            var financialGatewayId = parameters.GetValueOrNull( "financialGatewayId" );
+            var signedFields = parameters.GetValueOrNull( "signed_field_names" );
+            if ( string.IsNullOrEmpty( financialGatewayId ) || string.IsNullOrEmpty( signedFields ) )
+            {
+                return null;
+            }
+
+            foreach ( var key in parameters.Keys.Where( k => signedFields.Split( ',' ).ToList().Contains( k ) ) )
+            {
+                fieldsToSign.Add( key, parameters[key] );
+            }
+
+            var secretKey = string.Empty;
+            using ( var rockContext = new RockContext() )
+            {
+                var gatewayService = new FinancialGatewayService( rockContext );
+                var gateway = gatewayService.Get( int.Parse( financialGatewayId ) );
+                secretKey = GetAttributeValue( gateway, "SecretKey" );
+            }
+
+            // pass the whole array to be signed
             return parameters;
         }
 
@@ -179,41 +213,41 @@ namespace com.kfs.Tithely
                     throw new ArgumentNullException( "paymentInfo" );
                 }
 
-                var rootElement = GetRoot( financialGateway, "sale" );
 
-                rootElement.Add(
-                    new XElement( "ip-address", paymentInfo.IPAddress ),
-                    new XElement( "currency", "USD" ),
-                    new XElement( "amount", paymentInfo.Amount.ToString() ),
-                    new XElement( "order-description", paymentInfo.Description ),
-                    new XElement( "tax-amount", "0.00" ),
-                    new XElement( "shipping-amount", "0.00" ) );
+                
+
+                
+                //    new XElement( "ip-address", paymentInfo.IPAddress ),
+                //    new XElement( "currency", "USD" ),
+                //    new XElement( "amount", paymentInfo.Amount.ToString() ),
+                //    new XElement( "order-description", paymentInfo.Description ),
+                //    new XElement( "tax-amount", "0.00" ),
+                //    new XElement( "shipping-amount", "0.00" ) );
 
                 bool isReferencePayment = ( paymentInfo is ReferencePaymentInfo );
                 if ( isReferencePayment )
                 {
                     var reference = paymentInfo as ReferencePaymentInfo;
-                    rootElement.Add( new XElement( "customer-vault-id", reference.ReferenceNumber ) );
+                    //rootElement.Add( new XElement( "customer-vault-id", reference.ReferenceNumber ) );
                 }
 
                 if ( paymentInfo.AdditionalParameters != null )
                 {
                     if ( !isReferencePayment )
                     {
-                        rootElement.Add( new XElement( "add-customer" ) );
+                        //rootElement.Add( new XElement( "add-customer" ) );
                     }
 
                     foreach ( var keyValue in paymentInfo.AdditionalParameters )
                     {
-                        XElement xElement = new XElement( keyValue.Key, keyValue.Value );
-                        rootElement.Add( xElement );
+                        var xElement = new XElement( keyValue.Key, keyValue.Value );
+                        //rootElement.Add( xElement );
                     }
                 }
 
-                rootElement.Add( GetBilling( paymentInfo ) );
-
-                XDocument xdoc = new XDocument( new XDeclaration( "1.0", "UTF-8", "yes" ), rootElement );
-                var result = PostToGateway( financialGateway, xdoc );
+                //rootElement.Add( GetBilling( paymentInfo ) );
+                
+                var result = PostToGateway( financialGateway, null );
 
                 if ( result == null )
                 {
@@ -228,7 +262,6 @@ namespace com.kfs.Tithely
                 }
 
                 return result.GetValueOrNull( "form-url" );
-
             }
 
             catch ( WebException webException )
@@ -243,7 +276,6 @@ namespace com.kfs.Tithely
                 errorMessage = ex.Message;
                 return null;
             }
-
         }
 
         /// <summary>
@@ -259,10 +291,10 @@ namespace com.kfs.Tithely
 
             try
             {
-                var rootElement = GetRoot( financialGateway, "complete-action" );
-                rootElement.Add( new XElement( "token-id", resultQueryString.Substring( 10 ) ) );
-                XDocument xdoc = new XDocument( new XDeclaration( "1.0", "UTF-8", "yes" ), rootElement );
-                var result = PostToGateway( financialGateway, xdoc );
+                
+                //rootElement.Add( new XElement( "token-id", resultQueryString.Substring( 10 ) ) );
+                
+                var result = PostToGateway( financialGateway, null );
 
                 if ( result == null )
                 {
@@ -356,12 +388,12 @@ namespace com.kfs.Tithely
                 !string.IsNullOrWhiteSpace( origTransaction.TransactionCode ) &&
                 origTransaction.FinancialGateway != null )
             {
-                var rootElement = GetRoot( origTransaction.FinancialGateway, "refund" );
-                rootElement.Add( new XElement( "transaction-id", origTransaction.TransactionCode ) );
-                rootElement.Add( new XElement( "amount", amount.ToString( "0.00" ) ) );
+                
+                //rootElement.Add( new XElement( "transaction-id", origTransaction.TransactionCode ) );
+                //rootElement.Add( new XElement( "amount", amount.ToString( "0.00" ) ) );
 
-                XDocument xdoc = new XDocument( new XDeclaration( "1.0", "UTF-8", "yes" ), rootElement );
-                var result = PostToGateway( origTransaction.FinancialGateway, xdoc );
+                
+                var result = PostToGateway( origTransaction.FinancialGateway, null );
 
                 if ( result == null )
                 {
@@ -421,36 +453,71 @@ namespace com.kfs.Tithely
                     throw new ArgumentNullException( "paymentInfo" );
                 }
 
-                var rootElement = GetRoot( financialGateway, "add-subscription" );
+                
 
-                rootElement.Add(
-                    new XElement( "start-date", schedule.StartDate.ToString( "yyyyMMdd" ) ),
-                    new XElement( "order-description", paymentInfo.Description ),
-                    new XElement( "currency", "USD" ),
-                    new XElement( "tax-amount", "0.00" ) );
+                
+                    //new XElement( "start-date", schedule.StartDate.ToString( "yyyyMMdd" ) ),
+                    //new XElement( "order-description", paymentInfo.Description ),
+                    //new XElement( "currency", "USD" ),
+                    //new XElement( "tax-amount", "0.00" ) );
 
                 bool isReferencePayment = ( paymentInfo is ReferencePaymentInfo );
                 if ( isReferencePayment )
                 {
                     var reference = paymentInfo as ReferencePaymentInfo;
-                    rootElement.Add( new XElement( "customer-vault-id", reference.ReferenceNumber ) );
+                    //rootElement.Add( new XElement( "customer-vault-id", reference.ReferenceNumber ) );
                 }
 
                 if ( paymentInfo.AdditionalParameters != null )
                 {
                     foreach ( var keyValue in paymentInfo.AdditionalParameters )
                     {
-                        XElement xElement = new XElement( keyValue.Key, keyValue.Value );
-                        rootElement.Add( xElement );
+                        var xElement = new XElement( keyValue.Key, keyValue.Value );
+                        //rootElement.Add( xElement );
                     }
                 }
 
-                rootElement.Add( GetPlan( schedule, paymentInfo ) );
+                var selectedFrequencyGuid = schedule.TransactionFrequencyValue.Guid.ToString().ToUpper();
 
-                rootElement.Add( GetBilling( paymentInfo ) );
+                if ( selectedFrequencyGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_ONE_TIME )
+                {
+                    // Make sure number of payments is set to 1 for one-time future payments
+                    schedule.NumberOfPayments = 1;
+                }
 
-                XDocument xdoc = new XDocument( new XDeclaration( "1.0", "UTF-8", "yes" ), rootElement );
-                var result = PostToGateway( financialGateway, xdoc );
+                switch ( selectedFrequencyGuid )
+                {
+                    case Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_ONE_TIME:
+                        {
+                            //planElement.Add( new XElement( "month-frequency", "12" ) );
+                            //planElement.Add( new XElement( "day-of-month", schedule.StartDate.Day.ToString() ) );
+                            break;
+                        }
+                    case Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_WEEKLY:
+                        {
+                            //planElement.Add( new XElement( "day-frequency", "7" ) );
+                            break;
+                        }
+                    case Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_BIWEEKLY:
+                        {
+                            //planElement.Add( new XElement( "day-frequency", "14" ) );
+                            break;
+                        }
+                    case Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_MONTHLY:
+                        {
+                            //planElement.Add( new XElement( "month-frequency", "1" ) );
+
+                            break;
+                        }
+
+                    default:
+                        break;
+                }
+
+                //rootElement.Add( GetBilling( paymentInfo ) );
+
+
+                var result = PostToGateway( financialGateway, null );
 
                 if ( result == null )
                 {
@@ -496,10 +563,10 @@ namespace com.kfs.Tithely
 
             try
             {
-                var rootElement = GetRoot( financialGateway, "complete-action" );
-                rootElement.Add( new XElement( "token-id", resultQueryString.Substring( 10 ) ) );
-                XDocument xdoc = new XDocument( new XDeclaration( "1.0", "UTF-8", "yes" ), rootElement );
-                var result = PostToGateway( financialGateway, xdoc );
+                
+                //rootElement.Add( new XElement( "token-id", resultQueryString.Substring( 10 ) ) );
+                
+                var result = PostToGateway( financialGateway, null );
 
                 if ( result == null )
                 {
@@ -581,7 +648,7 @@ namespace com.kfs.Tithely
         /// <returns></returns>
         public override bool ReactivateScheduledPayment( FinancialScheduledTransaction transaction, out string errorMessage )
         {
-            errorMessage = "The payment gateway associated with this scheduled tranaction (Tithely) does not support reactivating scheduled transactions. A new scheduled transaction should be created instead.";
+            errorMessage = "The Tithely gateway associated with this scheduled tranaction does not support reactivating scheduled transactions. A new scheduled transaction should be created instead.";
             return false;
         }
 
@@ -603,7 +670,7 @@ namespace com.kfs.Tithely
         /// <returns></returns>
         public override bool UpdateScheduledPayment( FinancialScheduledTransaction transaction, PaymentInfo paymentInfo, out string errorMessage )
         {
-            errorMessage = "The payment gateway associated with this scheduled transaction (Tithely) does not support updating an existing scheduled transaction. A new scheduled transaction should be created instead.";
+            errorMessage = "The Tithely gateway associated with this scheduled transaction does not support updating an existing scheduled transaction. A new scheduled transaction should be created instead.";
             return false;
         }
 
@@ -621,11 +688,11 @@ namespace com.kfs.Tithely
                 !string.IsNullOrWhiteSpace( transaction.GatewayScheduleId ) &&
                 transaction.FinancialGateway != null )
             {
-                var rootElement = GetRoot( transaction.FinancialGateway, "delete-subscription" );
-                rootElement.Add( new XElement( "subscription-id", transaction.GatewayScheduleId ) );
+                
+                //rootElement.Add( new XElement( "subscription-id", transaction.GatewayScheduleId ) );
 
-                XDocument xdoc = new XDocument( new XDeclaration( "1.0", "UTF-8", "yes" ), rootElement );
-                var result = PostToGateway( transaction.FinancialGateway, xdoc );
+                
+                var result = PostToGateway( transaction.FinancialGateway, null );
 
                 if ( result == null )
                 {
@@ -656,7 +723,7 @@ namespace com.kfs.Tithely
         /// <returns></returns>
         public override bool GetScheduledPaymentStatusSupported
         {
-            get { return false; }
+            get { return true; }
         }
 
         /// <summary>
@@ -667,7 +734,6 @@ namespace com.kfs.Tithely
         /// <returns></returns>
         public override bool GetScheduledPaymentStatus( FinancialScheduledTransaction transaction, out string errorMessage )
         {
-            // Tithely does not support getting the status of a scheduled transaction.
             errorMessage = string.Empty;
             return true;
         }
@@ -714,58 +780,58 @@ namespace com.kfs.Tithely
                                 foreach ( var xTxn in xdocResult.Root.Elements( "transaction" ) )
                                 {
                                     Payment payment = new Payment();
-                                    payment.TransactionCode = GetXElementValue( xTxn, "transaction_id" );
-                                    payment.Status = GetXElementValue( xTxn, "condition" ).FixCase();
-                                    payment.IsFailure =
-                                        payment.Status == "Failed" ||
-                                        payment.Status == "Abandoned" ||
-                                        payment.Status == "Canceled";
-                                    payment.TransactionCode = GetXElementValue( xTxn, "transaction_id" );
-                                    payment.GatewayScheduleId = GetXElementValue( xTxn, "original_transaction_id" ).Trim();
+                                    //payment.TransactionCode = GetXElementValue( xTxn, "transaction_id" );
+                                    //payment.Status = GetXElementValue( xTxn, "condition" ).FixCase();
+                                    //payment.IsFailure =
+                                    //    payment.Status == "Failed" ||
+                                    //    payment.Status == "Abandoned" ||
+                                    //    payment.Status == "Canceled";
+                                    //payment.TransactionCode = GetXElementValue( xTxn, "transaction_id" );
+                                    //payment.GatewayScheduleId = GetXElementValue( xTxn, "original_transaction_id" ).Trim();
 
-                                    var statusMessage = new StringBuilder();
-                                    DateTime? txnDateTime = null;
+                                    //var statusMessage = new StringBuilder();
+                                    //DateTime? txnDateTime = null;
 
-                                    foreach ( var xAction in xTxn.Elements( "action" ) )
-                                    {
-                                        DateTime? actionDate = ParseDateValue( GetXElementValue( xAction, "date" ) );
-                                        string actionType = GetXElementValue( xAction, "action_type" );
-                                        string responseText = GetXElementValue( xAction, "response_text" );
+                                    //foreach ( var xAction in xTxn.Elements( "action" ) )
+                                    //{
+                                    //    DateTime? actionDate = ParseDateValue( GetXElementValue( xAction, "date" ) );
+                                    //    string actionType = GetXElementValue( xAction, "action_type" );
+                                    //    string responseText = GetXElementValue( xAction, "response_text" );
 
-                                        if ( actionDate.HasValue )
-                                        {
-                                            statusMessage.AppendFormat( "{0} {1}: {2}; Status: {3}",
-                                                actionDate.Value.ToShortDateString(), actionDate.Value.ToShortTimeString(),
-                                                actionType.FixCase(), responseText );
-                                            statusMessage.AppendLine();
-                                        }
+                                    //    if ( actionDate.HasValue )
+                                    //    {
+                                    //        statusMessage.AppendFormat( "{0} {1}: {2}; Status: {3}",
+                                    //            actionDate.Value.ToShortDateString(), actionDate.Value.ToShortTimeString(),
+                                    //            actionType.FixCase(), responseText );
+                                    //        statusMessage.AppendLine();
+                                    //    }
 
-                                        decimal? txnAmount = GetXElementValue( xAction, "amount" ).AsDecimalOrNull();
-                                        if ( txnAmount.HasValue && actionDate.HasValue )
-                                        {
-                                            payment.Amount = txnAmount.Value;
-                                        }
+                                    //    decimal? txnAmount = GetXElementValue( xAction, "amount" ).AsDecimalOrNull();
+                                    //    if ( txnAmount.HasValue && actionDate.HasValue )
+                                    //    {
+                                    //        payment.Amount = txnAmount.Value;
+                                    //    }
 
-                                        if ( actionType == "sale" )
-                                        {
-                                            txnDateTime = actionDate.Value;
-                                        }
+                                    //    if ( actionType == "sale" )
+                                    //    {
+                                    //        txnDateTime = actionDate.Value;
+                                    //    }
 
-                                        if ( actionType == "settle" )
-                                        {
-                                            payment.IsSettled = true;
-                                            payment.SettledGroupId = GetXElementValue( xAction, "processor_batch_id" ).Trim();
-                                            payment.SettledDate = actionDate;
-                                            txnDateTime = txnDateTime.HasValue ? txnDateTime.Value : actionDate.Value;
-                                        }
-                                    }
+                                    //    if ( actionType == "settle" )
+                                    //    {
+                                    //        payment.IsSettled = true;
+                                    //        payment.SettledGroupId = GetXElementValue( xAction, "processor_batch_id" ).Trim();
+                                    //        payment.SettledDate = actionDate;
+                                    //        txnDateTime = txnDateTime.HasValue ? txnDateTime.Value : actionDate.Value;
+                                    //    }
+                                    //}
 
-                                    if ( txnDateTime.HasValue )
-                                    {
-                                        payment.TransactionDateTime = txnDateTime.Value;
-                                        payment.StatusMessage = statusMessage.ToString();
-                                        txns.Add( payment );
-                                    }
+                                    //if ( txnDateTime.HasValue )
+                                    //{
+                                    //    payment.TransactionDateTime = txnDateTime.Value;
+                                    //    payment.StatusMessage = statusMessage.ToString();
+                                    //    txns.Add( payment );
+                                    //}
                                 }
 
                             }
@@ -818,123 +884,33 @@ namespace com.kfs.Tithely
             return string.Empty;
         }
 
-        private XElement GetRoot( FinancialGateway financialGateway, string elementName )
-        {
-            XElement rootElement = new XElement( elementName,
-                new XElement( "api-key", GetAttributeValue( financialGateway, "SecurityKey" ) )
-            );
-
-            return rootElement;
-        }
-
-        /// <summary>
-        /// Creates a billing XML element
-        /// </summary>
-        /// <param name="paymentInfo">The payment information.</param>
-        /// <returns></returns>
-        private XElement GetBilling( PaymentInfo paymentInfo )
-        {
-            XElement billingElement = new XElement( "billing",
-                new XElement( "first-name", paymentInfo.FirstName ),
-                new XElement( "last-name", paymentInfo.LastName ),
-                new XElement( "address1", paymentInfo.Street1 ),
-                new XElement( "address2", paymentInfo.Street2 ),
-                new XElement( "city", paymentInfo.City ),
-                new XElement( "state", paymentInfo.State ),
-                new XElement( "postal", paymentInfo.PostalCode ),
-                new XElement( "country", paymentInfo.Country ),
-                new XElement( "phone", paymentInfo.Phone ),
-                new XElement( "email", paymentInfo.Email )
-            );
-
-            if ( paymentInfo is ACHPaymentInfo )
-            {
-                var ach = paymentInfo as ACHPaymentInfo;
-                billingElement.Add( new XElement( "account-type", ach.AccountType == BankAccountType.Savings ? "savings" : "checking" ) );
-                billingElement.Add( new XElement( "entity-type", "personal" ) );
-            }
-
-            return billingElement;
-        }
-
-        /// <summary>
-        /// Creates a scheduled transaction plan XML element
-        /// </summary>
-        /// <param name="schedule">The schedule.</param>
-        /// <param name="paymentInfo">The payment information.</param>
-        /// <returns></returns>
-        private XElement GetPlan( PaymentSchedule schedule, PaymentInfo paymentInfo )
-        {
-            var selectedFrequencyGuid = schedule.TransactionFrequencyValue.Guid.ToString().ToUpper();
-
-            if ( selectedFrequencyGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_ONE_TIME )
-            {
-                // Make sure number of payments is set to 1 for one-time future payments
-                schedule.NumberOfPayments = 1;
-            }
-
-            XElement planElement = new XElement( "plan",
-                new XElement( "payments", schedule.NumberOfPayments.HasValue ? schedule.NumberOfPayments.Value.ToString() : "0" ),
-                new XElement( "amount", paymentInfo.Amount.ToString() ) );
-
-            switch ( selectedFrequencyGuid )
-            {
-                case Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_ONE_TIME:
-                    planElement.Add( new XElement( "month-frequency", "12" ) );
-                    planElement.Add( new XElement( "day-of-month", schedule.StartDate.Day.ToString() ) );
-                    break;
-                case Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_WEEKLY:
-                    planElement.Add( new XElement( "day-frequency", "7" ) );
-                    break;
-                case Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_BIWEEKLY:
-                    planElement.Add( new XElement( "day-frequency", "14" ) );
-                    break;
-                case Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_MONTHLY:
-                    planElement.Add( new XElement( "month-frequency", "1" ) );
-                    planElement.Add( new XElement( "day-of-month", schedule.StartDate.Day.ToString() ) );
-                    break;
-            }
-
-            return planElement;
-        }
-
         /// <summary>
         /// Posts to gateway.
         /// </summary>
-        /// <param name="financialGateway">The financial gateway.</param>
-        /// <param name="data">The data.</param>
+        /// <param name="gateway">The gateway.</param>
+        /// <param name="tithelyParams">The tithely parameters.</param>
         /// <returns></returns>
         /// <exception cref="System.Exception"></exception>
-        private Dictionary<string, string> PostToGateway( FinancialGateway financialGateway, XDocument data )
+        private Dictionary<string, string> PostToGateway( FinancialGateway gateway, Dictionary<string, string> tithelyParams )
         {
-            var restClient = new RestClient( GetAttributeValue( financialGateway, "APIUrl" ) );
+            var queryUrl = GetAttributeValue( gateway, "UseLiveMode" ).AsBoolean() ? LiveURL : TestURL;
+            var restClient = new RestClient( queryUrl );
+            restClient.Authenticator = new HttpBasicAuthenticator( GetAttributeValue( "PublicKey" ), GetAttributeValue( "SecretKey" ) );
             var restRequest = new RestRequest( Method.POST );
-            restRequest.RequestFormat = DataFormat.Xml;
-            restRequest.AddParameter( "text/xml", data.ToString(), ParameterType.RequestBody );
+            restRequest.RequestFormat = DataFormat.Json;
+
+            foreach( var param in tithelyParams )
+            {
+                restRequest.AddParameter( param.Key, param.Value );
+            }
 
             try
             {
                 var response = restClient.Execute( restRequest );
-                var xdocResult = GetXmlResponse( response );
-                if ( xdocResult != null )
+                if ( response != null )
                 {
-                    // Convert XML result to a dictionary
                     var result = new Dictionary<string, string>();
-                    foreach ( XElement element in xdocResult.Root.Elements() )
-                    {
-                        if ( element.HasElements )
-                        {
-                            string prefix = element.Name.LocalName;
-                            foreach ( XElement childElement in element.Elements() )
-                            {
-                                result.AddOrIgnore( prefix + "_" + childElement.Name.LocalName, childElement.Value.Trim() );
-                            }
-                        }
-                        else
-                        {
-                            result.AddOrIgnore( element.Name.LocalName, element.Value.Trim() );
-                        }
-                    }
+                    // parse response
                     return result;
                 }
             }
@@ -949,9 +925,8 @@ namespace com.kfs.Tithely
             }
 
             return null;
-
         }
-
+        
         /// <summary>
         /// Gets the response as an XDocument
         /// </summary>
@@ -1132,16 +1107,6 @@ namespace com.kfs.Tithely
             return sb.ToString();
         }
 
-        private string GetXElementValue( XElement parentElement, string elementName )
-        {
-            var x = parentElement.Element( elementName );
-            if ( x != null )
-            {
-                return x.Value;
-            }
-            return string.Empty;
-        }
-
         private DateTime? ParseDateValue( string dateString )
         {
             if ( !string.IsNullOrWhiteSpace( dateString ) && dateString.Length >= 14 )
@@ -1163,4 +1128,54 @@ namespace com.kfs.Tithely
         #endregion
 
     }
+
+
+
+    /// <summary>
+    /// Provides utility methods to parse query strings
+    /// </summary>
+    public class Utility
+    {
+        /// <summary>
+        /// Parses the query string.
+        /// </summary>
+        /// <param name="queryString">The query string.</param>
+        /// <returns></returns>
+        public static Dictionary<string, string> ParseQueryString( string queryString )
+        {
+            Dictionary<string, string> result = queryString.Split( '&' )
+                .Select( x => x.Split( '=' ) )
+                .Where( x => x.Length == 2 )
+                .ToDictionary( x => x.First(), x => WebUtility.UrlDecode( x.Last() ) );
+
+            if ( !result.Any() )
+            {
+                return null;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Creates the query string.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns></returns>
+        public static string CreateQueryString( Dictionary<string, string> parameters )
+        {
+            var queryString = string.Empty;
+            if ( parameters.Any() )
+            {
+                queryString = parameters
+                    .Select( p => string.Format( "{0}={1}", p.Key, WebUtility.UrlEncode( p.Value ).Replace( "+", "%20" ) ) )
+                    .ToList()
+                    .AsDelimited( "&" );
+            }
+
+            return queryString;
+        }
+
+
+    }
+
 }
