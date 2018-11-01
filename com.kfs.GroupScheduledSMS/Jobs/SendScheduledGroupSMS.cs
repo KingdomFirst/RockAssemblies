@@ -194,20 +194,5 @@ namespace com.kfs.GroupScheduledSMS.Jobs
                 throw new Exception( "One or more exceptions occurred sending communications..." + Environment.NewLine + exceptionMsgs.AsDelimited( Environment.NewLine ) );
             }
         }
-
-        private void Send( DefinedValueCache fromNumber, RecipientData recipient, string message, List<BinaryFile> attachments )
-        {
-            var smsMessage = new RockSMSMessage();
-            smsMessage.FromNumber = fromNumber;
-            smsMessage.AddRecipient( recipient );
-            smsMessage.Message = message;
-
-            if ( attachments.Count > 0 )
-            {
-                smsMessage.Attachments = attachments;
-            }
-
-            smsMessage.Send();
-        }
     }
 }
