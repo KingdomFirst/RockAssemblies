@@ -61,7 +61,7 @@ namespace com.kfs.GroupRSVP.Migrations
 
             // register blocks
             RockMigrationHelper.AddBlockType( "RSVP Group Registration", "Allows a person to register for an RSVP Group.", "~/Plugins/com_kfs/RsvpGroups/RsvpGroupRegistration.ascx", "KFS > RSVP Groups", "F7B249C3-7FFD-483D-820F-A44D04E2BAB1" );
-            RockMigrationHelper.UpdateBlockType( "Group List", "Lists groups for lava display.", "~/Plugins/com_kfs/Groups/GroupListLava.ascx", "KFS > Groups", "6731AF9D-F3CB-4CCB-AA42-19C9CB15CBF5" ); // shared block type
+            RockMigrationHelper.UpdateBlockType( "Group List Lava", "Lists groups for lava display.", "~/Plugins/com_kfs/Groups/GroupListLava.ascx", "KFS > Groups", "6731AF9D-F3CB-4CCB-AA42-19C9CB15CBF5" ); // shared block type
         }
 
         /// <summary>
