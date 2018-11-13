@@ -1,4 +1,12 @@
-﻿using System;
+﻿using RestSharp;
+using RestSharp.Authenticators;
+using Rock;
+using Rock.Attribute;
+using Rock.Financial;
+using Rock.Model;
+using Rock.Security;
+using Rock.Web.Cache;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -7,19 +15,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Web.Security;
 using System.Xml.Linq;
-
-using RestSharp;
-
-using Rock.Attribute;
-using Rock.Financial;
-using Rock.Model;
-using Rock.Web.Cache;
-using Rock.Security;
-using Rock;
-using RestSharp.Authenticators;
-using Rock.Data;
 
 namespace com.kfs.Tithely
 {
@@ -29,20 +26,20 @@ namespace com.kfs.Tithely
     [Description( "Tithely Gateway" )]
     [Export( typeof( GatewayComponent ) )]
     [ExportMetadata( "ComponentName", "Tithely Gateway" )]
-
-    [TextField( "Security Key", "The API key", true, "", "", 0 )]
+    [TextField( "Organization Id", "The organization ID for your Tithely account", true, "", "", 0, "", true )]
     [TextField( "Public Key", "The public key for your Tithely account", true, "", "", 1, "", true )]
     [TextField( "Secret Key", "The secret key for your Tithely account", true, "", "", 2, "", true )]
-    [BooleanField( "Use Live Mode", "By default the gateway will be in test mode. Toggle this to go live.", false, "" )]
-    [BooleanField( "Prompt for Billing Name", "Should users be prompted to enter name on the card", false, "" )]
-    [BooleanField( "Prompt for Billing Address", "Should users be prompted to enter billing address", false, "" )]
+    [BooleanField( "Use Live Mode", "By default the gateway will be in test mode. Toggle this to go live.", false, "", 3, "" )]
+    [BooleanField( "Prompt for Billing Name", "Should users be prompted to enter name on the card", false, "", 4 )]
+    [BooleanField( "Prompt for Billing Address", "Should users be prompted to enter billing address", false, "", 5 )]
+    [IntegerField( "Default PIN", "Enter the default PIN to use when user accounts are created.", true, 2468, "", 6 )]
+    [AttributeField( Rock.SystemGuid.EntityType.PERSON, "Tithely Account", "Select the person attribute used to store Tithely account", true, false, "", "", 7 )]
     public class Gateway : ThreeStepGatewayComponent
     {
-
         #region Gateway Component Implementation
 
         private const string LiveURL = "https://tithe.ly/api/v1/";
-        private const string TestURL = "http://tithelydev.com/api/v1/";
+        private const string TestURL = "https://tithelydev.com/api/v1/";
 
         /// <summary>
         /// Gets the step2 form URL.
@@ -154,28 +151,6 @@ namespace com.kfs.Tithely
                 return null;
             }
 
-            var fieldsToSign = new Dictionary<string, string>();
-            var financialGatewayId = parameters.GetValueOrNull( "financialGatewayId" );
-            var signedFields = parameters.GetValueOrNull( "signed_field_names" );
-            if ( string.IsNullOrEmpty( financialGatewayId ) || string.IsNullOrEmpty( signedFields ) )
-            {
-                return null;
-            }
-
-            foreach ( var key in parameters.Keys.Where( k => signedFields.Split( ',' ).ToList().Contains( k ) ) )
-            {
-                fieldsToSign.Add( key, parameters[key] );
-            }
-
-            var secretKey = string.Empty;
-            using ( var rockContext = new RockContext() )
-            {
-                var gatewayService = new FinancialGatewayService( rockContext );
-                var gateway = gatewayService.Get( int.Parse( financialGatewayId ) );
-                secretKey = GetAttributeValue( gateway, "SecretKey" );
-            }
-
-            // pass the whole array to be signed
             return parameters;
         }
 
@@ -202,7 +177,7 @@ namespace com.kfs.Tithely
         /// Url to post the Step2 request to
         /// </returns>
         /// <exception cref="System.ArgumentNullException">paymentInfo</exception>
-        public override string ChargeStep1( FinancialGateway financialGateway, PaymentInfo paymentInfo, out string errorMessage )
+        public override string ChargeStep1( FinancialGateway gateway, PaymentInfo paymentInfo, out string errorMessage )
         {
             errorMessage = string.Empty;
 
@@ -213,41 +188,18 @@ namespace com.kfs.Tithely
                     throw new ArgumentNullException( "paymentInfo" );
                 }
 
+                // look up existing person
 
-                
-
-                
-                //    new XElement( "ip-address", paymentInfo.IPAddress ),
-                //    new XElement( "currency", "USD" ),
-                //    new XElement( "amount", paymentInfo.Amount.ToString() ),
-                //    new XElement( "order-description", paymentInfo.Description ),
-                //    new XElement( "tax-amount", "0.00" ),
-                //    new XElement( "shipping-amount", "0.00" ) );
-
-                bool isReferencePayment = ( paymentInfo is ReferencePaymentInfo );
-                if ( isReferencePayment )
+                var payment = new Dictionary<string, string>
                 {
-                    var reference = paymentInfo as ReferencePaymentInfo;
-                    //rootElement.Add( new XElement( "customer-vault-id", reference.ReferenceNumber ) );
-                }
+                    { "first_name", paymentInfo.FirstName },
+                    { "last_name", paymentInfo.LastName },
+                    { "email", paymentInfo.Email },
+                    { "password", Membership.GeneratePassword( 8, 0) },
+                    { "pin", paymentInfo.Phone.IsNotNullOrWhiteSpace() ? paymentInfo.Phone.Right( 4 ) : "2468" }
+                };
 
-                if ( paymentInfo.AdditionalParameters != null )
-                {
-                    if ( !isReferencePayment )
-                    {
-                        //rootElement.Add( new XElement( "add-customer" ) );
-                    }
-
-                    foreach ( var keyValue in paymentInfo.AdditionalParameters )
-                    {
-                        var xElement = new XElement( keyValue.Key, keyValue.Value );
-                        //rootElement.Add( xElement );
-                    }
-                }
-
-                //rootElement.Add( GetBilling( paymentInfo ) );
-                
-                var result = PostToGateway( financialGateway, null );
+                dynamic result = PostToGateway( gateway, GetRoot( gateway, "accounts" ), payment );
 
                 if ( result == null )
                 {
@@ -263,14 +215,12 @@ namespace com.kfs.Tithely
 
                 return result.GetValueOrNull( "form-url" );
             }
-
             catch ( WebException webException )
             {
                 string message = GetResponseMessage( webException.Response.GetResponseStream() );
                 errorMessage = webException.Message + " - " + message;
                 return null;
             }
-
             catch ( Exception ex )
             {
                 errorMessage = ex.Message;
@@ -291,10 +241,12 @@ namespace com.kfs.Tithely
 
             try
             {
-                
                 //rootElement.Add( new XElement( "token-id", resultQueryString.Substring( 10 ) ) );
-                
-                var result = PostToGateway( financialGateway, null );
+
+                var functionPath = "charges";
+                // functionPath = "charge-once";
+
+                dynamic result = PostToGateway( financialGateway, functionPath, null );
 
                 if ( result == null )
                 {
@@ -356,20 +308,17 @@ namespace com.kfs.Tithely
 
                 return transaction;
             }
-
             catch ( WebException webException )
             {
                 string message = GetResponseMessage( webException.Response.GetResponseStream() );
                 errorMessage = webException.Message + " - " + message;
                 return null;
             }
-
             catch ( Exception ex )
             {
                 errorMessage = ex.Message;
                 return null;
             }
-
         }
 
         /// <summary>
@@ -388,12 +337,10 @@ namespace com.kfs.Tithely
                 !string.IsNullOrWhiteSpace( origTransaction.TransactionCode ) &&
                 origTransaction.FinancialGateway != null )
             {
-                
                 //rootElement.Add( new XElement( "transaction-id", origTransaction.TransactionCode ) );
                 //rootElement.Add( new XElement( "amount", amount.ToString( "0.00" ) ) );
 
-                
-                var result = PostToGateway( origTransaction.FinancialGateway, null );
+                dynamic result = PostToGateway( origTransaction.FinancialGateway, "refunds", null );
 
                 if ( result == null )
                 {
@@ -453,13 +400,10 @@ namespace com.kfs.Tithely
                     throw new ArgumentNullException( "paymentInfo" );
                 }
 
-                
-
-                
-                    //new XElement( "start-date", schedule.StartDate.ToString( "yyyyMMdd" ) ),
-                    //new XElement( "order-description", paymentInfo.Description ),
-                    //new XElement( "currency", "USD" ),
-                    //new XElement( "tax-amount", "0.00" ) );
+                //new XElement( "start-date", schedule.StartDate.ToString( "yyyyMMdd" ) ),
+                //new XElement( "order-description", paymentInfo.Description ),
+                //new XElement( "currency", "USD" ),
+                //new XElement( "tax-amount", "0.00" ) );
 
                 bool isReferencePayment = ( paymentInfo is ReferencePaymentInfo );
                 if ( isReferencePayment )
@@ -478,24 +422,15 @@ namespace com.kfs.Tithely
                 }
 
                 var selectedFrequencyGuid = schedule.TransactionFrequencyValue.Guid.ToString().ToUpper();
-
-                if ( selectedFrequencyGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_ONE_TIME )
-                {
-                    // Make sure number of payments is set to 1 for one-time future payments
-                    schedule.NumberOfPayments = 1;
-                }
-
                 switch ( selectedFrequencyGuid )
                 {
                     case Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_ONE_TIME:
                         {
-                            //planElement.Add( new XElement( "month-frequency", "12" ) );
-                            //planElement.Add( new XElement( "day-of-month", schedule.StartDate.Day.ToString() ) );
+                            schedule.NumberOfPayments = 1;
                             break;
                         }
                     case Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_WEEKLY:
                         {
-                            //planElement.Add( new XElement( "day-frequency", "7" ) );
                             break;
                         }
                     case Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_BIWEEKLY:
@@ -516,8 +451,7 @@ namespace com.kfs.Tithely
 
                 //rootElement.Add( GetBilling( paymentInfo ) );
 
-
-                var result = PostToGateway( financialGateway, null );
+                dynamic result = PostToGateway( financialGateway, "recurring", null );
 
                 if ( result == null )
                 {
@@ -533,20 +467,17 @@ namespace com.kfs.Tithely
 
                 return result.GetValueOrNull( "form-url" );
             }
-
             catch ( WebException webException )
             {
                 string message = GetResponseMessage( webException.Response.GetResponseStream() );
                 errorMessage = webException.Message + " - " + message;
                 return null;
             }
-
             catch ( Exception ex )
             {
                 errorMessage = ex.Message;
                 return null;
             }
-
         }
 
         /// <summary>
@@ -563,10 +494,9 @@ namespace com.kfs.Tithely
 
             try
             {
-                
                 //rootElement.Add( new XElement( "token-id", resultQueryString.Substring( 10 ) ) );
-                
-                var result = PostToGateway( financialGateway, null );
+
+                dynamic result = PostToGateway( financialGateway, "recurring", null );
 
                 if ( result == null )
                 {
@@ -614,21 +544,17 @@ namespace com.kfs.Tithely
 
                 return scheduledTransaction;
             }
-
             catch ( WebException webException )
             {
                 string message = GetResponseMessage( webException.Response.GetResponseStream() );
                 errorMessage = webException.Message + " - " + message;
                 return null;
             }
-
             catch ( Exception ex )
             {
                 errorMessage = ex.Message;
                 return null;
             }
-
-
         }
 
         /// <summary>
@@ -688,11 +614,9 @@ namespace com.kfs.Tithely
                 !string.IsNullOrWhiteSpace( transaction.GatewayScheduleId ) &&
                 transaction.FinancialGateway != null )
             {
-                
                 //rootElement.Add( new XElement( "subscription-id", transaction.GatewayScheduleId ) );
 
-                
-                var result = PostToGateway( transaction.FinancialGateway, null );
+                dynamic result = PostToGateway( transaction.FinancialGateway, "recurring", null );
 
                 if ( result == null )
                 {
@@ -752,110 +676,109 @@ namespace com.kfs.Tithely
 
             var txns = new List<Payment>();
 
-            var restClient = new RestClient( GetAttributeValue( financialGateway, "QueryUrl" ) );
-            var restRequest = new RestRequest( Method.GET );
+            //var restClient = new RestClient( GetAttributeValue( financialGateway, "QueryUrl" ) );
+            //var restRequest = new RestRequest( Method.GET );
 
-            restRequest.AddParameter( "username", GetAttributeValue( financialGateway, "AdminUsername" ) );
-            restRequest.AddParameter( "password", GetAttributeValue( financialGateway, "AdminPassword" ) );
-            restRequest.AddParameter( "start_date", startDate.ToString( "yyyyMMddHHmmss" ) );
-            restRequest.AddParameter( "end_date", endDate.ToString( "yyyyMMddHHmmss" ) );
+            //restRequest.AddParameter( "username", GetAttributeValue( financialGateway, "AdminUsername" ) );
+            //restRequest.AddParameter( "password", GetAttributeValue( financialGateway, "AdminPassword" ) );
+            //restRequest.AddParameter( "start_date", startDate.ToString( "yyyyMMddHHmmss" ) );
+            //restRequest.AddParameter( "end_date", endDate.ToString( "yyyyMMddHHmmss" ) );
 
-            try
-            {
-                var response = restClient.Execute( restRequest );
-                if ( response != null )
-                {
-                    if ( response.StatusCode == HttpStatusCode.OK )
-                    {
-                        var xdocResult = GetXmlResponse( response );
-                        if ( xdocResult != null )
-                        {
-                            var errorResponse = xdocResult.Root.Element( "error_response" );
-                            if ( errorResponse != null )
-                            {
-                                errorMessage = errorResponse.Value;
-                            }
-                            else
-                            {
-                                foreach ( var xTxn in xdocResult.Root.Elements( "transaction" ) )
-                                {
-                                    Payment payment = new Payment();
-                                    //payment.TransactionCode = GetXElementValue( xTxn, "transaction_id" );
-                                    //payment.Status = GetXElementValue( xTxn, "condition" ).FixCase();
-                                    //payment.IsFailure =
-                                    //    payment.Status == "Failed" ||
-                                    //    payment.Status == "Abandoned" ||
-                                    //    payment.Status == "Canceled";
-                                    //payment.TransactionCode = GetXElementValue( xTxn, "transaction_id" );
-                                    //payment.GatewayScheduleId = GetXElementValue( xTxn, "original_transaction_id" ).Trim();
+            //try
+            //{
+            //    var response = restClient.Execute( restRequest );
+            //    if ( response != null )
+            //    {
+            //        if ( response.StatusCode == HttpStatusCode.OK )
+            //        {
+            //            var xdocResult = GetXmlResponse( response );
+            //            if ( xdocResult != null )
+            //            {
+            //                var errorResponse = xdocResult.Root.Element( "error_response" );
+            //                if ( errorResponse != null )
+            //                {
+            //                    errorMessage = errorResponse.Value;
+            //                }
+            //                else
+            //                {
+            //                    foreach ( var xTxn in xdocResult.Root.Elements( "transaction" ) )
+            //                    {
+            //                        Payment payment = new Payment();
+            //                        //payment.TransactionCode = GetXElementValue( xTxn, "transaction_id" );
+            //                        //payment.Status = GetXElementValue( xTxn, "condition" ).FixCase();
+            //                        //payment.IsFailure =
+            //                        //    payment.Status == "Failed" ||
+            //                        //    payment.Status == "Abandoned" ||
+            //                        //    payment.Status == "Canceled";
+            //                        //payment.TransactionCode = GetXElementValue( xTxn, "transaction_id" );
+            //                        //payment.GatewayScheduleId = GetXElementValue( xTxn, "original_transaction_id" ).Trim();
 
-                                    //var statusMessage = new StringBuilder();
-                                    //DateTime? txnDateTime = null;
+            //                        //var statusMessage = new StringBuilder();
+            //                        //DateTime? txnDateTime = null;
 
-                                    //foreach ( var xAction in xTxn.Elements( "action" ) )
-                                    //{
-                                    //    DateTime? actionDate = ParseDateValue( GetXElementValue( xAction, "date" ) );
-                                    //    string actionType = GetXElementValue( xAction, "action_type" );
-                                    //    string responseText = GetXElementValue( xAction, "response_text" );
+            //                        //foreach ( var xAction in xTxn.Elements( "action" ) )
+            //                        //{
+            //                        //    DateTime? actionDate = ParseDateValue( GetXElementValue( xAction, "date" ) );
+            //                        //    string actionType = GetXElementValue( xAction, "action_type" );
+            //                        //    string responseText = GetXElementValue( xAction, "response_text" );
 
-                                    //    if ( actionDate.HasValue )
-                                    //    {
-                                    //        statusMessage.AppendFormat( "{0} {1}: {2}; Status: {3}",
-                                    //            actionDate.Value.ToShortDateString(), actionDate.Value.ToShortTimeString(),
-                                    //            actionType.FixCase(), responseText );
-                                    //        statusMessage.AppendLine();
-                                    //    }
+            //                        //    if ( actionDate.HasValue )
+            //                        //    {
+            //                        //        statusMessage.AppendFormat( "{0} {1}: {2}; Status: {3}",
+            //                        //            actionDate.Value.ToShortDateString(), actionDate.Value.ToShortTimeString(),
+            //                        //            actionType.FixCase(), responseText );
+            //                        //        statusMessage.AppendLine();
+            //                        //    }
 
-                                    //    decimal? txnAmount = GetXElementValue( xAction, "amount" ).AsDecimalOrNull();
-                                    //    if ( txnAmount.HasValue && actionDate.HasValue )
-                                    //    {
-                                    //        payment.Amount = txnAmount.Value;
-                                    //    }
+            //                        //    decimal? txnAmount = GetXElementValue( xAction, "amount" ).AsDecimalOrNull();
+            //                        //    if ( txnAmount.HasValue && actionDate.HasValue )
+            //                        //    {
+            //                        //        payment.Amount = txnAmount.Value;
+            //                        //    }
 
-                                    //    if ( actionType == "sale" )
-                                    //    {
-                                    //        txnDateTime = actionDate.Value;
-                                    //    }
+            //                        //    if ( actionType == "sale" )
+            //                        //    {
+            //                        //        txnDateTime = actionDate.Value;
+            //                        //    }
 
-                                    //    if ( actionType == "settle" )
-                                    //    {
-                                    //        payment.IsSettled = true;
-                                    //        payment.SettledGroupId = GetXElementValue( xAction, "processor_batch_id" ).Trim();
-                                    //        payment.SettledDate = actionDate;
-                                    //        txnDateTime = txnDateTime.HasValue ? txnDateTime.Value : actionDate.Value;
-                                    //    }
-                                    //}
+            //                        //    if ( actionType == "settle" )
+            //                        //    {
+            //                        //        payment.IsSettled = true;
+            //                        //        payment.SettledGroupId = GetXElementValue( xAction, "processor_batch_id" ).Trim();
+            //                        //        payment.SettledDate = actionDate;
+            //                        //        txnDateTime = txnDateTime.HasValue ? txnDateTime.Value : actionDate.Value;
+            //                        //    }
+            //                        //}
 
-                                    //if ( txnDateTime.HasValue )
-                                    //{
-                                    //    payment.TransactionDateTime = txnDateTime.Value;
-                                    //    payment.StatusMessage = statusMessage.ToString();
-                                    //    txns.Add( payment );
-                                    //}
-                                }
-
-                            }
-                        }
-                        else
-                        {
-                            errorMessage = "Invalid XML Document Returned From Gateway!";
-                        }
-                    }
-                    else
-                    {
-                        errorMessage = string.Format( "Invalid Response from Gateway: [{0}] {1}", response.StatusCode.ConvertToString(), response.ErrorMessage );
-                    }
-                }
-                else
-                {
-                    errorMessage = "Null Response From Gateway!";
-                }
-            }
-            catch ( WebException webException )
-            {
-                string message = GetResponseMessage( webException.Response.GetResponseStream() );
-                throw new Exception( webException.Message + " - " + message );
-            }
+            //                        //if ( txnDateTime.HasValue )
+            //                        //{
+            //                        //    payment.TransactionDateTime = txnDateTime.Value;
+            //                        //    payment.StatusMessage = statusMessage.ToString();
+            //                        //    txns.Add( payment );
+            //                        //}
+            //                    }
+            //                }
+            //            }
+            //            else
+            //            {
+            //                errorMessage = "Invalid XML Document Returned From Gateway!";
+            //            }
+            //        }
+            //        else
+            //        {
+            //            errorMessage = string.Format( "Invalid Response from Gateway: [{0}] {1}", response.StatusCode.ConvertToString(), response.ErrorMessage );
+            //        }
+            //    }
+            //    else
+            //    {
+            //        errorMessage = "Null Response From Gateway!";
+            //    }
+            //}
+            //catch ( WebException webException )
+            //{
+            //    string message = GetResponseMessage( webException.Response.GetResponseStream() );
+            //    throw new Exception( webException.Message + " - " + message );
+            //}
 
             return txns;
         }
@@ -885,21 +808,39 @@ namespace com.kfs.Tithely
         }
 
         /// <summary>
+        /// Gets the root url and adds the function path.
+        /// </summary>
+        /// <param name="gateway">The gateway.</param>
+        /// <param name="elementName">Name of the element.</param>
+        /// <returns></returns>
+        private string GetRoot( FinancialGateway gateway, string elementName )
+        {
+            var urlPrefix = GetAttributeValue( gateway, "UseLiveMode" ).AsBoolean() ? LiveURL : TestURL;
+            return string.Format( "{0}{1}", urlPrefix.EnsureTrailingForwardslash(), elementName );
+        }
+
+        /// <summary>
         /// Posts to gateway.
         /// </summary>
         /// <param name="gateway">The gateway.</param>
+        /// <param name="queryUrl">The query URL.</param>
         /// <param name="tithelyParams">The tithely parameters.</param>
         /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         /// <exception cref="System.Exception"></exception>
-        private Dictionary<string, string> PostToGateway( FinancialGateway gateway, Dictionary<string, string> tithelyParams )
+        private object PostToGateway( FinancialGateway gateway, string queryUrl, Dictionary<string, string> tithelyParams )
         {
-            var queryUrl = GetAttributeValue( gateway, "UseLiveMode" ).AsBoolean() ? LiveURL : TestURL;
-            var restClient = new RestClient( queryUrl );
-            restClient.Authenticator = new HttpBasicAuthenticator( GetAttributeValue( "PublicKey" ), GetAttributeValue( "SecretKey" ) );
-            var restRequest = new RestRequest( Method.POST );
-            restRequest.RequestFormat = DataFormat.Json;
+            var restClient = new RestClient( queryUrl )
+            {
+                Authenticator = new HttpBasicAuthenticator( GetAttributeValue( gateway, "PublicKey" ), GetAttributeValue( gateway, "SecretKey" ) )
+            };
 
-            foreach( var param in tithelyParams )
+            var restRequest = new RestRequest( Method.POST )
+            {
+                RequestFormat = DataFormat.Json
+            };
+
+            foreach ( var param in tithelyParams )
             {
                 restRequest.AddParameter( param.Key, param.Value );
             }
@@ -907,26 +848,28 @@ namespace com.kfs.Tithely
             try
             {
                 var response = restClient.Execute( restRequest );
-                if ( response != null )
+                if ( response != null && response.StatusCode == HttpStatusCode.OK )
                 {
-                    var result = new Dictionary<string, string>();
-                    // parse response
+                    // strongly typed
+                    //var result = JsonConvert.DeserializeObject<TithelyResponse>( response.Content );
+                    // dynamic typed
+                    dynamic result = SimpleJson.DeserializeObject( response.Content );
                     return result;
                 }
             }
             catch ( WebException webException )
             {
-                string message = GetResponseMessage( webException.Response.GetResponseStream() );
+                var message = GetResponseMessage( webException.Response.GetResponseStream() );
                 throw new Exception( webException.Message + " - " + message );
             }
             catch ( Exception ex )
             {
-                throw ex;
+                throw new Exception( ex?.InnerException?.Message, ex );
             }
 
             return null;
         }
-        
+
         /// <summary>
         /// Gets the response as an XDocument
         /// </summary>
@@ -1122,14 +1065,50 @@ namespace com.kfs.Tithely
             }
 
             return DateTime.MinValue;
-
         }
 
         #endregion
-
     }
 
+    public class TithelyResponse
+    {
+        private string Status;
+        private string Account_Id;
+        private string Type;
+        private object JSON;
+    }
 
+    public class TithelyAccount
+    {
+        private string Account_Id;
+        private string Type;
+        private string Email;
+        private string First_Name;
+        private string Last_Name;
+        private string Phone_Number;
+    }
+
+    public class TithelyPayment
+    {
+        public string AccountId;
+        public string PIN;
+        public int AmountCents;
+        public string City;
+        public string Country;
+        public string Email;
+        public string FirstName;
+        public string GivingType;
+        public string LastName;
+        public string Memo;
+        public string OrganizationId;
+        public string PaymentTerm;
+        public string PaymentToken;
+        public string PhoneNumber;
+        public string Postal;
+        public int StartDate;
+        public string State;
+        public string StreetAddress;
+    }
 
     /// <summary>
     /// Provides utility methods to parse query strings
@@ -1174,8 +1153,5 @@ namespace com.kfs.Tithely
 
             return queryString;
         }
-
-
     }
-
 }
