@@ -64,21 +64,34 @@ namespace com.kfs.GroupScheduledSMS.Jobs
 
             // get the date attributes
             var dateAttribute = AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_SEND_DATE.AsGuid() );
-            var dateAttributes = new AttributeValueService( rockContext ).Queryable()
-                                        .Where( d => d.AttributeId == dateAttribute.Id &&
-                                                d.ValueAsDateTime >= beginDateTime && d.ValueAsDateTime <= RockDateTime.Now )
-                                        .ToList();
+            var dateAttributes = new AttributeValueService( rockContext )
+                .Queryable().AsNoTracking()
+                .Where( d => d.AttributeId == dateAttribute.Id &&
+                        d.ValueAsDateTime >= beginDateTime && d.ValueAsDateTime <= RockDateTime.Now )
+                .ToList();
 
             foreach ( var d in dateAttributes )
             {
                 if ( d.EntityId.HasValue )
                 {
-                    var attributeMatrixId = new AttributeMatrixItemService( rockContext ).Queryable().FirstOrDefault( i => i.Id == d.EntityId.Value ).AttributeMatrixId;
-                    var attributeMatrixGuid = new AttributeMatrixService( rockContext ).Queryable().FirstOrDefault( m => m.Id == attributeMatrixId ).Guid.ToString();
-                    var group = new AttributeValueService( rockContext ).Queryable().FirstOrDefault( a => a.Value.Equals( attributeMatrixGuid, StringComparison.CurrentCultureIgnoreCase ) );
-                    if ( group != null && group.EntityId.HasValue )
+                    var attributeMatrixId = new AttributeMatrixItemService( rockContext )
+                        .Queryable().AsNoTracking()
+                        .FirstOrDefault( i => i.Id == d.EntityId.Value )
+                        .AttributeMatrixId;
+
+                    var attributeMatrixGuid = new AttributeMatrixService( rockContext )
+                        .Queryable().AsNoTracking()
+                        .FirstOrDefault( m => m.Id == attributeMatrixId )
+                        .Guid
+                        .ToString();
+
+                    var attributeValue = new AttributeValueService( rockContext )
+                        .Queryable().AsNoTracking()
+                        .FirstOrDefault( a => a.Value.Equals( attributeMatrixGuid, StringComparison.CurrentCultureIgnoreCase ) );
+
+                    if ( attributeValue != null && attributeValue.EntityId.HasValue )
                     {
-                        dGroupAndAttributeMatrixItemIds.Add( d.EntityId.Value, group.EntityId.Value );
+                        dGroupAndAttributeMatrixItemIds.Add( d.EntityId.Value, attributeValue.EntityId.Value );
                     }
                 }
             }
@@ -88,19 +101,24 @@ namespace com.kfs.GroupScheduledSMS.Jobs
                 try
                 {
                     var fromNumberAttributeId = AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_FROM_NUMBER.AsGuid() ).Id;
-                    var fromNumberGuid = new AttributeValueService( rockContext ).Queryable()
-                                                .FirstOrDefault( v => v.AttributeId == fromNumberAttributeId &&
-                                                        v.EntityId == groupAndAttributeMatrixItemId.Key ).Value;
+                    var fromNumberGuid = new AttributeValueService( rockContext )
+                        .Queryable().AsNoTracking()
+                        .FirstOrDefault( v => v.AttributeId == fromNumberAttributeId && v.EntityId == groupAndAttributeMatrixItemId.Key )
+                        .Value;
                     var fromNumber = DefinedValueCache.Get( fromNumberGuid.AsGuid() );
 
                     var messageAttributeId = AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_MESSAGE.AsGuid() ).Id;
-                    var message = new AttributeValueService( rockContext ).Queryable()
-                                                .FirstOrDefault( v => v.AttributeId == messageAttributeId &&
-                                                        v.EntityId == groupAndAttributeMatrixItemId.Key ).Value;
+                    var message = new AttributeValueService( rockContext )
+                        .Queryable().AsNoTracking()
+                        .FirstOrDefault( v => v.AttributeId == messageAttributeId && v.EntityId == groupAndAttributeMatrixItemId.Key )
+                        .Value;
 
                     var attachments = new List<BinaryFile>();
 
-                    var group = new GroupService( rockContext ).Queryable().Where( g => g.Id == groupAndAttributeMatrixItemId.Value ).FirstOrDefault();
+                    var group = new GroupService( rockContext )
+                        .Queryable().AsNoTracking()
+                        .Where( g => g.Id == groupAndAttributeMatrixItemId.Value )
+                        .FirstOrDefault();
 
                     if ( !message.IsNullOrWhiteSpace() && smsMediumType != null )
                     {
