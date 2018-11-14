@@ -75,10 +75,10 @@ namespace com.kfs.GroupScheduledEmails.Jobs
                 {
                     var attributeMatrixId = new AttributeMatrixItemService( rockContext ).Queryable().FirstOrDefault( i => i.Id == d.EntityId.Value ).AttributeMatrixId;
                     var attributeMatrixGuid = new AttributeMatrixService( rockContext ).Queryable().FirstOrDefault( m => m.Id == attributeMatrixId ).Guid.ToString();
-                    var groupId = new AttributeValueService( rockContext ).Queryable().FirstOrDefault( a => a.Value.Equals( attributeMatrixGuid, StringComparison.CurrentCultureIgnoreCase ) ).EntityId;
-                    if ( groupId.HasValue )
+                    var group = new AttributeValueService( rockContext ).Queryable().FirstOrDefault( a => a.Value.Equals( attributeMatrixGuid, StringComparison.CurrentCultureIgnoreCase ) );
+                    if ( group != null && group.EntityId.HasValue )
                     {
-                        dGroupAndAttributeMatrixItemIds.Add( d.EntityId.Value, groupId.Value );
+                        dGroupAndAttributeMatrixItemIds.Add( d.EntityId.Value, group.EntityId.Value );
                     }
                 }
             }
