@@ -1,7 +1,9 @@
-﻿using RestSharp;
+﻿using Newtonsoft.Json;
+using RestSharp;
 using RestSharp.Authenticators;
 using Rock;
 using Rock.Attribute;
+using Rock.Data;
 using Rock.Financial;
 using Rock.Model;
 using Rock.Security;
@@ -26,14 +28,12 @@ namespace com.kfs.Tithely
     [Description( "Tithely Gateway" )]
     [Export( typeof( GatewayComponent ) )]
     [ExportMetadata( "ComponentName", "Tithely Gateway" )]
-    [TextField( "Organization Id", "The organization ID for your Tithely account", true, "", "", 0, "", true )]
-    [TextField( "Public Key", "The public key for your Tithely account", true, "", "", 1, "", true )]
+    [TextField( "Organization Id", "The organization ID for your Tithely account", true, "", "", 0, "", false )]
+    [TextField( "Public Key", "The public key for your Tithely account", true, "", "", 1, "", false )]
     [TextField( "Secret Key", "The secret key for your Tithely account", true, "", "", 2, "", true )]
     [BooleanField( "Use Live Mode", "By default the gateway will be in test mode. Toggle this to go live.", false, "", 3, "" )]
     [BooleanField( "Prompt for Billing Name", "Should users be prompted to enter name on the card", false, "", 4 )]
     [BooleanField( "Prompt for Billing Address", "Should users be prompted to enter billing address", false, "", 5 )]
-    [IntegerField( "Default PIN", "Enter the default PIN to use when user accounts are created.", true, 2468, "", 6 )]
-    [AttributeField( Rock.SystemGuid.EntityType.PERSON, "Tithely Account", "Select the person attribute used to store Tithely account", true, false, "", "", 7 )]
     public class Gateway : ThreeStepGatewayComponent
     {
         #region Gateway Component Implementation
@@ -188,15 +188,13 @@ namespace com.kfs.Tithely
                     throw new ArgumentNullException( "paymentInfo" );
                 }
 
-                // look up existing person
-
                 var payment = new Dictionary<string, string>
                 {
                     { "first_name", paymentInfo.FirstName },
                     { "last_name", paymentInfo.LastName },
                     { "email", paymentInfo.Email },
-                    { "password", Membership.GeneratePassword( 8, 0) },
-                    { "pin", paymentInfo.Phone.IsNotNullOrWhiteSpace() ? paymentInfo.Phone.Right( 4 ) : "2468" }
+                    { "password", string.Format( "{0}1!", Membership.GeneratePassword( 8, 0 ) ) },
+                    { "pin", paymentInfo.Phone.IsNotNullOrWhiteSpace() ? paymentInfo.Phone.Right( 4 ) : "1234" }
                 };
 
                 dynamic result = PostToGateway( gateway, GetRoot( gateway, "accounts" ), payment );
@@ -207,17 +205,61 @@ namespace com.kfs.Tithely
                     return null;
                 }
 
-                if ( result.GetValueOrNull( "result" ) != "1" )
+                if ( result.status != "success" )
                 {
-                    errorMessage = result.GetValueOrNull( "result-text" );
+                    errorMessage = result.reason;
                     return null;
                 }
 
-                return result.GetValueOrNull( "form-url" );
+                string tithelyAccountToken = result.account_id;
+                using ( var rockContext = new RockContext() )
+                {
+                    // find or create the contributor record
+                    var personService = new PersonService( rockContext );
+                    var contributor = personService.FindPerson( paymentInfo.FirstName, paymentInfo.LastName, paymentInfo.Email, false, true, true );
+                    if ( contributor == null )
+                    {
+                        var recordTypePersonId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() ).Id;
+                        var recordStatusActiveId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_ACTIVE.AsGuid() ).Id;
+                        var connectionStatusWebId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_CONNECTION_STATUS_WEB_PROSPECT ).Id;
+                        contributor = new Person
+                        {
+                            FirstName = paymentInfo.FirstName.FixCase(),
+                            LastName = paymentInfo.LastName.FixCase(),
+                            Email = paymentInfo.Email,
+                            IsEmailActive = true,
+                            EmailPreference = EmailPreference.EmailAllowed,
+                            RecordStatusValueId = recordStatusActiveId,
+                            RecordTypeValueId = recordTypePersonId,
+                            Gender = Gender.Unknown,
+                            ConnectionStatusValueId = connectionStatusWebId
+                        };
+
+                        personService.Add( contributor );
+                        rockContext.SaveChanges();
+                    }
+
+                    // store the Tithely account id as a person search key
+                    var searchKey = contributor.GetPersonSearchKeys( rockContext ).FirstOrDefault( k => k.SearchValue.Equals( tithelyAccountToken ) );
+                    if ( searchKey == null )
+                    {
+                        var alternateValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_SEARCH_KEYS_ALTERNATE_ID.AsGuid() ).Id;
+                        searchKey = new PersonSearchKey
+                        {
+                            SearchTypeValueId = alternateValueId,
+                            SearchValue = tithelyAccountToken,
+                            PersonAliasId = contributor.PrimaryAliasId
+                        };
+                        new PersonSearchKeyService( rockContext ).Add( searchKey );
+                        rockContext.SaveChanges();
+                    }
+                }
+
+                return string.Format( "{0}?public_key={1}&account_id={2}", GetRoot( gateway, "charges" ), GetAttributeValue( gateway, "PublicKey" ), tithelyAccountToken );
             }
             catch ( WebException webException )
             {
-                string message = GetResponseMessage( webException.Response.GetResponseStream() );
+                var message = GetResponseMessage( webException.Response.GetResponseStream() );
                 errorMessage = webException.Message + " - " + message;
                 return null;
             }
@@ -850,10 +892,8 @@ namespace com.kfs.Tithely
                 var response = restClient.Execute( restRequest );
                 if ( response != null && response.StatusCode == HttpStatusCode.OK )
                 {
-                    // strongly typed
-                    //var result = JsonConvert.DeserializeObject<TithelyResponse>( response.Content );
-                    // dynamic typed
-                    dynamic result = SimpleJson.DeserializeObject( response.Content );
+                    //dynamic result = SimpleJson.DeserializeObject( response.Content );
+                    dynamic result = JsonConvert.DeserializeObject<dynamic>( response.Content );
                     return result;
                 }
             }
