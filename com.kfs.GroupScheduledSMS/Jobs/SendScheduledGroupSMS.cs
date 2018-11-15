@@ -67,7 +67,8 @@ namespace com.kfs.GroupScheduledSMS.Jobs
             var dateAttributes = new AttributeValueService( rockContext )
                 .Queryable().AsNoTracking()
                 .Where( d => d.AttributeId == dateAttribute.Id &&
-                        d.ValueAsDateTime >= beginDateTime && d.ValueAsDateTime <= RockDateTime.Now )
+                        d.ValueAsDateTime >= beginDateTime &&
+                        d.ValueAsDateTime <= RockDateTime.Now )
                 .ToList();
 
             foreach ( var d in dateAttributes )
