@@ -24,11 +24,6 @@ namespace com.kfs.Reach.Reporting
         public static object PostRequest( string url, HttpBasicAuthenticator authenticator, Dictionary<string, string> parameters, out string errorMessage )
         {
             errorMessage = string.Empty;
-            if ( !url.EndsWith( ".json" ) )
-            {
-                url = string.Format( "{0}.json", url );
-            }
-
             var restClient = new RestClient( url )
             {
                 Authenticator = authenticator

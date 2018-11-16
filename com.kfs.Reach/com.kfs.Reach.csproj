@@ -62,7 +62,6 @@
     <Compile Include="Gateway.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reporting\Api.cs" />
-    <Compile Include="Reporting\Creators.cs" />
     <Compile Include="Reporting\Donation.cs" />
     <Compile Include="Reporting\Supporter.cs" />
   </ItemGroup>
