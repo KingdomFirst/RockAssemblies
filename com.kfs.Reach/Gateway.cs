@@ -27,9 +27,11 @@ namespace com.kfs.Reach
     [TextField( "API Key", "Enter the API key provided in your Reach Account", true, "", "", 1 )]
     [TextField( "API Secret", "Enter the API secret provided in your Reach account", true, "", "", 2 )]
     [CustomRadioListField( "Mode", "Mode to use for transactions", "Live,Test", true, "Test", "", 3 )]
+    [DefinedTypeField( "Account Map", "Select the defined type used to specify the FinancialAccount mappings.", true, "80cdad25-a120-4a30-bb6a-21f1ccdb9e65", "", 4 )]
     public class Gateway : GatewayComponent
     {
         private readonly string DemoUrl = "demo.reachapp.co";
+        private readonly string ApiVersion = "api/v1";
 
         #region Gateway Component Implementation
 
@@ -163,14 +165,33 @@ namespace com.kfs.Reach
         /// <summary>
         /// Gets the payments that have been processed for any scheduled transactions
         /// </summary>
-        /// <param name="financialGateway"></param>
+        /// <param name="gateway">The gateway.</param>
         /// <param name="startDate">The start date.</param>
         /// <param name="endDate">The end date.</param>
         /// <param name="errorMessage">The error message.</param>
         /// <returns></returns>
-        public override List<Payment> GetPayments( FinancialGateway financialGateway, DateTime startDate, DateTime endDate, out string errorMessage )
+        public override List<Payment> GetPayments( FinancialGateway gateway, DateTime startDate, DateTime endDate, out string errorMessage )
         {
-            errorMessage = "The RecurringBillingReport report did not return any data";
+            var parameters = new Dictionary<string, string>
+            {
+                { "from_date", startDate.ToString( "yyyy-MM-dd" ) },
+                { "end_date", endDate.ToString( "yyyy-MM-dd" ) }
+            };
+
+            var requestResult = PostRequest( gateway, "donations", parameters, out errorMessage );
+            if ( requestResult != null )
+            {
+                var results = JsonConvert.DeserializeObject<List<ReachDonation>>( requestResult.ToString() );
+                foreach ( var transaction in results )
+                {
+                    // only sync completed transactions
+                    if ( transaction.status.Equals( "complete" ) )
+                    {
+
+                    }
+                }
+            }
+
             return null;
         }
 
@@ -178,14 +199,28 @@ namespace com.kfs.Reach
         /// Posts the request to the gateway endpoint.
         /// </summary>
         /// <param name="gateway">The gateway.</param>
-        /// <param name="queryUrl">The query URL.</param>
+        /// <param name="resource">The query resource.</param>
         /// <param name="parameters">The parameters.</param>
+        /// <param name="errorMessage">The error message.</param>
         /// <returns></returns>
-        /// <exception cref="System.Exception">
+        /// <exception cref="Exception">
         /// </exception>
-        private object PostRequest( FinancialGateway gateway, string queryUrl, Dictionary<string, string> parameters )
+        /// <exception cref="System.Exception"></exception>
+        private object PostRequest( FinancialGateway gateway, string resource, Dictionary<string, string> parameters, out string errorMessage )
         {
-            var restClient = new RestClient( queryUrl )
+            errorMessage = string.Empty;
+            var baseUrl = GetAttributeValue( gateway, "Mode" ) == "Live" ? GetAttributeValue( gateway, "ReachDomain" ) : DemoUrl;
+            if ( baseUrl.IsNullOrWhiteSpace() || !baseUrl.EndsWith( "reachapp.co" ) )
+            {
+                errorMessage = "The Domain URL was not provided or is not valid";
+                return null;
+            }
+            else
+            {
+                baseUrl = string.Format( "https://{0}/{1}/{2}.json", baseUrl, ApiVersion, resource );
+            }
+
+            var restClient = new RestClient( baseUrl )
             {
                 Authenticator = new HttpBasicAuthenticator( GetAttributeValue( gateway, "APIKey" ), GetAttributeValue( gateway, "APISecret" ) )
             };
@@ -205,8 +240,7 @@ namespace com.kfs.Reach
                 var response = restClient.Execute( restRequest );
                 if ( response != null && response.StatusCode == HttpStatusCode.OK )
                 {
-                    var result = JsonConvert.DeserializeObject<dynamic>( response.Content );
-                    return result;
+                    return response.Content;
                 }
             }
             catch ( WebException webException )
@@ -327,4 +361,51 @@ namespace com.kfs.Reach
 
         #endregion
     }
+
+    #region Object Declarations
+
+    public class ReachDonation
+    {
+        public int account_id;
+        public string address1;
+        public string address2;
+        public string admin_notes;
+        public string alpha2_country_code;
+        public decimal amount;
+        public string ancestry;
+        public string check_number;
+        public string city;
+        public string confirmation;
+        public string country;
+        public DateTime created_at;
+        public string currency;
+        public DateTime date;
+        public string email;
+        public string first_name;
+        public int id;
+        public string ip_address;
+        public string last_name;
+        public string name;
+        public DateTime next_donation;
+        public string note;
+        public string payment_method;
+        public string payment_type;
+        public string paypal_profile_id;
+        public string phone;
+        public string post_body;
+        public string postal;
+        public string purpose;
+        public bool recurring;
+        public string recurring_period;
+        public string referral_id;
+        public string state;
+        public string status;
+        public int? supporter_id;
+        public string token;
+        public string transaction_token;
+        public DateTime updated_at;
+        public int? user_id;
+    }
+
+    #endregion
 }
