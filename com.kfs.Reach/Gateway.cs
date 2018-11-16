@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.IO;
-using System.Net;
-using System.Text;
+using System.Linq;
+using com.kfs.Reach.Reporting;
 using Newtonsoft.Json;
-using RestSharp;
 using RestSharp.Authenticators;
 using Rock;
 using Rock.Attribute;
@@ -26,8 +24,10 @@ namespace com.kfs.Reach
     [TextField( "Reach Domain", "This is your organization's custom domain, typically [CHURCH].reachapp.co.", true, "", "", 0 )]
     [TextField( "API Key", "Enter the API key provided in your Reach Account", true, "", "", 1 )]
     [TextField( "API Secret", "Enter the API secret provided in your Reach account", true, "", "", 2 )]
-    [CustomRadioListField( "Mode", "Mode to use for transactions", "Live,Test", true, "Test", "", 3 )]
-    [DefinedTypeField( "Account Map", "Select the defined type used to specify the FinancialAccount mappings.", true, "80cdad25-a120-4a30-bb6a-21f1ccdb9e65", "", 4 )]
+    [TextField( "Batch Prefix", "Enter a batch prefix to be used with downloading transactions.  The date of the earliest transaction in the batch will be appended to the prefix.", true, "Reach", "", 3 )]
+    [DefinedTypeField( "Account Map", "Select the defined type that specifies the FinancialAccount mappings.", true, "80cdad25-a120-4a30-bb6a-21f1ccdb9e65", "", 4 )]
+    [DefinedValueField( Rock.SystemGuid.DefinedType.FINANCIAL_SOURCE_TYPE, "Source Type", "Select the defined value that new transactions should be attributed with.", true, false, "74650f5b-3e18-43e8-88db-1598deb2ffa0", "", 6 )]
+    [CustomRadioListField( "Mode", "Mode to use for transactions", "Live,Test", true, "Test", "", 7 )]
     public class Gateway : GatewayComponent
     {
         private readonly string DemoUrl = "demo.reachapp.co";
@@ -172,113 +172,285 @@ namespace com.kfs.Reach
         /// <returns></returns>
         public override List<Payment> GetPayments( FinancialGateway gateway, DateTime startDate, DateTime endDate, out string errorMessage )
         {
-            var parameters = new Dictionary<string, string>
+            var donationUrl = GetBaseUrl( gateway, "donations", out errorMessage );
+            if ( donationUrl.IsNullOrWhiteSpace() )
             {
-                { "from_date", startDate.ToString( "yyyy-MM-dd" ) },
-                { "end_date", endDate.ToString( "yyyy-MM-dd" ) }
-            };
-
-            var requestResult = PostRequest( gateway, "donations", parameters, out errorMessage );
-            if ( requestResult != null )
-            {
-                var results = JsonConvert.DeserializeObject<List<ReachDonation>>( requestResult.ToString() );
-                foreach ( var transaction in results )
-                {
-                    // only sync completed transactions
-                    if ( transaction.status.Equals( "complete" ) )
-                    {
-
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Posts the request to the gateway endpoint.
-        /// </summary>
-        /// <param name="gateway">The gateway.</param>
-        /// <param name="resource">The query resource.</param>
-        /// <param name="parameters">The parameters.</param>
-        /// <param name="errorMessage">The error message.</param>
-        /// <returns></returns>
-        /// <exception cref="Exception">
-        /// </exception>
-        /// <exception cref="System.Exception"></exception>
-        private object PostRequest( FinancialGateway gateway, string resource, Dictionary<string, string> parameters, out string errorMessage )
-        {
-            errorMessage = string.Empty;
-            var baseUrl = GetAttributeValue( gateway, "Mode" ) == "Live" ? GetAttributeValue( gateway, "ReachDomain" ) : DemoUrl;
-            if ( baseUrl.IsNullOrWhiteSpace() || !baseUrl.EndsWith( "reachapp.co" ) )
-            {
-                errorMessage = "The Domain URL was not provided or is not valid";
                 return null;
             }
-            else
+
+            var authenticator = GetAuthenticator( gateway, out errorMessage );
+            if ( authenticator == null )
             {
-                baseUrl = string.Format( "https://{0}/{1}/{2}.json", baseUrl, ApiVersion, resource );
+                return null;
             }
 
-            var restClient = new RestClient( baseUrl )
+            // get gateway values
+            var recordTypePersonId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() ).Id;
+            var recordStatusPendingId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_PENDING.AsGuid() ).Id;
+            var connectionStatusProspectId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_CONNECTION_STATUS_WEB_PROSPECT ).Id;
+            var homePhoneValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_PHONE_TYPE_HOME ).Id;
+            var homeLocationValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.GROUP_LOCATION_TYPE_HOME ).Id;
+            var searchKeyValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_SEARCH_KEYS_ALTERNATE_ID.AsGuid() ).Id;
+            var contributionTypeId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_TYPE_CONTRIBUTION ).Id;
+            var reachAccountMaps = DefinedTypeCache.Get( GetAttributeValue( gateway, "AccountMap" ) ).DefinedValues;
+            var reachSourceType = DefinedValueCache.Get( GetAttributeValue( gateway, "SourceType" ) );
+            if ( reachAccountMaps == null || reachSourceType == null )
             {
-                Authenticator = new HttpBasicAuthenticator( GetAttributeValue( gateway, "APIKey" ), GetAttributeValue( gateway, "APISecret" ) )
-            };
-
-            var restRequest = new RestRequest( Method.GET )
-            {
-                RequestFormat = DataFormat.Json
-            };
-
-            foreach ( var param in parameters )
-            {
-                restRequest.AddParameter( param.Key, param.Value );
+                errorMessage = "Reach Account Map or Source Type is not configured correctly in gateway settings.";
+                return null;
             }
 
-            try
+            var today = RockDateTime.Now;
+            var lookupContext = new RockContext();
+            var personLookup = new PersonService( lookupContext );
+            var searchKeyLookup = new PersonSearchKeyService( lookupContext );
+            var accountLookup = new FinancialAccountService( lookupContext );
+            var transactionLookup = new FinancialTransactionService( lookupContext );
+
+            var currentPage = 1;
+            var queryHasResults = true;
+            var infoMessages = new List<string>();
+            var newTransactions = new List<FinancialTransaction>();
+
+            while ( queryHasResults )
             {
-                var response = restClient.Execute( restRequest );
-                if ( response != null && response.StatusCode == HttpStatusCode.OK )
+                var parameters = new Dictionary<string, string>
                 {
-                    return response.Content;
+                    { "from_date", startDate.ToString( "yyyy-MM-dd" ) },
+                    { "end_date", endDate.ToString( "yyyy-MM-dd" ) },
+                    { "per_page", "100" },
+                    { "page", currentPage.ToString() }
+                };
+
+                var donationResults = Api.PostRequest( donationUrl, authenticator, parameters, out errorMessage );
+                if ( donationResults != null && errorMessage.IsNullOrWhiteSpace() )
+                {
+                    var donations = JsonConvert.DeserializeObject<List<Donation>>( donationResults.ToString() );
+                    if ( donations == null )
+                    {
+                        errorMessage = "Unable to parse donation objects, the API object format may have changed.";
+                        return null;
+                    }
+
+                    // process transactions
+                    var supporterUrl = GetBaseUrl( gateway, "sponsorship_supporters", out errorMessage );
+                    foreach ( var donation in donations )
+                    {
+                        // only sync completed transactions with confirmation codes
+                        if ( donation.status.Equals( "complete" ) && donation.confirmation.IsNotNullOrWhiteSpace() && donation.supporter_id.HasValue )
+                        {
+                            // get a single existing person by person fields
+                            var reachSearchKey = string.Format( "{0}_{1}", donation.supporter_id, "reach" );
+                            var person = personLookup.FindPerson( donation.first_name, donation.last_name, donation.email, true, true );
+                            if ( person == null )
+                            {
+                                // check by the search key
+                                var existingSearchKey = searchKeyLookup.Queryable().FirstOrDefault( k => k.SearchValue.Equals( reachSearchKey, StringComparison.InvariantCultureIgnoreCase ) );
+                                if ( existingSearchKey != null )
+                                {
+                                    person = person ?? existingSearchKey.PersonAlias.Person;
+                                }
+                            }
+
+                            // create the person if they don't exist
+                            if ( person == null )
+                            {
+                                using ( var rockContext = new RockContext() )
+                                {
+                                    person = new Person
+                                    {
+                                        Guid = Guid.NewGuid(),
+                                        FirstName = donation.first_name.FixCase(),
+                                        LastName = donation.last_name.FixCase(),
+                                        Email = donation.email,
+                                        IsEmailActive = true,
+                                        EmailPreference = EmailPreference.EmailAllowed,
+                                        RecordStatusValueId = recordStatusPendingId,
+                                        RecordTypeValueId = recordTypePersonId,
+                                        Gender = Gender.Unknown,
+                                        ConnectionStatusValueId = connectionStatusProspectId,
+                                        ForeignId = donation.supporter_id
+                                    };
+
+                                    // save so the person alias is attributed for the search key
+                                    PersonService.SaveNewPerson( person, rockContext );
+
+                                    // add the person phone number
+                                    if ( donation.phone.IsNotNullOrWhiteSpace() )
+                                    {
+                                        person.PhoneNumbers.Add( new PhoneNumber
+                                        {
+                                            Number = donation.phone,
+                                            NumberTypeValueId = homePhoneValueId,
+                                            Guid = Guid.NewGuid(),
+                                            CreatedDateTime = donation.date,
+                                            ModifiedDateTime = donation.updated_at
+                                        } );
+                                    }
+
+                                    // add the person address
+                                    if ( donation.address1.IsNotNullOrWhiteSpace() )
+                                    {
+                                        var familyGroup = person.GetFamily();
+                                        var location = new LocationService( rockContext ).Get( donation.address1, donation.address2, donation.city, donation.state, donation.postal, donation.country );
+                                        if ( familyGroup != null && location != null )
+                                        {
+                                            familyGroup.GroupLocations.Add( new GroupLocation
+                                            {
+                                                GroupLocationTypeValueId = homeLocationValueId,
+                                                LocationId = location.Id
+                                            } );
+                                        }
+                                    }
+
+                                    // add the search key
+                                    new PersonSearchKeyService( rockContext ).Add( new PersonSearchKey
+                                    {
+                                        SearchTypeValueId = searchKeyValueId,
+                                        SearchValue = reachSearchKey,
+                                        PersonAliasId = person.PrimaryAliasId
+                                    } );
+                                    rockContext.SaveChanges();
+                                }
+                            }
+
+                            // find financial account from the account map based on the sponsorship
+                            var reachAccountName = string.Empty;
+                            var supporterId = donation.referral_id ?? donation.line_items.Select( i => i.referral_id ).FirstOrDefault();
+                            if ( donation.purpose.EndsWith( "Sponsorship" ) && supporterId.HasValue )
+                            {
+                                // get the supporter results to find the account name
+                                var supporterResults = Api.PostRequest( string.Format( "{0}/{1}", supporterUrl, supporterId ), authenticator, null, out errorMessage );
+                                var supporter = JsonConvert.DeserializeObject<Supporter>( supporterResults.ToStringSafe() );
+                                if ( supporter != null )
+                                {
+                                    var place = supporter.sponsorship?.place?.title;
+                                    var sponsorshipType = supporter.sponsorship?.sponsorship_type_title;
+                                    var shareType = supporter.share_type_id;
+
+                                    string shareTypeName;
+                                    switch ( shareType )
+                                    {
+                                        case "668":
+                                            shareTypeName = "Primary";
+                                            break;
+                                        case "669":
+                                            shareTypeName = "Secondary";
+                                            break;
+                                        default:
+                                            shareTypeName = string.Empty;
+                                            break;
+                                    }
+
+                                    reachAccountName = string.Format( "{0} {1} {2}", place, sponsorshipType, shareTypeName ).Trim();
+                                }
+                            }
+                            else
+                            {
+                                reachAccountName = donation.purpose.Trim();
+                            }
+
+                            int? rockAccountId = null;
+                            var accountMapping = reachAccountMaps.FirstOrDefault( v => v.Value.Equals( reachAccountName, StringComparison.CurrentCultureIgnoreCase ) );
+                            if ( accountMapping == null )
+                            {
+                                infoMessages.Add( string.Format( "Unable to find account \"{1}\" for donation {0}", donation.confirmation, reachAccountName ) );
+                                continue;
+                            }
+                            else
+                            {
+                                var accountGuid = accountMapping.GetAttributeValue( "RockAccount" ).AsGuidOrNull();
+                                if ( accountGuid.HasValue )
+                                {
+                                    rockAccountId = accountLookup.Get( (Guid)accountGuid ).Id;
+                                }
+                            }
+
+                            // find/create financial transaction
+                            var transaction = transactionLookup.Queryable( "TransactionDetails" )
+                                .FirstOrDefault( t => t.FinancialGatewayId.HasValue &&
+                                    t.FinancialGatewayId.Value == gateway.Id &&
+                                    t.TransactionCode == donation.confirmation );
+                            if ( transaction == null && rockAccountId.HasValue && donation.amount.HasValue )
+                            {
+                                var summary = string.Format( "Reach Donation for {0} from {1} using {2} on {3} ({4})", reachAccountName, donation.name, donation.payment_method, donation.date, donation.token );
+                                transaction = new FinancialTransaction
+                                {
+                                    TransactionDateTime = donation.date,
+                                    TransactionCode = donation.confirmation,
+                                    Summary = summary,
+                                    SourceTypeValueId = reachSourceType.Id,
+                                    TransactionTypeValueId = contributionTypeId,
+                                    Guid = Guid.NewGuid(),
+                                    CreatedDateTime = today,
+                                    ModifiedDateTime = today,
+                                    AuthorizedPersonAliasId = person.PrimaryAliasId,
+                                    FinancialGatewayId = gateway.Id,
+                                    ForeignId = donation.id,
+                                    FinancialPaymentDetail = new FinancialPaymentDetail(),
+                                    TransactionDetails = new List<FinancialTransactionDetail>
+                                {
+                                    new FinancialTransactionDetail
+                                    {
+                                        AccountId = (int)rockAccountId,
+                                        Amount = (decimal)donation.amount,
+                                        Summary = summary,
+                                        Guid = Guid.NewGuid(),
+                                        CreatedDateTime = today,
+                                        ModifiedDateTime = today
+                                    }
+                                }
+                                };
+
+                                newTransactions.Add( transaction );
+                            }
+                            else
+                            {
+                                infoMessages.Add( string.Format( "Skipped donation {0} for {1} because it already exists", donation.confirmation, reachAccountName ) );
+                            }
+                        }
+                    }
                 }
+                else
+                {
+                    queryHasResults = false;
+                }
+
+                currentPage++;
             }
-            catch ( WebException webException )
+
+            if ( !newTransactions.Any() )
             {
-                var message = GetResponseMessage( webException.Response.GetResponseStream() );
-                throw new Exception( webException.Message + " - " + message );
+                errorMessage = "The donations API query did not return any data.";
+                return null;
             }
-            catch ( Exception ex )
+
+            // get current batch and add transactions to it
+            using ( var rockContext = new RockContext() )
             {
-                throw new Exception( ex?.InnerException?.Message, ex );
+                var batch = new FinancialBatchService( rockContext ).GetByNameAndDate( string.Format( "{0} {1}", GetAttributeValue( gateway, "BatchPrefix" ), today.ToString( "d" ) ), today, gateway.GetBatchTimeOffset() );
+                batch.BatchStartDateTime = newTransactions.Min( t => t.TransactionDateTime );
+                batch.BatchEndDateTime = newTransactions.Max( t => t.TransactionDateTime );
+                batch.ControlAmount += newTransactions.Select( t => t.TotalAmount ).Sum();
+
+                foreach ( var transaction in newTransactions )
+                {
+                    batch.Transactions.Add( transaction );
+                }
+                rockContext.SaveChanges();
+            }
+
+            // CallStack for processing transactions:
+            // Job.GetScheduledPayments
+            // Gateway.GetPayments (this)
+            // FinancialScheduledTransactionService.ProcessPayments
+
+            if ( infoMessages.Any() )
+            {
+                errorMessage = string.Join( "<br>", infoMessages );
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Gets the response message.
-        /// </summary>
-        /// <param name="responseStream">The response stream.</param>
-        /// <returns></returns>
-        private string GetResponseMessage( Stream responseStream )
-        {
-            var receiveStream = responseStream;
-            var encode = Encoding.GetEncoding( "utf-8" );
-            var readStream = new StreamReader( receiveStream, encode );
-
-            var sb = new StringBuilder();
-            var read = new Char[8192];
-            var count = 0;
-            do
-            {
-                count = readStream.Read( read, 0, 8192 );
-                var str = new string( read, 0, count );
-                sb.Append( str );
-            }
-            while ( count > 0 );
-
-            return sb.ToString();
         }
 
         /// <summary>
@@ -359,53 +531,50 @@ namespace com.kfs.Reach
             return null;
         }
 
+        /// <summary>
+        /// Gets the base URL.
+        /// </summary>
+        /// <param name="gateway">The gateway.</param>
+        /// <param name="resource">The resource.</param>
+        /// <param name="errorMessage">The error message.</param>
+        /// <returns></returns>
+        private string GetBaseUrl( FinancialGateway gateway, string resource, out string errorMessage )
+        {
+            errorMessage = string.Empty;
+            var baseUrl = GetAttributeValue( gateway, "Mode" ) == "Live" ? GetAttributeValue( gateway, "ReachDomain" ) : DemoUrl;
+            if ( baseUrl.IsNullOrWhiteSpace() || !baseUrl.EndsWith( "reachapp.co" ) )
+            {
+                errorMessage = "The Domain URL was not provided or is not valid";
+                return null;
+            }
+            else
+            {
+                baseUrl = string.Format( "https://{0}/{1}/{2}", baseUrl, ApiVersion, resource );
+            }
+
+            return baseUrl;
+        }
+
+        /// <summary>
+        /// Gets the authenticator.
+        /// </summary>
+        /// <param name="gateway">The gateway.</param>
+        /// <param name="errorMessage">The error message.</param>
+        /// <returns></returns>
+        private HttpBasicAuthenticator GetAuthenticator( FinancialGateway gateway, out string errorMessage )
+        {
+            errorMessage = string.Empty;
+            var apiKey = GetAttributeValue( gateway, "APIKey" );
+            var apiSecret = GetAttributeValue( gateway, "APISecret" );
+            if ( apiKey.IsNullOrWhiteSpace() || apiSecret.IsNullOrWhiteSpace() )
+            {
+                errorMessage = "API Key or API Secret is not valid";
+                return null;
+            }
+
+            return new HttpBasicAuthenticator( apiKey, apiSecret );
+        }
+
         #endregion
     }
-
-    #region Object Declarations
-
-    public class ReachDonation
-    {
-        public int account_id;
-        public string address1;
-        public string address2;
-        public string admin_notes;
-        public string alpha2_country_code;
-        public decimal amount;
-        public string ancestry;
-        public string check_number;
-        public string city;
-        public string confirmation;
-        public string country;
-        public DateTime created_at;
-        public string currency;
-        public DateTime date;
-        public string email;
-        public string first_name;
-        public int id;
-        public string ip_address;
-        public string last_name;
-        public string name;
-        public DateTime next_donation;
-        public string note;
-        public string payment_method;
-        public string payment_type;
-        public string paypal_profile_id;
-        public string phone;
-        public string post_body;
-        public string postal;
-        public string purpose;
-        public bool recurring;
-        public string recurring_period;
-        public string referral_id;
-        public string state;
-        public string status;
-        public int? supporter_id;
-        public string token;
-        public string transaction_token;
-        public DateTime updated_at;
-        public int? user_id;
-    }
-
-    #endregion
 }
