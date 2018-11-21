@@ -201,7 +201,6 @@ namespace com.kfs.Reach
                 return null;
             }
 
-            // get gateway values
             var reachAccountMaps = DefinedTypeCache.Get( GetAttributeValue( gateway, "AccountMap" ) ).DefinedValues;
             var connectionStatus = DefinedValueCache.Get( GetAttributeValue( gateway, "PersonStatus" ) );
             var reachSourceType = DefinedValueCache.Get( GetAttributeValue( gateway, "SourceType" ) );
@@ -245,6 +244,7 @@ namespace com.kfs.Reach
                             // find or create this person asynchronously for performance
                             var personAlias = Api.FindPersonAsync( lookupContext, donation, connectionStatus.Id );
 
+                            // get financial account from the sponsorship/supporter or use default account
                             var reachAccountName = string.Empty;
                             var supporterId = donation.referral_id ?? donation.line_items.Select( i => i.referral_id ).FirstOrDefault();
                             if ( donation.purpose.EndsWith( "Sponsorship" ) && supporterId.HasValue )
@@ -279,7 +279,6 @@ namespace com.kfs.Reach
                                 reachAccountName = donation.purpose.Trim();
                             }
 
-                            // get financial account from the sponsorship name or use default account
                             int? rockAccountId = defaultAccount.Id;
                             var accountMapping = reachAccountMaps.FirstOrDefault( v => v.Value.Equals( reachAccountName, StringComparison.CurrentCultureIgnoreCase ) );
                             if ( accountMapping != null )
@@ -301,6 +300,7 @@ namespace com.kfs.Reach
                                 continue;
                             }
 
+                            // create the transaction
                             var transactionCreated = donation.created_at ?? donation.date;
                             var summary = string.Format( "Reach Donation for {0} from {1} using {2} on {3} ({4})",
                                 reachAccountName, donation.name, donation.payment_method, transactionCreated, donation.token );
@@ -359,25 +359,27 @@ namespace com.kfs.Reach
             {
                 using ( var rockContext = new RockContext() )
                 {
+                    // create batch and add transactions
                     var batch = new FinancialBatchService( rockContext ).GetByNameAndDate( string.Format( "{0} {1}",
                         GetAttributeValue( gateway, "BatchPrefix" ), endDate.ToString( "d" ) ), endDate, gateway.GetBatchTimeOffset() );
                     batch.BatchStartDateTime = startDate;
                     batch.BatchEndDateTime = endDate;
                     batch.ControlAmount += newTransactions.Select( t => t.TotalAmount ).Sum();
 
-                    var batchChanges = 0;
+                    var currentChanges = 0;
                     foreach ( var transaction in newTransactions )
                     {
                         // save in large batches so it doesn't overload context
                         batch.Transactions.Add( transaction );
-                        if ( batchChanges++ > 500 )
+                        if ( currentChanges++ > 100 )
                         {
-                            rockContext.SaveChanges();
-                            batchChanges = 0;
+                            rockContext.SaveChanges( disablePrePostProcessing: true );
+                            currentChanges = 0;
                         }
                     }
 
-                    rockContext.SaveChanges();
+                    // by default Rock associates with the current person
+                    rockContext.SaveChanges( disablePrePostProcessing: true );
                 }
             }
 
