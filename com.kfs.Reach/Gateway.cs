@@ -228,79 +228,79 @@ namespace com.kfs.Reach
                     { "page", currentPage.ToString() }
                 };
 
-                var donationResults = Api.PostRequest( donationUrl, authenticator, parameters, out errorMessage );
-                var donations = JsonConvert.DeserializeObject<List<Donation>>( donationResults.ToStringSafe() );
+                // to_date doesn't have a timestamp, so it includes transactions posted after the cutoff
+                var donationResult = Api.PostRequest( donationUrl, authenticator, parameters, out errorMessage );
+                var donations = JsonConvert.DeserializeObject<List<Donation>>( donationResult.ToStringSafe() );
                 if ( donations.Any() && errorMessage.IsNullOrWhiteSpace() )
                 {
                     // only process completed transactions with confirmation codes and within the date range
                     foreach ( var donation in donations.Where( d => d.created_at >= startDate && d.created_at <= endDate && d.status.Equals( "complete" ) && d.confirmation.IsNotNullOrWhiteSpace() ) )
                     {
-                        // find or create this person asynchronously
-                        var personAlias = Api.FindPersonAsync( lookupContext, donation, connectionStatus.Id );
-
-                        // get financial account from the account map based on the sponsorship name
-                        var reachAccountName = string.Empty;
-                        var supporterId = donation.referral_id ?? donation.line_items.Select( i => i.referral_id ).FirstOrDefault();
-                        if ( donation.purpose.EndsWith( "Sponsorship" ) && supporterId.HasValue )
-                        {
-                            var supporterResults = Api.PostRequest( string.Format( "{0}/{1}", supporterUrl, supporterId ), authenticator, null, out errorMessage );
-                            var supporter = JsonConvert.DeserializeObject<Supporter>( supporterResults.ToStringSafe() );
-                            if ( supporter != null )
-                            {
-                                var place = supporter.sponsorship?.place?.title;
-                                var sponsorshipType = supporter.sponsorship?.sponsorship_type_title;
-                                var shareType = supporter.share_type_id;
-
-                                string shareTypeName;
-                                switch ( shareType )
-                                {
-                                    case "668":
-                                        shareTypeName = "Primary";
-                                        break;
-                                    case "669":
-                                        shareTypeName = "Secondary";
-                                        break;
-                                    default:
-                                        shareTypeName = string.Empty;
-                                        break;
-                                }
-
-                                reachAccountName = string.Format( "{0} {1} {2}", place, sponsorshipType, shareTypeName ).Trim();
-                            }
-                        }
-                        else
-                        {
-                            reachAccountName = donation.purpose.Trim();
-                        }
-
-                        int? rockAccountId = defaultAccount.Id;
-                        var accountMapping = reachAccountMaps.FirstOrDefault( v => v.Value.Equals( reachAccountName, StringComparison.CurrentCultureIgnoreCase ) );
-                        if ( accountMapping != null )
-                        {
-                            var accountGuid = accountMapping.GetAttributeValue( "RockAccount" ).AsGuidOrNull();
-                            if ( accountGuid.HasValue )
-                            {
-                                rockAccountId = accountLookup.Get( (Guid)accountGuid ).Id;
-                            }
-                        }
-
-                        // verify person alias was found or created
-                        personAlias.Wait();
-                        if ( !personAlias.Result.HasValue )
-                        {
-                            var infoMessage = string.Format( "{0} Reach import skipped {1} {2}'s donation {3} for {4} because their record could not be found or created",
-                                endDate.ToString( "d" ), donation.first_name, donation.last_name, donation.confirmation, reachAccountName );
-                            ExceptionLogService.LogException( new Exception( infoMessage ), null );
-                            continue;
-                        }
-
-                        // find or create financial transaction
-                        var transaction = transactionLookup.Queryable( "TransactionDetails" )
+                        var transaction = transactionLookup.Queryable()
                             .FirstOrDefault( t => t.FinancialGatewayId.HasValue &&
                                 t.FinancialGatewayId.Value == gateway.Id &&
                                 t.TransactionCode == donation.confirmation );
                         if ( transaction == null )
                         {
+                            // find or create this person asynchronously for performance
+                            var personAlias = Api.FindPersonAsync( lookupContext, donation, connectionStatus.Id );
+
+                            var reachAccountName = string.Empty;
+                            var supporterId = donation.referral_id ?? donation.line_items.Select( i => i.referral_id ).FirstOrDefault();
+                            if ( donation.purpose.EndsWith( "Sponsorship" ) && supporterId.HasValue )
+                            {
+                                var supporterResults = Api.PostRequest( string.Format( "{0}/{1}", supporterUrl, supporterId ), authenticator, null, out errorMessage );
+                                var supporter = JsonConvert.DeserializeObject<Supporter>( supporterResults.ToStringSafe() );
+                                if ( supporter != null )
+                                {
+                                    var place = supporter.sponsorship?.place?.title;
+                                    var sponsorshipType = supporter.sponsorship?.sponsorship_type_title;
+                                    var shareType = supporter.share_type_id;
+
+                                    string shareTypeName;
+                                    switch ( shareType )
+                                    {
+                                        case "668":
+                                            shareTypeName = "Primary";
+                                            break;
+                                        case "669":
+                                            shareTypeName = "Secondary";
+                                            break;
+                                        default:
+                                            shareTypeName = string.Empty;
+                                            break;
+                                    }
+
+                                    reachAccountName = string.Format( "{0} {1} {2}", place, sponsorshipType, shareTypeName ).Trim();
+                                }
+                            }
+                            else
+                            {
+                                reachAccountName = donation.purpose.Trim();
+                            }
+
+                            // get financial account from the sponsorship name or use default account
+                            int? rockAccountId = defaultAccount.Id;
+                            var accountMapping = reachAccountMaps.FirstOrDefault( v => v.Value.Equals( reachAccountName, StringComparison.CurrentCultureIgnoreCase ) );
+                            if ( accountMapping != null )
+                            {
+                                var accountGuid = accountMapping.GetAttributeValue( "RockAccount" ).AsGuidOrNull();
+                                if ( accountGuid.HasValue )
+                                {
+                                    rockAccountId = accountLookup.Get( (Guid)accountGuid ).Id;
+                                }
+                            }
+
+                            // verify person alias was found or created
+                            personAlias.Wait();
+                            if ( !personAlias.Result.HasValue )
+                            {
+                                var infoMessage = string.Format( "{0} Reach import skipped {1} {2}'s donation {3} for {4} because their record could not be found or created",
+                                    endDate.ToString( "d" ), donation.first_name, donation.last_name, donation.confirmation, reachAccountName );
+                                ExceptionLogService.LogException( new Exception( infoMessage ), null );
+                                continue;
+                            }
+
                             var transactionCreated = donation.created_at ?? donation.date;
                             var summary = string.Format( "Reach Donation for {0} from {1} using {2} on {3} ({4})",
                                 reachAccountName, donation.name, donation.payment_method, transactionCreated, donation.token );
@@ -351,7 +351,7 @@ namespace com.kfs.Reach
 
             if ( skippedTransactionCount > 0 )
             {
-                ExceptionLogService.LogException( new Exception( string.Format( "Reach import for {0} skipped downloading {1} transactions because they already exist",
+                ExceptionLogService.LogException( new Exception( string.Format( "{0} Reach import skipped downloading {1} transactions because they already exist",
                     endDate.ToString( "d" ), skippedTransactionCount ) ), null );
             }
 
@@ -368,9 +368,9 @@ namespace com.kfs.Reach
                     var batchChanges = 0;
                     foreach ( var transaction in newTransactions )
                     {
-                        // save in batches so it doesn't overload context
+                        // save in large batches so it doesn't overload context
                         batch.Transactions.Add( transaction );
-                        if ( batchChanges++ > 200 )
+                        if ( batchChanges++ > 500 )
                         {
                             rockContext.SaveChanges();
                             batchChanges = 0;
@@ -386,7 +386,7 @@ namespace com.kfs.Reach
                 errorMessage = string.Join( "<br>", errorMessages );
             }
 
-            return null;
+            return new List<Payment>();
         }
 
         /// <summary>
