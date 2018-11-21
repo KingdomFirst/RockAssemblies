@@ -26,8 +26,9 @@ namespace com.kfs.Reach
     [TextField( "API Secret", "Enter the API secret provided in your Reach account", true, "", "", 2 )]
     [TextField( "Batch Prefix", "Enter a batch prefix to be used with downloading transactions.  The date of the earliest transaction in the batch will be appended to the prefix.", true, "Reach", "", 3 )]
     [DefinedTypeField( "Account Map", "Select the defined type that specifies the FinancialAccount mappings.", true, "80cdad25-a120-4a30-bb6a-21f1ccdb9e65", "", 4 )]
-    [DefinedValueField( Rock.SystemGuid.DefinedType.FINANCIAL_SOURCE_TYPE, "Source Type", "Select the defined value that new transactions should be attributed with.", true, false, "74650f5b-3e18-43e8-88db-1598deb2ffa0", "", 5 )]
-    [DefinedValueField( Rock.SystemGuid.DefinedType.PERSON_CONNECTION_STATUS, "Person Status", "Select the defined value that new people should be created with.", true, false, "", "", 6 )]
+    [AccountField( "Default Account", "Select the default account transactions should post to if the Reach account does not exist", true, "", "", 5 )]
+    [DefinedValueField( Rock.SystemGuid.DefinedType.FINANCIAL_SOURCE_TYPE, "Source Type", "Select the defined value that new transactions should be attributed with.", true, false, "74650f5b-3e18-43e8-88db-1598deb2ffa0", "", 6 )]
+    [DefinedValueField( Rock.SystemGuid.DefinedType.PERSON_CONNECTION_STATUS, "Person Status", "Select the defined value that new people should be created with.", true, false, "", "", 7 )]
     [CustomRadioListField( "Mode", "Mode to use for transactions", "Live,Test", true, "Test", "", 7 )]
     public class Gateway : GatewayComponent
     {
@@ -180,15 +181,23 @@ namespace com.kfs.Reach
         /// <returns></returns>
         public override List<Payment> GetPayments( FinancialGateway gateway, DateTime startDate, DateTime endDate, out string errorMessage )
         {
+            var today = RockDateTime.Now;
+            var lookupContext = new RockContext();
+            var accountLookup = new FinancialAccountService( lookupContext );
+            var transactionLookup = new FinancialTransactionService( lookupContext );
             var donationUrl = GetBaseUrl( gateway, "donations", out errorMessage );
-            if ( donationUrl.IsNullOrWhiteSpace() )
+            var supporterUrl = GetBaseUrl( gateway, "sponsorship_supporters", out errorMessage );
+
+            if ( donationUrl.IsNullOrWhiteSpace() || supporterUrl.IsNullOrWhiteSpace() )
             {
+                // errorMessage already set
                 return null;
             }
 
             var authenticator = GetAuthenticator( gateway, out errorMessage );
             if ( authenticator == null )
             {
+                // errorMessage already set
                 return null;
             }
 
@@ -196,64 +205,44 @@ namespace com.kfs.Reach
             var reachAccountMaps = DefinedTypeCache.Get( GetAttributeValue( gateway, "AccountMap" ) ).DefinedValues;
             var connectionStatus = DefinedValueCache.Get( GetAttributeValue( gateway, "PersonStatus" ) );
             var reachSourceType = DefinedValueCache.Get( GetAttributeValue( gateway, "SourceType" ) );
-            if ( connectionStatus == null || reachAccountMaps == null || reachSourceType == null )
+            var defaultAccount = accountLookup.Get( GetAttributeValue( gateway, "DefaultAccount" ).AsGuid() );
+            if ( connectionStatus == null || reachAccountMaps == null || reachSourceType == null || defaultAccount == null )
             {
-                errorMessage = "The Reach Account Map, Person Status, or Source Type is not configured correctly in gateway settings.";
+                errorMessage = "The Reach Account Map, Person Status, Source Type, or Default Account is not configured correctly in gateway settings.";
                 return null;
             }
 
-            var today = RockDateTime.Now;
-            var lookupContext = new RockContext();
-            //var personLookup = new PersonService( lookupContext );
-            var searchKeyLookup = new PersonSearchKeyService( lookupContext );
-            var accountLookup = new FinancialAccountService( lookupContext );
-            var transactionLookup = new FinancialTransactionService( lookupContext );
-
             var currentPage = 1;
-            //var queryHasResults = true;
-            var infoMessages = new List<string>();
+            var queryHasResults = true;
+            var skippedTransactionCount = 0;
+            var errorMessages = new List<string>();
             var newTransactions = new List<FinancialTransaction>();
 
-            //while ( queryHasResults )
-            //{
-            var parameters = new Dictionary<string, string>
+            while ( queryHasResults )
+            {
+                var parameters = new Dictionary<string, string>
                 {
                     { "from_date", startDate.ToString( "yyyy-MM-dd" ) },
-                    { "end_date", endDate.ToString( "yyyy-MM-dd" ) },
+                    { "to_date", endDate.ToString( "yyyy-MM-dd" ) },
                     { "per_page", "50" },
                     { "page", currentPage.ToString() }
                 };
 
-            var donationResults = Api.PostRequest( donationUrl, authenticator, parameters, out errorMessage );
-            if ( donationResults != null && errorMessage.IsNullOrWhiteSpace() )
-            {
-                var donations = JsonConvert.DeserializeObject<List<Donation>>( donationResults.ToString() );
-                if ( donations == null )
+                var donationResults = Api.PostRequest( donationUrl, authenticator, parameters, out errorMessage );
+                var donations = JsonConvert.DeserializeObject<List<Donation>>( donationResults.ToStringSafe() );
+                if ( donations.Any() && errorMessage.IsNullOrWhiteSpace() )
                 {
-                    errorMessage = "Unable to parse donation objects, the API object format may have changed.";
-                    return null;
-                }
-
-                // process transactions
-                var supporterUrl = GetBaseUrl( gateway, "sponsorship_supporters", out errorMessage );
-
-                foreach ( var donation in donations.Where( d => d.date >= startDate && d.date >= endDate ) )
-                {
-                    // only sync completed transactions with confirmation codes
-                    if ( donation.status.Equals( "complete" ) && donation.confirmation.IsNotNullOrWhiteSpace() )
+                    // only process completed transactions with confirmation codes and within the date range
+                    foreach ( var donation in donations.Where( d => d.created_at >= startDate && d.created_at <= endDate && d.status.Equals( "complete" ) && d.confirmation.IsNotNullOrWhiteSpace() ) )
                     {
-                        int? personAliasId = null;
-                        if ( donation.supporter_id.HasValue )
-                        {
-                            personAliasId = Map.FindPerson( lookupContext, donation, connectionStatus.Id );
-                        }
+                        // find or create this person asynchronously
+                        var personAlias = Api.FindPersonAsync( lookupContext, donation, connectionStatus.Id );
 
                         // get financial account from the account map based on the sponsorship name
                         var reachAccountName = string.Empty;
                         var supporterId = donation.referral_id ?? donation.line_items.Select( i => i.referral_id ).FirstOrDefault();
                         if ( donation.purpose.EndsWith( "Sponsorship" ) && supporterId.HasValue )
                         {
-                            // get the supporter results to find the account name
                             var supporterResults = Api.PostRequest( string.Format( "{0}/{1}", supporterUrl, supporterId ), authenticator, null, out errorMessage );
                             var supporter = JsonConvert.DeserializeObject<Supporter>( supporterResults.ToStringSafe() );
                             if ( supporter != null )
@@ -284,14 +273,9 @@ namespace com.kfs.Reach
                             reachAccountName = donation.purpose.Trim();
                         }
 
-                        int? rockAccountId = null;
+                        int? rockAccountId = defaultAccount.Id;
                         var accountMapping = reachAccountMaps.FirstOrDefault( v => v.Value.Equals( reachAccountName, StringComparison.CurrentCultureIgnoreCase ) );
-                        if ( accountMapping == null )
-                        {
-                            infoMessages.Add( string.Format( "Unable to find account \"{1}\" for donation {0}", donation.confirmation, reachAccountName ) );
-                            continue;
-                        }
-                        else
+                        if ( accountMapping != null )
                         {
                             var accountGuid = accountMapping.GetAttributeValue( "RockAccount" ).AsGuidOrNull();
                             if ( accountGuid.HasValue )
@@ -300,17 +284,29 @@ namespace com.kfs.Reach
                             }
                         }
 
-                        // find/create financial transaction
+                        // verify person alias was found or created
+                        personAlias.Wait();
+                        if ( !personAlias.Result.HasValue )
+                        {
+                            var infoMessage = string.Format( "{0} Reach import skipped {1} {2}'s donation {3} for {4} because their record could not be found or created",
+                                endDate.ToString( "d" ), donation.first_name, donation.last_name, donation.confirmation, reachAccountName );
+                            ExceptionLogService.LogException( new Exception( infoMessage ), null );
+                            continue;
+                        }
+
+                        // find or create financial transaction
                         var transaction = transactionLookup.Queryable( "TransactionDetails" )
                             .FirstOrDefault( t => t.FinancialGatewayId.HasValue &&
                                 t.FinancialGatewayId.Value == gateway.Id &&
                                 t.TransactionCode == donation.confirmation );
-                        if ( transaction == null && rockAccountId.HasValue && donation.amount.HasValue )
+                        if ( transaction == null )
                         {
-                            var summary = string.Format( "Reach Donation for {0} from {1} using {2} on {3} ({4})", reachAccountName, donation.name, donation.payment_method, donation.date, donation.token );
+                            var transactionCreated = donation.created_at ?? donation.date;
+                            var summary = string.Format( "Reach Donation for {0} from {1} using {2} on {3} ({4})",
+                                reachAccountName, donation.name, donation.payment_method, transactionCreated, donation.token );
                             transaction = new FinancialTransaction
                             {
-                                TransactionDateTime = donation.updated_at ?? donation.date,
+                                TransactionDateTime = transactionCreated,
                                 ProcessedDateTime = donation.updated_at,
                                 TransactionCode = donation.confirmation,
                                 Summary = summary,
@@ -319,7 +315,7 @@ namespace com.kfs.Reach
                                 Guid = Guid.NewGuid(),
                                 CreatedDateTime = today,
                                 ModifiedDateTime = today,
-                                AuthorizedPersonAliasId = personAliasId,
+                                AuthorizedPersonAliasId = personAlias.Result.Value,
                                 FinancialGatewayId = gateway.Id,
                                 ForeignId = donation.id,
                                 FinancialPaymentDetail = new FinancialPaymentDetail(),
@@ -339,45 +335,55 @@ namespace com.kfs.Reach
 
                             newTransactions.Add( transaction );
                         }
-                        else
+                        else if ( transaction != null )
                         {
-                            infoMessages.Add( string.Format( "Skipped donation {0} for {1} because it already exists", donation.confirmation, reachAccountName ) );
+                            skippedTransactionCount++;
                         }
                     }
                 }
-                //}
-                //else
-                //{
-                //    queryHasResults = false;
-                //}
+                else
+                {
+                    queryHasResults = false;
+                }
 
                 currentPage++;
             }
 
-            if ( !newTransactions.Any() )
+            if ( skippedTransactionCount > 0 )
             {
-                errorMessage = "The donations API query did not return any data.";
-                return null;
+                ExceptionLogService.LogException( new Exception( string.Format( "Reach import for {0} skipped downloading {1} transactions because they already exist",
+                    endDate.ToString( "d" ), skippedTransactionCount ) ), null );
             }
 
-            // get current batch and add transactions to it
-            using ( var rockContext = new RockContext() )
+            if ( newTransactions.Any() )
             {
-                var batch = new FinancialBatchService( rockContext ).GetByNameAndDate( string.Format( "{0} {1}", GetAttributeValue( gateway, "BatchPrefix" ), today.ToString( "d" ) ), today, gateway.GetBatchTimeOffset() );
-                batch.BatchStartDateTime = newTransactions.Min( t => t.TransactionDateTime );
-                batch.BatchEndDateTime = newTransactions.Max( t => t.TransactionDateTime );
-                batch.ControlAmount += newTransactions.Select( t => t.TotalAmount ).Sum();
-
-                foreach ( var transaction in newTransactions )
+                using ( var rockContext = new RockContext() )
                 {
-                    batch.Transactions.Add( transaction );
+                    var batch = new FinancialBatchService( rockContext ).GetByNameAndDate( string.Format( "{0} {1}",
+                        GetAttributeValue( gateway, "BatchPrefix" ), endDate.ToString( "d" ) ), endDate, gateway.GetBatchTimeOffset() );
+                    batch.BatchStartDateTime = startDate;
+                    batch.BatchEndDateTime = endDate;
+                    batch.ControlAmount += newTransactions.Select( t => t.TotalAmount ).Sum();
+
+                    var batchChanges = 0;
+                    foreach ( var transaction in newTransactions )
+                    {
+                        // save in batches so it doesn't overload context
+                        batch.Transactions.Add( transaction );
+                        if ( batchChanges++ > 200 )
+                        {
+                            rockContext.SaveChanges();
+                            batchChanges = 0;
+                        }
+                    }
+
+                    rockContext.SaveChanges();
                 }
-                rockContext.SaveChanges();
             }
 
-            if ( infoMessages.Any() )
+            if ( errorMessages.Any() )
             {
-                errorMessage = string.Join( "<br>", infoMessages );
+                errorMessage = string.Join( "<br>", errorMessages );
             }
 
             return null;
