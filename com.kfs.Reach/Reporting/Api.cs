@@ -172,7 +172,7 @@ namespace com.kfs.Reach.Reporting
                             // add the person address
                             if ( donation.address1.IsNotNullOrWhiteSpace() )
                             {
-                                var familyGroup = person.GetFamily();
+                                var familyGroup = person.GetFamily( rockContext );
                                 var location = new LocationService( rockContext ).Get( donation.address1, donation.address2, donation.city, donation.state, donation.postal, donation.country );
                                 if ( familyGroup != null && location != null )
                                 {
