@@ -187,6 +187,7 @@ namespace com.kfs.Reach
             var transactionLookup = new FinancialTransactionService( lookupContext );
             var donationUrl = GetBaseUrl( gateway, "donations", out errorMessage );
             var supporterUrl = GetBaseUrl( gateway, "sponsorship_supporters", out errorMessage );
+            var categoryUrl = GetBaseUrl( gateway, "donation_categories", out errorMessage );
 
             if ( donationUrl.IsNullOrWhiteSpace() || supporterUrl.IsNullOrWhiteSpace() )
             {
@@ -216,6 +217,8 @@ namespace com.kfs.Reach
             var skippedTransactionCount = 0;
             var errorMessages = new List<string>();
             var newTransactions = new List<FinancialTransaction>();
+            var categoryResult = Api.PostRequest( categoryUrl, authenticator, null, out errorMessage );
+            var categories = JsonConvert.DeserializeObject<List<Reporting.Category>>( categoryResult.ToStringSafe() );
 
             while ( queryHasResults )
             {
@@ -244,12 +247,22 @@ namespace com.kfs.Reach
                             // find or create this person asynchronously for performance
                             var personAlias = Api.FindPersonAsync( lookupContext, donation, connectionStatus.Id );
 
-                            // get financial account from the sponsorship/supporter or use default account
                             var reachAccountName = string.Empty;
-                            var supporterId = donation.referral_id ?? donation.line_items.Select( i => i.referral_id ).FirstOrDefault();
-                            if ( donation.purpose.EndsWith( "Sponsorship" ) && supporterId.HasValue )
+                            var donationItem = donation.line_items.FirstOrDefault();
+                            if ( donationItem != null && donationItem.referral_type.Equals( "DonationOption", StringComparison.InvariantCultureIgnoreCase ) )
                             {
-                                var supporterResults = Api.PostRequest( string.Format( "{0}/{1}", supporterUrl, supporterId ), authenticator, null, out errorMessage );
+                                // one-time gift, should match a known category
+                                var category = categories.FirstOrDefault( c => c.id == donationItem.referral_id );
+                                if ( category != null )
+                                {
+                                    reachAccountName = category.title;
+                                }
+                            }
+                            else
+                            {
+                                // recurring gift, lookup the sponsor info
+                                var referralId = donation.referral_id ?? donationItem.referral_id;
+                                var supporterResults = Api.PostRequest( string.Format( "{0}/{1}", supporterUrl, referralId ), authenticator, null, out errorMessage );
                                 var supporter = JsonConvert.DeserializeObject<Supporter>( supporterResults.ToStringSafe() );
                                 if ( supporter != null )
                                 {
@@ -273,10 +286,6 @@ namespace com.kfs.Reach
 
                                     reachAccountName = string.Format( "{0} {1} {2}", place, sponsorshipType, shareTypeName ).Trim();
                                 }
-                            }
-                            else
-                            {
-                                reachAccountName = donation.purpose.Trim();
                             }
 
                             int? rockAccountId = defaultAccount.Id;
