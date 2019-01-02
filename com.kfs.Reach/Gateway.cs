@@ -236,7 +236,7 @@ namespace com.kfs.Reach
                 if ( donations.Any() && errorMessage.IsNullOrWhiteSpace() )
                 {
                     // only process completed transactions with confirmation codes and within the date range
-                    foreach ( var donation in donations.Where( d => d.updated_at >= startDate && d.updated_at <= endDate && d.status.Equals( "complete" ) && d.confirmation.IsNotNullOrWhiteSpace() ) )
+                    foreach ( var donation in donations.Where( d => d.updated_at >= startDate && d.updated_at < endDate && d.status.Equals( "complete" ) && d.confirmation.IsNotNullOrWhiteSpace() ) )
                     {
                         var transaction = transactionLookup.Queryable()
                             .FirstOrDefault( t => t.FinancialGatewayId.HasValue &&
