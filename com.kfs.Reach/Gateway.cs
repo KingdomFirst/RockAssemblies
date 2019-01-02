@@ -236,7 +236,7 @@ namespace com.kfs.Reach
                 if ( donations.Any() && errorMessage.IsNullOrWhiteSpace() )
                 {
                     // only process completed transactions with confirmation codes and within the date range
-                    foreach ( var donation in donations.Where( d => d.created_at >= startDate && d.created_at <= endDate && d.status.Equals( "complete" ) && d.confirmation.IsNotNullOrWhiteSpace() ) )
+                    foreach ( var donation in donations.Where( d => d.updated_at >= startDate && d.updated_at <= endDate && d.status.Equals( "complete" ) && d.confirmation.IsNotNullOrWhiteSpace() ) )
                     {
                         var transaction = transactionLookup.Queryable()
                             .FirstOrDefault( t => t.FinancialGatewayId.HasValue &&
@@ -310,12 +310,11 @@ namespace com.kfs.Reach
                             }
 
                             // create the transaction
-                            var transactionCreated = donation.created_at ?? donation.date;
                             var summary = string.Format( "Reach Donation for {0} from {1} using {2} on {3} ({4})",
-                                reachAccountName, donation.name, donation.payment_method, transactionCreated, donation.token );
+                                reachAccountName, donation.name, donation.payment_method, donation.updated_at, donation.token );
                             transaction = new FinancialTransaction
                             {
-                                TransactionDateTime = transactionCreated,
+                                TransactionDateTime = donation.updated_at,
                                 ProcessedDateTime = donation.updated_at,
                                 TransactionCode = donation.confirmation,
                                 Summary = summary,
@@ -369,10 +368,11 @@ namespace com.kfs.Reach
                 using ( var rockContext = new RockContext() )
                 {
                     // create batch and add transactions
+                    var batchDate = newTransactions.Select( t => (DateTime)t.CreatedDateTime ).Max();
                     var batch = new FinancialBatchService( rockContext ).GetByNameAndDate( string.Format( "{0} {1}",
-                        GetAttributeValue( gateway, "BatchPrefix" ), endDate.ToString( "d" ) ), endDate, gateway.GetBatchTimeOffset() );
+                        GetAttributeValue( gateway, "BatchPrefix" ), batchDate.ToString( "d" ) ), endDate, gateway.GetBatchTimeOffset() );
                     batch.BatchStartDateTime = startDate;
-                    batch.BatchEndDateTime = endDate;
+                    batch.BatchEndDateTime = batchDate;
                     batch.ControlAmount += newTransactions.Select( t => t.TotalAmount ).Sum();
 
                     var currentChanges = 0;
