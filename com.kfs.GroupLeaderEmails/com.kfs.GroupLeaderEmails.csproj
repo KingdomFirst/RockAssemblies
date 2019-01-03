@@ -24,23 +24,23 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotLiquid">
-      <HintPath>..\..\..\RockWeb\Bin\DotLiquid.dll</HintPath>
+      <HintPath>..\..\RockWeb\Bin\DotLiquid.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework">
-      <HintPath>..\..\..\RockWeb\Bin\EntityFramework.dll</HintPath>
+      <HintPath>..\..\RockWeb\Bin\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="Quartz">
-      <HintPath>..\..\..\RockWeb\Bin\Quartz.dll</HintPath>
+      <HintPath>..\..\RockWeb\Bin\Quartz.dll</HintPath>
     </Reference>
     <Reference Include="Rock">
-      <HintPath>..\..\..\RockWeb\Bin\Rock.dll</HintPath>
+      <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
