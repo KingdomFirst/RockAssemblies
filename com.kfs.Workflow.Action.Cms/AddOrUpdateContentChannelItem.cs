@@ -21,7 +21,7 @@ namespace com.kfs.Workflow.Action.Cms
     [ActionCategory( "KFS > CMS" )]
     [Description( "Creates a content channel item." )]
     [Export( typeof( ActionComponent ) )]
-    [ExportMetadata( "ComponentName", "Content Channel Item Add" )]
+    [ExportMetadata( "ComponentName", "Content Channel Item Add Or Update" )]
 
     [ContentChannelField( "Content Channel", "The content channel where items will be added.", true, null, "", 1, "ContentChannel" ) ]
     [TextField("Title", "The title of the content channel item. <span class='tip tip-lava'></span>", true, "", "", 2 )]
