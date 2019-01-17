@@ -19,7 +19,7 @@ namespace com.kfs.Workflow.Action.Cms
     /// Creates a content channel item.
     /// </summary>
     [ActionCategory( "KFS > CMS" )]
-    [Description( "Creates a content channel item." )]
+    [Description( "Adds or updates a content channel item." )]
     [Export( typeof( ActionComponent ) )]
     [ExportMetadata( "ComponentName", "Content Channel Item Add Or Update" )]
 
