@@ -44,6 +44,11 @@ namespace com.kfs.Avalanche.Migrations
             RockMigrationHelper.AddGlobalAttribute( Rock.SystemGuid.FieldType.TEXT, "", "", "Avalanche Footer Page", "Page Id of footer blocks/layout configuration", 0, "", "1B8B1811-D82F-48B0-A55C-4A463552264C" );
             RockMigrationHelper.AddGlobalAttribute( Rock.SystemGuid.FieldType.TEXT, "", "", "Avalanche Header Page", "Page Id of header blocks/layout configuration", 0, "", "B2F7130E-1C0C-41F8-A13E-3EE9B77F59B1" );
 
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'FF495C30-29C5-420C-A35B-E9E808EEBCEF' )
+                UPDATE av SET av.[Value] = @PageId
+                [AttributeValue] av
+                JOIN Attribute a ON av.AttributeId = a.Id
+                WHERE a.[Key] = 'AvalancheFooterPage'" ); // Set AttributeValue to correct page id
         }
 
         /// <summary>

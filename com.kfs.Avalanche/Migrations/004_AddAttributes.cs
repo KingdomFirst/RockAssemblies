@@ -16,6 +16,33 @@ namespace com.kfs.Avalanche.Migrations
         /// </summary>
         public override void Up()
         {
+
+            // Avalanche Page GUID's
+            //"Sermons", "", "9711DB54-0FB0-4722-AB45-1DFB6158F922"
+            //"Visit", "", "CD8A05F8-24FF-4D38-8ED0-FE2BF07C0CDE"
+            //"Connect", "", "DE6D125E-892E-4F10-A33D-F84942582B1E"
+            //"Give", "", "78EDFA36-FEC9-4D74-A34B-07C76A4FC071"
+            //"Footer", "", "FF495C30-29C5-420C-A35B-E9E808EEBCEF"
+            //"Visit Detail", "", "5F1E1759-0A3A-4A57-896B-7B8B8BD892B3"
+            //"Series Detail", "", "4F8A1FFA-05A7-4522-8C23-74468FAFD6BC"
+            //"Sermon Detail", "", "1CDE2032-482B-483E-B273-A1A3B421E04C"
+            //"Sermon Detail Audio", "", "344BABC7-5C30-4B53-87F9-A00F0DDA38E7"
+            //"Groups", "", "D943417B-F167-4CD0-8321-C779B1C9E92B"
+            //"Baptism", "", "8E94B8E8-171D-4A81-9A69-D34667510231"
+            //"Events", "", "B95062A4-770C-47DF-B88F-0626F7BFDF2F"
+            //"Contact Us", "", "7817298D-0A76-4039-A5D7-AF273AC05952"
+            //"Event Detail", "", "14A25533-186B-49C4-A949-0F9DA864A87E"
+            //"Serve", "", "C90B1E1B-EC24-49E0-9562-7F92BB2D24AB"
+            //"Other Blocks", "", "D4A5C0AB-0A90-416F-9B3F-C0ACFED92D43"
+            //"Login", "", "F53E2612-3E8B-4D26-87ED-468D4C9C02E6"
+            //"Prayer Request", "", "BB61CCD2-9E50-45A3-9D94-A37F3D7313FF"
+            //"Person Card", "", "79EF0279 - 9800 - 4BAF - A8D9 - DD42E6868BAA"
+            //"Group Attendance", "", "2FB9C8A1-B3E6-4608-8CE7-411AA27945BA"
+            //"Group List", "", "0EC21B17-EA03-450E-A0B4-594C09340458"
+            //"Group Member List", "", "C4A65B7E-D57C-44C9-93AD-9E2E51145481"
+            //"Note Block", "", "F522A717-2D7A-405B-87BB-CCB16C15BB44"
+            //"Webview Block", "", "0FBC5CE7-CF91-45EC-B28A-A5E486764B9A"
+
             // Attrib for BlockType: Audio Player Block:AutoPlay
             RockMigrationHelper.UpdateBlockTypeAttribute( "7515DA74-D55F-44C0-ABC0-A6D9DBFEF76B", "1EDAFDED-DFE6-4334-B019-6EECBA89E05A", "AutoPlay", "AutoPlay", "", @"Start playing audio on load", 0, @"False", "38F36F45-EDEE-4DEE-8DE2-377BBD029D76" );
             // Attrib for BlockType: Audio Player Block:Source
@@ -298,9 +325,15 @@ namespace com.kfs.Avalanche.Migrations
             RockMigrationHelper.UpdateBlockTypeAttribute( "36569642-F6D7-4EAC-AF0E-C8238BEEAF7E", "E5A6D6C7-DAB4-4EFA-B76F-E22AFEC5158D", "Action Item", "ActionItem", "", @"Action to take upon press of item in list.", 0, @"", "508BD5E9-D674-46AD-83DE-1BF620C85B29" );
 
             // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Action Item Page: Avalanche Home Page, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "A2487BA5-843D-4D7E-92A6-36A52027EB26", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^519^" ); // NEED SQL
+            RockMigrationHelper.AddBlockAttributeValue( "A2487BA5-843D-4D7E-92A6-36A52027EB26", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^519^" ); // NEED SQL, 519
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '9711DB54-0FB0-4722-AB45-1DFB6158F922' )
+                UPDATE av SET av.[Value] = Replace([Value],519,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799' AND b.[Guid] = 'A2487BA5-843D-4D7E-92A6-36A52027EB26'" ); // Set AttributeValue to correct page id         
             // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Image Page: Avalanche Home Page, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "A2487BA5-843D-4D7E-92A6-36A52027EB26", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/sermons.jpg" );
+            RockMigrationHelper.AddBlockAttributeValue( "A2487BA5 -843D-4D7E-92A6-36A52027EB26", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/sermons.jpg" );
             // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Text Page: Avalanche Home Page, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A2487BA5-843D-4D7E-92A6-36A52027EB26", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Sermons" );
             // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Aspect Ratio Page: Avalanche Home Page, Site: Avalanche
@@ -320,13 +353,25 @@ namespace com.kfs.Avalanche.Migrations
             // Attrib Value for Block:Text Over Image Block - Events, Attribute:Text Page: Avalanche Home Page, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7E1A52B6-68A9-423F-88DB-4E402360FED0", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Events" );
             // Attrib Value for Block:Text Over Image Block - Events, Attribute:Action Item Page: Avalanche Home Page, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "7E1A52B6-68A9-423F-88DB-4E402360FED0", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^531^" ); // NEED SQL
+            RockMigrationHelper.AddBlockAttributeValue( "7E1A52B6-68A9-423F-88DB-4E402360FED0", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^531^" ); // NEED SQL, 531
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'B95062A4-770C-47DF-B88F-0626F7BFDF2F' )
+                UPDATE av SET av.[Value] = Replace([Value],531,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799' AND b.[Guid] = '7E1A52B6-68A9-423F-88DB-4E402360FED0'" ); // Set AttributeValue to correct page id         
             // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Image Page: Avalanche Home Page, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "99865F0D-BD8A-4AA7-88A2-D7D7859E1992", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/visit.jpg" );
             // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Text Page: Avalanche Home Page, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "99865F0D-BD8A-4AA7-88A2-D7D7859E1992", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Visit" );
             // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Action Item Page: Avalanche Home Page, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "99865F0D-BD8A-4AA7-88A2-D7D7859E1992", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^520^" ); // NEED SQL
+            RockMigrationHelper.AddBlockAttributeValue( "99865F0D-BD8A-4AA7-88A2-D7D7859E1992", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^520^" ); // NEED SQL, 520
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'CD8A05F8-24FF-4D38-8ED0-FE2BF07C0CDE' )
+                UPDATE av SET av.[Value] = Replace([Value],520,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799' AND b.[Guid] = '99865F0D-BD8A-4AA7-88A2-D7D7859E1992'" ); // Set AttributeValue to correct page id         
             // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Aspect Ratio Page: Avalanche Home Page, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "99865F0D-BD8A-4AA7-88A2-D7D7859E1992", "BD4BC1F9-9C20-4A6E-A67D-8D5EF56A619D", @"0.45" );
             // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Enabled Lava Commands Page: Avalanche Home Page, Site: Avalanche
@@ -394,6 +439,13 @@ namespace com.kfs.Avalanche.Migrations
  {% endfor -%}
 {% endcapture -%}
 [{{ campusjson | ReplaceLast:', ' }}]" ); // NEED SQL
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '5F1E1759-0A3A-4A57-896B-7B8B8BD892B3' )
+                UPDATE av SET av.[Value] = Replace([Value],524,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '2DF1245C-33A6-4C0B-9CFB-30047103BD05' AND b.[Guid] = '14EFA755-D8F8-4BC2-A199-E67B2E960A95'" ); // Set AttributeValue to correct page id         
+
             // Attrib Value for Block:Image Block, Attribute:Aspect Page: Visit Detail, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "941F3F7B-2922-4D29-9B8E-FE22A5337486", "1900D9DD-EFA4-4278-8B23-0FEEF1894610", @"" );
             // Attrib Value for Block:Image Block, Attribute:Custom Attributes Page: Visit Detail, Site: Avalanche
@@ -500,6 +552,12 @@ namespace com.kfs.Avalanche.Migrations
 {% capture childjson %}{% for childitem in seriesItem.ChildItems %}{""Id"":""{{ childitem.ChildContentChannelItem.Id }}"",""Image"":""{{ seriesart }}"",""Title"":""{{ childitem.ChildContentChannelItem.Title | HtmlDecode | Replace:'""','\""' }}"",""Description"":""{{ childitem.ChildContentChannelItem.Content | StripHtml | HtmlDecode | Replace:'""','\""' }}"",""Resource"":""527"",""ActionType"":""1""},{% endfor -%}{% endcapture %}
 {% endcontentchannelitem -%}
 [{{ childjson | ReplaceLast:"","" }}]" ); // NEED SQL, 527
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '1CDE2032-482B-483E-B273-A1A3B421E04C' )
+                UPDATE av SET av.[Value] = Replace([Value],527,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '2DF1245C-33A6-4C0B-9CFB-30047103BD05' AND b.[Guid] = '7AA9738F-BA87-4761-9FD3-FF8A38703473'" ); // Set AttributeValue to correct page id         
             // Attrib Value for Block:Mobile ListView Lava - Sermon Content, Attribute:Component Page: Series Detail, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7AA9738F-BA87-4761-9FD3-FF8A38703473", "710306EF-D570-41D9-A806-DD38DC14FEDC", @"d9ea2c97-68e1-4d94-b881-f3ac4f2883a3" );
             // Attrib Value for Block:Image Block, Attribute:Custom Attributes Page: Series Detail, Site: Avalanche
@@ -558,6 +616,12 @@ namespace com.kfs.Avalanche.Migrations
             RockMigrationHelper.AddBlockAttributeValue( "BA50E899-CEAB-4816-8AD0-A650889882A4", "9FFA6301-04B4-4D1D-907C-D345BE825B13", @"Listen" );
             // Attrib Value for Block:Icon Button - Listen, Attribute:Action Item Page: Sermon Detail, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BA50E899-CEAB-4816-8AD0-A650889882A4", "1AD33D1F-BDE9-4AFB-B6E8-E2CD271A5EF3", @"2^528^{{ parameter }}" ); // NEED SQL, 528
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '344BABC7-5C30-4B53-87F9-A00F0DDA38E7' )
+                UPDATE av SET av.[Value] = Replace([Value],528,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '1AD33D1F-BDE9-4AFB-B6E8-E2CD271A5EF3' AND b.[Guid] = 'BA50E899-CEAB-4816-8AD0-A650889882A4'" ); // Set AttributeValue to correct page id         
             // Attrib Value for Block:Icon Button - Listen, Attribute:Icon Page: Sermon Detail, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BA50E899-CEAB-4816-8AD0-A650889882A4", "FCE07A51-64D8-4FC8-BFB2-8CDBCED449F7", @"fa fa-headphones" );
             // Attrib Value for Block:Icon Button - Listen, Attribute:Enabled Lava Commands Page: Sermon Detail, Site: Avalanche
@@ -574,6 +638,12 @@ namespace com.kfs.Avalanche.Migrations
             RockMigrationHelper.AddBlockAttributeValue( "F915EB5A-9260-4681-9A49-0C6778D2F084", "9FFA6301-04B4-4D1D-907C-D345BE825B13", @"Watch" );
             // Attrib Value for Block:Icon Button - Watch, Attribute:Action Item Page: Sermon Detail Audio, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "F915EB5A-9260-4681-9A49-0C6778D2F084", "1AD33D1F-BDE9-4AFB-B6E8-E2CD271A5EF3", @"2^527^{{ parameter }}" ); // NEED SQL, 527
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '1CDE2032-482B-483E-B273-A1A3B421E04C' )
+                UPDATE av SET av.[Value] = Replace([Value],527,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '1AD33D1F-BDE9-4AFB-B6E8-E2CD271A5EF3' AND b.[Guid] = 'F915EB5A-9260-4681-9A49-0C6778D2F084'" ); // Set AttributeValue to correct page id         
             // Attrib Value for Block:Image Block, Attribute:Enabled Lava Commands Page: Sermon Detail Audio, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "9735B56B-32A3-45CE-9298-5C1F7EFB3DEA", "155B8623-7723-4FD2-A321-B9D24B1611CE", @"RockEntity" );
             // Attrib Value for Block:Image Block, Attribute:Aspect Page: Sermon Detail Audio, Site: Avalanche
@@ -588,6 +658,14 @@ namespace com.kfs.Avalanche.Migrations
             RockMigrationHelper.AddBlockAttributeValue( "FCB9F034-0036-48DC-B588-6FBE969938C9", "2811B163-E681-4EBA-9280-A82742FEBE3C", @"" );
             // Attrib Value for Block:Preload Block, Attribute:Pages To Preload Page: Avalanche Home Page, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FCB9F034-0036-48DC-B588-6FBE969938C9", "73006B75-6B97-4203-8182-0944455BB213", @"519^|520^|521^" ); // NEED SQL
+            Sql( @"DECLARE @PageId1 int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '9711DB54-0FB0-4722-AB45-1DFB6158F922' )
+                DECLARE @PageId2 int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'CD8A05F8-24FF-4D38-8ED0-FE2BF07C0CDE' )
+                DECLARE @PageId3 int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'DE6D125E-892E-4F10-A33D-F84942582B1E' )
+                UPDATE av SET av.[Value] = Replace(Replace(Replace([Value],521,@PageId3),520,@PageId2),519,@PageId1) 
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '73006B75-6B97-4203-8182-0944455BB213' AND b.[Guid] = 'FCB9F034-0036-48DC-B588-6FBE969938C9'" ); // Set AttributeValue to correct page id         
             // Attrib Value for Block:Preload Block, Attribute:Custom Attributes Page: Avalanche Home Page, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FCB9F034-0036-48DC-B588-6FBE969938C9", "E28D8CD0-91E8-453F-B221-C8A9E60DEE46", @"" );
             // Attrib Value for Block:Preload Block, Attribute:Custom Attributes Page: Connect, Site: Avalanche
@@ -596,6 +674,14 @@ namespace com.kfs.Avalanche.Migrations
             RockMigrationHelper.AddBlockAttributeValue( "C6A448AB-B39B-48D1-9EDC-06062BF98766", "2811B163-E681-4EBA-9280-A82742FEBE3C", @"" );
             // Attrib Value for Block:Preload Block, Attribute:Pages To Preload Page: Connect, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C6A448AB-B39B-48D1-9EDC-06062BF98766", "73006B75-6B97-4203-8182-0944455BB213", @"529^|530^|531^" ); // NEED SQL
+            Sql( @"DECLARE @PageId1 int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'D943417B-F167-4CD0-8321-C779B1C9E92B' )
+                DECLARE @PageId2 int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '8E94B8E8-171D-4A81-9A69-D34667510231' )
+                DECLARE @PageId3 int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'B95062A4-770C-47DF-B88F-0626F7BFDF2F' )
+                UPDATE av SET av.[Value] = Replace(Replace(Replace([Value],531,@PageId3),530,@PageId2),529,@PageId1)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '73006B75-6B97-4203-8182-0944455BB213' AND b.[Guid] = 'C6A448AB-B39B-48D1-9EDC-06062BF98766'" ); // Set AttributeValue to correct page id         
             // Attrib Value for Block:Text Over Image Block - Baptism, Attribute:Custom Attributes Page: Connect, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "DC43E7F1-A294-4D99-B37A-CC04F18BD32C", "B0FCF405-607A-43C1-A2DB-1AA2C066EABB", @"TextColor^White|FontSize^45" );
             // Attrib Value for Block:Text Over Image Block - Baptism, Attribute:Aspect Ratio Page: Connect, Site: Avalanche
@@ -608,8 +694,20 @@ namespace com.kfs.Avalanche.Migrations
             RockMigrationHelper.AddBlockAttributeValue( "DC43E7F1-A294-4D99-B37A-CC04F18BD32C", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Baptism" );
             // Attrib Value for Block:Text Over Image Block - Baptism, Attribute:Action Item Page: Connect, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "DC43E7F1-A294-4D99-B37A-CC04F18BD32C", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^530^" ); // NEED SQL, 530
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '8E94B8E8-171D-4A81-9A69-D34667510231' )
+                UPDATE av SET av.[Value] = Replace([Value],530,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799' AND b.[Guid] = 'DC43E7F1-A294-4D99-B37A-CC04F18BD32C'" ); // Set AttributeValue to correct page id         
             // Attrib Value for Block:Text Over Image Block - Groups, Attribute:Action Item Page: Connect, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "44D7ED68-22F4-4D1F-B443-75FF6B9F791B", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^529^" ); // NEED SQL, 529
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'D943417B-F167-4CD0-8321-C779B1C9E92B' )
+                UPDATE av SET av.[Value] = Replace([Value],529,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799' AND b.[Guid] = '44D7ED68-22F4-4D1F-B443-75FF6B9F791B'" ); // Set AttributeValue to correct page id         
             // Attrib Value for Block:Text Over Image Block - Groups, Attribute:Text Page: Connect, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "44D7ED68-22F4-4D1F-B443-75FF6B9F791B", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Groups" );
             // Attrib Value for Block:Text Over Image Block - Groups, Attribute:Image Page: Connect, Site: Avalanche
@@ -632,6 +730,12 @@ namespace com.kfs.Avalanche.Migrations
             RockMigrationHelper.AddBlockAttributeValue( "E7E0ADD1-0863-492E-B7D7-A32B5680816F", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Events" );
             // Attrib Value for Block:Text Over Image Block - Events, Attribute:Action Item Page: Connect, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "E7E0ADD1-0863-492E-B7D7-A32B5680816F", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^531^" ); // NEED SQL, 531
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'B95062A4-770C-47DF-B88F-0626F7BFDF2F' )
+                UPDATE av SET av.[Value] = Replace([Value],531,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799' AND b.[Guid] = 'E7E0ADD1-0863-492E-B7D7-A32B5680816F'" ); // Set AttributeValue to correct page id         
             // Attrib Value for Block:Text Over Image Block, Attribute:Action Item Page: Groups, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "5C6A4458-56A3-4F60-8792-5271326DED00", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"0" );
             // Attrib Value for Block:Text Over Image Block, Attribute:Image Page: Groups, Site: Avalanche
@@ -671,7 +775,13 @@ Men's, women's, and mixed groups meet all over the Indianapolis area—in homes, c
 ### Are you ready to lead?
 Group leaders play an important role in creating environments where people can grow to be more like Jesus. If God is moving you to lead a group, we want to help equip and train you to lead well!" );
             // Attrib Value for Block:Next Steps Button, Attribute:Action Item Page: Groups, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "D0B758C4-18E1-45DE-82B0-70906E45B99A", "A9D5A12D-F60D-4CAA-A46B-1A605032586D", @"1^5XX^0" ); // NEED SQL, workflow form page
+            RockMigrationHelper.AddBlockAttributeValue( "D0B758C4-18E1-45DE-82B0-70906E45B99A", "A9D5A12D-F60D-4CAA-A46B-1A605032586D", @"1^532^0" ); // NEED SQL, workflow form page
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '7817298D-0A76-4039-A5D7-AF273AC05952' )
+                UPDATE av SET av.[Value] = Replace([Value],'532',@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = 'A9D5A12D-F60D-4CAA-A46B-1A605032586D' AND b.[Guid] = 'D0B758C4-18E1-45DE-82B0-70906E45B99A'" ); // Set AttributeValue to correct page id         
             // Attrib Value for Block:Next Steps Button, Attribute:Text Page: Groups, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D0B758C4-18E1-45DE-82B0-70906E45B99A", "B60F03CA-B109-48F6-ACE4-1C365DC4E908", @"Form a group" );
             // Attrib Value for Block:Next Steps Button, Attribute:Custom Attributes Page: Groups, Site: Avalanche
@@ -729,6 +839,13 @@ Group leaders play an important role in creating environments where people can g
 {% endif -%}{% for eventItemOccurrence in EventItemOccurrences -%}
 {""Id"":""{{ eventItemOccurrence.EventItemOccurrence.Id }}"", ""Title"":""{{ eventItemOccurrence.Name | Replace:'""','\""' }}"", ""Description"":""{{ eventItemOccurrence.Date | Date:'MMM d' }} - {{ eventItemOccurrence.Summary | Replace:'""','\""' }}"", ""Resource"":""533"", ""ActionType"":""1"", ""Image"":""{{ 'Global' | Attribute:'PublicApplicationRoot' }}/GetImage.ashx?id={{ eventItemOccurrence.EventItemOccurrence.EventItem.PhotoId }}&w=720""},
 {% endfor -%}]" ); // NEED SQL, 533
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '14A25533-186B-49C4-A949-0F9DA864A87E' )
+                UPDATE av SET av.[Value] = Replace([Value],533,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '71BFE3A7-41CD-46E8-B95F-456735104DA2' AND b.[Guid] = '713083B7-B5A8-416C-9603-594589A67B8D'" ); // Set AttributeValue to correct page id         
+
             // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Custom Attributes Page: Events, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "0B61EA06-A713-4359-BCA4-1D0602E8C6CA", @"Columns^1|Margin^20%2C0|WidthRequest^440" );
             // Attrib Value for Block:Text Over Image Block, Attribute:Aspect Ratio Page: Events, Site: Avalanche
@@ -745,6 +862,13 @@ Group leaders play an important role in creating environments where people can g
             RockMigrationHelper.AddBlockAttributeValue( "FB586E92-764C-4321-871F-47C38D768E94", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"0" );
             // Attrib Value for Block:Event Filter, Attribute:Action Item Page: Events, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A9D36E34-4D02-4179-B6DE-EF30B341D1D9", "CBB79612-83F9-4FC5-94EC-450DED06B30B", @"2^531^" ); // NEED SQL, 531
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'B95062A4-770C-47DF-B88F-0626F7BFDF2F' )
+                UPDATE av SET av.[Value] = Replace([Value],531,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = 'CBB79612-83F9-4FC5-94EC-450DED06B30B' AND b.[Guid] = 'A9D36E34-4D02-4179-B6DE-EF30B341D1D9'" ); // Set AttributeValue to correct page id         
+
             // Attrib Value for Block:Event Filter, Attribute:Custom Attributes Page: Events, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A9D36E34-4D02-4179-B6DE-EF30B341D1D9", "92E11239-D329-4E43-9847-72358122D052", @"Margin^10%2C0" );
             // Attrib Value for Block:Image Block, Attribute:Enabled Lava Commands Page: Event Detail, Site: Avalanche
@@ -789,7 +913,7 @@ Group leaders play an important role in creating environments where people can g
             // Attrib Value for Block:Mobile Button, Attribute:Text Page: Event Detail, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C454F889-AB57-4D38-A18F-195D60445EDF", "B60F03CA-B109-48F6-ACE4-1C365DC4E908", @"More Info" );
             // Attrib Value for Block:Mobile Button, Attribute:Action Item Page: Event Detail, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "C454F889-AB57-4D38-A18F-195D60445EDF", "A9D5A12D-F60D-4CAA-A46B-1A605032586D", @"4^{{ 'Global' | Attribute:'PublicApplicationRoot' }}/page/414?EventOccurrenceID={{ parameter }}^0" ); // NEED SQL, 414 or route
+            RockMigrationHelper.AddBlockAttributeValue( "C454F889-AB57-4D38-A18F-195D60445EDF", "A9D5A12D-F60D-4CAA-A46B-1A605032586D", @"4^{{ 'Global' | Attribute:'PublicApplicationRoot' }}/page/414?EventOccurrenceID={{ parameter }}^0" ); 
             // Attrib Value for Block:Mobile Button, Attribute:Enabled Lava Commands Page: Event Detail, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C454F889-AB57-4D38-A18F-195D60445EDF", "BEF7E221-837D-4DD5-BC3E-49E6E3BDEBF9", @"RockEntity" );
             // Attrib Value for Block:Mobile Button, Attribute:Custom Attributes Page: Event Detail, Site: Avalanche
@@ -832,6 +956,13 @@ You can learn more about why and how we do this at TPCC, by attending week one o
             RockMigrationHelper.AddBlockAttributeValue( "6AA0CB59-E4BA-4E74-8198-749EEB553835", "7A9950AC-B9E7-4200-9B7A-634BF90DDB2B", @"" );
             // Attrib Value for Block:Text Over Image Block - Serve, Attribute:Action Item Page: Connect, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "2901482E-A8C5-4A47-8EEB-2D3C9E0EA407", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^534^" ); // NEED SQL, 534
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'C90B1E1B-EC24-49E0-9562-7F92BB2D24AB' )
+                UPDATE av SET av.[Value] = Replace([Value],534,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799' AND b.[Guid] = '2901482E-A8C5-4A47-8EEB-2D3C9E0EA407'" ); // Set AttributeValue to correct page id         
+
             // Attrib Value for Block:Text Over Image Block - Serve, Attribute:Image Page: Connect, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "2901482E-A8C5-4A47-8EEB-2D3C9E0EA407", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/connect_serve.jpg" );
             // Attrib Value for Block:Text Over Image Block - Serve, Attribute:Text Page: Connect, Site: Avalanche
@@ -887,6 +1018,13 @@ You can learn more about why and how we do this at TPCC, by attending week one o
             // Attrib Value for Block:Mobile ListView Lava - Child Pages, Attribute:Lava Page: Other Blocks, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "253974FD-3F00-4677-86A4-F4F8C84F275C", "2DF1245C-33A6-4C0B-9CFB-30047103BD05", @"{% page id:'535' %}{% capture pagestr %}{% for childpage in page.Pages %}{% if childpage.DisplayInNavWhen != 'Never' %}{""Id"":""{{ forloop.index0 }}"",""Title"":""{{ childpage.PageTitle }}"",""Description"":""{{ childpage.PageDescription }}"",""Icon"":""{{ childpage.IconCssClass }}"",""Image"":"""",""Resource"":""{% assign resource = childpage | Attribute:""Resource"" %}{% if resource != '' %}{{ resource }}{% else %}{{ childpage.Id }}{% endif %}"",""ActionType"":""{{ childpage | Attribute:""ActionType"",""RawValue"" }}""}, {% endif %}{% endfor %}{% endcapture %}{% endpage -%}
 [{{ pagestr | ReplaceLast:"", "" }}]" ); // NEED SQL, 535
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'D4A5C0AB-0A90-416F-9B3F-C0ACFED92D43' )
+                UPDATE av SET av.[Value] = Replace([Value],535,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '2DF1245C-33A6-4C0B-9CFB-30047103BD05' AND b.[Guid] = '253974FD-3F00-4677-86A4-F4F8C84F275C'" ); // Set AttributeValue to correct page id         
+
             // Attrib Value for Block:Mobile ListView Lava - Child Pages, Attribute:Component Page: Other Blocks, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "253974FD-3F00-4677-86A4-F4F8C84F275C", "710306EF-D570-41D9-A806-DD38DC14FEDC", @"1a637b48-35fb-43b2-9822-88af2fd1d333" );
             // Attrib Value for Block:Login App, Attribute:Custom Attributes Page: Login, Site: Avalanche
@@ -917,6 +1055,13 @@ You can learn more about why and how we do this at TPCC, by attending week one o
             RockMigrationHelper.AddBlockAttributeValue( "13472A3E-A5FD-47C1-A382-4243BBE0BC98", "727903A8-FD3B-4E41-AFC4-309756390E34", @"" );
             // Attrib Value for Block:Group Member List Block, Attribute:Action Item Page: Group Member List, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D53AE8B1-9F7B-457C-A2AB-297D7E0B0C71", "0B073274-28E6-499F-A408-8CA05644F2EF", @"1^538^parameter" ); // NEED SQL, 538
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '79EF0279-9800-4BAF-A8D9-DD42E6868BAA' )
+                UPDATE av SET av.[Value] = Replace([Value],538,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = '0B073274-28E6-499F-A408-8CA05644F2EF' AND b.[Guid] = 'D53AE8B1-9F7B-457C-A2AB-297D7E0B0C71'" ); // Set AttributeValue to correct page id         
+
             // Attrib Value for Block:Group Member List Block, Attribute:Members Per Request Page: Group Member List, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D53AE8B1-9F7B-457C-A2AB-297D7E0B0C71", "D40889E8-9468-40B2-8776-B15C7D9120E9", @"20" );
             // Attrib Value for Block:Group Member List Block, Attribute:Component Page: Group Member List, Site: Avalanche
@@ -943,6 +1088,13 @@ You can learn more about why and how we do this at TPCC, by attending week one o
             RockMigrationHelper.AddBlockAttributeValue( "99CAEBAF-9E80-410E-BB33-9DCD6B4ECF9B", "BEF7E221-837D-4DD5-BC3E-49E6E3BDEBF9", @"" );
             // Attrib Value for Block:Button, Attribute:Action Item Page: Connect, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "99CAEBAF-9E80-410E-BB33-9DCD6B4ECF9B", "A9D5A12D-F60D-4CAA-A46B-1A605032586D", @"1^535^" ); // NEED SQL, 535
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'D4A5C0AB-0A90-416F-9B3F-C0ACFED92D43' )
+                UPDATE av SET av.[Value] = Replace([Value],535,@PageId)
+                FROM [AttributeValue] av 
+				INNER JOIN Attribute a ON a.Id = av.AttributeId 
+				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
+                WHERE a.[Guid] = 'A9D5A12D-F60D-4CAA-A46B-1A605032586D' AND b.[Guid] = '99CAEBAF-9E80-410E-BB33-9DCD6B4ECF9B'" ); // Set AttributeValue to correct page id         
+
             // Attrib Value for Block:WebViewBlock, Attribute:Url Page: Webview Block, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "E43CF3E1-D8FA-41B3-AED9-E09FAA594F7B", "924B7E50-5C8B-4455-A0F7-B82364EBC905", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/connect/" );
             // Attrib Value for Block:WebViewBlock, Attribute:Regex Limit Page: Webview Block, Site: Avalanche

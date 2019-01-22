@@ -22,6 +22,12 @@ namespace com.kfs.Avalanche.Migrations
             RockMigrationHelper.AddLayout( "613631FF-D19C-4F9C-B163-E9331C4BA61B", "MainPage", "Main Page", "", "FC61CD1A-15DC-4FDD-9DDD-4A0BD8936E16" ); // Site:Avalanche
             RockMigrationHelper.AddLayout( "613631FF-D19C-4F9C-B163-E9331C4BA61B", "NoScroll", "No Scroll", "", "901926F9-AD81-41A4-9B1E-254F5B45E471" ); // Site:Avalanche
             RockMigrationHelper.AddLayout( "613631FF-D19C-4F9C-B163-E9331C4BA61B", "Simple", "Simple", "", "355F6C23-29B3-4976-AE43-30426BE12B99" ); // Site:Avalanche
+            Sql( @"UPDATE [Page] SET [Guid] = '567FFD63-53F9-4419-AD96-C2F07CAE09F1' WHERE PageTitle = 'Avalanche Home Page'" ); // Set Home Page Guid to known Guid
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '567FFD63-53F9-4419-AD96-C2F07CAE09F1' )
+                UPDATE av SET av.[Value] = @PageId
+                [AttributeValue] av
+                JOIN Attribute a ON av.AttributeId = a.Id
+                WHERE a.[Key] = 'AvalancheHomePage'" ); // Set AttributeValue to correct page id
         }
 
         /// <summary>
@@ -32,6 +38,7 @@ namespace com.kfs.Avalanche.Migrations
             //
             // remove layouts and site
             //
+            RockMigrationHelper.DeletePage( "567FFD63-53F9-4419-AD96-C2F07CAE09F1" );
             RockMigrationHelper.DeleteLayout( "355F6C23-29B3-4976-AE43-30426BE12B99" ); //  Layout: Simple, Site: Avalanche
             RockMigrationHelper.DeleteLayout( "901926F9-AD81-41A4-9B1E-254F5B45E471" ); //  Layout: No Scroll, Site: Avalanche
             RockMigrationHelper.DeleteLayout( "FC61CD1A-15DC-4FDD-9DDD-4A0BD8936E16" ); //  Layout: Main Page, Site: Avalanche
