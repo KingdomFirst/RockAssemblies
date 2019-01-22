@@ -44,8 +44,7 @@ namespace com.kfs.GroupScheduledSMS.Jobs
         public virtual void Execute( IJobExecutionContext context )
         {
             var dataMap = context.JobDetail.JobDataMap;
-
-            var dGroupAndAttributeMatrixItemIds = new Dictionary<int, int>();
+            var dAttributeMatrixItemAndGroupIds = new Dictionary<int, int>(); // Key: AttributeMatrixItemId   Value: GroupId
             var rockContext = new RockContext();
             var exceptionMsgs = new List<string>();
             int communicationsSent = 0;
@@ -67,71 +66,67 @@ namespace com.kfs.GroupScheduledSMS.Jobs
             var dateAttributes = new AttributeValueService( rockContext )
                 .Queryable().AsNoTracking()
                 .Where( d => d.AttributeId == dateAttribute.Id &&
+                        d.EntityId.HasValue &&
                         d.ValueAsDateTime >= beginDateTime &&
                         d.ValueAsDateTime <= RockDateTime.Now )
                 .ToList();
 
             foreach ( var d in dateAttributes )
             {
-                if ( d.EntityId.HasValue )
+                var attributeMatrixId = new AttributeMatrixItemService( rockContext )
+                    .Queryable().AsNoTracking()
+                    .FirstOrDefault( i => i.Id == d.EntityId.Value )
+                    .AttributeMatrixId;
+
+                var attributeMatrixGuid = new AttributeMatrixService( rockContext )
+                    .Queryable().AsNoTracking()
+                    .FirstOrDefault( m => m.Id == attributeMatrixId )
+                    .Guid
+                    .ToString();
+
+                var attributeValue = new AttributeValueService( rockContext )
+                    .Queryable().AsNoTracking()
+                    .FirstOrDefault( a => a.Value.Equals( attributeMatrixGuid, StringComparison.CurrentCultureIgnoreCase ) );
+
+                if ( attributeValue != null && attributeValue.EntityId.HasValue )
                 {
-                    var attributeMatrixId = new AttributeMatrixItemService( rockContext )
-                        .Queryable().AsNoTracking()
-                        .FirstOrDefault( i => i.Id == d.EntityId.Value )
-                        .AttributeMatrixId;
-
-                    var attributeMatrixGuid = new AttributeMatrixService( rockContext )
-                        .Queryable().AsNoTracking()
-                        .FirstOrDefault( m => m.Id == attributeMatrixId )
-                        .Guid
-                        .ToString();
-
-                    var attributeValue = new AttributeValueService( rockContext )
-                        .Queryable().AsNoTracking()
-                        .FirstOrDefault( a => a.Value.Equals( attributeMatrixGuid, StringComparison.CurrentCultureIgnoreCase ) );
-
-                    if ( attributeValue != null && attributeValue.EntityId.HasValue )
-                    {
-                        dGroupAndAttributeMatrixItemIds.Add( d.EntityId.Value, attributeValue.EntityId.Value );
-                    }
+                    dAttributeMatrixItemAndGroupIds.Add( d.EntityId.Value, attributeValue.EntityId.Value );
                 }
             }
 
-            foreach ( var groupAndAttributeMatrixItemId in dGroupAndAttributeMatrixItemIds )
+            foreach ( var attributeMatrixItemAndGroupId in dAttributeMatrixItemAndGroupIds )
             {
                 try
                 {
                     var fromNumberAttributeId = AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_FROM_NUMBER.AsGuid() ).Id;
                     var fromNumberGuid = new AttributeValueService( rockContext )
                         .Queryable().AsNoTracking()
-                        .FirstOrDefault( v => v.AttributeId == fromNumberAttributeId && v.EntityId == groupAndAttributeMatrixItemId.Key )
+                        .FirstOrDefault( v => v.AttributeId == fromNumberAttributeId && v.EntityId == attributeMatrixItemAndGroupId.Key )
                         .Value;
                     var fromNumber = DefinedValueCache.Get( fromNumberGuid.AsGuid() );
 
                     var messageAttributeId = AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_MESSAGE.AsGuid() ).Id;
                     var message = new AttributeValueService( rockContext )
                         .Queryable().AsNoTracking()
-                        .FirstOrDefault( v => v.AttributeId == messageAttributeId && v.EntityId == groupAndAttributeMatrixItemId.Key )
+                        .FirstOrDefault( v => v.AttributeId == messageAttributeId && v.EntityId == attributeMatrixItemAndGroupId.Key )
                         .Value;
 
                     var attachments = new List<BinaryFile>();
 
                     var group = new GroupService( rockContext )
                         .Queryable().AsNoTracking()
-                        .Where( g => g.Id == groupAndAttributeMatrixItemId.Value )
+                        .Where( g => g.Id == attributeMatrixItemAndGroupId.Value )
                         .FirstOrDefault();
 
                     if ( !message.IsNullOrWhiteSpace() && smsMediumType != null )
                     {
-                        IQueryable<GroupMember> qry = new GroupMemberService( rockContext ).GetByGroupId( groupAndAttributeMatrixItemId.Value ).AsNoTracking();
+                        var recipients = new GroupMemberService( rockContext )
+                            .GetByGroupId( attributeMatrixItemAndGroupId.Value ).AsNoTracking()
+                            .Where( m => m.GroupMemberStatus == GroupMemberStatus.Active )
+                            .ToList();
 
-                        if ( qry != null )
+                        if ( recipients.Any() )
                         {
-                            var recipients = new List<GroupMember>();
-                            recipients = qry
-                                .Where( m => m.GroupMemberStatus == GroupMemberStatus.Active )
-                                .ToList();
-
                             var communicationService = new CommunicationService( rockContext );
 
                             var communication = new Rock.Model.Communication();
@@ -189,7 +184,7 @@ namespace com.kfs.GroupScheduledSMS.Jobs
                 }
                 catch ( Exception ex )
                 {
-                    exceptionMsgs.Add( string.Format( "Exception occurred sending message from group {0}:{1}    {2}", groupAndAttributeMatrixItemId.Value, Environment.NewLine, ex.Messages().AsDelimited( Environment.NewLine + "   " ) ) );
+                    exceptionMsgs.Add( string.Format( "Exception occurred sending message from group {0}:{1}    {2}", attributeMatrixItemAndGroupId.Value, Environment.NewLine, ex.Messages().AsDelimited( Environment.NewLine + "   " ) ) );
                     ExceptionLogService.LogException( ex, System.Web.HttpContext.Current );
                 }
             }
