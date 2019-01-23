@@ -333,7 +333,7 @@ namespace com.kfs.Avalanche.Migrations
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799' AND b.[Guid] = 'A2487BA5-843D-4D7E-92A6-36A52027EB26'" ); // Set AttributeValue to correct page id         
             // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Image Page: Avalanche Home Page, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "A2487BA5 -843D-4D7E-92A6-36A52027EB26", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/sermons.jpg" );
+            RockMigrationHelper.AddBlockAttributeValue( "A2487BA5-843D-4D7E-92A6-36A52027EB26", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/sermons.jpg" );
             // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Text Page: Avalanche Home Page, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A2487BA5-843D-4D7E-92A6-36A52027EB26", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Sermons" );
             // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Aspect Ratio Page: Avalanche Home Page, Site: Avalanche
@@ -753,10 +753,10 @@ namespace com.kfs.Avalanche.Migrations
             // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Groups, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "898CD5D8-AB1E-4267-8084-161FFBAA7820", "538EE4EC-33C5-4997-ABD6-1F105F78EF38", @"Margin^10" );
             // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Groups, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "898CD5D8-AB1E-4267-8084-161FFBAA7820", "9CB3C25B-815D-44A4-9171-698136CC0988", @"## Groups are where we connect and grow.
-Groups are mixed or gender-specific gatherings of eight to 12 people who gather two to four times per month, with one goal in mind: to become more like Jesus. Groups often create a fun, social environment, but they are focused on the personal and collective spiritual growth that comes from studying God's word together and applying it to our lives.
+            RockMigrationHelper.AddBlockAttributeValue( "898CD5D8-AB1E-4267-8084-161FFBAA7820", "9CB3C25B-815D-44A4-9171-698136CC0988", @"## Lorem ipsum dolor sit amet
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque mattis leo a eros accumsan elementum. Vestibulum iaculis ligula et molestie tempus. Nunc vel elit et orci vulputate ornare. Phasellus eleifend dapibus quam, vitae mollis tortor molestie eget. Vestibulum urna est, condimentum nec pulvinar at, semper malesuada elit. 
 
-Men's, women's, and mixed groups meet all over the Indianapolis area—in homes, coffee shops, diners, and TPCC locations. If you’re interested in joining a group, we'd love to help you take this next step in your faith. Attend week two of Growth Track to gain a greater understanding of how a group can be a source of encouragement, the accountability you need to keep going, and a catalyst for your spiritual growth." );
+Praesent ornare sapien vel nibh viverra, ac aliquet nibh sagittis. Nunc congue commodo tortor, sed interdum tortor viverra vel. In enim risus, volutpat ut augue non, condimentum suscipit mi. Proin condimentum, nisi ac placerat maximus, erat felis varius sapien, in fringilla enim metus vel sem. Pellentesque et fringilla ex, vel semper sapien. Vivamus condimentum lectus nec tincidunt pulvinar. Quisque mattis erat vel eleifend luctus. Sed vitae bibendum neque. Cras consectetur gravida leo, facilisis posuere purus tristique nec. Ut vitae diam et ipsum venenatis venenatis eu sed mauris. Cras fermentum purus eu suscipit tempor." );
             // Attrib Value for Block:Button - Attend Growth Track, Attribute:Text Page: Groups, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "6B2D9BCB-6229-4859-BA77-9E4BF34AE181", "B60F03CA-B109-48F6-ACE4-1C365DC4E908", @"Learn More" );
             // Attrib Value for Block:Button - Attend Growth Track, Attribute:Action Item Page: Groups, Site: Avalanche
@@ -770,10 +770,10 @@ Men's, women's, and mixed groups meet all over the Indianapolis area—in homes, c
             // Attrib Value for Block:Next Steps detail, Attribute:Enabled Lava Commands Page: Groups, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "87B3FD61-73E7-4BEF-AC56-1A96E497E916", "7A9950AC-B9E7-4200-9B7A-634BF90DDB2B", @"" );
             // Attrib Value for Block:Next Steps detail, Attribute:Markdown Page: Groups, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "87B3FD61-73E7-4BEF-AC56-1A96E497E916", "9CB3C25B-815D-44A4-9171-698136CC0988", @"If you attended week two of Growth Track and weren't ready to get in a group, but would like to do so now—visit our [Next Steps page]({{ 'Global' | Attribute:'PublicApplicationRoot' }}/Connect). Someone from our team would love to help you out!
+            RockMigrationHelper.AddBlockAttributeValue( "87B3FD61-73E7-4BEF-AC56-1A96E497E916", "9CB3C25B-815D-44A4-9171-698136CC0988", @"Curabitur imperdiet bibendum dui, gravida sollicitudin mauris pharetra eget. Quisque vestibulum arcu sed nulla porttitor aliquet. Fusce vel interdum diam [Next Steps page]({{ 'Global' | Attribute:'PublicApplicationRoot' }}/Connect). Nullam purus dolor, mattis at pellentesque quis, consectetur in arcu. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Fusce vel tellus nibh.
 
-### Are you ready to lead?
-Group leaders play an important role in creating environments where people can grow to be more like Jesus. If God is moving you to lead a group, we want to help equip and train you to lead well!" );
+### Nam semper facilisis ligula ut consequat
+Sed quis tincidunt ex, ut sagittis erat. Donec congue ultrices mauris ut consectetur. Nulla urna nisl, pretium et mauris ac, tempus tristique augue. Morbi sodales egestas magna quis convallis. Pellentesque interdum tincidunt sollicitudin. Cras mattis eu arcu ultrices porta. Etiam eleifend viverra nulla, eget porta turpis mattis nec. Nullam faucibus maximus est, a rutrum metus fringilla vulputate." );
             // Attrib Value for Block:Next Steps Button, Attribute:Action Item Page: Groups, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D0B758C4-18E1-45DE-82B0-70906E45B99A", "A9D5A12D-F60D-4CAA-A46B-1A605032586D", @"1^532^0" ); // NEED SQL, workflow form page
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '7817298D-0A76-4039-A5D7-AF273AC05952' )
@@ -845,7 +845,6 @@ Group leaders play an important role in creating environments where people can g
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '71BFE3A7-41CD-46E8-B95F-456735104DA2' AND b.[Guid] = '713083B7-B5A8-416C-9603-594589A67B8D'" ); // Set AttributeValue to correct page id         
-
             // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Custom Attributes Page: Events, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "0B61EA06-A713-4359-BCA4-1D0602E8C6CA", @"Columns^1|Margin^20%2C0|WidthRequest^440" );
             // Attrib Value for Block:Text Over Image Block, Attribute:Aspect Ratio Page: Events, Site: Avalanche
@@ -868,7 +867,6 @@ Group leaders play an important role in creating environments where people can g
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = 'CBB79612-83F9-4FC5-94EC-450DED06B30B' AND b.[Guid] = 'A9D36E34-4D02-4179-B6DE-EF30B341D1D9'" ); // Set AttributeValue to correct page id         
-
             // Attrib Value for Block:Event Filter, Attribute:Custom Attributes Page: Events, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A9D36E34-4D02-4179-B6DE-EF30B341D1D9", "92E11239-D329-4E43-9847-72358122D052", @"Margin^10%2C0" );
             // Attrib Value for Block:Image Block, Attribute:Enabled Lava Commands Page: Event Detail, Site: Avalanche
@@ -933,11 +931,13 @@ Group leaders play an important role in creating environments where people can g
             // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Baptism, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "010B3F1F-2149-4DBA-ABB3-1DCF795C4C89", "538EE4EC-33C5-4997-ABD6-1F105F78EF38", @"Margin^10" );
             // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Baptism, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "010B3F1F-2149-4DBA-ABB3-1DCF795C4C89", "9CB3C25B-815D-44A4-9171-698136CC0988", @"### Interested in learning more about baptism or getting baptized?
+            RockMigrationHelper.AddBlockAttributeValue( "010B3F1F-2149-4DBA-ABB3-1DCF795C4C89", "9CB3C25B-815D-44A4-9171-698136CC0988", @"### Pellentesque habitant morbi tristique senectus
 
-Baptism is a public demonstration of putting one's trust and hope in Jesus, and it's for everyone who has put his or her faith in Christ. At Traders Point, we believe baptism is an outward expression of that internal transformation, and it's one of the first steps we take to start following Jesus.
+Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse in arcu sodales felis dignissim accumsan. Sed interdum laoreet nulla. Duis laoreet scelerisque elit eu venenatis. 
 
-You can learn more about why and how we do this at TPCC, by attending week one of _Growth Track _at your campus." );
+Donec ultricies consequat nibh vitae vulputate. Sed vitae nunc in erat maximus feugiat sed et diam. Morbi risus nunc, placerat id ligula nec, bibendum volutpat quam. Maecenas faucibus orci ante, vel sollicitudin enim finibus quis. Suspendisse potenti. 
+
+Aliquam massa eros, tincidunt vel enim eu, imperdiet tristique felis. Phasellus vel erat ullamcorper, fringilla urna a, maximus odio. Donec ornare arcu ut ligula cursus sagittis. Vivamus id sollicitudin ex, et rhoncus massa. Sed urna metus, ultricies venenatis nibh ac, consequat finibus eros." );
             // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Baptism, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "010B3F1F-2149-4DBA-ABB3-1DCF795C4C89", "7A9950AC-B9E7-4200-9B7A-634BF90DDB2B", @"" );
             // Attrib Value for Block:Button, Attribute:Text Page: Baptism, Site: Avalanche
@@ -1061,7 +1061,6 @@ You can learn more about why and how we do this at TPCC, by attending week one o
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '0B073274-28E6-499F-A408-8CA05644F2EF' AND b.[Guid] = 'D53AE8B1-9F7B-457C-A2AB-297D7E0B0C71'" ); // Set AttributeValue to correct page id         
-
             // Attrib Value for Block:Group Member List Block, Attribute:Members Per Request Page: Group Member List, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D53AE8B1-9F7B-457C-A2AB-297D7E0B0C71", "D40889E8-9468-40B2-8776-B15C7D9120E9", @"20" );
             // Attrib Value for Block:Group Member List Block, Attribute:Component Page: Group Member List, Site: Avalanche
@@ -1093,8 +1092,7 @@ You can learn more about why and how we do this at TPCC, by attending week one o
                 FROM [AttributeValue] av 
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
-                WHERE a.[Guid] = 'A9D5A12D-F60D-4CAA-A46B-1A605032586D' AND b.[Guid] = '99CAEBAF-9E80-410E-BB33-9DCD6B4ECF9B'" ); // Set AttributeValue to correct page id         
-
+                WHERE a.[Guid] = 'A9D5A12D-F60D-4CAA-A46B-1A605032586D' AND b.[Guid] = '99CAEBAF-9E80-410E-BB33-9DCD6B4ECF9B'" ); // Set AttributeValue to correct page id
             // Attrib Value for Block:WebViewBlock, Attribute:Url Page: Webview Block, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "E43CF3E1-D8FA-41B3-AED9-E09FAA594F7B", "924B7E50-5C8B-4455-A0F7-B82364EBC905", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/connect/" );
             // Attrib Value for Block:WebViewBlock, Attribute:Regex Limit Page: Webview Block, Site: Avalanche
@@ -1110,7 +1108,7 @@ You can learn more about why and how we do this at TPCC, by attending week one o
             // Attrib Value for Block:Icon Block, Attribute:Custom Attributes , Layout: No Scroll, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "962317D3-42D0-4152-839E-35AAF2BD66E2", "BE7D91EF-5C79-4940-9DA6-608933781419", @"TextColor^White|FontSize^25|Margin^15%2C19%2C10%2C16" );
 
-            RockMigrationHelper.UpdateFieldType( "Action Item", "", "Avalanche", "Avalanche.Field.Types.ActionItemFieldType", "E5A6D6C7-DAB4-4EFA-B76F-E22AFEC5158D" );
+            //RockMigrationHelper.UpdateFieldType( "Action Item", "", "Avalanche", "Avalanche.Field.Types.ActionItemFieldType", "E5A6D6C7-DAB4-4EFA-B76F-E22AFEC5158D" );
         }
 
         /// <summary>

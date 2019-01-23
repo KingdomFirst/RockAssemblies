@@ -16,6 +16,7 @@ namespace com.kfs.Avalanche.Migrations
         /// </summary>
         public override void Up()
         {
+            RockMigrationHelper.AddPage( true, null, "FC61CD1A-15DC-4FDD-9DDD-4A0BD8936E16", "Avalanche Home Page", "", "567FFD63-53F9-4419-AD96-C2F07CAE09F1", "" ); // Site:Avalanche
             RockMigrationHelper.AddPage( true, "567FFD63-53F9-4419-AD96-C2F07CAE09F1", "901926F9-AD81-41A4-9B1E-254F5B45E471", "Sermons", "", "9711DB54-0FB0-4722-AB45-1DFB6158F922", "fa fa-tv" ); // Site:Avalanche
             RockMigrationHelper.AddPage( true, "567FFD63-53F9-4419-AD96-C2F07CAE09F1", "355F6C23-29B3-4976-AE43-30426BE12B99", "Visit", "", "CD8A05F8-24FF-4D38-8ED0-FE2BF07C0CDE", "fa fa-map-marker" ); // Site:Avalanche
             RockMigrationHelper.AddPage( true, "567FFD63-53F9-4419-AD96-C2F07CAE09F1", "355F6C23-29B3-4976-AE43-30426BE12B99", "Connect", "", "DE6D125E-892E-4F10-A33D-F84942582B1E", "fa fa-link" ); // Site:Avalanche
@@ -41,12 +42,30 @@ namespace com.kfs.Avalanche.Migrations
             RockMigrationHelper.AddPage( true, "D4A5C0AB-0A90-416F-9B3F-C0ACFED92D43", "355F6C23-29B3-4976-AE43-30426BE12B99", "Note Block", "", "F522A717-2D7A-405B-87BB-CCB16C15BB44", "" ); // Site:Avalanche
             RockMigrationHelper.AddPage( true, "D4A5C0AB-0A90-416F-9B3F-C0ACFED92D43", "901926F9-AD81-41A4-9B1E-254F5B45E471", "Webview Block", "", "0FBC5CE7-CF91-45EC-B28A-A5E486764B9A", "" ); // Site:Avalanche
 
+            RockMigrationHelper.UpdateFieldType( "Action Item", "", "Avalanche", "Avalanche.Field.Types.ActionItemFieldType", "E5A6D6C7-DAB4-4EFA-B76F-E22AFEC5158D" );
+
             RockMigrationHelper.AddGlobalAttribute( Rock.SystemGuid.FieldType.TEXT, "", "", "Avalanche Footer Page", "Page Id of footer blocks/layout configuration", 0, "", "1B8B1811-D82F-48B0-A55C-4A463552264C" );
             RockMigrationHelper.AddGlobalAttribute( Rock.SystemGuid.FieldType.TEXT, "", "", "Avalanche Header Page", "Page Id of header blocks/layout configuration", 0, "", "B2F7130E-1C0C-41F8-A13E-3EE9B77F59B1" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Page", Rock.SystemGuid.FieldType.TEXT, "SiteId", "", "Background Color", "", "Used for Avalanche. Hex or color name for background of page", 0, "#f2f6f8", "1fd61a40-3fe7-4b05-adca-a7edc957921e", "BackgroundColor" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Page", "E5A6D6C7-DAB4-4EFA-B76F-E22AFEC5158D", "SiteId", "", "Action Type", "", "Used for Avalanche. Used for tab/page navigation Action Types", 1, "", "2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f", "ActionType" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Page", Rock.SystemGuid.FieldType.TEXT, "SiteId", "", "Resource", "", "Used for Avalanche. Text string to overwrite resource value in navigation, primarily for 'Open Browser' Action type.", 2, "", "342b2c81-976d-472d-89bf-b8f8f826730e", "Resource" );
+            Sql( @"DECLARE @SiteId int = ( SELECT TOP 1 [Id] FROM [Site] WHERE [Guid] = '613631FF-D19C-4F9C-B163-E9331C4BA61B' )
+                 UPDATE [Attribute] SET EntityTypeQualifierValue = '@SiteId' WHERE [Guid] = '1fd61a40-3fe7-4b05-adca-a7edc957921e'
+                 UPDATE [Attribute] SET EntityTypeQualifierValue = '@SiteId' WHERE [Guid] = '2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f'
+                 UPDATE [Attribute] SET EntityTypeQualifierValue = '@SiteId' WHERE [Guid] = '342b2c81-976d-472d-89bf-b8f8f826730e'" ); // Set EntityTypeQualifier to proper site id
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "App Image", "", "Used for Avalanche. ", 0, "", "347b7207-1f42-45b2-8ce1-15f98510265c", "AppName" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "App Header Image", "", "Used for Avalanche. ", 0, "", "ff664883-74a0-476e-85ac-1d8d68f85105", "AppHeaderImage" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.HTML, "", "", "Location Info Summary", "", "Used for Avalanche. ", 0, "", "2611897a-6dfe-470f-9a74-bd5019ea033e", "LocationInfoSummary" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "Parking Map", "", "Used for Avalanche. URL/Image to a Parking Map", 0, "", "c6306b5d-105e-456c-9369-98bbd37c93b6", "ParkingMap" );
 
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '567FFD63-53F9-4419-AD96-C2F07CAE09F1' )
+                UPDATE av SET av.[Value] = @PageId
+                FROM [AttributeValue] av
+                JOIN Attribute a ON av.AttributeId = a.Id
+                WHERE a.[Key] = 'AvalancheHomePage'" ); // Set AttributeValue to correct page id
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'FF495C30-29C5-420C-A35B-E9E808EEBCEF' )
                 UPDATE av SET av.[Value] = @PageId
-                [AttributeValue] av
+                FROM [AttributeValue] av
                 JOIN Attribute a ON av.AttributeId = a.Id
                 WHERE a.[Key] = 'AvalancheFooterPage'" ); // Set AttributeValue to correct page id
         }
