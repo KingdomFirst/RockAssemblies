@@ -231,7 +231,7 @@ namespace com.kfs.Avalanche.Migrations
             RockMigrationHelper.AddDefinedValue( AvalancheUtilities.LayoutsDefinedType, "Main Page", "MainPage layout to have some different options, came from SECC", "a28546a5-54d8-4a2e-b912-af9f5e2f0aa2", false );
             RockMigrationHelper.AddDefinedValueAttributeValue( "a28546a5-54d8-4a2e-b912-af9f5e2f0aa2", "E5DE699C-49F6-488B-BA1F-F4CC13CE8B91", mainpage );
 
-            var footer = @"[ { ""Name"": ""FooterHorizontal"", ""Type"": ""Grid"", ""RowDefinitions"": ""60"", ""Children"": [ { ""Name"": ""Footer"", ""Type"": ""StackLayout"", ""Orientation"": ""Vertical"", ""Attributes"": { ""VerticalOptions"": ""End"" } } ] } ]";
+            var footer = @"[ { ""Name"": ""FooterHorizontal"", ""Type"": ""Grid"", ""RowDefinitions"": ""100"", ""Children"": [ { ""Name"": ""Footer"", ""Type"": ""StackLayout"", ""Orientation"": ""Vertical"", ""Attributes"": { ""VerticalOptions"": ""End"" } } ] } ]";
             RockMigrationHelper.AddDefinedValue( AvalancheUtilities.LayoutsDefinedType, "Footer", "Footer layout fairly simple", "7f0d651b-6acc-4207-a985-6d9deb81e71d", false );
             RockMigrationHelper.AddDefinedValueAttributeValue( "7f0d651b-6acc-4207-a985-6d9deb81e71d", "E5DE699C-49F6-488B-BA1F-F4CC13CE8B91", footer );
         }
