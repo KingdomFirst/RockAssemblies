@@ -104,7 +104,7 @@ namespace com.kfs.Avalanche.Migrations
     }
 ]";
 
-            RockMigrationHelper.AddDefinedValue( AvalancheUtilities.LayoutsDefinedType, "Simple", "Simple layout with a featured, main, three sub sections, and a footer.", "BB5006D8-7F51-43D5-B977-5E07F5ACA8C2", false );
+            //RockMigrationHelper.AddDefinedValue( AvalancheUtilities.LayoutsDefinedType, "Simple", "Simple layout with a featured, main, three sub sections, and a footer.", "BB5006D8-7F51-43D5-B977-5E07F5ACA8C2", false );
             RockMigrationHelper.AddDefinedValueAttributeValue( "BB5006D8-7F51-43D5-B977-5E07F5ACA8C2", "E5DE699C-49F6-488B-BA1F-F4CC13CE8B91", simple );
 
             var noscroll = @"[
@@ -166,7 +166,7 @@ namespace com.kfs.Avalanche.Migrations
         ""Orientation"": ""Vertical"",
     }
 ]";
-            RockMigrationHelper.AddDefinedValue( AvalancheUtilities.LayoutsDefinedType, "No Scroll", "Layout with no scrolling elements. Good for list views.", "3812C543-8B80-4A7C-BBD0-4DEFEABBA7DC", false );
+            //RockMigrationHelper.AddDefinedValue( AvalancheUtilities.LayoutsDefinedType, "No Scroll", "Layout with no scrolling elements. Good for list views.", "3812C543-8B80-4A7C-BBD0-4DEFEABBA7DC", false );
             RockMigrationHelper.AddDefinedValueAttributeValue( "3812C543-8B80-4A7C-BBD0-4DEFEABBA7DC", "E5DE699C-49F6-488B-BA1F-F4CC13CE8B91", noscroll );
 
             var mainpage = @"[

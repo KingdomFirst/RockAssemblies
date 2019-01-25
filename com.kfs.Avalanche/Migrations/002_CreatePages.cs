@@ -50,14 +50,28 @@ namespace com.kfs.Avalanche.Migrations
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.Page", "E5A6D6C7-DAB4-4EFA-B76F-E22AFEC5158D", "SiteId", "", "Action Type", "", "Used for Avalanche. Used for tab/page navigation Action Types", 1, "", "2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f", "ActionType" );
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.Page", Rock.SystemGuid.FieldType.TEXT, "SiteId", "", "Resource", "", "Used for Avalanche. Text string to overwrite resource value in navigation, primarily for 'Open Browser' Action type.", 2, "", "342b2c81-976d-472d-89bf-b8f8f826730e", "Resource" );
             Sql( @"DECLARE @SiteId int = ( SELECT TOP 1 [Id] FROM [Site] WHERE [Guid] = '613631FF-D19C-4F9C-B163-E9331C4BA61B' )
-                 UPDATE [Attribute] SET EntityTypeQualifierValue = '@SiteId' WHERE [Guid] = '1fd61a40-3fe7-4b05-adca-a7edc957921e'
-                 UPDATE [Attribute] SET EntityTypeQualifierValue = '@SiteId' WHERE [Guid] = '2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f'
-                 UPDATE [Attribute] SET EntityTypeQualifierValue = '@SiteId' WHERE [Guid] = '342b2c81-976d-472d-89bf-b8f8f826730e'" ); // Set EntityTypeQualifier to proper site id
+                 UPDATE [Attribute] SET EntityTypeQualifierValue = @SiteId WHERE [Guid] = '1fd61a40-3fe7-4b05-adca-a7edc957921e'
+                 UPDATE [Attribute] SET EntityTypeQualifierValue = @SiteId WHERE [Guid] = '2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f'
+                 UPDATE [Attribute] SET EntityTypeQualifierValue = @SiteId WHERE [Guid] = '342b2c81-976d-472d-89bf-b8f8f826730e'" ); // Set EntityTypeQualifier to proper site id
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "App Image", "", "Used for Avalanche. ", 0, "", "347b7207-1f42-45b2-8ce1-15f98510265c", "AppName" );
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "App Header Image", "", "Used for Avalanche. ", 0, "", "ff664883-74a0-476e-85ac-1d8d68f85105", "AppHeaderImage" );
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.HTML, "", "", "Location Info Summary", "", "Used for Avalanche. ", 0, "", "2611897a-6dfe-470f-9a74-bd5019ea033e", "LocationInfoSummary" );
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "Parking Map", "", "Used for Avalanche. URL/Image to a Parking Map", 0, "", "c6306b5d-105e-456c-9369-98bbd37c93b6", "ParkingMap" );
 
+            // RockMigrationHelper.AddAttributeValue( "1B8B1811-D82F-48B0-A55C-4A463552264C", null, "", "1329FC96-2837-4614-80CB-4C8852C0EAA4" );
+            // Doesn't work with null EntityId, i.e. global attribute values
+            Sql( string.Format( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '{0}' )
+                DECLARE @AttributeId int
+                SET @AttributeId = (SELECT [Id] FROM [Attribute] WHERE [Guid] = '{1}')
+                IF NOT EXISTS(Select * FROM [AttributeValue] WHERE [Guid] = '{3}')
+                    INSERT INTO [AttributeValue] (
+                        [IsSystem],[AttributeId],[EntityId],[Value],[Guid])
+                    VALUES(1,@AttributeId,{2},@PageId,'{3}')",
+                "FF495C30-29C5-420C-A35B-E9E808EEBCEF",
+                "1B8B1811-D82F-48B0-A55C-4A463552264C",
+                "null",
+                "1329FC96-2837-4614-80CB-4C8852C0EAA4" )
+           );
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '567FFD63-53F9-4419-AD96-C2F07CAE09F1' )
                 UPDATE av SET av.[Value] = @PageId
                 FROM [AttributeValue] av

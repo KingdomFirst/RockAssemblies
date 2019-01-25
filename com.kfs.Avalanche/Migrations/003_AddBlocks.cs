@@ -51,10 +51,12 @@ namespace com.kfs.Avalanche.Migrations
             RockMigrationHelper.AddBlock( true, null, "355F6C23-29B3-4976-AE43-30426BE12B99", "1112BA70-CE0D-4158-8A2B-D5F2FD217BAE", "Icon Block - Back", "TopLeft", @"", @"", 0, "D2DFBCB4-894C-4E5C-A534-110B21A00FEB" );
             //// Add Block to  Site: Avalanche (v9?)
             //RockMigrationHelper.AddBlock( true, null, null, "613631FF-D19C-4F9C-B163-E9331C4BA61B", "47C24453-10F9-4A11-9BD0-3D9B1CC943D3", "Logo Image", "TopCenter", @"", @"", 0, "BD1F22F8-783B-4B87-AEB6-9B6AFE9A8938" );
+            // Add Block to Layout: Main Page Site: Avalanche
+            RockMigrationHelper.AddBlock( true, null, "FC61CD1A-15DC-4FDD-9DDD-4A0BD8936E16", "47C24453-10F9-4A11-9BD0-3D9B1CC943D3", "Logo Image", "TopCenter", @"", @"", 0, "0EDCFD24-D064-49D7-8004-A5A74BF94F9C" );
             // Add Block to Layout: No Scroll Site: Avalanche
             RockMigrationHelper.AddBlock( true, null, "901926F9-AD81-41A4-9B1E-254F5B45E471", "47C24453-10F9-4A11-9BD0-3D9B1CC943D3", "Logo Image", "TopCenter", @"", @"", 0, "BD1F22F8-783B-4B87-AEB6-9B6AFE9A8938" );
             // Add Block to Layout: Simple Site: Avalanche
-            RockMigrationHelper.AddBlock( true, null, "355F6C23-29B3-4976-AE43-30426BE12B99", "47C24453-10F9-4A11-9BD0-3D9B1CC943D3", "Logo Image", "TopCenter", @"", @"", 0, "BD1F22F8-783B-4B87-AEB6-9B6AFE9A8938" );
+            RockMigrationHelper.AddBlock( true, null, "355F6C23-29B3-4976-AE43-30426BE12B99", "47C24453-10F9-4A11-9BD0-3D9B1CC943D3", "Logo Image", "TopCenter", @"", @"", 0, "AB5D577E-92B4-49F8-AA50-9ADDA515F881" );
             // Add Block to Page: Avalanche Home Page Site: Avalanche
             RockMigrationHelper.AddBlock( true, "567FFD63-53F9-4419-AD96-C2F07CAE09F1", null, "01CFA67B-429A-432E-BA56-4F4289917D06", "Preload Block", "Main", @"", @"", 0, "FCB9F034-0036-48DC-B588-6FBE969938C9" );
             // Add Block to Page: Avalanche Home Page Site: Avalanche
@@ -369,6 +371,7 @@ namespace com.kfs.Avalanche.Migrations
             RockMigrationHelper.DeleteBlock( "99865F0D-BD8A-4AA7-88A2-D7D7859E1992" );
             // Remove Block: Text Over Image Block - Events, from Page: Avalanche Home Page, Site: Avalanche
             RockMigrationHelper.DeleteBlock( "7E1A52B6-68A9-423F-88DB-4E402360FED0" );
+            RockMigrationHelper.DeleteBlock( "47C24453-10F9-4A11-9BD0-3D9B1CC943D3" );
             // Remove Block: Text Over Image Block - Sermons, from Page: Avalanche Home Page, Site: Avalanche
             RockMigrationHelper.DeleteBlock( "A2487BA5-843D-4D7E-92A6-36A52027EB26" );
             RockMigrationHelper.DeleteBlockType( "36569642-F6D7-4EAC-AF0E-C8238BEEAF7E" ); // Person Profile Family
