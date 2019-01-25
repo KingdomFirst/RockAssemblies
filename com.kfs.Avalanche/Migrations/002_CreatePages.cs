@@ -42,21 +42,26 @@ namespace com.kfs.Avalanche.Migrations
             RockMigrationHelper.AddPage( true, "D4A5C0AB-0A90-416F-9B3F-C0ACFED92D43", "355F6C23-29B3-4976-AE43-30426BE12B99", "Note Block", "", "F522A717-2D7A-405B-87BB-CCB16C15BB44", "" ); // Site:Avalanche
             RockMigrationHelper.AddPage( true, "D4A5C0AB-0A90-416F-9B3F-C0ACFED92D43", "901926F9-AD81-41A4-9B1E-254F5B45E471", "Webview Block", "", "0FBC5CE7-CF91-45EC-B28A-A5E486764B9A", "" ); // Site:Avalanche
 
+            Sql( @"DECLARE @SiteId int = ( SELECT TOP 1 [Id] FROM [Site] WHERE [Guid] = '613631FF-D19C-4F9C-B163-E9331C4BA61B' )
+                 DECLARE @LayoutIds TABLE (id int) 
+                 INSERT INTO @LayoutIds 
+                 SELECT [Id] FROM [Layout] WHERE [SiteId] = @SiteId
+                 UPDATE [Page] SET [PageDisplayTitle] = 0 WHERE [LayoutId] IN (SELECT * FROM @LayoutIds)" );
+
             RockMigrationHelper.UpdateFieldType( "Action Item", "", "Avalanche", "Avalanche.Field.Types.ActionItemFieldType", "E5A6D6C7-DAB4-4EFA-B76F-E22AFEC5158D" );
 
             RockMigrationHelper.AddGlobalAttribute( Rock.SystemGuid.FieldType.TEXT, "", "", "Avalanche Footer Page", "Page Id of footer blocks/layout configuration", 0, "", "1B8B1811-D82F-48B0-A55C-4A463552264C" );
             RockMigrationHelper.AddGlobalAttribute( Rock.SystemGuid.FieldType.TEXT, "", "", "Avalanche Header Page", "Page Id of header blocks/layout configuration", 0, "", "B2F7130E-1C0C-41F8-A13E-3EE9B77F59B1" );
+
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.Page", Rock.SystemGuid.FieldType.TEXT, "SiteId", "", "Background Color", "", "Used for Avalanche. Hex or color name for background of page", 0, "#f2f6f8", "1fd61a40-3fe7-4b05-adca-a7edc957921e", "BackgroundColor" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Page", "E5A6D6C7-DAB4-4EFA-B76F-E22AFEC5158D", "SiteId", "", "Action Type", "", "Used for Avalanche. Used for tab/page navigation Action Types", 1, "", "2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f", "ActionType" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Page", Rock.SystemGuid.FieldType.SINGLE_SELECT, "SiteId", "", "Action Type", "", "Used for Avalanche. Used for tab/page navigation Action Types", 1, "1", "2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f", "ActionType" );
+            RockMigrationHelper.AddAttributeQualifier( "2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f", "fieldtype", "ddl", "421fda4f-1acc-47db-86fa-1bfd0a7eb903" );
+            RockMigrationHelper.AddAttributeQualifier( "2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f", "values", "0^Do Nothing,1^Push New Page,2^Replace CurrentPage,3^Pop CurrentPage,4^Open Browser", "421fda4f-1acc-47db-86fa-1bfd0a7eb903" );
             RockMigrationHelper.AddEntityAttribute( "Rock.Model.Page", Rock.SystemGuid.FieldType.TEXT, "SiteId", "", "Resource", "", "Used for Avalanche. Text string to overwrite resource value in navigation, primarily for 'Open Browser' Action type.", 2, "", "342b2c81-976d-472d-89bf-b8f8f826730e", "Resource" );
             Sql( @"DECLARE @SiteId int = ( SELECT TOP 1 [Id] FROM [Site] WHERE [Guid] = '613631FF-D19C-4F9C-B163-E9331C4BA61B' )
                  UPDATE [Attribute] SET EntityTypeQualifierValue = @SiteId WHERE [Guid] = '1fd61a40-3fe7-4b05-adca-a7edc957921e'
                  UPDATE [Attribute] SET EntityTypeQualifierValue = @SiteId WHERE [Guid] = '2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f'
                  UPDATE [Attribute] SET EntityTypeQualifierValue = @SiteId WHERE [Guid] = '342b2c81-976d-472d-89bf-b8f8f826730e'" ); // Set EntityTypeQualifier to proper site id
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "App Image", "", "Used for Avalanche. ", 0, "", "347b7207-1f42-45b2-8ce1-15f98510265c", "AppName" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "App Header Image", "", "Used for Avalanche. ", 0, "", "ff664883-74a0-476e-85ac-1d8d68f85105", "AppHeaderImage" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.HTML, "", "", "Location Info Summary", "", "Used for Avalanche. ", 0, "", "2611897a-6dfe-470f-9a74-bd5019ea033e", "LocationInfoSummary" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "Parking Map", "", "Used for Avalanche. URL/Image to a Parking Map", 0, "", "c6306b5d-105e-456c-9369-98bbd37c93b6", "ParkingMap" );
 
             // RockMigrationHelper.AddAttributeValue( "1B8B1811-D82F-48B0-A55C-4A463552264C", null, "", "1329FC96-2837-4614-80CB-4C8852C0EAA4" );
             // Doesn't work with null EntityId, i.e. global attribute values

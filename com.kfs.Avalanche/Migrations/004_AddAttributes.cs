@@ -331,11 +331,11 @@ namespace com.kfs.Avalanche.Migrations
             // Attrib Value for Block:Image Block, Attribute:Image Page: Simple Layout, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "AB5D577E-92B4-49F8-AA50-9ADDA515F881", "2E9389F8-0E3C-485D-B722-762D89C8EB2E", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/logo.png" );
             // Attrib Value for Block:Image Block, Attribute:Action Page: Main Page Layout, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "0EDCFD24-D064-49D7-8004-A5A74BF94F9C", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^518^" );
+            RockMigrationHelper.AddBlockAttributeValue( "0EDCFD24-D064-49D7-8004-A5A74BF94F9C", "68EF73D8-3C6D-4524-A3A4-9C06D95B164A", @"1^518^" );
             // Attrib Value for Block:Image Block, Attribute:Action Page: No Scroll Layout, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "BD1F22F8-783B-4B87-AEB6-9B6AFE9A8938", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^518^" );
+            RockMigrationHelper.AddBlockAttributeValue( "BD1F22F8-783B-4B87-AEB6-9B6AFE9A8938", "68EF73D8-3C6D-4524-A3A4-9C06D95B164A", @"1^518^" );
             // Attrib Value for Block:Image Block, Attribute:Action Page: Simple Layout, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "AB5D577E-92B4-49F8-AA50-9ADDA515F881", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^518^" );
+            RockMigrationHelper.AddBlockAttributeValue( "AB5D577E-92B4-49F8-AA50-9ADDA515F881", "68EF73D8-3C6D-4524-A3A4-9C06D95B164A", @"1^518^" );
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '567FFD63-53F9-4419-AD96-C2F07CAE09F1' )
                 UPDATE av SET av.[Value] = Replace([Value],518,@PageId)
                 FROM [AttributeValue] av INNER JOIN Attribute a ON a.Id = av.AttributeId INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
@@ -1135,7 +1135,17 @@ Aliquam massa eros, tincidunt vel enim eu, imperdiet tristique felis. Phasellus 
             // Attrib Value for Block:Icon Block, Attribute:Custom Attributes , Layout: No Scroll, Site: Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "962317D3-42D0-4152-839E-35AAF2BD66E2", "BE7D91EF-5C79-4940-9DA6-608933781419", @"TextColor^White|FontSize^25|Margin^15%2C19%2C10%2C16" );
 
-            //RockMigrationHelper.UpdateFieldType( "Action Item", "", "Avalanche", "Avalanche.Field.Types.ActionItemFieldType", "E5A6D6C7-DAB4-4EFA-B76F-E22AFEC5158D" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "App Image", "", "Used for Avalanche. ", 0, "", "347b7207-1f42-45b2-8ce1-15f98510265c", "AppName" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "App Header Image", "", "Used for Avalanche. ", 0, "", "ff664883-74a0-476e-85ac-1d8d68f85105", "AppHeaderImage" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.HTML, "", "", "Location Info Summary", "", "Used for Avalanche. ", 0, "", "2611897a-6dfe-470f-9a74-bd5019ea033e", "LocationInfoSummary" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "Parking Map", "", "Used for Avalanche. URL/Image to a Parking Map", 0, "", "c6306b5d-105e-456c-9369-98bbd37c93b6", "ParkingMap" );
+
+            // Give page attribute values
+            RockMigrationHelper.AddAttributeValue( "2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f", -1, "4", "2a37a673-d9ba-4572-9e70-e8a32dcb484c" );
+            RockMigrationHelper.AddAttributeValue( "342b2c81-976d-472d-89bf-b8f8f826730e", -1, @"{{ ""Global"" | Attribute:""PublicApplicationRoot"" }}/Give", "d5c08e97-5563-40d7-baac-fe43e6133a26" );
+            Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '78EDFA36-FEC9-4D74-A34B-07C76A4FC071' )
+                 UPDATE [AttributeValue] SET EntityId = @PageId WHERE [Guid] = '2a37a673-d9ba-4572-9e70-e8a32dcb484c'
+                 UPDATE [AttributeValue] SET EntityId = @PageId WHERE [Guid] = 'd5c08e97-5563-40d7-baac-fe43e6133a26'" ); // Set EntityId to proper Page id
         }
 
         /// <summary>
