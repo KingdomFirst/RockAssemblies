@@ -76,7 +76,19 @@ namespace com.kfs.Avalanche.Migrations
                 "1B8B1811-D82F-48B0-A55C-4A463552264C",
                 "null",
                 "1329FC96-2837-4614-80CB-4C8852C0EAA4" )
-           );
+           ); // Add attribute value Footer Page Id
+            Sql( string.Format( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '{0}' )
+                DECLARE @AttributeId int
+                SET @AttributeId = (SELECT [Id] FROM [Attribute] WHERE [Guid] = '{1}')
+                IF NOT EXISTS(Select * FROM [AttributeValue] WHERE [Guid] = '{3}')
+                    INSERT INTO [AttributeValue] (
+                        [IsSystem],[AttributeId],[EntityId],[Value],[Guid])
+                    VALUES(1,@AttributeId,{2},@PageId,'{3}')",
+                "567FFD63-53F9-4419-AD96-C2F07CAE09F1",
+                "5FEFE20F-742E-4204-8A1C-7E400F802288",
+                "null",
+                "e45e368e-97bd-4908-b5b3-b0ac6636f688" )
+           ); // Add attribute value Home Page Id
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '567FFD63-53F9-4419-AD96-C2F07CAE09F1' )
                 UPDATE av SET av.[Value] = @PageId
                 FROM [AttributeValue] av
