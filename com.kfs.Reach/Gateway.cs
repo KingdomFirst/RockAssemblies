@@ -368,11 +368,14 @@ namespace com.kfs.Reach
                 using ( var rockContext = new RockContext() )
                 {
                     // create batch and add transactions
-                    var batchDate = newTransactions.Select( t => (DateTime)t.CreatedDateTime ).Max();
+                    var batchPrefix = GetAttributeValue( gateway, "BatchPrefix" );
+                    var batchDate = newTransactions.GroupBy( t => t.TransactionDateTime.Value.Date ).OrderByDescending( t => t.Count() )
+                        .Select( g => g.Key ).FirstOrDefault();
                     var batch = new FinancialBatchService( rockContext ).GetByNameAndDate( string.Format( "{0} {1}",
-                        GetAttributeValue( gateway, "BatchPrefix" ), batchDate.ToString( "d" ) ), endDate, gateway.GetBatchTimeOffset() );
-                    batch.BatchStartDateTime = startDate;
-                    batch.BatchEndDateTime = batchDate;
+                        batchPrefix, batchDate.ToString( "d" ) ), endDate, gateway.GetBatchTimeOffset() );
+                    batch.BatchStartDateTime = batchDate;
+                    batch.BatchEndDateTime = endDate;
+                    batch.Note = string.Format( "{0} transactions downloaded starting {1} to {2}", batchPrefix, startDate, endDate );
                     batch.ControlAmount += newTransactions.Select( t => t.TotalAmount ).Sum();
 
                     var currentChanges = 0;
