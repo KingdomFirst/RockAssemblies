@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web;
+
 using Quartz;
 
 using Rock;
 using Rock.Attribute;
+using Rock.Communication;
 using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
@@ -50,10 +52,9 @@ namespace com.kfs.GroupScheduledEmails.Jobs
             var JobStartDateTime = RockDateTime.Now;
             var dateAttributes = new List<AttributeValue>();
             var dAttributeMatrixItemAndGroupIds = new Dictionary<int, int>(); // Key: AttributeMatrixItemId   Value: GroupId
-            var exceptionMsgs = new List<string>();
             int communicationsSent = 0;
             var emailMediumType = EntityTypeCache.Get( "Rock.Communication.Medium.Email" );
-            var dateAttribute = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SEND_DATE.AsGuid() );
+            var dateAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SEND_DATE.AsGuid() ).Id;
             var fromEmailAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_FROM_EMAIL.AsGuid() ).Id;
             var fromNameAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_FROM_NAME.AsGuid() ).Id;
             var subjectAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SUBJECT.AsGuid() ).Id;
@@ -82,7 +83,7 @@ namespace com.kfs.GroupScheduledEmails.Jobs
                     // get the date attributes
                     dateAttributes = new AttributeValueService( rockContext )
                         .Queryable().AsNoTracking()
-                        .Where( d => d.AttributeId == dateAttribute.Id &&
+                        .Where( d => d.AttributeId == dateAttributeId &&
                                 d.EntityId.HasValue &&
                                 d.ValueAsDateTime >= beginDateTime &&
                                 d.ValueAsDateTime <= JobStartDateTime )
@@ -94,19 +95,6 @@ namespace com.kfs.GroupScheduledEmails.Jobs
                     // Use a new context to limit the amount of change-tracking required
                     using ( var rockContext = new RockContext() )
                     {
-                        /*
-                        var attributeMatrixId = new AttributeMatrixItemService( rockContext )
-                            .Queryable().AsNoTracking()
-                            .FirstOrDefault( i => i.Id == d.EntityId.Value )
-                            .AttributeMatrixId;
-
-                        var attributeMatrixGuid = new AttributeMatrixService( rockContext )
-                            .Queryable().AsNoTracking()
-                            .FirstOrDefault( m => m.Id == attributeMatrixId )
-                            .Guid
-                            .ToString();
-                        */
-
                         var attributeMatrixId = new AttributeMatrixItemService( rockContext )
                             .GetNoTracking( d.EntityId.Value )
                             .AttributeMatrixId;
@@ -133,136 +121,85 @@ namespace com.kfs.GroupScheduledEmails.Jobs
                     using ( var rockContext = new RockContext() )
                     {
                         rockContext.Database.CommandTimeout = commandTimeout;
-                        //try
-                        //{
-                            /*
-                            var fromEmail = new AttributeValueService( rockContext )
-                                .Queryable().AsNoTracking()
-                                .FirstOrDefault( v => v.AttributeId == fromEmailAttributeId && v.EntityId == attributeMatrixItemAndGroupId.Key )
-                                .Value;
 
-                            var fromName = new AttributeValueService( rockContext )
-                                .Queryable().AsNoTracking()
-                                .FirstOrDefault( v => v.AttributeId == fromNameAttributeId && v.EntityId == attributeMatrixItemAndGroupId.Key )
-                                .Value;
+                        var fromEmail = new AttributeValueService( rockContext )
+                            .GetByAttributeIdAndEntityId( fromEmailAttributeId, attributeMatrixItemAndGroupId.Key )
+                            .Value;
 
-                            var subject = new AttributeValueService( rockContext )
-                                .Queryable().AsNoTracking()
-                                .FirstOrDefault( v => v.AttributeId == subjectAttributeId && v.EntityId == attributeMatrixItemAndGroupId.Key )
-                                .Value;
+                        var fromName = new AttributeValueService( rockContext )
+                            .GetByAttributeIdAndEntityId( fromNameAttributeId, attributeMatrixItemAndGroupId.Key )
+                            .Value;
 
-                            var message = new AttributeValueService( rockContext )
-                                .Queryable().AsNoTracking()
-                                .FirstOrDefault( v => v.AttributeId == messageAttributeId && v.EntityId == attributeMatrixItemAndGroupId.Key )
-                                .Value;
-                            */
+                        var subject = new AttributeValueService( rockContext )
+                            .GetByAttributeIdAndEntityId( subjectAttributeId, attributeMatrixItemAndGroupId.Key )
+                            .Value;
 
-                            var fromEmail = new AttributeValueService( rockContext )
-                                .GetByAttributeIdAndEntityId( fromEmailAttributeId, attributeMatrixItemAndGroupId.Key )
-                                .Value;
+                        var message = new AttributeValueService( rockContext )
+                            .GetByAttributeIdAndEntityId( messageAttributeId, attributeMatrixItemAndGroupId.Key )
+                            .Value;
 
-                            var fromName = new AttributeValueService( rockContext )
-                                .GetByAttributeIdAndEntityId( fromNameAttributeId, attributeMatrixItemAndGroupId.Key )
-                                .Value;
+                        var attachments = new List<BinaryFile>();
 
-                            var subject = new AttributeValueService( rockContext )
-                                .GetByAttributeIdAndEntityId( subjectAttributeId, attributeMatrixItemAndGroupId.Key )
-                                .Value;
+                        var group = new GroupService( rockContext )
+                            .GetNoTracking( attributeMatrixItemAndGroupId.Value );
 
-                            var message = new AttributeValueService( rockContext )
-                                .GetByAttributeIdAndEntityId( messageAttributeId, attributeMatrixItemAndGroupId.Key )
-                                .Value;
+                        if ( !message.IsNullOrWhiteSpace() && emailMediumType != null )
+                        {
+                            var groupMembers = group.Members.Where( m => m.Person != null && m.Person.Email != null && m.Person.Email != string.Empty && m.GroupMemberStatus == GroupMemberStatus.Active );
 
-                            var attachments = new List<BinaryFile>();
-
-                            /*
-                            var group = new GroupService( rockContext )
-                                .Queryable().AsNoTracking()
-                                .Where( g => g.Id == attributeMatrixItemAndGroupId.Value )
-                                .FirstOrDefault();
-                            */
-
-                            var group = new GroupService( rockContext )
-                                .GetNoTracking( attributeMatrixItemAndGroupId.Value );
-
-                            if ( !message.IsNullOrWhiteSpace() && emailMediumType != null )
+                            if ( !groupMembers.Any() )
                             {
-                                var recipients = new GroupMemberService( rockContext )
-                                    .GetByGroupId( attributeMatrixItemAndGroupId.Value ).AsNoTracking()
-                                    .Where( m => m.GroupMemberStatus == GroupMemberStatus.Active )
-                                    .ToList();
+                                continue;
+                            }
 
-                                if ( recipients.Any() )
+                            var communicationService = new CommunicationService( rockContext );
+
+                            var communication = new Rock.Model.Communication();
+                            communication.Status = CommunicationStatus.Transient;
+                            communication.ReviewedDateTime = JobStartDateTime;
+                            communication.ReviewerPersonAliasId = group.ModifiedByPersonAliasId;
+                            communication.SenderPersonAliasId = group.ModifiedByPersonAliasId;
+                            communication.CreatedByPersonAliasId = group.ModifiedByPersonAliasId;
+                            communicationService.Add( communication );
+
+                            communication.EnabledLavaCommands = enabledLavaCommands;
+
+                            var personIdHash = new HashSet<int>();
+                            foreach ( var member in groupMembers )
+                            {
+                                if ( !personIdHash.Contains( member.PersonId ) )
                                 {
-                                    var communicationService = new CommunicationService( rockContext );
-
-                                    var communication = new Rock.Model.Communication();
-                                    communication.Status = CommunicationStatus.Transient;
-                                    communication.ReviewedDateTime = JobStartDateTime;
-                                    communication.ReviewerPersonAliasId = group.ModifiedByPersonAliasId;
-                                    communication.SenderPersonAliasId = group.ModifiedByPersonAliasId;
-                                    communication.CreatedByPersonAliasId = group.ModifiedByPersonAliasId;
-                                    communicationService.Add( communication );
-
-                                    communication.EnabledLavaCommands = enabledLavaCommands;
-                                    var personIdHash = new HashSet<int>();
-                                    foreach ( var groupMember in recipients )
-                                    {
-                                        // Use a new context to limit the amount of change-tracking required
-                                        using ( var groupMemberContext = new RockContext() )
-                                        {
-                                            if ( !personIdHash.Contains( groupMember.PersonId ) )
-                                            {
-                                                var person = new PersonService( groupMemberContext )
-                                                    .GetNoTracking( groupMember.PersonId );
-
-                                                if ( person != null && person.PrimaryAliasId.HasValue )
-                                                {
-                                                    personIdHash.Add( groupMember.PersonId );
-                                                    var communicationRecipient = new CommunicationRecipient();
-                                                    communicationRecipient.PersonAliasId = person.PrimaryAliasId.Value;
-                                                    communicationRecipient.AdditionalMergeValues = new Dictionary<string, object>();
-                                                    communicationRecipient.AdditionalMergeValues.Add( "GroupMember", groupMember );
-                                                    communicationRecipient.AdditionalMergeValues.Add( "Group", group );
-                                                    communication.Recipients.Add( communicationRecipient );
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    communication.IsBulkCommunication = false;
-                                    communication.CommunicationType = CommunicationType.Email;
-                                    communication.CommunicationTemplateId = null;
-
-                                    foreach ( var recipient in communication.Recipients )
-                                    {
-                                        recipient.MediumEntityTypeId = emailMediumType.Id;
-                                    }
-
-                                    communication.FromEmail = fromEmail;
-                                    communication.FromName = fromName;
-                                    communication.Subject = subject;
-                                    communication.Message = message;
-                                    communication.Status = CommunicationStatus.Approved;
-
-                                    rockContext.SaveChanges();
-
-                                    Rock.Model.Communication.Send( communication );
-
-                                    //var transaction = new Rock.Transactions.SendCommunicationTransaction();
-                                    //transaction.CommunicationId = communication.Id;
-                                    //transaction.PersonAlias = group.ModifiedByPersonAlias;
-                                    //Rock.Transactions.RockQueue.TransactionQueue.Enqueue( transaction );
-
-                                    communicationsSent = communicationsSent + personIdHash.Count;
+                                    personIdHash.Add( member.PersonId );
+                                    var communicationRecipient = new CommunicationRecipient();
+                                    communicationRecipient.PersonAliasId = member.Person.PrimaryAliasId.Value;
+                                    communicationRecipient.AdditionalMergeValues = new Dictionary<string, object>();
+                                    communicationRecipient.AdditionalMergeValues.Add( "GroupMember", member );
+                                    //communicationRecipient.AdditionalMergeValues.Add( "Group", group );
+                                    communication.Recipients.Add( communicationRecipient );
                                 }
                             }
-                        //}
-                        //catch ( Exception ex )
-                        //{
-                        //    exceptionMsgs.Add( string.Format( "Exception occurred sending message from group {0}:{1}    {2}", attributeMatrixItemAndGroupId.Value, Environment.NewLine, ex.Messages().AsDelimited( Environment.NewLine + "   " ) ) );
-                        //    ExceptionLogService.LogException( ex, System.Web.HttpContext.Current );
-                        //}
+
+                            communication.IsBulkCommunication = false;
+                            communication.CommunicationType = CommunicationType.Email;
+                            communication.CommunicationTemplateId = null;
+
+                            foreach ( var recipient in communication.Recipients )
+                            {
+                                recipient.MediumEntityTypeId = emailMediumType.Id;
+                            }
+
+                            communication.FromEmail = fromEmail;
+                            communication.FromName = fromName;
+                            communication.Subject = subject;
+                            communication.Message = message;
+                            communication.Status = CommunicationStatus.Approved;
+
+                            rockContext.SaveChanges();
+
+                            Rock.Model.Communication.Send( communication );
+
+                            communicationsSent += personIdHash.Count;
+                        }
                     }
                 }
 
@@ -274,11 +211,6 @@ namespace com.kfs.GroupScheduledEmails.Jobs
                 {
                     context.Result = "No communications to send";
                 }
-
-                //if ( exceptionMsgs.Any() )
-                //{
-                //    throw new Exception( "One or more exceptions occurred sending communications..." + Environment.NewLine + exceptionMsgs.AsDelimited( Environment.NewLine ) );
-                //}
             }
             catch ( System.Exception ex )
             {
