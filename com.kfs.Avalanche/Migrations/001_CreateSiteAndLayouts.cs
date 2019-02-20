@@ -2,7 +2,7 @@
 using Avalanche;
 using Rock.Plugin;
 
-namespace com.kfs.Avalanche.Migrations
+namespace rocks.kfs.Avalanche.Migrations
 {
     [MigrationNumber( 1, "1.8.0" )]
     public class CreateSiteAndLayouts : Migration

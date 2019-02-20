@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Rock.Plugin;
 
-namespace com.kfs.Avalanche.Migrations
+namespace rocks.kfs.Avalanche.Migrations
 {
     [MigrationNumber( 2, "1.8.0" )]
     public class CreatePages : Migration
