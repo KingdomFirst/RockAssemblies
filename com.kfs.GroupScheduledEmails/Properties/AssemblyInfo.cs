@@ -5,9 +5,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle( "com.kfs.GroupScheduledEmails" )]
+[assembly: AssemblyProduct( "com.kfs.GroupScheduledEmails" )]
+[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2019" )]
 
 // Auto increment assembly versions
-[assembly: AssemblyVersion( "1.2.*" )]
+[assembly: AssemblyVersion( "1.3.*" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
