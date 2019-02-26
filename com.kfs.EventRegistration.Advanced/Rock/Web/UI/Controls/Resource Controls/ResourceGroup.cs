@@ -24,6 +24,7 @@ namespace com.kfs.EventRegistration.Advanced
 
         private DataTextBox _tbGroupName;
         private RockCheckBox _cbIsActive;
+        private RockDropDownList _ddlGroupRequirement;
         private PlaceHolder _phGroupAttributes;
         private Grid _gLocations;
 
@@ -222,6 +223,20 @@ namespace com.kfs.EventRegistration.Advanced
         {
             group.Name = _tbGroupName.Text;
             group.IsActive = _cbIsActive.Checked;
+
+            var groupRequirementId = _ddlGroupRequirement.SelectedValueAsId();
+            if ( groupRequirementId.HasValue )
+            {
+                if ( !group.GroupRequirements.Any( r => r.Id.Equals( (int)groupRequirementId ) ) )
+                {
+                    group.GroupRequirements.Add( new GroupRequirement { GroupRequirementTypeId = (int)groupRequirementId } );
+                }
+            }
+            else
+            {
+                group.GroupRequirements.Clear();
+            }
+
             Rock.Attribute.Helper.GetEditValues( _phGroupAttributes, group );
         }
 
@@ -246,6 +261,7 @@ namespace com.kfs.EventRegistration.Advanced
                 _tbGroupName.Text = value.Name;
                 _cbIsActive.Checked = value.IsActive;
 
+                CreateGroupRequirementControls( value, rockContext );
                 CreateGroupAttributeControls( value, rockContext );
             }
         }
@@ -277,6 +293,11 @@ namespace com.kfs.EventRegistration.Advanced
             _cbIsActive.ID = this.ID + "_cbIsActive";
             _cbIsActive.Text = "Active";
 
+            _ddlGroupRequirement = new RockDropDownList();
+            _ddlGroupRequirement.ID = this.ID + "_ddlGroupRequirement";
+            _ddlGroupRequirement.Label = "Group Requirement";
+            _ddlGroupRequirement.Help = "The requirement to add to this group. To add more than a single requirement, use the Group Viewer.";
+
             // set label when they exit the edit field
             _tbGroupName.Attributes["onblur"] = string.Format( "javascript: $('#{0}').text($(this).val());", _lblGroupName.ID );
             _tbGroupName.SourceTypeName = "Rock.Model.Group, Rock";
@@ -291,6 +312,7 @@ namespace com.kfs.EventRegistration.Advanced
             Controls.Add( _lblGroupName );
             Controls.Add( _tbGroupName );
             Controls.Add( _cbIsActive );
+            Controls.Add( _ddlGroupRequirement );
             Controls.Add( _phGroupAttributes );
 
             // Locations Grid
@@ -351,6 +373,7 @@ namespace com.kfs.EventRegistration.Advanced
 
                 _tbGroupName.RenderControl( writer );
                 _cbIsActive.RenderBaseControl( writer );
+                _ddlGroupRequirement.RenderControl( writer );
                 _phGroupAttributes.RenderControl( writer );
 
                 if ( EnableAddLocations )
@@ -364,6 +387,36 @@ namespace com.kfs.EventRegistration.Advanced
 
                     _gLocations.RenderControl( writer );
                 }
+            }
+        }
+
+        /// <summary>
+        /// Creates the group requirement controls.
+        /// </summary>
+        /// <param name="group">The group.</param>
+        /// <param name="rockContext">The rock context.</param>
+        public void CreateGroupRequirementControls( Group group, RockContext rockContext )
+        {
+            EnsureChildControls();
+
+            _ddlGroupRequirement.Items.Clear();
+            _ddlGroupRequirement.SelectedIndex = -1;
+
+            if ( group != null )
+            {
+                var selectedRequirement = group.GroupRequirements.Select( r => r.GroupRequirementTypeId ).FirstOrDefault();
+                var groupRequirements = new GroupRequirementTypeService( rockContext ).Queryable().ToList();
+
+                _ddlGroupRequirement.Items.Add( Rock.Constants.None.ListItem );
+                _ddlGroupRequirement.Items.AddRange(
+                    groupRequirements.Select( r => new ListItem
+                    {
+                        Text = r.Name,
+                        Value = r.Id.ToString()
+                    } ).ToArray()
+                );
+
+                _ddlGroupRequirement.Items.FindByValue( selectedRequirement.ToString() ).Selected = true;
             }
         }
 

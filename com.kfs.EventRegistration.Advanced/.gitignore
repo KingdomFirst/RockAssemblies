@@ -3,6 +3,8 @@
 /bin/*.pdb
 /bin/*.xml
 /bin/*.config
+/obj/[Dd]ebug
+/obj/Release
 
 /*.suo
 /*.user

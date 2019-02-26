@@ -20,11 +20,18 @@
 **/desktop.ini
 **/ehthumbs.db
 **/Thumbs.db
+*.user
+*.suo
+.vs/*
+*/bin/*
+*/obj/*
 
-# Jobs Debug Files #
-####################
+# Debug and Release Files #
+###########################
 **/[Dd]ebug/*
+**/[Rr]elease/*
 
 # Reporting Sevices Files #
 ###########################
 **/SqlServerTypes/*
+com.kfs.Import/bin/

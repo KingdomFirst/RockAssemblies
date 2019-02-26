@@ -8,7 +8,7 @@ using Rock.Plugin;
 
 namespace com.kfs.ShelbyBatchExport.Migrations
 {
-    [MigrationNumber( 1, "1.6.1" )]
+    [MigrationNumber( 1, "1.8.0" )]
     public class CreateShelbyGLAssets : Migration
     {
         /// <summary>
@@ -63,11 +63,11 @@ namespace com.kfs.ShelbyBatchExport.Migrations
             " );
 
             // account gl attributes
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Company", "", "", 1, "", "A211D2C9-249D-4D33-B120-A3EAB37C1EDF", "GeneralLedgerExport_Company" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Fund", "", "", 2, "", "B83D7934-F85A-42B7-AD0E-B4E16D63C189", "GeneralLedgerExport_Fund" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Bank Account", "", "", 3, "", "FD4EF8CC-DDB7-4DBD-9FD1-601A0119850B", "GeneralLedgerExport_BankAccount" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Revenue Department", "", "", 4, "", "2C1EE0CC-D329-453B-B4F0-29549E24ED05", "GeneralLedgerExport_RevenueDepartment" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Revenue Account", "", "", 5, "", "0D114FB9-B1AA-4D6D-B0F3-9BB739710992", "GeneralLedgerExport_RevenueAccount" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Company", "", "", 1, "", "A211D2C9-249D-4D33-B120-A3EAB37C1EDF", "OLD_com.kfs.Shelby.Company" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Fund", "", "", 2, "", "B83D7934-F85A-42B7-AD0E-B4E16D63C189", "OLD_com.kfs.Shelby.Fund" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Bank Account", "", "", 3, "", "FD4EF8CC-DDB7-4DBD-9FD1-601A0119850B", "OLD_com.kfs.Shelby.BankAccount" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Revenue Department", "", "", 4, "", "2C1EE0CC-D329-453B-B4F0-29549E24ED05", "OLD_com.kfs.Shelby.RevenueDepartment" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Revenue Account", "", "", 5, "", "0D114FB9-B1AA-4D6D-B0F3-9BB739710992", "OLD_com.kfs.Shelby.RevenueAccount" );
 
             RockMigrationHelper.UpdateCategory( "5997C8D3-8840-4591-99A5-552919F90CBD", "GL Export", "fa fa-calculator", "", "C19D547F-CD02-45C1-9962-FA1DBCEC2897" ); // batch
             RockMigrationHelper.UpdateCategory( "5997C8D3-8840-4591-99A5-552919F90CBD", "GL Export", "fa fa-calculator", "", "DD221639-4EFF-4C16-9E7B-BE318E9E9F55" ); // transaction
