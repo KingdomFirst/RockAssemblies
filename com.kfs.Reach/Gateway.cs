@@ -219,6 +219,11 @@ namespace com.kfs.Reach
             var newTransactions = new List<FinancialTransaction>();
             var categoryResult = Api.PostRequest( categoryUrl, authenticator, null, out errorMessage );
             var categories = JsonConvert.DeserializeObject<List<Reporting.Category>>( categoryResult.ToStringSafe() );
+            if ( !categories.Any() )
+            {
+                // errorMessage already set
+                return null;
+            }
 
             while ( queryHasResults )
             {
@@ -233,7 +238,8 @@ namespace com.kfs.Reach
                 // to_date doesn't have a timestamp, so it includes transactions posted after the cutoff
                 var donationResult = Api.PostRequest( donationUrl, authenticator, parameters, out errorMessage );
                 var donations = JsonConvert.DeserializeObject<List<Donation>>( donationResult.ToStringSafe() );
-                if ( donations.Any() && errorMessage.IsNullOrWhiteSpace() )
+                var continueProcessing = errorMessage.IsNullOrWhiteSpace();
+                if ( donations.Any() && continueProcessing )
                 {
                     // only process completed transactions with confirmation codes and within the date range
                     foreach ( var donation in donations.Where( d => d.updated_at >= startDate && d.updated_at < endDate && d.status.Equals( "complete" ) && d.confirmation.IsNotNullOrWhiteSpace() ) )
@@ -349,7 +355,12 @@ namespace com.kfs.Reach
                         }
                     }
                 }
-                else
+                else if ( !continueProcessing )
+                {
+                    errorMessages.Add( errorMessage );
+                    errorMessage = string.Empty;
+                }
+                else 
                 {
                     queryHasResults = false;
                 }
