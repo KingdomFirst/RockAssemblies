@@ -19,6 +19,7 @@ namespace com.kfs.EventRegistration.Advanced.Migrations
         private string EventLodgingGuid = "EB8D40E7-A71E-4288-853F-2084AE3CB24D";
         private string EventTransportationGuid = "6BDD3A27-E178-44FD-A3AC-6C177D59EE18";
         private string EventVolunteerGuid = "181EAC76-7FA5-47B1-8D5D-2D1E25C76A8B";
+        private string GroupTypePurposeServingAreaGuid = "36A554CE-7815-41B9-A435-93F3D52A2828";
 
         /// <summary>
         /// Ups this instance.
@@ -49,7 +50,7 @@ namespace com.kfs.EventRegistration.Advanced.Migrations
             RockMigrationHelper.AddGroupType( "Event Activities", "Activity Groups for Advanced Events.", "Activity", "Participant", false, true, true, "fa fa-futbol-o", 0, AdvancedEventGuid, 0, "", EventActivityGuid, false);
             RockMigrationHelper.AddGroupType( "Event Lodging", "Lodging Groups for Advanced Events.", "Lodging", "Occupant", false, true, true, "fa fa-bed", 0, AdvancedEventGuid, 0, "", EventLodgingGuid, false);
             RockMigrationHelper.AddGroupType( "Event Transportation", "Transportation Groups for Advanced Events.", "Vehicle", "Passenger", false, true, true, "fa fa-bus", 0, AdvancedEventGuid, 0, "", EventTransportationGuid, false);
-            RockMigrationHelper.AddGroupType( "Event Volunteers", "Volunteer Groups for Advanced Events.", "Group", "Volunteer", false, true, true, "fa fa-handshake-o", 0, AdvancedEventGuid, 0, "", EventVolunteerGuid, false);
+            RockMigrationHelper.AddGroupType( "Event Volunteers", "Volunteer Groups for Advanced Events.", "Group", "Volunteer", false, true, true, "fa fa-handshake-o", 0, AdvancedEventGuid, 0, GroupTypePurposeServingAreaGuid, EventVolunteerGuid, false);
 
             Sql( $@"
                 DECLARE @AdvancedEventId INT = (SELECT [ID] FROM GroupType WHERE [Guid] = '{AdvancedEventGuid}')
