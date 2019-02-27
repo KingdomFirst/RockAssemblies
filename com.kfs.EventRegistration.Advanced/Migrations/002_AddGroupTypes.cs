@@ -28,7 +28,8 @@ namespace com.kfs.EventRegistration.Advanced.Migrations
             // check if grouptype already exists
             using ( var rockContext = new RockContext() )
             {
-                if ( !new GroupTypeService( rockContext ).Queryable().Any( gt => gt.Name == "Advanced Event Registration" || gt.Guid.Equals( AdvancedEventGuid ) ) )
+                var eventGuid = AdvancedEventGuid.AsGuid();
+                if ( new GroupTypeService( rockContext ).Queryable().Any( gt => gt.Name == "Advanced Event Registration" || gt.Guid.Equals( eventGuid ) ) )
                 {
                     return;
                 }
