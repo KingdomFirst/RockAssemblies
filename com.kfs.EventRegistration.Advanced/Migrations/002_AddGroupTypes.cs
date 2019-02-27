@@ -38,7 +38,7 @@ namespace com.kfs.EventRegistration.Advanced.Migrations
 
             // add primary grouptype
             RockMigrationHelper.AddGroupType( "Advanced Event Registration", "This template triggers advanced features for the Event Registration module.", "Advanced Events", "Member", false, true, true, "fa fa-fire", 0, "", 0, "", AdvancedEventGuid, false);
-
+            
             // add grouptype attributes to the primary grouptype
             AddGroupTypeAttribute( "Rock.Model.GroupType",AdvancedEventGuid,BooleanFieldTypeGuid,"Allow Multiple Registrations",@"Should registrants be allowed to join multiple groups of this type?",0,"False", true, "4F9CA590-882A-4A2A-9262-C9350953C996" );
             AddGroupTypeAttribute( "Rock.Model.GroupType",AdvancedEventGuid,BooleanFieldTypeGuid,"Allow Volunteer Assignment",@"Should volunteers be allowed to join groups of this type?",1,"False",true,"7129D352-5468-4BD9-BF2E-5CF9758D83BF");
@@ -123,7 +123,7 @@ namespace com.kfs.EventRegistration.Advanced.Migrations
                     SELECT [Id]
                     FROM [Attribute]
                     WHERE [EntityTypeId] = @EntityTypeId
-                    AND [EntityTypeQualifierColumn] = 'GroupTypeId'
+                    AND [EntityTypeQualifierColumn] = 'Id'
                     AND [EntityTypeQualifierValue] = @GroupTypeId
                     AND [Key] = '{attributeKey}' )
                 BEGIN
@@ -136,7 +136,7 @@ namespace com.kfs.EventRegistration.Advanced.Migrations
                         [IsRequired]= {isRequired.Bit()},
                         [Guid] = '{guid}'
                     WHERE [EntityTypeId] = @EntityTypeId
-                    AND [EntityTypeQualifierColumn] = 'GroupTypeId'
+                    AND [EntityTypeQualifierColumn] = 'Id'
                     AND [EntityTypeQualifierValue] = @GroupTypeId
                     AND [Key] = '{attributeKey}'
                 END
@@ -161,7 +161,7 @@ namespace com.kfs.EventRegistration.Advanced.Migrations
                         (1
                         ,@FieldTypeId
                         ,@EntityTypeId
-                        ,'GroupTypeId'
+                        ,'Id'
                         ,@GroupTypeId
                         ,'{attributeKey}'
                         ,'{name}'
