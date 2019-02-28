@@ -64,18 +64,22 @@ namespace com.kfs.Reach.Reporting
                 {
                     return response.Content;
                 }
+                else
+                {
+                    errorMessage = $"Error with API request: {response.ErrorMessage} {response.StatusDescription}";
+                    return null;
+                }
             }
             catch ( WebException webException )
             {
-                var message = GetResponseMessage( webException.Response.GetResponseStream() );
-                throw new Exception( webException.Message + " - " + message );
+                errorMessage = GetResponseMessage( webException.Response.GetResponseStream() );
+                return null;
             }
             catch ( Exception ex )
             {
-                throw new Exception( ex?.InnerException?.Message, ex );
+                errorMessage = ex?.InnerException?.Message;
+                return null;
             }
-
-            return null;
         }
 
         /// <summary>
