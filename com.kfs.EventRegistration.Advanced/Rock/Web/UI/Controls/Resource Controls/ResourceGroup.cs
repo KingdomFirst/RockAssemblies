@@ -229,7 +229,7 @@ namespace com.kfs.EventRegistration.Advanced
             {
                 if ( !group.GroupRequirements.Any( r => r.Id.Equals( (int)groupRequirementId ) ) )
                 {
-                    group.GroupRequirements.Add( new GroupRequirement { GroupRequirementTypeId = (int)groupRequirementId } );
+                    group.GroupRequirements.Add( new GroupRequirement { GroupRequirementTypeId = (int)groupRequirementId, MustMeetRequirementToAddMember = true } );
                 }
             }
             else
