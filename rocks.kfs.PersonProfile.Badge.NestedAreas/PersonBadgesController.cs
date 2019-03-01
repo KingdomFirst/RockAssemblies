@@ -1,30 +1,47 @@
-﻿using System;
+﻿// <copyright>
+// Copyright by the Spark Development Network
+//
+// Licensed under the Rock Community License (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.rockrms.com/license
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+// <notice>
+// This file contains modifications by Kingdom First Solutions
+// and is a derivative work.
+//
+// Modification (including but not limited to):
+// * Sorts the returned groups by order then name.
+// * Adds property with comma separated list of leaders.
+// </notice>
+//
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
-using System.Net;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Web;
 using System.Web.Http;
-using System.Web.Http.WebHost;
 
 using Rock;
 using Rock.Data;
 using Rock.Model;
 using Rock.Rest;
 using Rock.Rest.Filters;
-using Rock.Security;
-using Rock.Web.Cache;
 
-namespace com.kfs.PersonBadges.Rest
+namespace rocks.kfs.PersonBadges.Rest
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    public class com_kfs_PersonBadges_Rest_PersonBadgesController : ApiControllerBase, IHasCustomRoutes
+    public class rocks_kfs_PersonBadges_Rest_PersonBadgesController : ApiControllerBase, IHasCustomRoutes
     {
         /// <summary>
         /// Add in the routes that are supported by this badge
@@ -33,11 +50,11 @@ namespace com.kfs.PersonBadges.Rest
         public void AddRoutes( System.Web.Routing.RouteCollection routes )
         {
             routes.MapHttpRoute(
-                name: "com.kfs.PersonBadges.Rest.PersonBadgesController",
-                routeTemplate: "api/com.kfs/PersonBadges/NestedGeofencingGroups/{personId}/{groupTypeGuid}",
+                name: "rocks.kfs.PersonBadges.Rest.PersonBadgesController",
+                routeTemplate: "api/rocks.kfs/PersonBadges/NestedGeofencingGroups/{personId}/{groupTypeGuid}",
                 defaults: new
                 {
-                    controller = "com_kfs_PersonBadges_Rest_PersonBadges"
+                    controller = "rocks_kfs_PersonBadges_Rest_PersonBadges"
                 } );
         }
 
@@ -49,7 +66,7 @@ namespace com.kfs.PersonBadges.Rest
         /// <returns></returns>
         [Authenticate, Secured]
         [HttpGet]
-        [System.Web.Http.Route( "api/com.kfs/PersonBadges/NestedGeofencingGroups/{personId}/{groupTypeGuid}" )]
+        [System.Web.Http.Route( "api/rocks.kfs/PersonBadges/NestedGeofencingGroups/{personId}/{groupTypeGuid}" )]
         public List<GroupAndLeaderInfo> GetGeofencingGroups( int personId, Guid groupTypeGuid )
         {
             var rockContext = new RockContext();
@@ -58,7 +75,7 @@ namespace com.kfs.PersonBadges.Rest
             var groups = new GroupService( rockContext ).GetGeofencingGroups( personId, groupTypeGuid ).AsNoTracking();
 
             var result = new List<GroupAndLeaderInfo>();
-            foreach ( var group in groups.OrderBy( g => g.Order ) )
+            foreach ( var group in groups.OrderBy( g => g.Order ).ThenBy( g => g.Name ) )
             {
                 var info = new GroupAndLeaderInfo();
                 info.GroupName = group.Name.Trim();
