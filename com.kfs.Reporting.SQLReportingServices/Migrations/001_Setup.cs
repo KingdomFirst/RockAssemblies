@@ -67,7 +67,7 @@ namespace com.kfs.Reporting.SQLReportingServices.Migrations
             // Attrib Value for Block:Reporting Services Tree, Attribute:Show Hidden Items Page: Reporting Services, Site: Rock RMS
             RockMigrationHelper.AddBlockAttributeValue( "60F24AEB-38C8-4430-932F-8F1A1F6D472E", "B1C319AD-0849-4252-B1AC-911CF6F6E14B", @"False" );
             // Attrib Value for Block:Reporting Services Tree, Attribute:Root Folder Page: Reporting Services, Site: Rock RMS
-            RockMigrationHelper.AddBlockAttributeValue( "60F24AEB-38C8-4430-932F-8F1A1F6D472E", "0DB0C38B-0B0D-4274-9D84-0B0BEA00B6CE", @"/Rock" );
+            RockMigrationHelper.AddBlockAttributeValue( "60F24AEB-38C8-4430-932F-8F1A1F6D472E", "0DB0C38B-0B0D-4274-9D84-0B0BEA00B6CE", @"/" );
         }
 
         /// <summary>
