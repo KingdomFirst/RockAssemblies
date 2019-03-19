@@ -16,7 +16,6 @@ namespace rocks.kfs.Avalanche.Migrations
         /// </summary>
         public override void Up()
         {
-            RockMigrationHelper.AddPage( true, null, "FC61CD1A-15DC-4FDD-9DDD-4A0BD8936E16", "KFS Avalanche Home Page", "", "567FFD63-53F9-4419-AD96-C2F07CAE09F1", "" ); // Site:KFS Avalanche
             RockMigrationHelper.AddPage( true, "567FFD63-53F9-4419-AD96-C2F07CAE09F1", "901926F9-AD81-41A4-9B1E-254F5B45E471", "Sermons", "", "9711DB54-0FB0-4722-AB45-1DFB6158F922", "fa fa-tv" ); // Site:KFS Avalanche
             RockMigrationHelper.AddPage( true, "567FFD63-53F9-4419-AD96-C2F07CAE09F1", "355F6C23-29B3-4976-AE43-30426BE12B99", "Visit", "", "CD8A05F8-24FF-4D38-8ED0-FE2BF07C0CDE", "fa fa-map-marker" ); // Site:KFS Avalanche
             RockMigrationHelper.AddPage( true, "567FFD63-53F9-4419-AD96-C2F07CAE09F1", "355F6C23-29B3-4976-AE43-30426BE12B99", "Connect", "", "DE6D125E-892E-4F10-A33D-F84942582B1E", "fa fa-link" ); // Site:KFS Avalanche
@@ -134,8 +133,6 @@ namespace rocks.kfs.Avalanche.Migrations
             RockMigrationHelper.DeletePage( "DE6D125E-892E-4F10-A33D-F84942582B1E" ); //  Page: Connect, Layout: Simple, Site: Avalanche
             RockMigrationHelper.DeletePage( "CD8A05F8-24FF-4D38-8ED0-FE2BF07C0CDE" ); //  Page: Visit, Layout: Simple, Site: Avalanche
             RockMigrationHelper.DeletePage( "9711DB54-0FB0-4722-AB45-1DFB6158F922" ); //  Page: Sermons, Layout: No Scroll, Site: Avalanche
-            RockMigrationHelper.DeletePage( "567FFD63-53F9-4419-AD96-C2F07CAE09F1" ); //  Page: Avalanche Home Page, Layout: Main Page, Site: Avalanche
-
         }
     }
 }

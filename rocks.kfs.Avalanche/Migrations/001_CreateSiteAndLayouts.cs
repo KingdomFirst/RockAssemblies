@@ -104,8 +104,8 @@ namespace rocks.kfs.Avalanche.Migrations
     }
 ]";
 
-            //RockMigrationHelper.AddDefinedValue( AvalancheUtilities.LayoutsDefinedType, "Simple", "Simple layout with a featured, main, three sub sections, and a footer.", "BB5006D8-7F51-43D5-B977-5E07F5ACA8C2", false );
-            RockMigrationHelper.AddDefinedValueAttributeValue( "BB5006D8-7F51-43D5-B977-5E07F5ACA8C2", "E5DE699C-49F6-488B-BA1F-F4CC13CE8B91", simple );
+            //RockMigrationHelper.UpdateDefinedValue( AvalancheUtilities.LayoutsDefinedType, "Simple", "Simple layout with a featured, main, three sub sections, and a footer.", "BB5006D8-7F51-43D5-B977-5E07F5ACA8C2", false );
+            RockMigrationHelper.UpdateDefinedValueAttributeValue( "BB5006D8-7F51-43D5-B977-5E07F5ACA8C2", "E5DE699C-49F6-488B-BA1F-F4CC13CE8B91", simple );
 
             var noscroll = @"[
     {
@@ -166,8 +166,8 @@ namespace rocks.kfs.Avalanche.Migrations
         ""Orientation"": ""Vertical"",
     }
 ]";
-            //RockMigrationHelper.AddDefinedValue( AvalancheUtilities.LayoutsDefinedType, "No Scroll", "Layout with no scrolling elements. Good for list views.", "3812C543-8B80-4A7C-BBD0-4DEFEABBA7DC", false );
-            RockMigrationHelper.AddDefinedValueAttributeValue( "3812C543-8B80-4A7C-BBD0-4DEFEABBA7DC", "E5DE699C-49F6-488B-BA1F-F4CC13CE8B91", noscroll );
+            //RockMigrationHelper.UpdateDefinedValue( AvalancheUtilities.LayoutsDefinedType, "No Scroll", "Layout with no scrolling elements. Good for list views.", "3812C543-8B80-4A7C-BBD0-4DEFEABBA7DC", false );
+            RockMigrationHelper.UpdateDefinedValueAttributeValue( "3812C543-8B80-4A7C-BBD0-4DEFEABBA7DC", "E5DE699C-49F6-488B-BA1F-F4CC13CE8B91", noscroll );
 
             var mainpage = @"[
     {
@@ -228,12 +228,18 @@ namespace rocks.kfs.Avalanche.Migrations
         ""Orientation"": ""Vertical"",
     }
 ]";
-            RockMigrationHelper.AddDefinedValue( AvalancheUtilities.LayoutsDefinedType, "Main Page", "MainPage layout to have some different options, came from SECC", "a28546a5-54d8-4a2e-b912-af9f5e2f0aa2", false );
-            RockMigrationHelper.AddDefinedValueAttributeValue( "a28546a5-54d8-4a2e-b912-af9f5e2f0aa2", "E5DE699C-49F6-488B-BA1F-F4CC13CE8B91", mainpage );
+            RockMigrationHelper.UpdateDefinedValue( AvalancheUtilities.LayoutsDefinedType, "Main Page", "MainPage layout to have some different options, came from SECC", "a28546a5-54d8-4a2e-b912-af9f5e2f0aa2", false );
+            RockMigrationHelper.UpdateDefinedValueAttributeValue( "a28546a5-54d8-4a2e-b912-af9f5e2f0aa2", "E5DE699C-49F6-488B-BA1F-F4CC13CE8B91", mainpage );
 
             var footer = @"[ { ""Name"": ""FooterHorizontal"", ""Type"": ""Grid"", ""RowDefinitions"": ""100"", ""Children"": [ { ""Name"": ""Footer"", ""Type"": ""StackLayout"", ""Orientation"": ""Vertical"", ""Attributes"": { ""VerticalOptions"": ""End"" } } ] } ]";
-            RockMigrationHelper.AddDefinedValue( AvalancheUtilities.LayoutsDefinedType, "Footer", "Footer layout fairly simple", "7f0d651b-6acc-4207-a985-6d9deb81e71d", false );
-            RockMigrationHelper.AddDefinedValueAttributeValue( "7f0d651b-6acc-4207-a985-6d9deb81e71d", "E5DE699C-49F6-488B-BA1F-F4CC13CE8B91", footer );
+            RockMigrationHelper.UpdateDefinedValue( AvalancheUtilities.LayoutsDefinedType, "Footer", "Footer layout fairly simple", "7f0d651b-6acc-4207-a985-6d9deb81e71d", false );
+            RockMigrationHelper.UpdateDefinedValueAttributeValue( "7f0d651b-6acc-4207-a985-6d9deb81e71d", "E5DE699C-49F6-488B-BA1F-F4CC13CE8B91", footer );
+
+            RockMigrationHelper.AddPage( true, null, "FC61CD1A-15DC-4FDD-9DDD-4A0BD8936E16", "KFS Avalanche Home Page", "", "567FFD63-53F9-4419-AD96-C2F07CAE09F1", "" ); // Site:KFS Avalanche
+            Sql( string.Format( @"
+                DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '{0}' )
+                UPDATE Site SET DefaultPageId = @PageId WHERE [Guid] = '{1}'
+                ", "567FFD63-53F9-4419-AD96-C2F07CAE09F1", "613631FF-D19C-4F9C-B163-E9331C4BA61B" ) );
         }
 
         /// <summary>
