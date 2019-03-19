@@ -324,17 +324,17 @@ namespace rocks.kfs.Avalanche.Migrations
             // Attrib for BlockType: Person Profile Family:Action Item
             RockMigrationHelper.UpdateBlockTypeAttribute( "36569642-F6D7-4EAC-AF0E-C8238BEEAF7E", "E5A6D6C7-DAB4-4EFA-B76F-E22AFEC5158D", "Action Item", "ActionItem", "", @"Action to take upon press of item in list.", 0, @"", "508BD5E9-D674-46AD-83DE-1BF620C85B29" );
 
-            // Attrib Value for Block:Image Block, Attribute:Image Page: Main Page Layout, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Image Page: Main Page Layout, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "0EDCFD24-D064-49D7-8004-A5A74BF94F9C", "2E9389F8-0E3C-485D-B722-762D89C8EB2E", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/logo.png" );
-            // Attrib Value for Block:Image Block, Attribute:Image Page: No Scroll Layout, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Image Page: No Scroll Layout, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BD1F22F8-783B-4B87-AEB6-9B6AFE9A8938", "2E9389F8-0E3C-485D-B722-762D89C8EB2E", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/logo.png" );
-            // Attrib Value for Block:Image Block, Attribute:Image Page: Simple Layout, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Image Page: Simple Layout, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "AB5D577E-92B4-49F8-AA50-9ADDA515F881", "2E9389F8-0E3C-485D-B722-762D89C8EB2E", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/logo.png" );
-            // Attrib Value for Block:Image Block, Attribute:Action Page: Main Page Layout, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Action Page: Main Page Layout, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "0EDCFD24-D064-49D7-8004-A5A74BF94F9C", "68EF73D8-3C6D-4524-A3A4-9C06D95B164A", @"1^518^" );
-            // Attrib Value for Block:Image Block, Attribute:Action Page: No Scroll Layout, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Action Page: No Scroll Layout, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BD1F22F8-783B-4B87-AEB6-9B6AFE9A8938", "68EF73D8-3C6D-4524-A3A4-9C06D95B164A", @"1^518^" );
-            // Attrib Value for Block:Image Block, Attribute:Action Page: Simple Layout, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Action Page: Simple Layout, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "AB5D577E-92B4-49F8-AA50-9ADDA515F881", "68EF73D8-3C6D-4524-A3A4-9C06D95B164A", @"1^518^" );
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '567FFD63-53F9-4419-AD96-C2F07CAE09F1' )
                 UPDATE av SET av.[Value] = Replace([Value],518,@PageId)
@@ -346,7 +346,7 @@ namespace rocks.kfs.Avalanche.Migrations
                 UPDATE av SET av.[Value] = Replace([Value],518,@PageId)
                 FROM [AttributeValue] av INNER JOIN Attribute a ON a.Id = av.AttributeId INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '68EF73D8-3C6D-4524-A3A4-9C06D95B164A' AND b.[Guid] = 'AB5D577E-92B4-49F8-AA50-9ADDA515F881'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Action Item Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Action Item Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A2487BA5-843D-4D7E-92A6-36A52027EB26", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^519^" ); // NEED SQL, 519
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '9711DB54-0FB0-4722-AB45-1DFB6158F922' )
                 UPDATE av SET av.[Value] = Replace([Value],519,@PageId)
@@ -354,27 +354,27 @@ namespace rocks.kfs.Avalanche.Migrations
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799' AND b.[Guid] = 'A2487BA5-843D-4D7E-92A6-36A52027EB26'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Image Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Image Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A2487BA5-843D-4D7E-92A6-36A52027EB26", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/sermons.jpg" );
-            // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Text Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Text Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A2487BA5-843D-4D7E-92A6-36A52027EB26", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Sermons" );
-            // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Aspect Ratio Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Aspect Ratio Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A2487BA5-843D-4D7E-92A6-36A52027EB26", "BD4BC1F9-9C20-4A6E-A67D-8D5EF56A619D", @"0.45" );
-            // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Enabled Lava Commands Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Enabled Lava Commands Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A2487BA5-843D-4D7E-92A6-36A52027EB26", "3B56BD7B-DFFA-4C07-A936-8B79029C01C5", @"" );
-            // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Custom Attributes Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Sermons, Attribute:Custom Attributes Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A2487BA5-843D-4D7E-92A6-36A52027EB26", "B0FCF405-607A-43C1-A2DB-1AA2C066EABB", @"TextColor^White|FontSize^55" );
-            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Custom Attributes Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Custom Attributes Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7E1A52B6-68A9-423F-88DB-4E402360FED0", "B0FCF405-607A-43C1-A2DB-1AA2C066EABB", @"TextColor^White|FontSize^55|HorizontalOptions^Center" );
-            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Aspect Ratio Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Aspect Ratio Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7E1A52B6-68A9-423F-88DB-4E402360FED0", "BD4BC1F9-9C20-4A6E-A67D-8D5EF56A619D", @"0.45" );
-            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Enabled Lava Commands Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Enabled Lava Commands Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7E1A52B6-68A9-423F-88DB-4E402360FED0", "3B56BD7B-DFFA-4C07-A936-8B79029C01C5", @"" );
-            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Image Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Image Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7E1A52B6-68A9-423F-88DB-4E402360FED0", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/events.jpg" );
-            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Text Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Text Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7E1A52B6-68A9-423F-88DB-4E402360FED0", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Events" );
-            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Action Item Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Action Item Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7E1A52B6-68A9-423F-88DB-4E402360FED0", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^531^" ); // NEED SQL, 531
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'B95062A4-770C-47DF-B88F-0626F7BFDF2F' )
                 UPDATE av SET av.[Value] = Replace([Value],531,@PageId)
@@ -382,11 +382,11 @@ namespace rocks.kfs.Avalanche.Migrations
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799' AND b.[Guid] = '7E1A52B6-68A9-423F-88DB-4E402360FED0'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Image Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Image Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "99865F0D-BD8A-4AA7-88A2-D7D7859E1992", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/visit.jpg" );
-            // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Text Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Text Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "99865F0D-BD8A-4AA7-88A2-D7D7859E1992", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Visit" );
-            // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Action Item Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Action Item Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "99865F0D-BD8A-4AA7-88A2-D7D7859E1992", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^520^" ); // NEED SQL, 520
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'CD8A05F8-24FF-4D38-8ED0-FE2BF07C0CDE' )
                 UPDATE av SET av.[Value] = Replace([Value],520,@PageId)
@@ -394,70 +394,70 @@ namespace rocks.kfs.Avalanche.Migrations
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799' AND b.[Guid] = '99865F0D-BD8A-4AA7-88A2-D7D7859E1992'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Aspect Ratio Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Aspect Ratio Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "99865F0D-BD8A-4AA7-88A2-D7D7859E1992", "BD4BC1F9-9C20-4A6E-A67D-8D5EF56A619D", @"0.45" );
-            // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Enabled Lava Commands Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Enabled Lava Commands Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "99865F0D-BD8A-4AA7-88A2-D7D7859E1992", "3B56BD7B-DFFA-4C07-A936-8B79029C01C5", @"" );
-            // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Custom Attributes Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Visit, Attribute:Custom Attributes Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "99865F0D-BD8A-4AA7-88A2-D7D7859E1992", "B0FCF405-607A-43C1-A2DB-1AA2C066EABB", @"TextColor^White|FontSize^55" );
-            // Attrib Value for Block:Listview Footer, Attribute:Lava Page: Footer, Site: Avalanche
+            // Attrib Value for Block:Listview Footer, Attribute:Lava Page: Footer, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "0DBA9AAB-FA2E-4C53-B820-A4C0B3FF29D0", "2DF1245C-33A6-4C0B-9CFB-30047103BD05", @"{% page id:'{{ 'Global' | Attribute:'AvalancheHomePage' }}' %}{% capture pagestr %}{% for childpage in page.Pages %}{% if childpage.DisplayInNavWhen != 'Never' %}{""Id"":""{{ forloop.index0 }}"",""Title"":""{{ childpage.PageTitle }}"",""Description"":""{{ childpage.PageDescription }}"",""Icon"":""{{ childpage.IconCssClass }}"",""Image"":"""",""Resource"":""{% assign resource = childpage | Attribute:""Resource"" %}{% if resource != '' %}{{ resource }}{% else %}{{ childpage.Id }}{% endif %}"",""ActionType"":""{{ childpage | Attribute:""ActionType"",""RawValue"" }}""}, {% endif %}{% endfor %}{% endcapture %}{% endpage -%}
 [{{ pagestr | ReplaceLast:"", "" }}]" );
-            // Attrib Value for Block:Listview Footer, Attribute:Component Page: Footer, Site: Avalanche
+            // Attrib Value for Block:Listview Footer, Attribute:Component Page: Footer, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "0DBA9AAB-FA2E-4C53-B820-A4C0B3FF29D0", "710306EF-D570-41D9-A806-DD38DC14FEDC", @"673b7db5-2200-41d6-8857-9a7663b56c47" );
-            // Attrib Value for Block:Listview Footer, Attribute:Enabled Lava Commands Page: Footer, Site: Avalanche
+            // Attrib Value for Block:Listview Footer, Attribute:Enabled Lava Commands Page: Footer, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "0DBA9AAB-FA2E-4C53-B820-A4C0B3FF29D0", "1E87BAD4-50AB-474B-955B-E44FA10C0ADE", @"RockEntity" );
-            // Attrib Value for Block:Listview Footer, Attribute:Action Item Page: Footer, Site: Avalanche
+            // Attrib Value for Block:Listview Footer, Attribute:Action Item Page: Footer, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "0DBA9AAB-FA2E-4C53-B820-A4C0B3FF29D0", "9D4D1596-B680-4AFF-AF57-6C8867FC7D6B", @"0" );
-            // Attrib Value for Block:Listview Footer, Attribute:Custom Attributes Page: Footer, Site: Avalanche
+            // Attrib Value for Block:Listview Footer, Attribute:Custom Attributes Page: Footer, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "0DBA9AAB-FA2E-4C53-B820-A4C0B3FF29D0", "100D227F-518B-4AF4-9451-DB5663433C14", @"Columns^4|FontSize^10|IconFontSize^25|HeightRequest^100|BackgroundColor^#0094d9|Margin^0|TextColor^White|IconTextColor^White" );
-            // Attrib Value for Block:Icon Block - Back, Attribute:Enabled Lava Commands , Layout: Simple, Site: Avalanche
+            // Attrib Value for Block:Icon Block - Back, Attribute:Enabled Lava Commands , Layout: Simple, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D2DFBCB4-894C-4E5C-A534-110B21A00FEB", "0910B50C-23D8-46AC-BBF2-F54F074E35DC", @"" );
-            // Attrib Value for Block:Icon Block - Back, Attribute:Text , Layout: Simple, Site: Avalanche
+            // Attrib Value for Block:Icon Block - Back, Attribute:Text , Layout: Simple, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D2DFBCB4-894C-4E5C-A534-110B21A00FEB", "4F4142E2-E6C0-4878-953F-521FC7A8A4C9", @"fa fa-chevron-left" );
-            // Attrib Value for Block:Icon Block - Back, Attribute:Action Item , Layout: Simple, Site: Avalanche
+            // Attrib Value for Block:Icon Block - Back, Attribute:Action Item , Layout: Simple, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D2DFBCB4-894C-4E5C-A534-110B21A00FEB", "7B4B9D30-2BED-4F39-B897-10C7C561CFAE", @"3" );
-            // Attrib Value for Block:Icon Block - Back, Attribute:Custom Attributes , Layout: Simple, Site: Avalanche
+            // Attrib Value for Block:Icon Block - Back, Attribute:Custom Attributes , Layout: Simple, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D2DFBCB4-894C-4E5C-A534-110B21A00FEB", "BE7D91EF-5C79-4940-9DA6-608933781419", @"TextColor^White|FontSize^25|Margin^15%2C19%2C10%2C16" );
-            // Attrib Value for Block:Text Over Image Block - Plan a visit, Attribute:Custom Attributes Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Plan a visit, Attribute:Custom Attributes Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C730CAF4-F17F-4D9C-B2F3-9A6A29491FD7", "B0FCF405-607A-43C1-A2DB-1AA2C066EABB", @"TextColor^White|FontSize^48|HorizontalOptions^Center" );
-            // Attrib Value for Block:Text Over Image Block - Plan a visit, Attribute:Enabled Lava Commands Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Plan a visit, Attribute:Enabled Lava Commands Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C730CAF4-F17F-4D9C-B2F3-9A6A29491FD7", "3B56BD7B-DFFA-4C07-A936-8B79029C01C5", @"" );
-            // Attrib Value for Block:Text Over Image Block - Plan a visit, Attribute:Text Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Plan a visit, Attribute:Text Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C730CAF4-F17F-4D9C-B2F3-9A6A29491FD7", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Plan A Visit" );
-            // Attrib Value for Block:Text Over Image Block - Plan a visit, Attribute:Aspect Ratio Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Plan a visit, Attribute:Aspect Ratio Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C730CAF4-F17F-4D9C-B2F3-9A6A29491FD7", "BD4BC1F9-9C20-4A6E-A67D-8D5EF56A619D", @"0.35" );
-            // Attrib Value for Block:Text Over Image Block - Plan a visit, Attribute:Image Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Plan a visit, Attribute:Image Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C730CAF4-F17F-4D9C-B2F3-9A6A29491FD7", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/planavisit.jpg" );
-            // Attrib Value for Block:Text Over Image Block - Plan a visit, Attribute:Action Item Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Plan a visit, Attribute:Action Item Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C730CAF4-F17F-4D9C-B2F3-9A6A29491FD7", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"0" );
-            // Attrib Value for Block:Label Block - Welcome, Attribute:Enabled Lava Commands Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Label Block - Welcome, Attribute:Enabled Lava Commands Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "57096CBB-21E8-4EF5-ABD3-05B2414225D0", "7F860DC6-7478-4F88-A878-FAF3D75CEB9C", @"" );
-            // Attrib Value for Block:Label Block - Welcome, Attribute:Action Item Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Label Block - Welcome, Attribute:Action Item Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "57096CBB-21E8-4EF5-ABD3-05B2414225D0", "0D9816B1-E6CF-46C3-A3C7-4099359B2857", @"0" );
-            // Attrib Value for Block:Label Block - Welcome, Attribute:Text Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Label Block - Welcome, Attribute:Text Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "57096CBB-21E8-4EF5-ABD3-05B2414225D0", "95980EF8-47FA-40C9-9372-938F46746458", @"WELCOME" );
-            // Attrib Value for Block:Label Block - Welcome, Attribute:Custom Attributes Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Label Block - Welcome, Attribute:Custom Attributes Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "57096CBB-21E8-4EF5-ABD3-05B2414225D0", "A59E551E-6B04-4C70-B1F6-B8EAEAC27D94", @"TextColor^#0094d9|FontSize^25|HorizontalOptions^Center|FontFamily^Open Sans Light" );
-            // Attrib Value for Block:Welcome Text, Attribute:Markdown Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Welcome Text, Attribute:Markdown Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "0B08E530-6763-473F-A338-C7E2B2F753BA", "9CB3C25B-815D-44A4-9171-698136CC0988", @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a lorem nisi. Donec ornare ligula sed elit tincidunt congue. Integer eleifend eget eros eget scelerisque. Vestibulum ut finibus urna, nec semper ex." );
-            // Attrib Value for Block:Welcome Text, Attribute:Enabled Lava Commands Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Welcome Text, Attribute:Enabled Lava Commands Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "0B08E530-6763-473F-A338-C7E2B2F753BA", "7A9950AC-B9E7-4200-9B7A-634BF90DDB2B", @"" );
-            // Attrib Value for Block:Welcome Text, Attribute:Custom Attributes Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Welcome Text, Attribute:Custom Attributes Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "0B08E530-6763-473F-A338-C7E2B2F753BA", "538EE4EC-33C5-4997-ABD6-1F105F78EF38", @"Margin^15%2C10" );
-            // Attrib Value for Block:Campus Listview, Attribute:Action Item Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Campus Listview, Attribute:Action Item Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "14EFA755-D8F8-4BC2-A199-E67B2E960A95", "9D4D1596-B680-4AFF-AF57-6C8867FC7D6B", @"0" );
-            // Attrib Value for Block:Campus Listview, Attribute:Custom Attributes Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Campus Listview, Attribute:Custom Attributes Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "14EFA755-D8F8-4BC2-A199-E67B2E960A95", "100D227F-518B-4AF4-9451-DB5663433C14", @"Columns^1|Margin^10%2C0" );
-            // Attrib Value for Block:Campus Listview, Attribute:Component Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Campus Listview, Attribute:Component Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "14EFA755-D8F8-4BC2-A199-E67B2E960A95", "710306EF-D570-41D9-A806-DD38DC14FEDC", @"1a637b48-35fb-43b2-9822-88af2fd1d333" );
-            // Attrib Value for Block:Campus Listview, Attribute:Enabled Lava Commands Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Campus Listview, Attribute:Enabled Lava Commands Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "14EFA755-D8F8-4BC2-A199-E67B2E960A95", "1E87BAD4-50AB-474B-955B-E44FA10C0ADE", @"" );
-            // Attrib Value for Block:Campus Listview, Attribute:Lava Page: Visit, Site: Avalanche
+            // Attrib Value for Block:Campus Listview, Attribute:Lava Page: Visit, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "14EFA755-D8F8-4BC2-A199-E67B2E960A95", "2DF1245C-33A6-4C0B-9CFB-30047103BD05", @"{% capture campusjson -%}
  {% for campus in Campuses -%}
   {% if campus.IsActive -%}
-{""Id"":""{{ campus.Id }}"",""Title"":"""",""Description"":"""",""Icon"":"""",""Image"":""{% assign imgurl = campus | Attribute:'AppImage','Url' %}{{ imgurl }}"", ""Resource"":""524"", ""ActionType"":""1"" },{% endif -%}
+{""Id"":""{{ campus.Id }}"",""Title"":"""",""Description"":"""",""Icon"":"""",""Image"":""{% assign imgurl = campus | Attribute:'rocks.kfs.AppImage','Url' %}{{ imgurl }}"", ""Resource"":""524"", ""ActionType"":""1"" },{% endif -%}
  {% endfor -%}
 {% endcapture -%}
 [{{ campusjson | ReplaceLast:', ' }}]" ); // NEED SQL
@@ -467,108 +467,108 @@ namespace rocks.kfs.Avalanche.Migrations
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '2DF1245C-33A6-4C0B-9CFB-30047103BD05' AND b.[Guid] = '14EFA755-D8F8-4BC2-A199-E67B2E960A95'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Image Block, Attribute:Aspect Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Aspect Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "941F3F7B-2922-4D29-9B8E-FE22A5337486", "1900D9DD-EFA4-4278-8B23-0FEEF1894610", @"" );
-            // Attrib Value for Block:Image Block, Attribute:Custom Attributes Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Custom Attributes Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "941F3F7B-2922-4D29-9B8E-FE22A5337486", "B9523EB6-EEE5-4DC4-B2B0-EF7FF0E73F51", @"" );
-            // Attrib Value for Block:Image Block, Attribute:Custom Attributes Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Custom Attributes Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "941F3F7B-2922-4D29-9B8E-FE22A5337486", "B0FCF405-607A-43C1-A2DB-1AA2C066EABB", @"" );
-            // Attrib Value for Block:Image Block, Attribute:Enabled Lava Commands Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Enabled Lava Commands Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "941F3F7B-2922-4D29-9B8E-FE22A5337486", "155B8623-7723-4FD2-A321-B9D24B1611CE", @"RockEntity" );
-            // Attrib Value for Block:Image Block, Attribute:Action Item Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Action Item Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "941F3F7B-2922-4D29-9B8E-FE22A5337486", "68EF73D8-3C6D-4524-A3A4-9C06D95B164A", @"0" );
-            // Attrib Value for Block:Image Block, Attribute:Image Page: Visit Detail, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "941F3F7B-2922-4D29-9B8E-FE22A5337486", "2E9389F8-0E3C-485D-B722-762D89C8EB2E", @"{% campus id:'{{parameter}}' %}{% assign imgurl = campus | Attribute:'AppHeaderImage','Url' %}{{ imgurl }}{% endcampus %}" );
-            // Attrib Value for Block:Image Block, Attribute:Text Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Image Page: Visit Detail, Site: KFS Avalanche
+            RockMigrationHelper.AddBlockAttributeValue( "941F3F7B-2922-4D29-9B8E-FE22A5337486", "2E9389F8-0E3C-485D-B722-762D89C8EB2E", @"{% campus id:'{{parameter}}' %}{% assign imgurl = campus | Attribute:'rocks.kfs.AppHeaderImage','Url' %}{{ imgurl }}{% endcampus %}" );
+            // Attrib Value for Block:Image Block, Attribute:Text Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "941F3F7B-2922-4D29-9B8E-FE22A5337486", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"{% campus id:'{{parameter}}' %}{{ campus.Name | Upcase }}{% endcampus %}" );
-            // Attrib Value for Block:Image Block, Attribute:Enabled Lava Commands Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Enabled Lava Commands Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "941F3F7B-2922-4D29-9B8E-FE22A5337486", "3B56BD7B-DFFA-4C07-A936-8B79029C01C5", @"RockEntity" );
-            // Attrib Value for Block:Image Block, Attribute:Aspect Ratio Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Aspect Ratio Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "941F3F7B-2922-4D29-9B8E-FE22A5337486", "BD4BC1F9-9C20-4A6E-A67D-8D5EF56A619D", @"0.45" );
-            // Attrib Value for Block:Image Block, Attribute:Action Item Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Action Item Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "941F3F7B-2922-4D29-9B8E-FE22A5337486", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"0" );
-            // Attrib Value for Block:Image Block, Attribute:Image Page: Visit Detail, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "941F3F7B-2922-4D29-9B8E-FE22A5337486", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{% campus id:'{{parameter}}' %}{% assign imgurl = campus | Attribute:'AppHeaderImage','Url' %}{{ imgurl }}{% endcampus %}" );
-            // Attrib Value for Block:Header Title, Attribute:Custom Attributes Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Image Page: Visit Detail, Site: KFS Avalanche
+            RockMigrationHelper.AddBlockAttributeValue( "941F3F7B-2922-4D29-9B8E-FE22A5337486", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{% campus id:'{{parameter}}' %}{% assign imgurl = campus | Attribute:'rocks.kfs.AppHeaderImage','Url' %}{{ imgurl }}{% endcampus %}" );
+            // Attrib Value for Block:Header Title, Attribute:Custom Attributes Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "089C9B48-AE89-416C-98FB-32304206DB20", "A59E551E-6B04-4C70-B1F6-B8EAEAC27D94", @"TextColor^#0094d9|HorizontalOptions^Center|FontSize^25|FontFamily^Open Sans Light|Margin^10" );
-            // Attrib Value for Block:Header Title, Attribute:Action Item Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Header Title, Attribute:Action Item Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "089C9B48-AE89-416C-98FB-32304206DB20", "0D9816B1-E6CF-46C3-A3C7-4099359B2857", @"0" );
-            // Attrib Value for Block:Header Title, Attribute:Text Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Header Title, Attribute:Text Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "089C9B48-AE89-416C-98FB-32304206DB20", "95980EF8-47FA-40C9-9372-938F46746458", @"{% campus id:'{{parameter}}' %}{{ campus.Name | Upcase }}{% endcampus %}" );
-            // Attrib Value for Block:Header Title, Attribute:Enabled Lava Commands Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Header Title, Attribute:Enabled Lava Commands Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "089C9B48-AE89-416C-98FB-32304206DB20", "7F860DC6-7478-4F88-A878-FAF3D75CEB9C", @"RockEntity" );
-            // Attrib Value for Block:Description/Location summary text, Attribute:Enabled Lava Commands Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Description/Location summary text, Attribute:Enabled Lava Commands Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BDAAFA41-836E-4C27-9696-847D685D3980", "7A9950AC-B9E7-4200-9B7A-634BF90DDB2B", @"RockEntity" );
-            // Attrib Value for Block:Description/Location summary text, Attribute:Custom Attributes Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Description/Location summary text, Attribute:Custom Attributes Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BDAAFA41-836E-4C27-9696-847D685D3980", "538EE4EC-33C5-4997-ABD6-1F105F78EF38", @"Margin^10" );
-            // Attrib Value for Block:Description/Location summary text, Attribute:Markdown Page: Visit Detail, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "BDAAFA41-836E-4C27-9696-847D685D3980", "9CB3C25B-815D-44A4-9171-698136CC0988", @"{% campus id:'{{parameter}}' %}{% assign campusinfo = campus | Attribute:'LocationInfoSummary' -%}
+            // Attrib Value for Block:Description/Location summary text, Attribute:Markdown Page: Visit Detail, Site: KFS Avalanche
+            RockMigrationHelper.AddBlockAttributeValue( "BDAAFA41-836E-4C27-9696-847D685D3980", "9CB3C25B-815D-44A4-9171-698136CC0988", @"{% campus id:'{{parameter}}' %}{% assign campusinfo = campus | Attribute:'rocks.kfs.AppLocationInfoSummary' -%}
 {{ campusinfo | HtmlToMarkdown }}{% endcampus %}" );
-            // Attrib Value for Block:Parking Map Button, Attribute:Text Page: Visit Detail, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "41BD57CC-71E3-4DC0-957C-F9265061FA65", "B60F03CA-B109-48F6-ACE4-1C365DC4E908", @"{% campus id:'{{parameter}}' %}{% assign imgurl = campus | Attribute:'ParkingMap','Url' %}{% if imgurl != '' %}Parking Map{% endif %}{% endcampus %}" );
-            // Attrib Value for Block:Parking Map Button, Attribute:Action Item Page: Visit Detail, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "41BD57CC-71E3-4DC0-957C-F9265061FA65", "A9D5A12D-F60D-4CAA-A46B-1A605032586D", @"4^{% campus id:'{{parameter}}' %}{% assign imgurl = campus | Attribute:'ParkingMap','Url' %}{{ imgurl }}{% endcampus %}^0" );
-            // Attrib Value for Block:Parking Map Button, Attribute:Enabled Lava Commands Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Parking Map Button, Attribute:Text Page: Visit Detail, Site: KFS Avalanche
+            RockMigrationHelper.AddBlockAttributeValue( "41BD57CC-71E3-4DC0-957C-F9265061FA65", "B60F03CA-B109-48F6-ACE4-1C365DC4E908", @"{% campus id:'{{parameter}}' %}{% assign imgurl = campus | Attribute:'rocks.kfs.AppParkingMap','Url' %}{% if imgurl != '' %}Parking Map{% endif %}{% endcampus %}" );
+            // Attrib Value for Block:Parking Map Button, Attribute:Action Item Page: Visit Detail, Site: KFS Avalanche
+            RockMigrationHelper.AddBlockAttributeValue( "41BD57CC-71E3-4DC0-957C-F9265061FA65", "A9D5A12D-F60D-4CAA-A46B-1A605032586D", @"4^{% campus id:'{{parameter}}' %}{% assign imgurl = campus | Attribute:'rocks.kfs.AppParkingMap','Url' %}{{ imgurl }}{% endcampus %}^0" );
+            // Attrib Value for Block:Parking Map Button, Attribute:Enabled Lava Commands Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "41BD57CC-71E3-4DC0-957C-F9265061FA65", "BEF7E221-837D-4DD5-BC3E-49E6E3BDEBF9", @"RockEntity" );
-            // Attrib Value for Block:Parking Map Button, Attribute:Custom Attributes Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Parking Map Button, Attribute:Custom Attributes Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "41BD57CC-71E3-4DC0-957C-F9265061FA65", "FED19184-4169-4EEF-9437-592545A79461", @"WidthRequest^100|BackgroundColor^White|TextColor^#0094d9" );
-            // Attrib Value for Block:Parking Map Button, Attribute:Text Page: Visit Detail, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "41BD57CC-71E3-4DC0-957C-F9265061FA65", "9FFA6301-04B4-4D1D-907C-D345BE825B13", @"{% campus id:'{{parameter}}' %}{% assign imgurl = campus | Attribute:'ParkingMap','Url' %}{% if imgurl != '' %}Parking Map{% endif %}{% endcampus %}" );
-            // Attrib Value for Block:Parking Map Button, Attribute:Action Item Page: Visit Detail, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "41BD57CC-71E3-4DC0-957C-F9265061FA65", "1AD33D1F-BDE9-4AFB-B6E8-E2CD271A5EF3", @"4^{% campus id:'{{parameter}}' %}{% assign imgurl = campus | Attribute:'ParkingMap','Url' %}{{ imgurl }}{% endcampus %}^0" );
-            // Attrib Value for Block:Parking Map Button, Attribute:Custom Attributes Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Parking Map Button, Attribute:Text Page: Visit Detail, Site: KFS Avalanche
+            RockMigrationHelper.AddBlockAttributeValue( "41BD57CC-71E3-4DC0-957C-F9265061FA65", "9FFA6301-04B4-4D1D-907C-D345BE825B13", @"{% campus id:'{{parameter}}' %}{% assign imgurl = campus | Attribute:'rocks.kfs.AppParkingMap','Url' %}{% if imgurl != '' %}Parking Map{% endif %}{% endcampus %}" );
+            // Attrib Value for Block:Parking Map Button, Attribute:Action Item Page: Visit Detail, Site: KFS Avalanche
+            RockMigrationHelper.AddBlockAttributeValue( "41BD57CC-71E3-4DC0-957C-F9265061FA65", "1AD33D1F-BDE9-4AFB-B6E8-E2CD271A5EF3", @"4^{% campus id:'{{parameter}}' %}{% assign imgurl = campus | Attribute:'rocks.kfs.AppParkingMap','Url' %}{{ imgurl }}{% endcampus %}^0" );
+            // Attrib Value for Block:Parking Map Button, Attribute:Custom Attributes Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "41BD57CC-71E3-4DC0-957C-F9265061FA65", "6D8A7116-BB0F-4F3A-9C24-5C39F2364E42", @"TextColor^#0094d9|BackgroundColor^White|HorizontalOptions^Center" );
-            // Attrib Value for Block:Parking Map Button, Attribute:Icon Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Parking Map Button, Attribute:Icon Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "41BD57CC-71E3-4DC0-957C-F9265061FA65", "FCE07A51-64D8-4FC8-BFB2-8CDBCED449F7", @"fa fa-map" );
-            // Attrib Value for Block:Parking Map Button, Attribute:Enabled Lava Commands Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:Parking Map Button, Attribute:Enabled Lava Commands Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "41BD57CC-71E3-4DC0-957C-F9265061FA65", "2FCA15F3-D621-4E7C-8F0C-FF9222AB3447", @"RockEntity" );
-            // Attrib Value for Block:More Info Button, Attribute:Enabled Lava Commands Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:More Info Button, Attribute:Enabled Lava Commands Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "20E578B0-BAB2-40DA-944D-9189465C6A96", "2FCA15F3-D621-4E7C-8F0C-FF9222AB3447", @"RockEntity" );
-            // Attrib Value for Block:More Info Button, Attribute:Text Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:More Info Button, Attribute:Text Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "20E578B0-BAB2-40DA-944D-9189465C6A96", "9FFA6301-04B4-4D1D-907C-D345BE825B13", @"{% campus id:'{{parameter}}' %}{% if campus.Url != '' %}More Info{% endif %}{% endcampus %}" );
-            // Attrib Value for Block:More Info Button, Attribute:Icon Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:More Info Button, Attribute:Icon Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "20E578B0-BAB2-40DA-944D-9189465C6A96", "FCE07A51-64D8-4FC8-BFB2-8CDBCED449F7", @"fa fa-plus" );
-            // Attrib Value for Block:More Info Button, Attribute:Action Item Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:More Info Button, Attribute:Action Item Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "20E578B0-BAB2-40DA-944D-9189465C6A96", "1AD33D1F-BDE9-4AFB-B6E8-E2CD271A5EF3", @"4^{% campus id:'{{parameter}}' %}{{ campus.Url }}{% endcampus %}^0" );
-            // Attrib Value for Block:More Info Button, Attribute:Custom Attributes Page: Visit Detail, Site: Avalanche
+            // Attrib Value for Block:More Info Button, Attribute:Custom Attributes Page: Visit Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "20E578B0-BAB2-40DA-944D-9189465C6A96", "6D8A7116-BB0F-4F3A-9C24-5C39F2364E42", @"TextColor^#0094d9|HorizontalOptions^Center|BackgroundColor^White" );
-            // Attrib Value for Block:Content Channel Mobile List, Attribute:Item Cache Duration Page: Sermons, Site: Avalanche
+            // Attrib Value for Block:Content Channel Mobile List, Attribute:Item Cache Duration Page: Sermons, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "724E2C2F-213B-4959-9F01-1957C77733DD", "7A361636-F72A-40CA-91E2-20AA7496CDBC", @"0" );
-            // Attrib Value for Block:Content Channel Mobile List, Attribute:Custom Attributes Page: Sermons, Site: Avalanche
+            // Attrib Value for Block:Content Channel Mobile List, Attribute:Custom Attributes Page: Sermons, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "724E2C2F-213B-4959-9F01-1957C77733DD", "A88DA132-AA2B-47BD-8C04-F1A14D4B12A8", @"Columns^1|VerticalOptions^Fill" );
-            // Attrib Value for Block:Content Channel Mobile List, Attribute:Output Cache Duration Page: Sermons, Site: Avalanche
+            // Attrib Value for Block:Content Channel Mobile List, Attribute:Output Cache Duration Page: Sermons, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "724E2C2F-213B-4959-9F01-1957C77733DD", "0F110CCF-188D-4061-998C-7368A1BE171B", @"0" );
-            // Attrib Value for Block:Content Channel Mobile List, Attribute:Component Page: Sermons, Site: Avalanche
+            // Attrib Value for Block:Content Channel Mobile List, Attribute:Component Page: Sermons, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "724E2C2F-213B-4959-9F01-1957C77733DD", "CF2A9EB3-8F1B-4562-979C-CB59D447BCCF", @"1a637b48-35fb-43b2-9822-88af2fd1d333" );
-            // Attrib Value for Block:Content Channel Mobile List, Attribute:Detail Page Page: Sermons, Site: Avalanche
+            // Attrib Value for Block:Content Channel Mobile List, Attribute:Detail Page Page: Sermons, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "724E2C2F-213B-4959-9F01-1957C77733DD", "46D432B9-7F18-4BF5-B874-54347A87A2C2", @"4f8a1ffa-05a7-4522-8c23-74468fafd6bc" );
-            // Attrib Value for Block:Content Channel Mobile List, Attribute:Channel Page: Sermons, Site: Avalanche
+            // Attrib Value for Block:Content Channel Mobile List, Attribute:Channel Page: Sermons, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "724E2C2F-213B-4959-9F01-1957C77733DD", "25941CC2-1C51-46F6-AB82-7A9FA85ECFBA", @"e2c598f1-d299-1baa-4873-8b679e3c1998" );
-            // Attrib Value for Block:Content Channel Mobile List, Attribute:Status Page: Sermons, Site: Avalanche
+            // Attrib Value for Block:Content Channel Mobile List, Attribute:Status Page: Sermons, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "724E2C2F-213B-4959-9F01-1957C77733DD", "4B294624-5BB8-4457-9621-FC471BCD5823", @"2" );
-            // Attrib Value for Block:Content Channel Mobile List, Attribute:Count Page: Sermons, Site: Avalanche
+            // Attrib Value for Block:Content Channel Mobile List, Attribute:Count Page: Sermons, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "724E2C2F-213B-4959-9F01-1957C77733DD", "CE2FCBB8-22C5-4522-893C-DC63F5AD9E1F", @"10" );
-            // Attrib Value for Block:Content Channel Mobile List, Attribute:Filter Id Page: Sermons, Site: Avalanche
+            // Attrib Value for Block:Content Channel Mobile List, Attribute:Filter Id Page: Sermons, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "724E2C2F-213B-4959-9F01-1957C77733DD", "378D03E2-16C8-42AB-89FF-A90DE0FDA232", @"92" );
-            // Attrib Value for Block:Content Channel Mobile List, Attribute:Query Parameter Filtering Page: Sermons, Site: Avalanche
+            // Attrib Value for Block:Content Channel Mobile List, Attribute:Query Parameter Filtering Page: Sermons, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "724E2C2F-213B-4959-9F01-1957C77733DD", "3BDF891A-3B7D-4839-A0B5-E83E966C5F5F", @"False" );
-            // Attrib Value for Block:Content Channel Mobile List, Attribute:Order Page: Sermons, Site: Avalanche
+            // Attrib Value for Block:Content Channel Mobile List, Attribute:Order Page: Sermons, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "724E2C2F-213B-4959-9F01-1957C77733DD", "956EFB28-F562-4A65-AEBB-AFACD44DB659", @"" );
-            // Attrib Value for Block:Content Channel Mobile List, Attribute:Title Lava Page: Sermons, Site: Avalanche
+            // Attrib Value for Block:Content Channel Mobile List, Attribute:Title Lava Page: Sermons, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "724E2C2F-213B-4959-9F01-1957C77733DD", "DCD91C59-5152-4043-A7E2-A79301AF6A18", @"{{ Item.Title }}" );
-            // Attrib Value for Block:Content Channel Mobile List, Attribute:Description Lava Page: Sermons, Site: Avalanche
+            // Attrib Value for Block:Content Channel Mobile List, Attribute:Description Lava Page: Sermons, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "724E2C2F-213B-4959-9F01-1957C77733DD", "7B7BF120-464E-45A6-9398-4E7F82C6B5F2", @"" );
-            // Attrib Value for Block:Content Channel Mobile List, Attribute:Image Lava Page: Sermons, Site: Avalanche
+            // Attrib Value for Block:Content Channel Mobile List, Attribute:Image Lava Page: Sermons, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "724E2C2F-213B-4959-9F01-1957C77733DD", "4BC02D93-4ECB-44C0-9218-445815394C2E", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}GetImage.ashx?guid={{ Item | Attribute:'SeriesImage','RawValue' }}" );
-            // Attrib Value for Block:Content Channel Mobile List, Attribute:Icon Lava Page: Sermons, Site: Avalanche
+            // Attrib Value for Block:Content Channel Mobile List, Attribute:Icon Lava Page: Sermons, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "724E2C2F-213B-4959-9F01-1957C77733DD", "1D0A5A0B-CD92-4120-93D1-4A5F698A33FC", @"" );
-            // Attrib Value for Block:Mobile ListView Lava - Sermon Content, Attribute:Enabled Lava Commands Page: Series Detail, Site: Avalanche
+            // Attrib Value for Block:Mobile ListView Lava - Sermon Content, Attribute:Enabled Lava Commands Page: Series Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7AA9738F-BA87-4761-9FD3-FF8A38703473", "1E87BAD4-50AB-474B-955B-E44FA10C0ADE", @"RockEntity" );
-            // Attrib Value for Block:Mobile ListView Lava - Sermon Content, Attribute:Custom Attributes Page: Series Detail, Site: Avalanche
+            // Attrib Value for Block:Mobile ListView Lava - Sermon Content, Attribute:Custom Attributes Page: Series Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7AA9738F-BA87-4761-9FD3-FF8A38703473", "100D227F-518B-4AF4-9451-DB5663433C14", @"Margin^5%2C0|BackgroundColor^#f2f6f8|VerticalOptions^Start" );
-            // Attrib Value for Block:Mobile ListView Lava - Sermon Content, Attribute:Action Item Page: Series Detail, Site: Avalanche
+            // Attrib Value for Block:Mobile ListView Lava - Sermon Content, Attribute:Action Item Page: Series Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7AA9738F-BA87-4761-9FD3-FF8A38703473", "9D4D1596-B680-4AFF-AF57-6C8867FC7D6B", @"0" );
-            // Attrib Value for Block:Mobile ListView Lava - Sermon Content, Attribute:Lava Page: Series Detail, Site: Avalanche
+            // Attrib Value for Block:Mobile ListView Lava - Sermon Content, Attribute:Lava Page: Series Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7AA9738F-BA87-4761-9FD3-FF8A38703473", "2DF1245C-33A6-4C0B-9CFB-30047103BD05", @"{% contentchannelitem id:'{{parameter}}' %}{% assign seriesItem = contentchannelitemItems | First -%}{% capture seriesart %}{{ 'Global' | Attribute:'PublicApplicationRoot' }}GetImage.ashx?guid={{ seriesItem | Attribute:'SeriesImage','RawValue' }}{% endcapture %}
 {% capture childjson %}{% for childitem in seriesItem.ChildItems %}{""Id"":""{{ childitem.ChildContentChannelItem.Id }}"",""Image"":""{{ seriesart }}"",""Title"":""{{ childitem.ChildContentChannelItem.Title | HtmlDecode | Replace:'""','\""' }}"",""Description"":""{{ childitem.ChildContentChannelItem.Content | StripHtml | HtmlDecode | Replace:'""','\""' }}"",""Resource"":""527"",""ActionType"":""1""},{% endfor -%}{% endcapture %}
 {% endcontentchannelitem -%}
@@ -579,63 +579,63 @@ namespace rocks.kfs.Avalanche.Migrations
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '2DF1245C-33A6-4C0B-9CFB-30047103BD05' AND b.[Guid] = '7AA9738F-BA87-4761-9FD3-FF8A38703473'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Mobile ListView Lava - Sermon Content, Attribute:Component Page: Series Detail, Site: Avalanche
+            // Attrib Value for Block:Mobile ListView Lava - Sermon Content, Attribute:Component Page: Series Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7AA9738F-BA87-4761-9FD3-FF8A38703473", "710306EF-D570-41D9-A806-DD38DC14FEDC", @"d9ea2c97-68e1-4d94-b881-f3ac4f2883a3" );
-            // Attrib Value for Block:Image Block, Attribute:Custom Attributes Page: Series Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Custom Attributes Page: Series Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A47A5177-CD5B-4A1F-9F6D-C1718DB0BA16", "B9523EB6-EEE5-4DC4-B2B0-EF7FF0E73F51", @"" );
-            // Attrib Value for Block:Image Block, Attribute:Image Page: Series Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Image Page: Series Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A47A5177-CD5B-4A1F-9F6D-C1718DB0BA16", "2E9389F8-0E3C-485D-B722-762D89C8EB2E", @"{% contentchannelitem id:'{{parameter}}' %}{% assign seriesItem = contentchannelitemItems | First -%}{{ 'Global' | Attribute:'PublicApplicationRoot' }}GetImage.ashx?guid={{ seriesItem | Attribute:'SeriesImage','RawValue' }}{% endcontentchannelitem %}" );
-            // Attrib Value for Block:Image Block, Attribute:Action Item Page: Series Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Action Item Page: Series Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A47A5177-CD5B-4A1F-9F6D-C1718DB0BA16", "68EF73D8-3C6D-4524-A3A4-9C06D95B164A", @"0" );
-            // Attrib Value for Block:Image Block, Attribute:Aspect Page: Series Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Aspect Page: Series Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A47A5177-CD5B-4A1F-9F6D-C1718DB0BA16", "1900D9DD-EFA4-4278-8B23-0FEEF1894610", @"" );
-            // Attrib Value for Block:Image Block, Attribute:Enabled Lava Commands Page: Series Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Enabled Lava Commands Page: Series Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A47A5177-CD5B-4A1F-9F6D-C1718DB0BA16", "155B8623-7723-4FD2-A321-B9D24B1611CE", @"RockEntity" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Series Detail, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Series Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "EDC51B07-CA23-4415-8997-E03A60D5FA5A", "9CB3C25B-815D-44A4-9171-698136CC0988", @"{% contentchannelitem id:'{{parameter}}' %}{% assign seriesItem = contentchannelitemItems | First -%}{{ seriesItem.Content | HtmlToMarkdown }}{% endcontentchannelitem %}" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Series Detail, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Series Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "EDC51B07-CA23-4415-8997-E03A60D5FA5A", "538EE4EC-33C5-4997-ABD6-1F105F78EF38", @"Margin^20%2C10" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Series Detail, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Series Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "EDC51B07-CA23-4415-8997-E03A60D5FA5A", "7A9950AC-B9E7-4200-9B7A-634BF90DDB2B", @"RockEntity" );
-            // Attrib Value for Block:Video Player Block, Attribute:Aspect Ratio Page: Sermon Detail, Site: Avalanche
+            // Attrib Value for Block:Video Player Block, Attribute:Aspect Ratio Page: Sermon Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7E110550-159D-463A-A532-673564806896", "0AF93DA7-6355-4EEB-AC12-D1C4AD8F0118", @"0.5625" );
-            // Attrib Value for Block:Video Player Block, Attribute:Source Page: Sermon Detail, Site: Avalanche
+            // Attrib Value for Block:Video Player Block, Attribute:Source Page: Sermon Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7E110550-159D-463A-A532-673564806896", "8E4398DD-5BE5-4148-A87B-0C72E649CE6E", @"{% contentchannelitem id:'{{parameter}}' %}{% assign sermonItem = contentchannelitemItems | First -%}{{ sermonItem | Attribute:'VideoLink' }}{% endcontentchannelitem %}" );
-            // Attrib Value for Block:Video Player Block, Attribute:Enabled Lava Commands Page: Sermon Detail, Site: Avalanche
+            // Attrib Value for Block:Video Player Block, Attribute:Enabled Lava Commands Page: Sermon Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7E110550-159D-463A-A532-673564806896", "F860FBE4-55E7-4541-9C91-CC01463B3496", @"RockEntity" );
-            // Attrib Value for Block:Video Player Block, Attribute:AutoPlay Page: Sermon Detail, Site: Avalanche
+            // Attrib Value for Block:Video Player Block, Attribute:AutoPlay Page: Sermon Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7E110550-159D-463A-A532-673564806896", "FB9755DA-5078-4CF1-826D-93CADE127EAA", @"True" );
-            // Attrib Value for Block:Video Player Block, Attribute:Custom Attributes Page: Sermon Detail, Site: Avalanche
+            // Attrib Value for Block:Video Player Block, Attribute:Custom Attributes Page: Sermon Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7E110550-159D-463A-A532-673564806896", "8E6A53D3-AD8B-4993-86B6-981A909F66A2", @"" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Sermon Detail, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Sermon Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "11955742-2F20-40BB-B304-7865C992C7B4", "7A9950AC-B9E7-4200-9B7A-634BF90DDB2B", @"RockEntity" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Sermon Detail, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Sermon Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "11955742-2F20-40BB-B304-7865C992C7B4", "538EE4EC-33C5-4997-ABD6-1F105F78EF38", @"Margin^20%2C10" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Sermon Detail, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Sermon Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "11955742-2F20-40BB-B304-7865C992C7B4", "9CB3C25B-815D-44A4-9171-698136CC0988", @"{% contentchannelitem id:'{{parameter}}' %}{% assign sermonItem = contentchannelitemItems | First -%}**{{ sermonItem.Title }}**
 {{ sermonItem.Content | HtmlToMarkdown }}{% endcontentchannelitem %}" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "8F975583-92F5-4827-909B-97D3D09E4BEC", "9CB3C25B-815D-44A4-9171-698136CC0988", @"{% contentchannelitem id:'{{parameter}}' %}{% assign sermonItem = contentchannelitemItems | First -%}**{{ sermonItem.Title }}**
 {{ sermonItem.Content | HtmlToMarkdown }}{% endcontentchannelitem %}" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "8F975583-92F5-4827-909B-97D3D09E4BEC", "7A9950AC-B9E7-4200-9B7A-634BF90DDB2B", @"RockEntity" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "8F975583-92F5-4827-909B-97D3D09E4BEC", "538EE4EC-33C5-4997-ABD6-1F105F78EF38", @"Margin^20%2C10" );
-            // Attrib Value for Block:Audio Player Block, Attribute:Source Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Audio Player Block, Attribute:Source Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7761BC7C-DDE7-4DCB-81C9-720339A24477", "CA288975-9E8C-4612-96A0-23E1B7C3FDF9", @"{% contentchannelitem id:'{{parameter}}' %}{% assign sermonItem = contentchannelitemItems | First -%}{{ sermonItem | Attribute:'AudioLink' }}{% endcontentchannelitem %}" );
-            // Attrib Value for Block:Audio Player Block, Attribute:Enabled Lava Commands Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Audio Player Block, Attribute:Enabled Lava Commands Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7761BC7C-DDE7-4DCB-81C9-720339A24477", "2DF42069-76B8-4414-B602-9828F1FDC2B2", @"RockEntity" );
-            // Attrib Value for Block:Audio Player Block, Attribute:AutoPlay Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Audio Player Block, Attribute:AutoPlay Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7761BC7C-DDE7-4DCB-81C9-720339A24477", "38F36F45-EDEE-4DEE-8DE2-377BBD029D76", @"True" );
-            // Attrib Value for Block:Audio Player Block, Attribute:Title Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Audio Player Block, Attribute:Title Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7761BC7C-DDE7-4DCB-81C9-720339A24477", "79211D59-E0D9-4C7C-919F-B5B084F9D953", @"{% contentchannelitem id:'{{parameter}}' %}{% assign sermonItem = contentchannelitemItems | First -%}{{ sermonItem.Title }}{% endcontentchannelitem %}" );
-            // Attrib Value for Block:Audio Player Block, Attribute:Artist Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Audio Player Block, Attribute:Artist Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7761BC7C-DDE7-4DCB-81C9-720339A24477", "614313D7-9634-4959-B117-6A2E7FA76272", @"{% contentchannelitem id:'{{parameter}}' %}{% assign sermonItem = contentchannelitemItems | First -%}{{ sermonItem | Attribute:'Speaker' }}{% endcontentchannelitem %}" );
-            // Attrib Value for Block:Audio Player Block, Attribute:Custom Attributes Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Audio Player Block, Attribute:Custom Attributes Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "7761BC7C-DDE7-4DCB-81C9-720339A24477", "B5C561AE-4926-42E3-8FF3-D231F0B7FAEC", @"BackgroundColor^#0094d9|TextColor^White" );
-            // Attrib Value for Block:Icon Button - Listen, Attribute:Text Page: Sermon Detail, Site: Avalanche
+            // Attrib Value for Block:Icon Button - Listen, Attribute:Text Page: Sermon Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BA50E899-CEAB-4816-8AD0-A650889882A4", "9FFA6301-04B4-4D1D-907C-D345BE825B13", @"Listen" );
-            // Attrib Value for Block:Icon Button - Listen, Attribute:Action Item Page: Sermon Detail, Site: Avalanche
+            // Attrib Value for Block:Icon Button - Listen, Attribute:Action Item Page: Sermon Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BA50E899-CEAB-4816-8AD0-A650889882A4", "1AD33D1F-BDE9-4AFB-B6E8-E2CD271A5EF3", @"2^528^{{ parameter }}" ); // NEED SQL, 528
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '344BABC7-5C30-4B53-87F9-A00F0DDA38E7' )
                 UPDATE av SET av.[Value] = Replace([Value],528,@PageId)
@@ -643,21 +643,21 @@ namespace rocks.kfs.Avalanche.Migrations
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '1AD33D1F-BDE9-4AFB-B6E8-E2CD271A5EF3' AND b.[Guid] = 'BA50E899-CEAB-4816-8AD0-A650889882A4'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Icon Button - Listen, Attribute:Icon Page: Sermon Detail, Site: Avalanche
+            // Attrib Value for Block:Icon Button - Listen, Attribute:Icon Page: Sermon Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BA50E899-CEAB-4816-8AD0-A650889882A4", "FCE07A51-64D8-4FC8-BFB2-8CDBCED449F7", @"fa fa-headphones" );
-            // Attrib Value for Block:Icon Button - Listen, Attribute:Enabled Lava Commands Page: Sermon Detail, Site: Avalanche
+            // Attrib Value for Block:Icon Button - Listen, Attribute:Enabled Lava Commands Page: Sermon Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BA50E899-CEAB-4816-8AD0-A650889882A4", "2FCA15F3-D621-4E7C-8F0C-FF9222AB3447", @"" );
-            // Attrib Value for Block:Icon Button - Listen, Attribute:Custom Attributes Page: Sermon Detail, Site: Avalanche
+            // Attrib Value for Block:Icon Button - Listen, Attribute:Custom Attributes Page: Sermon Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BA50E899-CEAB-4816-8AD0-A650889882A4", "6D8A7116-BB0F-4F3A-9C24-5C39F2364E42", @"TextColor^#0094d9|BackgroundColor^White" );
-            // Attrib Value for Block:Icon Button - Watch, Attribute:Custom Attributes Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Icon Button - Watch, Attribute:Custom Attributes Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "F915EB5A-9260-4681-9A49-0C6778D2F084", "6D8A7116-BB0F-4F3A-9C24-5C39F2364E42", @"TextColor^#0094d9|BackgroundColor^White" );
-            // Attrib Value for Block:Icon Button - Watch, Attribute:Enabled Lava Commands Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Icon Button - Watch, Attribute:Enabled Lava Commands Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "F915EB5A-9260-4681-9A49-0C6778D2F084", "2FCA15F3-D621-4E7C-8F0C-FF9222AB3447", @"" );
-            // Attrib Value for Block:Icon Button - Watch, Attribute:Icon Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Icon Button - Watch, Attribute:Icon Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "F915EB5A-9260-4681-9A49-0C6778D2F084", "FCE07A51-64D8-4FC8-BFB2-8CDBCED449F7", @"fa fa-television" );
-            // Attrib Value for Block:Icon Button - Watch, Attribute:Text Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Icon Button - Watch, Attribute:Text Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "F915EB5A-9260-4681-9A49-0C6778D2F084", "9FFA6301-04B4-4D1D-907C-D345BE825B13", @"Watch" );
-            // Attrib Value for Block:Icon Button - Watch, Attribute:Action Item Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Icon Button - Watch, Attribute:Action Item Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "F915EB5A-9260-4681-9A49-0C6778D2F084", "1AD33D1F-BDE9-4AFB-B6E8-E2CD271A5EF3", @"2^527^{{ parameter }}" ); // NEED SQL, 527
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '1CDE2032-482B-483E-B273-A1A3B421E04C' )
                 UPDATE av SET av.[Value] = Replace([Value],527,@PageId)
@@ -665,19 +665,19 @@ namespace rocks.kfs.Avalanche.Migrations
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '1AD33D1F-BDE9-4AFB-B6E8-E2CD271A5EF3' AND b.[Guid] = 'F915EB5A-9260-4681-9A49-0C6778D2F084'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Image Block, Attribute:Enabled Lava Commands Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Enabled Lava Commands Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "9735B56B-32A3-45CE-9298-5C1F7EFB3DEA", "155B8623-7723-4FD2-A321-B9D24B1611CE", @"RockEntity" );
-            // Attrib Value for Block:Image Block, Attribute:Aspect Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Aspect Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "9735B56B-32A3-45CE-9298-5C1F7EFB3DEA", "1900D9DD-EFA4-4278-8B23-0FEEF1894610", @"" );
-            // Attrib Value for Block:Image Block, Attribute:Action Item Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Action Item Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "9735B56B-32A3-45CE-9298-5C1F7EFB3DEA", "68EF73D8-3C6D-4524-A3A4-9C06D95B164A", @"0" );
-            // Attrib Value for Block:Image Block, Attribute:Image Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Image Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "9735B56B-32A3-45CE-9298-5C1F7EFB3DEA", "2E9389F8-0E3C-485D-B722-762D89C8EB2E", @"{% contentchannelitem id:'{{parameter}}' %}{% assign sermonItem = contentchannelitemItems | First -%}{{ 'Global' | Attribute:'PublicApplicationRoot'}}GetImage.ashx?guid={{ sermonItem | Attribute:'Image','RawValue' }}{% endcontentchannelitem %}" );
-            // Attrib Value for Block:Image Block, Attribute:Custom Attributes Page: Sermon Detail Audio, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Custom Attributes Page: Sermon Detail Audio, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "9735B56B-32A3-45CE-9298-5C1F7EFB3DEA", "B9523EB6-EEE5-4DC4-B2B0-EF7FF0E73F51", @"" );
-            // Attrib Value for Block:Preload Block, Attribute:Enabled Lava Commands Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Preload Block, Attribute:Enabled Lava Commands Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FCB9F034-0036-48DC-B588-6FBE969938C9", "2811B163-E681-4EBA-9280-A82742FEBE3C", @"" );
-            // Attrib Value for Block:Preload Block, Attribute:Pages To Preload Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Preload Block, Attribute:Pages To Preload Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FCB9F034-0036-48DC-B588-6FBE969938C9", "73006B75-6B97-4203-8182-0944455BB213", @"519^|520^|521^" ); // NEED SQL
             Sql( @"DECLARE @PageId1 int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '9711DB54-0FB0-4722-AB45-1DFB6158F922' )
                 DECLARE @PageId2 int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'CD8A05F8-24FF-4D38-8ED0-FE2BF07C0CDE' )
@@ -687,13 +687,13 @@ namespace rocks.kfs.Avalanche.Migrations
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '73006B75-6B97-4203-8182-0944455BB213' AND b.[Guid] = 'FCB9F034-0036-48DC-B588-6FBE969938C9'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Preload Block, Attribute:Custom Attributes Page: Avalanche Home Page, Site: Avalanche
+            // Attrib Value for Block:Preload Block, Attribute:Custom Attributes Page: KFS Avalanche Home Page, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FCB9F034-0036-48DC-B588-6FBE969938C9", "E28D8CD0-91E8-453F-B221-C8A9E60DEE46", @"" );
-            // Attrib Value for Block:Preload Block, Attribute:Custom Attributes Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Preload Block, Attribute:Custom Attributes Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C6A448AB-B39B-48D1-9EDC-06062BF98766", "E28D8CD0-91E8-453F-B221-C8A9E60DEE46", @"" );
-            // Attrib Value for Block:Preload Block, Attribute:Enabled Lava Commands Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Preload Block, Attribute:Enabled Lava Commands Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C6A448AB-B39B-48D1-9EDC-06062BF98766", "2811B163-E681-4EBA-9280-A82742FEBE3C", @"" );
-            // Attrib Value for Block:Preload Block, Attribute:Pages To Preload Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Preload Block, Attribute:Pages To Preload Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C6A448AB-B39B-48D1-9EDC-06062BF98766", "73006B75-6B97-4203-8182-0944455BB213", @"529^|530^|531^" ); // NEED SQL
             Sql( @"DECLARE @PageId1 int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'D943417B-F167-4CD0-8321-C779B1C9E92B' )
                 DECLARE @PageId2 int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '8E94B8E8-171D-4A81-9A69-D34667510231' )
@@ -703,17 +703,17 @@ namespace rocks.kfs.Avalanche.Migrations
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '73006B75-6B97-4203-8182-0944455BB213' AND b.[Guid] = 'C6A448AB-B39B-48D1-9EDC-06062BF98766'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Text Over Image Block - Baptism, Attribute:Custom Attributes Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Baptism, Attribute:Custom Attributes Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "DC43E7F1-A294-4D99-B37A-CC04F18BD32C", "B0FCF405-607A-43C1-A2DB-1AA2C066EABB", @"TextColor^White|FontSize^45" );
-            // Attrib Value for Block:Text Over Image Block - Baptism, Attribute:Aspect Ratio Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Baptism, Attribute:Aspect Ratio Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "DC43E7F1-A294-4D99-B37A-CC04F18BD32C", "BD4BC1F9-9C20-4A6E-A67D-8D5EF56A619D", @"0.45" );
-            // Attrib Value for Block:Text Over Image Block - Baptism, Attribute:Enabled Lava Commands Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Baptism, Attribute:Enabled Lava Commands Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "DC43E7F1-A294-4D99-B37A-CC04F18BD32C", "3B56BD7B-DFFA-4C07-A936-8B79029C01C5", @"" );
-            // Attrib Value for Block:Text Over Image Block - Baptism, Attribute:Image Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Baptism, Attribute:Image Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "DC43E7F1-A294-4D99-B37A-CC04F18BD32C", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/connect_baptism.jpg" );
-            // Attrib Value for Block:Text Over Image Block - Baptism, Attribute:Text Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Baptism, Attribute:Text Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "DC43E7F1-A294-4D99-B37A-CC04F18BD32C", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Baptism" );
-            // Attrib Value for Block:Text Over Image Block - Baptism, Attribute:Action Item Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Baptism, Attribute:Action Item Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "DC43E7F1-A294-4D99-B37A-CC04F18BD32C", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^530^" ); // NEED SQL, 530
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '8E94B8E8-171D-4A81-9A69-D34667510231' )
                 UPDATE av SET av.[Value] = Replace([Value],530,@PageId)
@@ -721,7 +721,7 @@ namespace rocks.kfs.Avalanche.Migrations
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799' AND b.[Guid] = 'DC43E7F1-A294-4D99-B37A-CC04F18BD32C'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Text Over Image Block - Groups, Attribute:Action Item Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Groups, Attribute:Action Item Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "44D7ED68-22F4-4D1F-B443-75FF6B9F791B", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^529^" ); // NEED SQL, 529
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'D943417B-F167-4CD0-8321-C779B1C9E92B' )
                 UPDATE av SET av.[Value] = Replace([Value],529,@PageId)
@@ -729,27 +729,27 @@ namespace rocks.kfs.Avalanche.Migrations
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799' AND b.[Guid] = '44D7ED68-22F4-4D1F-B443-75FF6B9F791B'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Text Over Image Block - Groups, Attribute:Text Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Groups, Attribute:Text Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "44D7ED68-22F4-4D1F-B443-75FF6B9F791B", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Groups" );
-            // Attrib Value for Block:Text Over Image Block - Groups, Attribute:Image Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Groups, Attribute:Image Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "44D7ED68-22F4-4D1F-B443-75FF6B9F791B", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/connect_groups.jpg" );
-            // Attrib Value for Block:Text Over Image Block - Groups, Attribute:Enabled Lava Commands Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Groups, Attribute:Enabled Lava Commands Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "44D7ED68-22F4-4D1F-B443-75FF6B9F791B", "3B56BD7B-DFFA-4C07-A936-8B79029C01C5", @"" );
-            // Attrib Value for Block:Text Over Image Block - Groups, Attribute:Custom Attributes Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Groups, Attribute:Custom Attributes Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "44D7ED68-22F4-4D1F-B443-75FF6B9F791B", "B0FCF405-607A-43C1-A2DB-1AA2C066EABB", @"TextColor^White|FontSize^45" );
-            // Attrib Value for Block:Text Over Image Block - Groups, Attribute:Aspect Ratio Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Groups, Attribute:Aspect Ratio Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "44D7ED68-22F4-4D1F-B443-75FF6B9F791B", "BD4BC1F9-9C20-4A6E-A67D-8D5EF56A619D", @"0.45" );
-            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Aspect Ratio Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Aspect Ratio Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "E7E0ADD1-0863-492E-B7D7-A32B5680816F", "BD4BC1F9-9C20-4A6E-A67D-8D5EF56A619D", @"0.45" );
-            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Custom Attributes Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Custom Attributes Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "E7E0ADD1-0863-492E-B7D7-A32B5680816F", "B0FCF405-607A-43C1-A2DB-1AA2C066EABB", @"TextColor^White|FontSize^45" );
-            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Enabled Lava Commands Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Enabled Lava Commands Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "E7E0ADD1-0863-492E-B7D7-A32B5680816F", "3B56BD7B-DFFA-4C07-A936-8B79029C01C5", @"" );
-            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Image Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Image Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "E7E0ADD1-0863-492E-B7D7-A32B5680816F", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/connect_events.jpg" );
-            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Text Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Text Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "E7E0ADD1-0863-492E-B7D7-A32B5680816F", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Events" );
-            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Action Item Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Events, Attribute:Action Item Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "E7E0ADD1-0863-492E-B7D7-A32B5680816F", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^531^" ); // NEED SQL, 531
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'B95062A4-770C-47DF-B88F-0626F7BFDF2F' )
                 UPDATE av SET av.[Value] = Replace([Value],531,@PageId)
@@ -757,45 +757,45 @@ namespace rocks.kfs.Avalanche.Migrations
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799' AND b.[Guid] = 'E7E0ADD1-0863-492E-B7D7-A32B5680816F'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Text Over Image Block, Attribute:Action Item Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Action Item Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "5C6A4458-56A3-4F60-8792-5271326DED00", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"0" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Image Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Image Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "5C6A4458-56A3-4F60-8792-5271326DED00", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/groups.jpg" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Text Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Text Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "5C6A4458-56A3-4F60-8792-5271326DED00", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Groups" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Enabled Lava Commands Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Enabled Lava Commands Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "5C6A4458-56A3-4F60-8792-5271326DED00", "3B56BD7B-DFFA-4C07-A936-8B79029C01C5", @"" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Custom Attributes Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Custom Attributes Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "5C6A4458-56A3-4F60-8792-5271326DED00", "B0FCF405-607A-43C1-A2DB-1AA2C066EABB", @"TextColor^White|FontSize^45" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Aspect Ratio Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Aspect Ratio Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "5C6A4458-56A3-4F60-8792-5271326DED00", "BD4BC1F9-9C20-4A6E-A67D-8D5EF56A619D", @"0.35" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "898CD5D8-AB1E-4267-8084-161FFBAA7820", "7A9950AC-B9E7-4200-9B7A-634BF90DDB2B", @"RockEntity" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "898CD5D8-AB1E-4267-8084-161FFBAA7820", "538EE4EC-33C5-4997-ABD6-1F105F78EF38", @"Margin^10" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "898CD5D8-AB1E-4267-8084-161FFBAA7820", "9CB3C25B-815D-44A4-9171-698136CC0988", @"## Lorem ipsum dolor sit amet
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque mattis leo a eros accumsan elementum. Vestibulum iaculis ligula et molestie tempus. Nunc vel elit et orci vulputate ornare. Phasellus eleifend dapibus quam, vitae mollis tortor molestie eget. Vestibulum urna est, condimentum nec pulvinar at, semper malesuada elit. 
 
 Praesent ornare sapien vel nibh viverra, ac aliquet nibh sagittis. Nunc congue commodo tortor, sed interdum tortor viverra vel. In enim risus, volutpat ut augue non, condimentum suscipit mi. Proin condimentum, nisi ac placerat maximus, erat felis varius sapien, in fringilla enim metus vel sem. Pellentesque et fringilla ex, vel semper sapien. Vivamus condimentum lectus nec tincidunt pulvinar. Quisque mattis erat vel eleifend luctus. Sed vitae bibendum neque. Cras consectetur gravida leo, facilisis posuere purus tristique nec. Ut vitae diam et ipsum venenatis venenatis eu sed mauris. Cras fermentum purus eu suscipit tempor." );
-            // Attrib Value for Block:Button - Attend Growth Track, Attribute:Text Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Button - Attend Growth Track, Attribute:Text Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "6B2D9BCB-6229-4859-BA77-9E4BF34AE181", "B60F03CA-B109-48F6-ACE4-1C365DC4E908", @"Learn More" );
-            // Attrib Value for Block:Button - Attend Growth Track, Attribute:Action Item Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Button - Attend Growth Track, Attribute:Action Item Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "6B2D9BCB-6229-4859-BA77-9E4BF34AE181", "A9D5A12D-F60D-4CAA-A46B-1A605032586D", @"4^{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Connect^0" );
-            // Attrib Value for Block:Button - Attend Growth Track, Attribute:Enabled Lava Commands Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Button - Attend Growth Track, Attribute:Enabled Lava Commands Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "6B2D9BCB-6229-4859-BA77-9E4BF34AE181", "BEF7E221-837D-4DD5-BC3E-49E6E3BDEBF9", @"" );
-            // Attrib Value for Block:Button - Attend Growth Track, Attribute:Custom Attributes Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Button - Attend Growth Track, Attribute:Custom Attributes Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "6B2D9BCB-6229-4859-BA77-9E4BF34AE181", "FED19184-4169-4EEF-9437-592545A79461", @"BackgroundColor^#0094d9|TextColor^White|BorderRadius^20|FontSize^24|Margin^30%2C10" );
-            // Attrib Value for Block:Next Steps detail, Attribute:Custom Attributes Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Next Steps detail, Attribute:Custom Attributes Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "87B3FD61-73E7-4BEF-AC56-1A96E497E916", "538EE4EC-33C5-4997-ABD6-1F105F78EF38", @"Margin^10" );
-            // Attrib Value for Block:Next Steps detail, Attribute:Enabled Lava Commands Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Next Steps detail, Attribute:Enabled Lava Commands Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "87B3FD61-73E7-4BEF-AC56-1A96E497E916", "7A9950AC-B9E7-4200-9B7A-634BF90DDB2B", @"" );
-            // Attrib Value for Block:Next Steps detail, Attribute:Markdown Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Next Steps detail, Attribute:Markdown Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "87B3FD61-73E7-4BEF-AC56-1A96E497E916", "9CB3C25B-815D-44A4-9171-698136CC0988", @"Curabitur imperdiet bibendum dui, gravida sollicitudin mauris pharetra eget. Quisque vestibulum arcu sed nulla porttitor aliquet. Fusce vel interdum diam [Next Steps page]({{ 'Global' | Attribute:'PublicApplicationRoot' }}/Connect). Nullam purus dolor, mattis at pellentesque quis, consectetur in arcu. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Fusce vel tellus nibh.
 
 ### Nam semper facilisis ligula ut consequat
 Sed quis tincidunt ex, ut sagittis erat. Donec congue ultrices mauris ut consectetur. Nulla urna nisl, pretium et mauris ac, tempus tristique augue. Morbi sodales egestas magna quis convallis. Pellentesque interdum tincidunt sollicitudin. Cras mattis eu arcu ultrices porta. Etiam eleifend viverra nulla, eget porta turpis mattis nec. Nullam faucibus maximus est, a rutrum metus fringilla vulputate." );
-            // Attrib Value for Block:Next Steps Button, Attribute:Action Item Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Next Steps Button, Attribute:Action Item Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D0B758C4-18E1-45DE-82B0-70906E45B99A", "A9D5A12D-F60D-4CAA-A46B-1A605032586D", @"1^532^0" ); // NEED SQL, workflow form page
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '7817298D-0A76-4039-A5D7-AF273AC05952' )
                 UPDATE av SET av.[Value] = Replace([Value],'532',@PageId)
@@ -803,57 +803,57 @@ Sed quis tincidunt ex, ut sagittis erat. Donec congue ultrices mauris ut consect
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = 'A9D5A12D-F60D-4CAA-A46B-1A605032586D' AND b.[Guid] = 'D0B758C4-18E1-45DE-82B0-70906E45B99A'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Next Steps Button, Attribute:Text Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Next Steps Button, Attribute:Text Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D0B758C4-18E1-45DE-82B0-70906E45B99A", "B60F03CA-B109-48F6-ACE4-1C365DC4E908", @"Form a group" );
-            // Attrib Value for Block:Next Steps Button, Attribute:Custom Attributes Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Next Steps Button, Attribute:Custom Attributes Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D0B758C4-18E1-45DE-82B0-70906E45B99A", "FED19184-4169-4EEF-9437-592545A79461", @"TextColor^White|BackgroundColor^#0094d9|BorderRadius^20|Margin^30%2C10|FontSize^24" );
-            // Attrib Value for Block:Next Steps Button, Attribute:Enabled Lava Commands Page: Groups, Site: Avalanche
+            // Attrib Value for Block:Next Steps Button, Attribute:Enabled Lava Commands Page: Groups, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D0B758C4-18E1-45DE-82B0-70906E45B99A", "BEF7E221-837D-4DD5-BC3E-49E6E3BDEBF9", @"" );
-            // Attrib Value for Block:Mobile Workflow, Attribute:Workflow Type Page: Contact Us, Site: Avalanche
+            // Attrib Value for Block:Mobile Workflow, Attribute:Workflow Type Page: Contact Us, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "F05B2A93-CEF8-4EAE-9358-EACC73C31173", "3667DECB-4576-46A5-B2CE-ACC2D43D0D69", @"236ab611-ede8-42b5-b559-6b6a88adddcb" );
-            // Attrib Value for Block:Mobile Workflow, Attribute:Custom Attributes Page: Contact Us, Site: Avalanche
+            // Attrib Value for Block:Mobile Workflow, Attribute:Custom Attributes Page: Contact Us, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "F05B2A93-CEF8-4EAE-9358-EACC73C31173", "96FBBEC4-EDDE-4D98-8B3D-BF656CB4B563", @"" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Cache Duration Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Cache Duration Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "4D9B40B4-14E2-4B00-9725-0D33B6606BD1", @"0" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Event Calendar Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Event Calendar Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "29E37C6C-CCD8-4631-A2B5-200D93678D7A", @"8a444668-19af-4417-9c74-09f842572974" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Default View Option Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Default View Option Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "4BC3868B-23BB-4A46-970F-BD16447F705E", @"Year" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Enabled Lava Commands Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Enabled Lava Commands Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "1AD0C6A7-16D4-4DBA-9584-342137D3E051", @"" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Campus Filter Display Mode Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Campus Filter Display Mode Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "7FBB51A6-B2C7-4E1D-ABAF-F4D01ABF1D8F", @"2" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Audience Filter Display Mode Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Audience Filter Display Mode Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "95AF549B-D25C-49BE-8B0F-59C3F3D1B4D4", @"2" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Filter Audiences Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Filter Audiences Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "9F67474F-B6DF-4549-884D-F89E56AA954F", @"" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Show Date Range Filter Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Show Date Range Filter Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "04992B21-617D-48A1-ADF3-951CB633CC93", @"False" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Show Small Calendar Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Show Small Calendar Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "197DA2B8-F798-44BF-B2C2-99723A3E2E45", @"True" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Show Day View Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Show Day View Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "3692C511-DFBF-4F5A-8BC0-16EAFC1B4BAC", @"False" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Show Week View Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Show Week View Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "15084637-2667-4260-8E50-9B01EA852ADF", @"True" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Show Month View Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Show Month View Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "42744616-A525-4252-8CEE-9CDE6250DD31", @"True" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Show Year View Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Show Year View Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "B7A1B651-9CC9-4961-AB8C-5E89FA7F19B2", @"True" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Enable Campus Context Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Enable Campus Context Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "13564317-66A2-4EE2-9078-5B314E8EB249", @"False" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Action Item Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Action Item Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "FD94A70E-EAC2-4851-9D3C-84629A93F62E", @"0" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Campus Parameter Name Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Campus Parameter Name Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "32ADBCD2-7858-4566-9AAE-4C5DC5C43246", @"campusId" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Start of Week Day Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Start of Week Day Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "A016AF17-6C91-49BD-AC92-C4B83A9BFE46", @"0" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Set Page Title Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Set Page Title Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "B5EA1BE1-DE1D-4C9E-B565-A3050869CD58", @"False" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Component Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Component Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "2A037292-80ED-4EF6-95E6-A3518EFFDC2C", @"a6efb571-56c8-44c2-8f87-b7f4db4e1991" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Category Parameter Name Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Category Parameter Name Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "EC03AFD7-A544-4BEB-9CD8-5A87FC90B6B0", @"categoryId" );
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Lava Template Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Lava Template Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "71BFE3A7-41CD-46E8-B95F-456735104DA2", @"[{% assign eventItemOccurrenceCount = EventItemOccurrences | Size -%}
 {% if eventItemOccurrenceCount == 0 -%}
 {""Id"":""-1"", ""Title"":""There are no events in this time frame."", ""Description"":"""", ""Resource"":"""", ""ActionType"":""0"", ""Image"":""""}
@@ -866,21 +866,21 @@ Sed quis tincidunt ex, ut sagittis erat. Donec congue ultrices mauris ut consect
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '71BFE3A7-41CD-46E8-B95F-456735104DA2' AND b.[Guid] = '713083B7-B5A8-416C-9603-594589A67B8D'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Custom Attributes Page: Events, Site: Avalanche
+            // Attrib Value for Block:Avalanche Event Calendar Lava, Attribute:Custom Attributes Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "713083B7-B5A8-416C-9603-594589A67B8D", "0B61EA06-A713-4359-BCA4-1D0602E8C6CA", @"Columns^1|Margin^20%2C0|WidthRequest^440" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Aspect Ratio Page: Events, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Aspect Ratio Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FB586E92-764C-4321-871F-47C38D768E94", "BD4BC1F9-9C20-4A6E-A67D-8D5EF56A619D", @"0.45" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Custom Attributes Page: Events, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Custom Attributes Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FB586E92-764C-4321-871F-47C38D768E94", "B0FCF405-607A-43C1-A2DB-1AA2C066EABB", @"TextColor^White|FontSize^45" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Enabled Lava Commands Page: Events, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Enabled Lava Commands Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FB586E92-764C-4321-871F-47C38D768E94", "3B56BD7B-DFFA-4C07-A936-8B79029C01C5", @"" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Text Page: Events, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Text Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FB586E92-764C-4321-871F-47C38D768E94", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Events" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Image Page: Events, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Image Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FB586E92-764C-4321-871F-47C38D768E94", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/events.jpg" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Action Item Page: Events, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Action Item Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FB586E92-764C-4321-871F-47C38D768E94", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"0" );
-            // Attrib Value for Block:Event Filter, Attribute:Action Item Page: Events, Site: Avalanche
+            // Attrib Value for Block:Event Filter, Attribute:Action Item Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A9D36E34-4D02-4179-B6DE-EF30B341D1D9", "CBB79612-83F9-4FC5-94EC-450DED06B30B", @"2^531^" ); // NEED SQL, 531
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'B95062A4-770C-47DF-B88F-0626F7BFDF2F' )
                 UPDATE av SET av.[Value] = Replace([Value],531,@PageId)
@@ -888,27 +888,27 @@ Sed quis tincidunt ex, ut sagittis erat. Donec congue ultrices mauris ut consect
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = 'CBB79612-83F9-4FC5-94EC-450DED06B30B' AND b.[Guid] = 'A9D36E34-4D02-4179-B6DE-EF30B341D1D9'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Event Filter, Attribute:Custom Attributes Page: Events, Site: Avalanche
+            // Attrib Value for Block:Event Filter, Attribute:Custom Attributes Page: Events, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "A9D36E34-4D02-4179-B6DE-EF30B341D1D9", "92E11239-D329-4E43-9847-72358122D052", @"Margin^10%2C0" );
-            // Attrib Value for Block:Image Block, Attribute:Enabled Lava Commands Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Enabled Lava Commands Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BAAA075C-AD3F-4A0B-AF0C-D9462760D16F", "155B8623-7723-4FD2-A321-B9D24B1611CE", @"RockEntity" );
-            // Attrib Value for Block:Image Block, Attribute:Action Item Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Action Item Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BAAA075C-AD3F-4A0B-AF0C-D9462760D16F", "68EF73D8-3C6D-4524-A3A4-9C06D95B164A", @"0" );
-            // Attrib Value for Block:Image Block, Attribute:Image Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Image Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BAAA075C-AD3F-4A0B-AF0C-D9462760D16F", "2E9389F8-0E3C-485D-B722-762D89C8EB2E", @"{% eventitemoccurrence id:'{{parameter}}' %}{{ 'Global' | Attribute:'PublicApplicationRoot' }}/GetImage.ashx?id={{ eventitemoccurrence.EventItem.PhotoId }}{% endeventitemoccurrence %}" );
-            // Attrib Value for Block:Image Block, Attribute:Aspect Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Aspect Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BAAA075C-AD3F-4A0B-AF0C-D9462760D16F", "1900D9DD-EFA4-4278-8B23-0FEEF1894610", @"" );
-            // Attrib Value for Block:Image Block, Attribute:Custom Attributes Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Image Block, Attribute:Custom Attributes Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BAAA075C-AD3F-4A0B-AF0C-D9462760D16F", "B9523EB6-EEE5-4DC4-B2B0-EF7FF0E73F51", @"" );
-            // Attrib Value for Block:Label Block, Attribute:Text Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Label Block, Attribute:Text Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "897FE435-F9E8-4755-AC87-5B273A415DCD", "95980EF8-47FA-40C9-9372-938F46746458", @"{% eventitemoccurrence id:'{{ parameter }}' %}{{ eventitemoccurrence.EventItem.Name }}{% endeventitemoccurrence %}" );
-            // Attrib Value for Block:Label Block, Attribute:Custom Attributes Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Label Block, Attribute:Custom Attributes Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "897FE435-F9E8-4755-AC87-5B273A415DCD", "A59E551E-6B04-4C70-B1F6-B8EAEAC27D94", @"FontSize^24|TextColor^#0094d9|FontFamily^Open Sans Light|Margin^10" );
-            // Attrib Value for Block:Label Block, Attribute:Enabled Lava Commands Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Label Block, Attribute:Enabled Lava Commands Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "897FE435-F9E8-4755-AC87-5B273A415DCD", "7F860DC6-7478-4F88-A878-FAF3D75CEB9C", @"RockEntity" );
-            // Attrib Value for Block:Label Block, Attribute:Action Item Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Label Block, Attribute:Action Item Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "897FE435-F9E8-4755-AC87-5B273A415DCD", "0D9816B1-E6CF-46C3-A3C7-4099359B2857", @"0" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "10F85187-7796-45FC-A65D-4EC1314E3609", "9CB3C25B-815D-44A4-9171-698136CC0988", @"{% eventitemoccurrence id:'{{ parameter }}' -%}{% assign icaldate = eventitemoccurrence.Schedule.iCalendarContent | DatesFromICal:'all' | First -%}
 {% capture datestr %}{% if eventitemoccurrence.Schedule.EffectiveStartDate != eventitemoccurrence.Schedule.EffectiveEndDate -%}
 {{ eventitemoccurrence.Schedule.EffectiveStartDate  | Date: 'MMMM d' }} - {{ eventitemoccurrence.Schedule.EffectiveEndDate  | Date: 'MMMM d'}}
@@ -925,33 +925,33 @@ Sed quis tincidunt ex, ut sagittis erat. Donec congue ultrices mauris ut consect
 **Note:**   
 {{ eventitemoccurrence.Note | HtmlToMarkdown }}  
 {% endif -%}{% endeventitemoccurrence -%}" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "10F85187-7796-45FC-A65D-4EC1314E3609", "538EE4EC-33C5-4997-ABD6-1F105F78EF38", @"Margin^10%2C0" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "10F85187-7796-45FC-A65D-4EC1314E3609", "7A9950AC-B9E7-4200-9B7A-634BF90DDB2B", @"RockEntity" );
-            // Attrib Value for Block:Mobile Button, Attribute:Text Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Mobile Button, Attribute:Text Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C454F889-AB57-4D38-A18F-195D60445EDF", "B60F03CA-B109-48F6-ACE4-1C365DC4E908", @"More Info" );
-            // Attrib Value for Block:Mobile Button, Attribute:Action Item Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Mobile Button, Attribute:Action Item Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C454F889-AB57-4D38-A18F-195D60445EDF", "A9D5A12D-F60D-4CAA-A46B-1A605032586D", @"4^{{ 'Global' | Attribute:'PublicApplicationRoot' }}/page/414?EventOccurrenceID={{ parameter }}^0" ); 
-            // Attrib Value for Block:Mobile Button, Attribute:Enabled Lava Commands Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Mobile Button, Attribute:Enabled Lava Commands Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C454F889-AB57-4D38-A18F-195D60445EDF", "BEF7E221-837D-4DD5-BC3E-49E6E3BDEBF9", @"RockEntity" );
-            // Attrib Value for Block:Mobile Button, Attribute:Custom Attributes Page: Event Detail, Site: Avalanche
+            // Attrib Value for Block:Mobile Button, Attribute:Custom Attributes Page: Event Detail, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "C454F889-AB57-4D38-A18F-195D60445EDF", "FED19184-4169-4EEF-9437-592545A79461", @"BorderRadius^20|TextColor^White|FontSize^24|BackgroundColor^#0094d9|Margin^20" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Enabled Lava Commands Page: Baptism, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Enabled Lava Commands Page: Baptism, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "F6B935B9-6DA2-421A-9645-F9EF7B432E8C", "3B56BD7B-DFFA-4C07-A936-8B79029C01C5", @"" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Custom Attributes Page: Baptism, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Custom Attributes Page: Baptism, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "F6B935B9-6DA2-421A-9645-F9EF7B432E8C", "B0FCF405-607A-43C1-A2DB-1AA2C066EABB", @"TextColor^White|FontSize^45" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Aspect Ratio Page: Baptism, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Aspect Ratio Page: Baptism, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "F6B935B9-6DA2-421A-9645-F9EF7B432E8C", "BD4BC1F9-9C20-4A6E-A67D-8D5EF56A619D", @"0.35" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Action Item Page: Baptism, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Action Item Page: Baptism, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "F6B935B9-6DA2-421A-9645-F9EF7B432E8C", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"0" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Image Page: Baptism, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "F6B935B9-6DA2-421A-9645-F9EF7B432E8C", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/parallax-baptism.jpg" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Text Page: Baptism, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Image Page: Baptism, Site: KFS Avalanche
+            RockMigrationHelper.AddBlockAttributeValue( "F6B935B9-6DA2-421A-9645-F9EF7B432E8C", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/baptism.jpg" );
+            // Attrib Value for Block:Text Over Image Block, Attribute:Text Page: Baptism, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "F6B935B9-6DA2-421A-9645-F9EF7B432E8C", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Baptism" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Baptism, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Baptism, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "010B3F1F-2149-4DBA-ABB3-1DCF795C4C89", "538EE4EC-33C5-4997-ABD6-1F105F78EF38", @"Margin^10" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Baptism, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Baptism, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "010B3F1F-2149-4DBA-ABB3-1DCF795C4C89", "9CB3C25B-815D-44A4-9171-698136CC0988", @"### Pellentesque habitant morbi tristique senectus
 
 Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse in arcu sodales felis dignissim accumsan. Sed interdum laoreet nulla. Duis laoreet scelerisque elit eu venenatis. 
@@ -959,23 +959,23 @@ Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac tu
 Donec ultricies consequat nibh vitae vulputate. Sed vitae nunc in erat maximus feugiat sed et diam. Morbi risus nunc, placerat id ligula nec, bibendum volutpat quam. Maecenas faucibus orci ante, vel sollicitudin enim finibus quis. Suspendisse potenti. 
 
 Aliquam massa eros, tincidunt vel enim eu, imperdiet tristique felis. Phasellus vel erat ullamcorper, fringilla urna a, maximus odio. Donec ornare arcu ut ligula cursus sagittis. Vivamus id sollicitudin ex, et rhoncus massa. Sed urna metus, ultricies venenatis nibh ac, consequat finibus eros." );
-            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Baptism, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Baptism, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "010B3F1F-2149-4DBA-ABB3-1DCF795C4C89", "7A9950AC-B9E7-4200-9B7A-634BF90DDB2B", @"" );
-            // Attrib Value for Block:Button, Attribute:Text Page: Baptism, Site: Avalanche
+            // Attrib Value for Block:Button, Attribute:Text Page: Baptism, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "9B44C218-D744-43AC-B4A0-9DBD7C78911D", "B60F03CA-B109-48F6-ACE4-1C365DC4E908", @"Learn More" );
-            // Attrib Value for Block:Button, Attribute:Action Item Page: Baptism, Site: Avalanche
+            // Attrib Value for Block:Button, Attribute:Action Item Page: Baptism, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "9B44C218-D744-43AC-B4A0-9DBD7C78911D", "A9D5A12D-F60D-4CAA-A46B-1A605032586D", @"4^{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Baptism^0" );
-            // Attrib Value for Block:Button, Attribute:Enabled Lava Commands Page: Baptism, Site: Avalanche
+            // Attrib Value for Block:Button, Attribute:Enabled Lava Commands Page: Baptism, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "9B44C218-D744-43AC-B4A0-9DBD7C78911D", "BEF7E221-837D-4DD5-BC3E-49E6E3BDEBF9", @"" );
-            // Attrib Value for Block:Button, Attribute:Custom Attributes Page: Baptism, Site: Avalanche
+            // Attrib Value for Block:Button, Attribute:Custom Attributes Page: Baptism, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "9B44C218-D744-43AC-B4A0-9DBD7C78911D", "FED19184-4169-4EEF-9437-592545A79461", @"TextColor^White|FontSize^24|BorderRadius^20|BackgroundColor^#0094d9|Margin^20%2C0" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Baptism, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Baptism, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "6AA0CB59-E4BA-4E74-8198-749EEB553835", "538EE4EC-33C5-4997-ABD6-1F105F78EF38", @"Margin^10" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Baptism, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "6AA0CB59-E4BA-4E74-8198-749EEB553835", "9CB3C25B-815D-44A4-9171-698136CC0988", @"If you attended week one of _Growth Track_ and weren't ready to be baptized, but would like to do so now—visit our [Next Steps page]({{ 'Global' | Attribute:'PublicApplicationRoot' }}/NextSteps). Someone from our team would love to help you out!" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Baptism, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Baptism, Site: KFS Avalanche
+            RockMigrationHelper.AddBlockAttributeValue( "6AA0CB59-E4BA-4E74-8198-749EEB553835", "9CB3C25B-815D-44A4-9171-698136CC0988", @"Aliquam massa eros, tincidunt vel enim eu, imperdiet tristique felis. Phasellus vel erat ullamcorper, fringilla urna a, maximus odio. [Next Steps page]({{ 'Global' | Attribute:'PublicApplicationRoot' }}/NextSteps)." );
+            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Baptism, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "6AA0CB59-E4BA-4E74-8198-749EEB553835", "7A9950AC-B9E7-4200-9B7A-634BF90DDB2B", @"" );
-            // Attrib Value for Block:Text Over Image Block - Serve, Attribute:Action Item Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Serve, Attribute:Action Item Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "2901482E-A8C5-4A47-8EEB-2D3C9E0EA407", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"1^534^" ); // NEED SQL, 534
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'C90B1E1B-EC24-49E0-9562-7F92BB2D24AB' )
                 UPDATE av SET av.[Value] = Replace([Value],534,@PageId)
@@ -984,59 +984,59 @@ Aliquam massa eros, tincidunt vel enim eu, imperdiet tristique felis. Phasellus 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799' AND b.[Guid] = '2901482E-A8C5-4A47-8EEB-2D3C9E0EA407'" ); // Set AttributeValue to correct page id         
 
-            // Attrib Value for Block:Text Over Image Block - Serve, Attribute:Image Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Serve, Attribute:Image Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "2901482E-A8C5-4A47-8EEB-2D3C9E0EA407", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/connect_serve.jpg" );
-            // Attrib Value for Block:Text Over Image Block - Serve, Attribute:Text Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Serve, Attribute:Text Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "2901482E-A8C5-4A47-8EEB-2D3C9E0EA407", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Serve" );
-            // Attrib Value for Block:Text Over Image Block - Serve, Attribute:Aspect Ratio Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Serve, Attribute:Aspect Ratio Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "2901482E-A8C5-4A47-8EEB-2D3C9E0EA407", "BD4BC1F9-9C20-4A6E-A67D-8D5EF56A619D", @"0.45" );
-            // Attrib Value for Block:Text Over Image Block - Serve, Attribute:Enabled Lava Commands Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Serve, Attribute:Enabled Lava Commands Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "2901482E-A8C5-4A47-8EEB-2D3C9E0EA407", "3B56BD7B-DFFA-4C07-A936-8B79029C01C5", @"" );
-            // Attrib Value for Block:Text Over Image Block - Serve, Attribute:Custom Attributes Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block - Serve, Attribute:Custom Attributes Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "2901482E-A8C5-4A47-8EEB-2D3C9E0EA407", "B0FCF405-607A-43C1-A2DB-1AA2C066EABB", @"TextColor^White|FontSize^45" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Custom Attributes Page: Serve, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Custom Attributes Page: Serve, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "454646F6-C317-4764-B514-4AF84C1E7FEC", "B0FCF405-607A-43C1-A2DB-1AA2C066EABB", @"TextColor^White|FontSize^45" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Enabled Lava Commands Page: Serve, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Enabled Lava Commands Page: Serve, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "454646F6-C317-4764-B514-4AF84C1E7FEC", "3B56BD7B-DFFA-4C07-A936-8B79029C01C5", @"" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Aspect Ratio Page: Serve, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Aspect Ratio Page: Serve, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "454646F6-C317-4764-B514-4AF84C1E7FEC", "BD4BC1F9-9C20-4A6E-A67D-8D5EF56A619D", @"0.35" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Image Page: Serve, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Image Page: Serve, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "454646F6-C317-4764-B514-4AF84C1E7FEC", "B1DD109B-F099-4C88-AEF4-FDA0959B5530", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/serve.jpg" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Action Item Page: Serve, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Action Item Page: Serve, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "454646F6-C317-4764-B514-4AF84C1E7FEC", "0BF7D627-4BD3-4AE3-9AD7-CFABBA6C9799", @"0" );
-            // Attrib Value for Block:Text Over Image Block, Attribute:Text Page: Serve, Site: Avalanche
+            // Attrib Value for Block:Text Over Image Block, Attribute:Text Page: Serve, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "454646F6-C317-4764-B514-4AF84C1E7FEC", "3C535AE2-5D1D-4634-AFC2-658B4D55A3A8", @"Serve" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Serve, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Enabled Lava Commands Page: Serve, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "897EB15F-66BB-44F6-BF89-C9012CA36BCA", "7A9950AC-B9E7-4200-9B7A-634BF90DDB2B", @"" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Serve, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Custom Attributes Page: Serve, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "897EB15F-66BB-44F6-BF89-C9012CA36BCA", "538EE4EC-33C5-4997-ABD6-1F105F78EF38", @"Margin^10" );
-            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Serve, Site: Avalanche
-            RockMigrationHelper.AddBlockAttributeValue( "897EB15F-66BB-44F6-BF89-C9012CA36BCA", "9CB3C25B-815D-44A4-9171-698136CC0988", @"Serving changes lives and helps you connect with others at Traders Point and in our community. Choose the area below that’s right for you." );
-            // Attrib Value for Block:Mobile ListView Lava, Attribute:Component Page: Serve, Site: Avalanche
+            // Attrib Value for Block:Markdown Detail, Attribute:Markdown Page: Serve, Site: KFS Avalanche
+            RockMigrationHelper.AddBlockAttributeValue( "897EB15F-66BB-44F6-BF89-C9012CA36BCA", "9CB3C25B-815D-44A4-9171-698136CC0988", @"Fusce vel purus eros. Vivamus maximus elit porta pretium vehicula. Mauris consectetur erat vel enim egestas, sed scelerisque elit eleifend. " );
+            // Attrib Value for Block:Mobile ListView Lava, Attribute:Component Page: Serve, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "77E64C5A-7F2A-4634-BEA4-46ECBAF4E56D", "710306EF-D570-41D9-A806-DD38DC14FEDC", @"a6efb571-56c8-44c2-8f87-b7f4db4e1991" );
-            // Attrib Value for Block:Mobile ListView Lava, Attribute:Action Item Page: Serve, Site: Avalanche
+            // Attrib Value for Block:Mobile ListView Lava, Attribute:Action Item Page: Serve, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "77E64C5A-7F2A-4634-BEA4-46ECBAF4E56D", "9D4D1596-B680-4AFF-AF57-6C8867FC7D6B", @"4^^0" );
-            // Attrib Value for Block:Mobile ListView Lava, Attribute:Custom Attributes Page: Serve, Site: Avalanche
+            // Attrib Value for Block:Mobile ListView Lava, Attribute:Custom Attributes Page: Serve, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "77E64C5A-7F2A-4634-BEA4-46ECBAF4E56D", "100D227F-518B-4AF4-9451-DB5663433C14", @"Columns^2" );
-            // Attrib Value for Block:Mobile ListView Lava, Attribute:Lava Page: Serve, Site: Avalanche
+            // Attrib Value for Block:Mobile ListView Lava, Attribute:Lava Page: Serve, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "77E64C5A-7F2A-4634-BEA4-46ECBAF4E56D", "2DF1245C-33A6-4C0B-9CFB-30047103BD05", @"[{""Id"":""0"",""Title"":""Serve the Church"",""Description"":"""",""Image"":""{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/serve_thechurch.jpg"",""Resource"":""{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Serve"",""ActionType"":""4""},
 {""Id"":""1"",""Title"":""Serve the Community"",""Description"":"""",""Image"":""{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/serve_thecommunity.jpg"",""Resource"":""{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Serve"",""ActionType"":""4""},
 {""Id"":""2"",""Title"":""Serve the World"",""Description"":"""",""Image"":""{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Content/app/serve_theworld.jpg"",""Resource"":""{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Serve"",""ActionType"":""4""}]" );
-            // Attrib Value for Block:Mobile ListView Lava, Attribute:Enabled Lava Commands Page: Serve, Site: Avalanche
+            // Attrib Value for Block:Mobile ListView Lava, Attribute:Enabled Lava Commands Page: Serve, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "77E64C5A-7F2A-4634-BEA4-46ECBAF4E56D", "1E87BAD4-50AB-474B-955B-E44FA10C0ADE", @"" );
-            // Attrib Value for Block:WebViewBlock, Attribute:Url Page: Give, Site: Avalanche
+            // Attrib Value for Block:WebViewBlock, Attribute:Url Page: Give, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FAF7BF20-4F53-47CC-B7E7-A5223BED5188", "924B7E50-5C8B-4455-A0F7-B82364EBC905", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/Give" );
-            // Attrib Value for Block:WebViewBlock, Attribute:Regex Limit Page: Give, Site: Avalanche
+            // Attrib Value for Block:WebViewBlock, Attribute:Regex Limit Page: Give, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FAF7BF20-4F53-47CC-B7E7-A5223BED5188", "D98A8E24-D980-4FB6-B5D4-00CB8287C851", @"^{{ 'Global' | Attribute:'PublicApplicationRoot' }}/.*$" );
-            // Attrib Value for Block:WebViewBlock, Attribute:Custom Attributes Page: Give, Site: Avalanche
+            // Attrib Value for Block:WebViewBlock, Attribute:Custom Attributes Page: Give, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FAF7BF20-4F53-47CC-B7E7-A5223BED5188", "4E1E3555-76B6-44C3-9F5E-56DFFB87C8E0", @"" );
-            // Attrib Value for Block:Mobile ListView Lava - Child Pages, Attribute:Custom Attributes Page: Other Blocks, Site: Avalanche
+            // Attrib Value for Block:Mobile ListView Lava - Child Pages, Attribute:Custom Attributes Page: Other Blocks, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "253974FD-3F00-4677-86A4-F4F8C84F275C", "100D227F-518B-4AF4-9451-DB5663433C14", @"Columns^1|Margin^5%2C0" );
-            // Attrib Value for Block:Mobile ListView Lava - Child Pages, Attribute:Enabled Lava Commands Page: Other Blocks, Site: Avalanche
+            // Attrib Value for Block:Mobile ListView Lava - Child Pages, Attribute:Enabled Lava Commands Page: Other Blocks, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "253974FD-3F00-4677-86A4-F4F8C84F275C", "1E87BAD4-50AB-474B-955B-E44FA10C0ADE", @"RockEntity" );
-            // Attrib Value for Block:Mobile ListView Lava - Child Pages, Attribute:Action Item Page: Other Blocks, Site: Avalanche
+            // Attrib Value for Block:Mobile ListView Lava - Child Pages, Attribute:Action Item Page: Other Blocks, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "253974FD-3F00-4677-86A4-F4F8C84F275C", "9D4D1596-B680-4AFF-AF57-6C8867FC7D6B", @"0" );
-            // Attrib Value for Block:Mobile ListView Lava - Child Pages, Attribute:Lava Page: Other Blocks, Site: Avalanche
+            // Attrib Value for Block:Mobile ListView Lava - Child Pages, Attribute:Lava Page: Other Blocks, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "253974FD-3F00-4677-86A4-F4F8C84F275C", "2DF1245C-33A6-4C0B-9CFB-30047103BD05", @"{% page id:'535' %}{% capture pagestr %}{% for childpage in page.Pages %}{% if childpage.DisplayInNavWhen != 'Never' %}{""Id"":""{{ forloop.index0 }}"",""Title"":""{{ childpage.PageTitle }}"",""Description"":""{{ childpage.PageDescription }}"",""Icon"":""{{ childpage.IconCssClass }}"",""Image"":"""",""Resource"":""{% assign resource = childpage | Attribute:""Resource"" %}{% if resource != '' %}{{ resource }}{% else %}{{ childpage.Id }}{% endif %}"",""ActionType"":""{{ childpage | Attribute:""ActionType"",""RawValue"" }}""}, {% endif %}{% endfor %}{% endcapture %}{% endpage -%}
 [{{ pagestr | ReplaceLast:"", "" }}]" ); // NEED SQL, 535
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'D4A5C0AB-0A90-416F-9B3F-C0ACFED92D43' )
@@ -1046,31 +1046,31 @@ Aliquam massa eros, tincidunt vel enim eu, imperdiet tristique felis. Phasellus 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '2DF1245C-33A6-4C0B-9CFB-30047103BD05' AND b.[Guid] = '253974FD-3F00-4677-86A4-F4F8C84F275C'" ); // Set AttributeValue to correct page id         
 
-            // Attrib Value for Block:Mobile ListView Lava - Child Pages, Attribute:Component Page: Other Blocks, Site: Avalanche
+            // Attrib Value for Block:Mobile ListView Lava - Child Pages, Attribute:Component Page: Other Blocks, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "253974FD-3F00-4677-86A4-F4F8C84F275C", "710306EF-D570-41D9-A806-DD38DC14FEDC", @"1a637b48-35fb-43b2-9822-88af2fd1d333" );
-            // Attrib Value for Block:Login App, Attribute:Custom Attributes Page: Login, Site: Avalanche
+            // Attrib Value for Block:Login App, Attribute:Custom Attributes Page: Login, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "0DB6C226-836D-4CEB-B3CC-9F50ED499DD5", "3021F2AE-08B6-4EC0-B18F-F18C51D4DC7A", @"Margin^10" );
-            // Attrib Value for Block:Person Card, Attribute:EntityType Page: Person Card, Site: Avalanche
+            // Attrib Value for Block:Person Card, Attribute:EntityType Page: Person Card, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "86FF3353-4FEE-4272-BD9B-78B5C373051A", "AF34D0D9-76BA-4D34-8236-929C71BC2CEB", @"GroupMember" );
-            // Attrib Value for Block:Person Card, Attribute:Accent Color Page: Person Card, Site: Avalanche
+            // Attrib Value for Block:Person Card, Attribute:Accent Color Page: Person Card, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "86FF3353-4FEE-4272-BD9B-78B5C373051A", "3E3A6CB1-CAA4-4B7E-ABE3-4C58D870F912", @"" );
-            // Attrib Value for Block:Person Card, Attribute:Custom Attributes Page: Person Card, Site: Avalanche
+            // Attrib Value for Block:Person Card, Attribute:Custom Attributes Page: Person Card, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "86FF3353-4FEE-4272-BD9B-78B5C373051A", "27CE0D5E-7E9A-4F63-B940-27F89017E267", @"" );
-            // Attrib Value for Block:Group List, Attribute:Enabled Lava Commands Page: Group List, Site: Avalanche
+            // Attrib Value for Block:Group List, Attribute:Enabled Lava Commands Page: Group List, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "13472A3E-A5FD-47C1-A382-4243BBE0BC98", "6451C0FE-D830-46C2-9C4E-F6CCA72C8A89", @"" );
-            // Attrib Value for Block:Group List, Attribute:Lava Page: Group List, Site: Avalanche
+            // Attrib Value for Block:Group List, Attribute:Lava Page: Group List, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "13472A3E-A5FD-47C1-A382-4243BBE0BC98", "C9A3774F-21D3-49B1-8EFD-4A7807ED5A8A", @"[
 {% for group in Groups -%}
   { ""Id"":""{{group.Id}}"", ""Title"":""{{group.Name}}"", ""Description"":""{{group.Description}}"", ""Icon"":""{{group.GroupType.IconCssClass}}"" },
 {% endfor -%}
 ]" );
-            // Attrib Value for Block:Group List, Attribute:Only Show If Leader Page: Group List, Site: Avalanche
+            // Attrib Value for Block:Group List, Attribute:Only Show If Leader Page: Group List, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "13472A3E-A5FD-47C1-A382-4243BBE0BC98", "16F74DEE-D2CF-459B-9E7B-0BE66F6A47AE", @"True" );
-            // Attrib Value for Block:Group List, Attribute:Parent Group Ids Page: Group List, Site: Avalanche
+            // Attrib Value for Block:Group List, Attribute:Parent Group Ids Page: Group List, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "13472A3E-A5FD-47C1-A382-4243BBE0BC98", "36595C20-0B19-44D8-ADE9-446595557E80", @"56" );
-            // Attrib Value for Block:Group List, Attribute:Component Page: Group List, Site: Avalanche
+            // Attrib Value for Block:Group List, Attribute:Component Page: Group List, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "13472A3E-A5FD-47C1-A382-4243BBE0BC98", "9B306F24-7D3A-4EF8-A1A1-C767211C92AB", @"1a637b48-35fb-43b2-9822-88af2fd1d333" );
-            // Attrib Value for Block:Group List, Attribute:Action Item Page: Group List, Site: Avalanche
+            // Attrib Value for Block:Group List, Attribute:Action Item Page: Group List, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "13472A3E-A5FD-47C1-A382-4243BBE0BC98", "0CB6C7EC-FB8B-4C0A-805B-108075AA72BE", @"1^541^parameter" ); // NEED SQL, 541
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'C4A65B7E-D57C-44C9-93AD-9E2E51145481' )
                 UPDATE av SET av.[Value] = Replace([Value],541,@PageId)
@@ -1078,9 +1078,9 @@ Aliquam massa eros, tincidunt vel enim eu, imperdiet tristique felis. Phasellus 
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '0CB6C7EC-FB8B-4C0A-805B-108075AA72BE' AND b.[Guid] = '13472A3E-A5FD-47C1-A382-4243BBE0BC98'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Group List, Attribute:Custom Attributes Page: Group List, Site: Avalanche
+            // Attrib Value for Block:Group List, Attribute:Custom Attributes Page: Group List, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "13472A3E-A5FD-47C1-A382-4243BBE0BC98", "727903A8-FD3B-4E41-AFC4-309756390E34", @"" );
-            // Attrib Value for Block:Group Member List Block, Attribute:Action Item Page: Group Member List, Site: Avalanche
+            // Attrib Value for Block:Group Member List Block, Attribute:Action Item Page: Group Member List, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D53AE8B1-9F7B-457C-A2AB-297D7E0B0C71", "0B073274-28E6-499F-A408-8CA05644F2EF", @"1^538^parameter" ); // NEED SQL, 538
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '79EF0279-9800-4BAF-A8D9-DD42E6868BAA' )
                 UPDATE av SET av.[Value] = Replace([Value],538,@PageId)
@@ -1088,31 +1088,31 @@ Aliquam massa eros, tincidunt vel enim eu, imperdiet tristique felis. Phasellus 
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = '0B073274-28E6-499F-A408-8CA05644F2EF' AND b.[Guid] = 'D53AE8B1-9F7B-457C-A2AB-297D7E0B0C71'" ); // Set AttributeValue to correct page id         
-            // Attrib Value for Block:Group Member List Block, Attribute:Members Per Request Page: Group Member List, Site: Avalanche
+            // Attrib Value for Block:Group Member List Block, Attribute:Members Per Request Page: Group Member List, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D53AE8B1-9F7B-457C-A2AB-297D7E0B0C71", "D40889E8-9468-40B2-8776-B15C7D9120E9", @"20" );
-            // Attrib Value for Block:Group Member List Block, Attribute:Component Page: Group Member List, Site: Avalanche
+            // Attrib Value for Block:Group Member List Block, Attribute:Component Page: Group Member List, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D53AE8B1-9F7B-457C-A2AB-297D7E0B0C71", "4D97403F-2540-4B22-9EC4-6BEF1DC283C4", @"d9ea2c97-68e1-4d94-b881-f3ac4f2883a3" );
-            // Attrib Value for Block:Group Member List Block, Attribute:Enabled Lava Commands Page: Group Member List, Site: Avalanche
+            // Attrib Value for Block:Group Member List Block, Attribute:Enabled Lava Commands Page: Group Member List, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D53AE8B1-9F7B-457C-A2AB-297D7E0B0C71", "FB550261-8164-41BF-A2C8-554E161CB617", @"" );
-            // Attrib Value for Block:Group Member List Block, Attribute:Custom Attributes Page: Group Member List, Site: Avalanche
+            // Attrib Value for Block:Group Member List Block, Attribute:Custom Attributes Page: Group Member List, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "D53AE8B1-9F7B-457C-A2AB-297D7E0B0C71", "56498C7F-E638-4E45-A11F-644D6AC20242", @"" );
-            // Attrib Value for Block:Note Block, Attribute:Note Field Label Page: Note Block, Site: Avalanche
+            // Attrib Value for Block:Note Block, Attribute:Note Field Label Page: Note Block, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FB213CB9-C91F-4546-9371-73839FBD447A", "34C4CC92-BC30-4835-9E36-71247FB2AC2D", @"Notes:" );
-            // Attrib Value for Block:Note Block, Attribute:Note Type Page: Note Block, Site: Avalanche
+            // Attrib Value for Block:Note Block, Attribute:Note Type Page: Note Block, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FB213CB9-C91F-4546-9371-73839FBD447A", "E1E76347-70A9-464C-BA51-A4D938538A27", @"66A1B9D7-7EFA-40F3-9415-E54437977D60" );
-            // Attrib Value for Block:Note Block, Attribute:Note Field Height Page: Note Block, Site: Avalanche
+            // Attrib Value for Block:Note Block, Attribute:Note Field Height Page: Note Block, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FB213CB9-C91F-4546-9371-73839FBD447A", "ED27D786-60AA-45E0-A57C-9893206F9A3E", @"200" );
-            // Attrib Value for Block:Note Block, Attribute:Custom Attributes Page: Note Block, Site: Avalanche
+            // Attrib Value for Block:Note Block, Attribute:Custom Attributes Page: Note Block, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "FB213CB9-C91F-4546-9371-73839FBD447A", "D0EC7BA9-C9A3-48B3-A291-202571ED7AD4", @"" );
-            // Attrib Value for Block:Group Attendance Block, Attribute:Custom Attributes Page: Group Attendance, Site: Avalanche
+            // Attrib Value for Block:Group Attendance Block, Attribute:Custom Attributes Page: Group Attendance, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "BD824150-F1B1-4A7D-93FA-5A4AA7AE565D", "151CEBB9-9BFF-43F3-9C73-672F6B645C7D", @"" );
-            // Attrib Value for Block:Button, Attribute:Custom Attributes Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Button, Attribute:Custom Attributes Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "99CAEBAF-9E80-410E-BB33-9DCD6B4ECF9B", "FED19184-4169-4EEF-9437-592545A79461", @"Margin^10|BorderRadius^10" );
-            // Attrib Value for Block:Button, Attribute:Text Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Button, Attribute:Text Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "99CAEBAF-9E80-410E-BB33-9DCD6B4ECF9B", "B60F03CA-B109-48F6-ACE4-1C365DC4E908", @"More pages" );
-            // Attrib Value for Block:Button, Attribute:Enabled Lava Commands Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Button, Attribute:Enabled Lava Commands Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "99CAEBAF-9E80-410E-BB33-9DCD6B4ECF9B", "BEF7E221-837D-4DD5-BC3E-49E6E3BDEBF9", @"" );
-            // Attrib Value for Block:Button, Attribute:Action Item Page: Connect, Site: Avalanche
+            // Attrib Value for Block:Button, Attribute:Action Item Page: Connect, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "99CAEBAF-9E80-410E-BB33-9DCD6B4ECF9B", "A9D5A12D-F60D-4CAA-A46B-1A605032586D", @"1^535^" ); // NEED SQL, 535
             Sql( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = 'D4A5C0AB-0A90-416F-9B3F-C0ACFED92D43' )
                 UPDATE av SET av.[Value] = Replace([Value],535,@PageId)
@@ -1120,25 +1120,25 @@ Aliquam massa eros, tincidunt vel enim eu, imperdiet tristique felis. Phasellus 
 				INNER JOIN Attribute a ON a.Id = av.AttributeId 
 				INNER JOIN Block b ON a.EntityTypeQualifierColumn = 'BlockTypeId' AND a.EntityTypeQualifierValue = b.BlockTypeId
                 WHERE a.[Guid] = 'A9D5A12D-F60D-4CAA-A46B-1A605032586D' AND b.[Guid] = '99CAEBAF-9E80-410E-BB33-9DCD6B4ECF9B'" ); // Set AttributeValue to correct page id
-            // Attrib Value for Block:WebViewBlock, Attribute:Url Page: Webview Block, Site: Avalanche
+            // Attrib Value for Block:WebViewBlock, Attribute:Url Page: Webview Block, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "E43CF3E1-D8FA-41B3-AED9-E09FAA594F7B", "924B7E50-5C8B-4455-A0F7-B82364EBC905", @"{{ 'Global' | Attribute:'PublicApplicationRoot' }}/connect/" );
-            // Attrib Value for Block:WebViewBlock, Attribute:Regex Limit Page: Webview Block, Site: Avalanche
+            // Attrib Value for Block:WebViewBlock, Attribute:Regex Limit Page: Webview Block, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "E43CF3E1-D8FA-41B3-AED9-E09FAA594F7B", "D98A8E24-D980-4FB6-B5D4-00CB8287C851", @"^{{ 'Global' | Attribute:'PublicApplicationRoot' }}/.*$" );
-            // Attrib Value for Block:WebViewBlock, Attribute:Custom Attributes Page: Webview Block, Site: Avalanche
+            // Attrib Value for Block:WebViewBlock, Attribute:Custom Attributes Page: Webview Block, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "E43CF3E1-D8FA-41B3-AED9-E09FAA594F7B", "4E1E3555-76B6-44C3-9F5E-56DFFB87C8E0", @"" );
-            // Attrib Value for Block:Icon Block, Attribute:Enabled Lava Commands , Layout: No Scroll, Site: Avalanche
+            // Attrib Value for Block:Icon Block, Attribute:Enabled Lava Commands , Layout: No Scroll, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "962317D3-42D0-4152-839E-35AAF2BD66E2", "0910B50C-23D8-46AC-BBF2-F54F074E35DC", @"" );
-            // Attrib Value for Block:Icon Block, Attribute:Text , Layout: No Scroll, Site: Avalanche
+            // Attrib Value for Block:Icon Block, Attribute:Text , Layout: No Scroll, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "962317D3-42D0-4152-839E-35AAF2BD66E2", "4F4142E2-E6C0-4878-953F-521FC7A8A4C9", @"fa fa-chevron-left" );
-            // Attrib Value for Block:Icon Block, Attribute:Action Item , Layout: No Scroll, Site: Avalanche
+            // Attrib Value for Block:Icon Block, Attribute:Action Item , Layout: No Scroll, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "962317D3-42D0-4152-839E-35AAF2BD66E2", "7B4B9D30-2BED-4F39-B897-10C7C561CFAE", @"3" );
-            // Attrib Value for Block:Icon Block, Attribute:Custom Attributes , Layout: No Scroll, Site: Avalanche
+            // Attrib Value for Block:Icon Block, Attribute:Custom Attributes , Layout: No Scroll, Site: KFS Avalanche
             RockMigrationHelper.AddBlockAttributeValue( "962317D3-42D0-4152-839E-35AAF2BD66E2", "BE7D91EF-5C79-4940-9DA6-608933781419", @"TextColor^White|FontSize^25|Margin^15%2C19%2C10%2C16" );
 
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "App Image", "", "Used for Avalanche. ", 0, "", "347b7207-1f42-45b2-8ce1-15f98510265c", "AppName" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "App Header Image", "", "Used for Avalanche. ", 0, "", "ff664883-74a0-476e-85ac-1d8d68f85105", "AppHeaderImage" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.HTML, "", "", "Location Info Summary", "", "Used for Avalanche. ", 0, "", "2611897a-6dfe-470f-9a74-bd5019ea033e", "LocationInfoSummary" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "Parking Map", "", "Used for Avalanche. URL/Image to a Parking Map", 0, "", "c6306b5d-105e-456c-9369-98bbd37c93b6", "ParkingMap" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "App Image", "", "Used for KFS Avalanche. ", 0, "", "347b7207-1f42-45b2-8ce1-15f98510265c", "rocks.kfs.AppImage" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "App Header Image", "", "Used for KFS Avalanche. ", 0, "", "ff664883-74a0-476e-85ac-1d8d68f85105", "rocks.kfs.AppHeaderImage" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.HTML, "", "", "App Location Info Summary", "", "Used for KFS Avalanche. ", 0, "", "2611897a-6dfe-470f-9a74-bd5019ea033e", "rocks.kfs.AppLocationInfoSummary" );
+            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Campus", Rock.SystemGuid.FieldType.IMAGE, "", "", "App Parking Map", "", "Used for KFS Avalanche. URL/Image to a Parking Map", 0, "", "c6306b5d-105e-456c-9369-98bbd37c93b6", "rocks.kfs.AppParkingMap" );
 
             // Give page attribute values
             RockMigrationHelper.AddAttributeValue( "2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f", -1, "4", "2a37a673-d9ba-4572-9e70-e8a32dcb484c" );
