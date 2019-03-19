@@ -52,18 +52,18 @@ namespace rocks.kfs.Avalanche.Migrations
             RockMigrationHelper.AddGlobalAttribute( Rock.SystemGuid.FieldType.TEXT, "", "", "Avalanche Footer Page", "Page Id of footer blocks/layout configuration", 0, "", "1B8B1811-D82F-48B0-A55C-4A463552264C" );
             RockMigrationHelper.AddGlobalAttribute( Rock.SystemGuid.FieldType.TEXT, "", "", "Avalanche Header Page", "Page Id of header blocks/layout configuration", 0, "", "B2F7130E-1C0C-41F8-A13E-3EE9B77F59B1" );
 
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Page", Rock.SystemGuid.FieldType.TEXT, "SiteId", "", "Background Color", "", "Used for Avalanche. Hex or color name for background of page", 0, "#f2f6f8", "1fd61a40-3fe7-4b05-adca-a7edc957921e", "BackgroundColor" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Page", Rock.SystemGuid.FieldType.SINGLE_SELECT, "SiteId", "", "Action Type", "", "Used for Avalanche. Used for tab/page navigation Action Types", 1, "1", "2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f", "ActionType" );
+            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.Page", Rock.SystemGuid.FieldType.TEXT, "SiteId", "", "Background Color", "Used for KFS Avalanche. Hex or color name for background of page", 0, "#f2f6f8", "1fd61a40-3fe7-4b05-adca-a7edc957921e", "BackgroundColor" );
+            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.Page", Rock.SystemGuid.FieldType.SINGLE_SELECT, "SiteId", "", "Action Type", "Used for KFS Avalanche. Used for tab/page navigation Action Types", 1, "1", "2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f", "ActionType" );
             RockMigrationHelper.AddAttributeQualifier( "2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f", "fieldtype", "ddl", "421fda4f-1acc-47db-86fa-1bfd0a7eb903" );
             RockMigrationHelper.AddAttributeQualifier( "2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f", "values", "0^Do Nothing,1^Push New Page,2^Replace CurrentPage,3^Pop CurrentPage,4^Open Browser", "421fda4f-1acc-47db-86fa-1bfd0a7eb903" );
-            RockMigrationHelper.AddEntityAttribute( "Rock.Model.Page", Rock.SystemGuid.FieldType.TEXT, "SiteId", "", "Resource", "", "Used for Avalanche. Text string to overwrite resource value in navigation, primarily for 'Open Browser' Action type.", 2, "", "342b2c81-976d-472d-89bf-b8f8f826730e", "Resource" );
+            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.Page", Rock.SystemGuid.FieldType.TEXT, "SiteId", "", "Resource", "Used for KFS Avalanche. Text string to overwrite resource value in navigation, primarily for 'Open Browser' Action type.", 2, "", "342b2c81-976d-472d-89bf-b8f8f826730e", "Resource" );
             Sql( @"DECLARE @SiteId int = ( SELECT TOP 1 [Id] FROM [Site] WHERE [Guid] = '613631FF-D19C-4F9C-B163-E9331C4BA61B' )
                  UPDATE [Attribute] SET EntityTypeQualifierValue = @SiteId WHERE [Guid] = '1fd61a40-3fe7-4b05-adca-a7edc957921e'
                  UPDATE [Attribute] SET EntityTypeQualifierValue = @SiteId WHERE [Guid] = '2baa54bb-fe5d-4b1c-bb7a-1b6c1dcb500f'
                  UPDATE [Attribute] SET EntityTypeQualifierValue = @SiteId WHERE [Guid] = '342b2c81-976d-472d-89bf-b8f8f826730e'" ); // Set EntityTypeQualifier to proper site id
 
             // RockMigrationHelper.AddAttributeValue( "1B8B1811-D82F-48B0-A55C-4A463552264C", null, "", "1329FC96-2837-4614-80CB-4C8852C0EAA4" );
-            // Doesn't work with null EntityId, i.e. global attribute values
+            // The AddAttributeValue method doesn't work with a null EntityId, i.e. global attribute values
             Sql( string.Format( @"DECLARE @PageId int = ( SELECT TOP 1 [Id] FROM [Page] WHERE [Guid] = '{0}' )
                 DECLARE @AttributeId int
                 SET @AttributeId = (SELECT [Id] FROM [Attribute] WHERE [Guid] = '{1}')
