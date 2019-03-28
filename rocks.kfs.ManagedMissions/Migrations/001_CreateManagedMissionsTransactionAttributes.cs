@@ -26,6 +26,16 @@ namespace rocks.kfs.ManagedMissions.Migrations
         /// </summary>
         public override void Up()
         {
+            // modify keys if they exist
+            RockMigrationHelper.EnsureAttributeByGuid( "3DF6068C-AFD2-4D59-8FCE-9BE9D4930E0D", "kfs_mm_firstname", Rock.SystemGuid.EntityType.FINANCIAL_TRANSACTION, Rock.SystemGuid.FieldType.TEXT, "", "" );
+            RockMigrationHelper.EnsureAttributeByGuid( "D9A20523-2979-41E3-B6E2-C4C75EC079FE", "kfs_mm_lastname", Rock.SystemGuid.EntityType.FINANCIAL_TRANSACTION, Rock.SystemGuid.FieldType.TEXT, "", "" );
+            RockMigrationHelper.EnsureAttributeByGuid( "3E99FD9F-87DB-429D-9DDA-09ACC73C2911", "kfs_mm_personkey", Rock.SystemGuid.EntityType.FINANCIAL_TRANSACTION, Rock.SystemGuid.FieldType.TEXT, "", "" );
+            RockMigrationHelper.EnsureAttributeByGuid( "C500B2C3-79A0-4EBC-9E6A-0B356A66B970", "kfs_mm_tripname", Rock.SystemGuid.EntityType.FINANCIAL_TRANSACTION, Rock.SystemGuid.FieldType.TEXT, "", "" );
+            RockMigrationHelper.EnsureAttributeByGuid( "3025ACDB-40D1-4A52-AF0A-547D7126D90D", "kfs_mm_purposecode", Rock.SystemGuid.EntityType.FINANCIAL_TRANSACTION, Rock.SystemGuid.FieldType.TEXT, "", "" );
+            RockMigrationHelper.EnsureAttributeByGuid( "6A5F63FA-23D6-4BA4-84A1-3D10951646DB", "kfs_mm_tripkey", Rock.SystemGuid.EntityType.FINANCIAL_TRANSACTION, Rock.SystemGuid.FieldType.TEXT, "", "" );
+            RockMigrationHelper.EnsureAttributeByGuid( "A30C07EB-AE07-4AF4-9831-B32F9B073B31", "kfs_mm_incomeaccount", Rock.SystemGuid.EntityType.FINANCIAL_TRANSACTION, Rock.SystemGuid.FieldType.TEXT, "", "" );
+            RockMigrationHelper.EnsureAttributeByGuid( "BFC71CD0-2A4C-4491-847E-A5DCB1A1E876", "kfs_mm_ManagedMissionsSyncDate", Rock.SystemGuid.EntityType.FINANCIAL_TRANSACTION, Rock.SystemGuid.FieldType.TEXT, "", "" );
+
             // mm url fields
             RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialTransaction", Rock.SystemGuid.FieldType.TEXT, "", "", "Person First Name", "", 100, "", "3DF6068C-AFD2-4D59-8FCE-9BE9D4930E0D", "kfs_mm_firstname" );
             RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialTransaction", Rock.SystemGuid.FieldType.TEXT, "", "", "Person Last Name", "", 101, "", "D9A20523-2979-41E3-B6E2-C4C75EC079FE", "kfs_mm_lastname" );
@@ -53,14 +63,16 @@ namespace rocks.kfs.ManagedMissions.Migrations
                 INSERT INTO [AttributeCategory]
                 SELECT [Id], @CategoryId
                 FROM [Attribute]
-                WHERE [Guid] = '3DF6068C-AFD2-4D59-8FCE-9BE9D4930E0D'
-                   OR [Guid] = 'D9A20523-2979-41E3-B6E2-C4C75EC079FE'
-                   OR [Guid] = '3E99FD9F-87DB-429D-9DDA-09ACC73C2911'
-                   OR [Guid] = 'C500B2C3-79A0-4EBC-9E6A-0B356A66B970'
-                   OR [Guid] = '3025ACDB-40D1-4A52-AF0A-547D7126D90D'
-                   OR [Guid] = '6A5F63FA-23D6-4BA4-84A1-3D10951646DB'
-                   OR [Guid] = 'A30C07EB-AE07-4AF4-9831-B32F9B073B31'
-                   OR [Guid] = 'BFC71CD0-2A4C-4491-847E-A5DCB1A1E876'
+                LEFT OUTER JOIN [AttributeCategory] ON [Attribute].[Id] = [AttributeCategory].[AttributeId] AND [AttributeCategory].[CategoryId] = @CategoryId
+                WHERE ([Attribute].[Guid] = '3DF6068C-AFD2-4D59-8FCE-9BE9D4930E0D'
+                   OR [Attribute].[Guid] = 'D9A20523-2979-41E3-B6E2-C4C75EC079FE'
+                   OR [Attribute].[Guid] = '3E99FD9F-87DB-429D-9DDA-09ACC73C2911'
+                   OR [Attribute].[Guid] = 'C500B2C3-79A0-4EBC-9E6A-0B356A66B970'
+                   OR [Attribute].[Guid] = '3025ACDB-40D1-4A52-AF0A-547D7126D90D'
+                   OR [Attribute].[Guid] = '6A5F63FA-23D6-4BA4-84A1-3D10951646DB'
+                   OR [Attribute].[Guid] = 'A30C07EB-AE07-4AF4-9831-B32F9B073B31'
+                   OR [Attribute].[Guid] = 'BFC71CD0-2A4C-4491-847E-A5DCB1A1E876')
+                   AND [AttributeCategory].[AttributeId] IS NULL
             " );
         }
 
