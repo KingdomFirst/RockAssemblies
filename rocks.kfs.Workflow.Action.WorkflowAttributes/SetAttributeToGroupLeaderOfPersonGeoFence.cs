@@ -13,7 +13,7 @@ using Rock.Security;
 using Rock.Web.Cache;
 using Rock.Workflow;
 
-namespace com.kfs.Workflow.Action.WorkflowAttributes
+namespace rocks.kfs.Workflow.Action.WorkflowAttributes
 {
     /// <summary>
     /// Sets an attribute equal to the person who created workflow (if known).
