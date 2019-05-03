@@ -14,7 +14,7 @@ using OfficeOpenXml;
 using System.Data;
 using System.ComponentModel;
 
-namespace com.kfs.ShelbyBatchExport
+namespace rocks.kfs.ShelbyFinancials
 {
     public class SFJournal
     {
@@ -63,9 +63,9 @@ namespace com.kfs.ShelbyBatchExport
                     transactionDetail.LoadAttributes();
                     transactionDetail.Account.LoadAttributes();
 
-                    var detailProject = transactionDetail.GetAttributeValue( "com.kfs.ShelbyFinancials.Project" ).AsGuidOrNull();
-                    var transactionProject = transaction.GetAttributeValue( "com.kfs.ShelbyFinancials.Project" ).AsGuidOrNull();
-                    var accountProject = transactionDetail.Account.GetAttributeValue( "com.kfs.ShelbyFinancials.Project" ).AsGuidOrNull();
+                    var detailProject = transactionDetail.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Project" ).AsGuidOrNull();
+                    var transactionProject = transaction.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Project" ).AsGuidOrNull();
+                    var accountProject = transactionDetail.Account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Project" ).AsGuidOrNull();
 
                     var projectCode = string.Empty;
                     if ( detailProject != null )
@@ -110,16 +110,16 @@ namespace com.kfs.ShelbyBatchExport
 
                 var batchSummaryItem = new GLBatchTotals()
                 {
-                    CompanyNumber = account.GetAttributeValue( "com.kfs.ShelbyFinancials.Company" ),
-                    RegionNumber = account.GetAttributeValue( "com.kfs.ShelbyFinancials.Region" ),
-                    SuperFundNumber = account.GetAttributeValue( "com.kfs.ShelbyFinancials.SuperFund" ),
-                    FundNumber = account.GetAttributeValue( "com.kfs.ShelbyFinancials.Fund" ),
-                    LocationNumber = account.GetAttributeValue( "com.kfs.ShelbyFinancials.Location" ),
-                    CostCenterNumber = account.GetAttributeValue( "com.kfs.ShelbyFinancials.CostCenter" ),
-                    DepartmentNumber = account.GetAttributeValue( "com.kfs.ShelbyFinancials.Department" ),
-                    CreditAccountNumber = account.GetAttributeValue( "com.kfs.ShelbyFinancials.CreditAccount" ),
-                    DebitAccountNumber = account.GetAttributeValue( "com.kfs.ShelbyFinancials.DebitAccount" ),
-                    AccountSub = account.GetAttributeValue( "com.kfs.ShelbyFinancials.AccountSub" ),
+                    CompanyNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Company" ),
+                    RegionNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Region" ),
+                    SuperFundNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.SuperFund" ),
+                    FundNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Fund" ),
+                    LocationNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Location" ),
+                    CostCenterNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.CostCenter" ),
+                    DepartmentNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Department" ),
+                    CreditAccountNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.CreditAccount" ),
+                    DebitAccountNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.DebitAccount" ),
+                    AccountSub = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.AccountSub" ),
                     Amount = summary.Amount,
                     Project = summary.Project,
                     JournalNumber = financialBatch.Id,
