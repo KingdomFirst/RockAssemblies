@@ -441,7 +441,6 @@ namespace rocks.kfs.ShelbyFinancials
                 ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, string.Empty );
             }
 
-            //ShelbyFormatWorksheet( worksheet, headerRows, rowCounter, columnCounter );
             var range = worksheet.Cells[headerRows, 1, rowCounter, columnCounter];
             var table = worksheet.Tables.Add( range, title );
 
