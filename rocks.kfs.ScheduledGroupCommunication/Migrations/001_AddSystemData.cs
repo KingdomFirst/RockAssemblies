@@ -57,13 +57,40 @@ namespace rocks.kfs.ScheduledGroupCommunication.Migrations
 
             if ( migrateNamespaceEmail )
             {
-                var attributeMatrixTemplateEmailId = new AttributeMatrixTemplateService( new RockContext() ).Get( KFSConst.Attribute.ATTRIBUTE_MATRIX_TEMPLATE_SCHEDULED_SMS.AsGuid() ).Id.ToString();
+                var attributeMatrixTemplateEmailId = new AttributeMatrixTemplateService( new RockContext() ).Get( KFSConst.Attribute.ATTRIBUTE_MATRIX_TEMPLATE_SCHEDULED_EMAILS.AsGuid() ).Id.ToString();
 
                 RockMigrationHelper.EnsureAttributeByGuid( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SEND_DATE, "rocks.kfs.ScheduledGroupCommunication.EmailSendDateTime", "3c9d5021-0484-4846-aef6-b6216d26c3c8", Rock.SystemGuid.FieldType.DATE_TIME, "AttributeMatrixTemplateId", attributeMatrixTemplateEmailId );
                 RockMigrationHelper.EnsureAttributeByGuid( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_FROM_EMAIL, "rocks.kfs.ScheduledGroupCommunication.EmailFromAddress", "3c9d5021-0484-4846-aef6-b6216d26c3c8", Rock.SystemGuid.FieldType.EMAIL, "AttributeMatrixTemplateId", attributeMatrixTemplateEmailId );
                 RockMigrationHelper.EnsureAttributeByGuid( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_FROM_NAME, "rocks.kfs.ScheduledGroupCommunication.EmailFromName", "3c9d5021-0484-4846-aef6-b6216d26c3c8", Rock.SystemGuid.FieldType.TEXT, "AttributeMatrixTemplateId", attributeMatrixTemplateEmailId );
                 RockMigrationHelper.EnsureAttributeByGuid( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SUBJECT, "rocks.kfs.ScheduledGroupCommunication.EmailSubject", "3c9d5021-0484-4846-aef6-b6216d26c3c8", Rock.SystemGuid.FieldType.TEXT, "AttributeMatrixTemplateId", attributeMatrixTemplateEmailId );
                 RockMigrationHelper.EnsureAttributeByGuid( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_MESSAGE, "rocks.kfs.ScheduledGroupCommunication.EmailMessage", "3c9d5021-0484-4846-aef6-b6216d26c3c8", Rock.SystemGuid.FieldType.HTML, "AttributeMatrixTemplateId", attributeMatrixTemplateEmailId );
+
+                using ( var rockContext = new RockContext() )
+                {
+                    // look for any configured jobs and change the class name
+                    var emailJobs = new ServiceJobService( rockContext )
+                        .Queryable()
+                        .Where( j => j.Class.Equals( "com.kfs.GroupScheduledEmails.Jobs.SendScheduledGroupEmail", StringComparison.CurrentCultureIgnoreCase ) )
+                        .ToList();
+
+                    foreach ( var job in emailJobs )
+                    {
+                        job.Class = "rocks.kfs.ScheduledGroupCommunication.Jobs.SendScheduledGroupEmail";
+                    }
+
+                    // look for job attributes and change qualifier value
+                    var attributes = new AttributeService( rockContext )
+                        .Queryable()
+                        .Where( a => a.EntityTypeQualifierValue.Equals( "com.kfs.GroupScheduledEmails.Jobs.SendScheduledGroupEmail", StringComparison.CurrentCultureIgnoreCase ) )
+                        .ToList();
+
+                    foreach ( var attribute in attributes )
+                    {
+                        attribute.EntityTypeQualifierValue = "rocks.kfs.ScheduledGroupCommunication.Jobs.SendScheduledGroupEmail";
+                    }
+
+                    rockContext.SaveChanges();
+                }
             }
             else
             {
@@ -141,6 +168,33 @@ namespace rocks.kfs.ScheduledGroupCommunication.Migrations
                 RockMigrationHelper.EnsureAttributeByGuid( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_SEND_DATE, "rocks.kfs.ScheduledGroupCommunication.SMSSendDateTime", "3c9d5021-0484-4846-aef6-b6216d26c3c8", Rock.SystemGuid.FieldType.DATE_TIME, "AttributeMatrixTemplateId", attributeMatrixTemplateSMSId );
                 RockMigrationHelper.EnsureAttributeByGuid( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_FROM_NUMBER, "rocks.kfs.ScheduledGroupCommunication.SMSFromNumber", "3c9d5021-0484-4846-aef6-b6216d26c3c8", Rock.SystemGuid.FieldType.DEFINED_VALUE, "AttributeMatrixTemplateId", attributeMatrixTemplateSMSId );
                 RockMigrationHelper.EnsureAttributeByGuid( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_MESSAGE, "rocks.kfs.ScheduledGroupCommunication.SMSMessage", "3c9d5021-0484-4846-aef6-b6216d26c3c8", Rock.SystemGuid.FieldType.MEMO, "AttributeMatrixTemplateId", attributeMatrixTemplateSMSId );
+
+                using ( var rockContext = new RockContext() )
+                {
+                    // look for any configured jobs and change the class name
+                    var smsJobs = new ServiceJobService( rockContext )
+                        .Queryable()
+                        .Where( j => j.Class.Equals( "com.kfs.GroupScheduledSMS.Jobs.SendScheduledGroupSMS", StringComparison.CurrentCultureIgnoreCase ) )
+                        .ToList();
+
+                    foreach ( var job in smsJobs )
+                    {
+                        job.Class = "rocks.kfs.ScheduledGroupCommunication.Jobs.SendScheduledGroupSMS";
+                    }
+
+                    // look for job attributes and change qualifier value
+                    var attributes = new AttributeService( rockContext )
+                        .Queryable()
+                        .Where( a => a.EntityTypeQualifierValue.Equals( "com.kfs.GroupScheduledSMS.Jobs.SendScheduledGroupSMS", StringComparison.CurrentCultureIgnoreCase ) )
+                        .ToList();
+
+                    foreach ( var attribute in attributes )
+                    {
+                        attribute.EntityTypeQualifierValue = "rocks.kfs.ScheduledGroupCommunication.Jobs.SendScheduledGroupSMS";
+                    }
+
+                    rockContext.SaveChanges();
+                }
             }
             else
             {
