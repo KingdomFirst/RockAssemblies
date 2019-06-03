@@ -7,10 +7,11 @@
     <ProjectGuid>{779475E3-F5F7-4F5D-9641-3A0A543EBE12}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>com.kfs.Security.ExternalAuthentication.DoorkeeperOAuth</RootNamespace>
-    <AssemblyName>com.kfs.Security.ExternalAuthentication.DoorkeeperOAuth</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <RootNamespace>rocks.kfs.Security.ExternalAuthentication.DoorkeeperOAuth</RootNamespace>
+    <AssemblyName>rocks.kfs.Security.ExternalAuthentication.DoorkeeperOAuth</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

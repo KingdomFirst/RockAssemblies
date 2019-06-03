@@ -1,9 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// <copyright>
+// Copyright 2019 by Kingdom First Solutions
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Dynamic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -26,13 +39,11 @@ namespace com.kfs.Security.ExternalAuthentication
     [Description( "OAuth Authentication Provider for Doorkeeper" )]
     [Export( typeof( AuthenticationComponent ) )]
     [ExportMetadata( "ComponentName", "Doorkeeper OAuth" )]
-
     [TextField( "Client ID", "The Doorkeeper OAuth Client ID" )]
     [TextField( "Client Secret", "The Doorkeeper OAuth Client Secret" )]
     [UrlLinkField( "Doorkeeper Server Url", "The base Url of the local Doorkeeper server. Example: https://login.mychurch.org/" )]
     [UrlLinkField( "User Info Url", "The Url location of the 'me.json' data. Example: https://login.mychurch.org/api/v1/me.json" )]
     [DefinedValueField( "2E6540EA-63F0-40FE-BE50-F2A84735E600", "Connection Status", "The connection status to use for new individuals (default: 'Web Prospect'.)", true, false, "368DD475-242C-49C4-A42C-7278BE690CC2" )]
-
     public class DoorkeeperOAuth : AuthenticationComponent
     {
         /// <summary>
@@ -176,7 +187,6 @@ namespace com.kfs.Security.ExternalAuthentication
                     }
                 }
             }
-
             catch ( Exception ex )
             {
                 ExceptionLogService.LogException( ex, HttpContext.Current );
@@ -351,8 +361,7 @@ namespace com.kfs.Security.ExternalAuthentication
 
             using ( var rockContext = new RockContext() )
             {
-
-                // Query for an existing user 
+                // Query for an existing user
                 var userLoginService = new UserLoginService( rockContext );
                 user = userLoginService.GetByUserName( userName );
 
@@ -454,7 +463,6 @@ namespace com.kfs.Security.ExternalAuthentication
                             int typeId = EntityTypeCache.Get( typeof( DoorkeeperOAuth ) ).Id;
                             user = UserLoginService.Create( rockContext, person, AuthenticationServiceType.External, typeId, userName, "KFSRocksRock", true );
                         }
-
                     } );
                 }
                 if ( user != null )
