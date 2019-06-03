@@ -1,14 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// <copyright>
+// Copyright 2019 by Kingdom First Solutions
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+using System;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using Rock;
 
-namespace com.kfs.FTPHelper
+namespace rocks.kfs.FTPHelper
 {
     public class FTP
     {
@@ -21,9 +32,16 @@ namespace com.kfs.FTPHelper
         private int bufferSize = 2048;
 
         /* Construct Object */
-        public FTP( string hostAddress, string userName, string password ) { host = hostAddress; user = userName; pass = password; }
+
+        public FTP( string hostAddress, string userName, string password )
+        {
+            host = hostAddress;
+            user = userName;
+            pass = password;
+        }
 
         /* Download File */
+
         public void Download( string remoteFile, string localFile )
         {
             try
@@ -91,6 +109,7 @@ namespace com.kfs.FTPHelper
         }
 
         /* Upload File */
+
         public void Upload( string remoteFile, string localFile )
         {
             try
@@ -172,6 +191,7 @@ namespace com.kfs.FTPHelper
         }
 
         /* Delete File */
+
         public void Delete( string deleteFile )
         {
             //try
@@ -197,6 +217,7 @@ namespace com.kfs.FTPHelper
         }
 
         /* Rename File */
+
         public void Rename( string currentFileNameAndPath, string newFileName )
         {
             try
@@ -224,6 +245,7 @@ namespace com.kfs.FTPHelper
         }
 
         /* Create a New Directory on the FTP Server */
+
         public void CreateDirectory( string newDirectory )
         {
             try
@@ -249,6 +271,7 @@ namespace com.kfs.FTPHelper
         }
 
         /* Get the Date/Time a File was Created */
+
         public string GetFileCreatedDateTime( string fileName )
         {
             try
@@ -289,6 +312,7 @@ namespace com.kfs.FTPHelper
         }
 
         /* Get the Size of a File */
+
         public long GetFileSize( string fileName )
         {
             try
@@ -306,13 +330,11 @@ namespace com.kfs.FTPHelper
                 /* Establish Return Communication with the FTP Server */
                 ftpResponse = ( FtpWebResponse ) ftpRequest.GetResponse();
 
-
                 ///* Establish Return Communication with the FTP Server */
                 //ftpStream = ftpResponse.GetResponseStream();
                 ///* Get the FTP Server's Response Stream */
                 //StreamReader ftpReader = new StreamReader( ftpStream );
                 ///* Store the Raw Response */
-
 
                 long fileInfo = 0;
                 if ( ftpResponse.ContentLength > 0 )
@@ -332,6 +354,7 @@ namespace com.kfs.FTPHelper
         }
 
         /* List Directory Contents File/Folder Name Only */
+
         public string[] DirectoryListSimple( string directory )
         {
             try
@@ -374,6 +397,7 @@ namespace com.kfs.FTPHelper
         }
 
         /* List Directory Contents in Detail (Name, Size, Created, etc.) */
+
         public string[] DirectoryListDetailed( string directory )
         {
             try

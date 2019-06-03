@@ -56,9 +56,9 @@
     <Compile Include="FTPStorage.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\com.kfs.FTPHelper\com.kfs.FTPHelper.csproj">
+    <ProjectReference Include="..\rocks.kfs.FTPHelper\rocks.kfs.FTPHelper.csproj">
       <Project>{14c14a9a-6cee-46ef-873f-26864777942c}</Project>
-      <Name>com.kfs.FTPHelper</Name>
+      <Name>rocks.kfs.FTPHelper</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

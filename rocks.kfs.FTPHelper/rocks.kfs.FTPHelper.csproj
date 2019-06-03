@@ -7,10 +7,11 @@
     <ProjectGuid>{14C14A9A-6CEE-46EF-873F-26864777942C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>com.kfs.FTPHelper</RootNamespace>
-    <AssemblyName>com.kfs.FTPHelper</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <RootNamespace>rocks.kfs.FTPHelper</RootNamespace>
+    <AssemblyName>rocks.kfs.FTPHelper</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

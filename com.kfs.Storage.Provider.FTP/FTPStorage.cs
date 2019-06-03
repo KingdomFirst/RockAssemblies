@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Net;
-using System.Web;
 using Newtonsoft.Json;
 
 using Rock;
-using Rock.Attribute;
-using Rock.Extension;
 using Rock.Model;
 using Rock.Security;
 using Rock.Storage;
-using com.kfs.FTPHelper;
+using rocks.kfs.FTPHelper;
 
-namespace com.kfs.FTPStorageProvider
+namespace rocks.kfs.FTPStorageProvider
 {
     /// <summary>
     /// Storage provider for saving binary files to a FTP server
