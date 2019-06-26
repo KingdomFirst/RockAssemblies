@@ -20,8 +20,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "rocks.kfs.FTPHelper" )]
-[assembly: AssemblyProduct( "rocks.kfs.FTPHelper" )]
+[assembly: AssemblyTitle( "rocks.kfs.Storage.Provider.FTP" )]
+[assembly: AssemblyProduct( "rocks.kfs.Storage.Provider.FTP" )]
 [assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2019" )]
 
 // Auto increment assembly versions
@@ -33,4 +33,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible( false )]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid( "14c14a9a-6cee-46ef-873f-26864777942c" )]
+[assembly: Guid( "69909880-cbca-4505-8a03-14b55e8cabbe" )]
