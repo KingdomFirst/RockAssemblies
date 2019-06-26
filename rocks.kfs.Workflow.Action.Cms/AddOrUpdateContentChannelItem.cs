@@ -1,27 +1,43 @@
-﻿
+﻿// <copyright>
+// Copyright 2019 by Kingdom First Solutions
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-
+using Rock;
 using Rock.Attribute;
 using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
-using Rock.Security;
 using Rock.Workflow;
-using Rock;
 
-namespace com.kfs.Workflow.Action.Cms
+namespace rocks.kfs.Workflow.Action.Cms
 {
-    /// <summary>
-    /// Creates a content channel item.
-    /// </summary>
-    [ActionCategory( "KFS > CMS" )]
+    #region Action Attributes
+
+    [ActionCategory( "KFS: CMS" )]
     [Description( "Adds or updates a content channel item." )]
     [Export( typeof( ActionComponent ) )]
     [ExportMetadata( "ComponentName", "Content Channel Item Add Or Update" )]
+
+    #endregion
+
+    #region Action Settings
 
     [ContentChannelField( "Content Channel", "The content channel where items will be added.", true, null, "", 1, "ContentChannel" ) ]
     [TextField("Title", "The title of the content channel item. <span class='tip tip-lava'></span>", true, "", "", 2 )]
@@ -37,6 +53,12 @@ namespace com.kfs.Workflow.Action.Cms
     [KeyValueListField( "Item Attribute Key", "Used to match the current workflow's attribute keys to the keys of the content channel item. The new content channel item will receive the values from this workflow's attributes.", false, keyPrompt: "Source Attribute", valuePrompt: "Target Attribute", order: 8 )]
     [WorkflowAttribute( "Entity Id", "An optional Entity Id (like Reservation.Id) to associate with the content channel item on create or update.", false, "", "", 6, "EntityId",
         new string[] { "Rock.Field.Types.IntegerFieldType" } )]
+
+    #endregion
+
+    /// <summary>
+    /// Creates a content channel item.
+    /// </summary>
     public class AddOrUpdateContentChannelItem : ActionComponent
     {
         /// <summary>
@@ -167,7 +189,7 @@ namespace com.kfs.Workflow.Action.Cms
                 }
             }
             // otherwise check just the text value and then perform lava merge on it.
-            else if ( ! string.IsNullOrWhiteSpace( expireAttributeValue ) ) 
+            else if ( ! string.IsNullOrWhiteSpace( expireAttributeValue ) )
             {
                 string mergedExpireAttributeValue = expireAttributeValue.ResolveMergeFields( mergeFields );
                 DateTime aDateTime;
@@ -282,4 +304,3 @@ namespace com.kfs.Workflow.Action.Cms
         }
     }
 }
-
