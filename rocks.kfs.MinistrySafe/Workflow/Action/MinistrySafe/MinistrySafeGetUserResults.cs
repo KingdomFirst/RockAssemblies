@@ -1,8 +1,25 @@
-﻿using System;
+﻿// <copyright>
+// Copyright 2019 by Kingdom First Solutions
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
+
+using Newtonsoft.Json.Linq;
 
 using Rock;
 using Rock.Attribute;
@@ -12,29 +29,33 @@ using Rock.Security;
 using Rock.Web.Cache;
 using Rock.Workflow;
 
-using Newtonsoft.Json.Linq;
-
-namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
+namespace rocks.kfs.MinistrySafe.Workflow.Action.MinistrySafe
 {
-    /// <summary>
-    /// Retrieves a user at Ministry Safe for the provided Ministry Safe User Id.
-    /// </summary>
+    #region Action Attributes
+
     [ActionCategory( "Ministry Safe" )]
     [Description( "Gets the training test results from Ministry Safe." )]
     [Export( typeof( ActionComponent ) )]
     [ExportMetadata( "ComponentName", "Ministry Safe Get User Results" )]
+
+    #endregion
+
+    #region Action Settings
 
     [WorkflowAttribute( "Ministry Safe Id", "The User Id in the Ministry Safe system.", true, "", "", 0 )]
     [WorkflowAttribute( "Date Completed", "Workflow attribute to store the Date Completed.", true, "", "", 1 )]
     [WorkflowAttribute( "Score", "Workflow attribute to store the Score.", true, "", "", 2 )]
     [IntegerField( "Pass Score", "The minimum score to consider a pass.", true, 80, "", 3 )]
     [WorkflowAttribute( "Result", "Workflow attribute to store the Result.", true, "", "", 4 )]
-
     [EncryptedTextField( "API Key", "Optional API Key to override Global Attribute.", false, "", "Advanced", 0 )]
     [BooleanField( "Staging Mode", "Flag indicating if Ministry Safe Staging Mode should be used.", false, "Advanced", 1 )]
-    
 
-    class MinistrySafeGetUserResults : ActionComponent
+    #endregion
+
+    /// <summary>
+    /// Retrieves a user at Ministry Safe for the provided Ministry Safe User Id.
+    /// </summary>
+    public class MinistrySafeGetUserResults : ActionComponent
     {
         /// <summary>
         /// Executes the specified workflow.
@@ -90,7 +111,7 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
 
                             SetWorkflowAttributeValue( action, attributeResult.Guid, result );
                             action.AddLogEntry( string.Format( "Set '{0}' attribute to '{1}'.", attributeResult.Name, result ) );
-                        }  
+                        }
 
                         return true;
                     }

@@ -7,9 +7,9 @@
     <ProjectGuid>{4DA9EFFE-7D29-45F5-8F39-63A6D6F3014A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>com.kfs.MinistrySafe</RootNamespace>
-    <AssemblyName>com.kfs.MinistrySafe</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <RootNamespace>rocks.kfs.MinistrySafe</RootNamespace>
+    <AssemblyName>rocks.kfs.MinistrySafe</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -63,19 +63,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Migrations\009_UpdateTrainingWorfkflowPending.cs" />
-    <Compile Include="Migrations\008_ChangeTestResultPersonAttribute.cs" />
-    <Compile Include="Migrations\007_UpdateTrainingWorkflowResults.cs" />
-    <Compile Include="Migrations\006_AddTestResultPersonAttribute.cs" />
-    <Compile Include="Migrations\001_AddMinistrySafeElements.cs" />
-    <Compile Include="Migrations\002_CreateWorkflow.cs" />
-    <Compile Include="Migrations\004_UpdateTrainingWorkflow.cs" />
-    <Compile Include="Migrations\005_CreateConnectionTrainingWorkflow.cs" />
-    <Compile Include="Migrations\003_AddActionBlockSetting.cs" />
+    <Compile Include="Migrations\001_AddSystemData.cs" />
     <Compile Include="MinistrySafe.cs" />
     <Compile Include="SystemGuid\Attribute.cs" />
     <Compile Include="SystemGuid\Category.cs" />
     <Compile Include="SystemGuid\DefinedType.cs" />
+    <Compile Include="SystemGuid\PersonBadge.cs" />
     <Compile Include="Trainings.cs" />
     <Compile Include="Users.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

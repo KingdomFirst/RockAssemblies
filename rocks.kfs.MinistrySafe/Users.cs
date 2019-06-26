@@ -1,11 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// <copyright>
+// Copyright 2019 by Kingdom First Solutions
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+using System;
 using System.Net;
+
 using Newtonsoft.Json;
 using RestSharp;
-using Rock;
 
-namespace com.kfs.MinistrySafe
+namespace rocks.kfs.MinistrySafe
 {
     public class Users
     {
@@ -19,7 +34,7 @@ namespace com.kfs.MinistrySafe
         /// <param name="StagingMode">Optional flag indicating if the Staging API should be used.</param>
         /// <returns>Returns true or error.</returns>
         public static dynamic CreateUser( string APIKey, Rock.Model.Person Person, string msUserType = "volunteer", string ExternalId = "", bool StagingMode = false )
-        {   
+        {
             var externalId = string.IsNullOrWhiteSpace( ExternalId ) ? $"P{ Person.PrimaryAliasId.ToString() }" : ExternalId;
             var body = $"user[first_name]={ Person.FirstName }&user[last_name]={ Person.LastName }&user[email]={ Person.Email }&user[external_id]={ externalId }&user[user_type]={ msUserType }";
 
@@ -33,7 +48,7 @@ namespace com.kfs.MinistrySafe
 
             request.AddHeader( "content-type", "application/x-www-form-urlencoded" );
             request.AddParameter( "application/x-www-form-urlencoded", body, ParameterType.RequestBody );
-            
+
             var response = client.Execute( request );
 
             dynamic results = "";

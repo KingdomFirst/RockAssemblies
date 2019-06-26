@@ -1,9 +1,27 @@
-﻿using System;
+﻿// <copyright>
+// Copyright 2019 by Kingdom First Solutions
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+
 using Newtonsoft.Json.Linq;
+
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
@@ -12,17 +30,20 @@ using Rock.Security;
 using Rock.Web.Cache;
 using Rock.Workflow;
 
-namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
+namespace rocks.kfs.MinistrySafe.Workflow.Action.MinistrySafe
 {
-    /// <summary>
-    /// Creates a user at Ministry Safe for the specified Person and stores the Ministry Safe User Id in a Workflow Attribute.
-    /// </summary>
+    #region Action Attributes
+
     [ActionCategory( "Ministry Safe" )]
     [Description( "Creates a user at Ministry Safe for the selected person." )]
     [Export( typeof( ActionComponent ) )]
     [ExportMetadata( "ComponentName", "Ministry Safe Create User" )]
-    [WorkflowAttribute( "Person", "Workflow attribute that contains the person to update.", true, "", "", 0, null,
-        new string[] { "Rock.Field.Types.PersonFieldType" } )]
+
+    #endregion
+
+    #region Action Settings
+
+    [WorkflowAttribute( "Person", "Workflow attribute that contains the person to update.", true, "", "", 0, null, new string[] { "Rock.Field.Types.PersonFieldType" } )]
     [WorkflowAttribute( "Ministry Safe Id", "Workflow attribute to store the Ministry Safe User Id.", true, "", "", 1 )]
     [WorkflowAttribute( "Direct Login Url", "Workflow attribute to store the Ministry Safe Direct Login Url.", true, "", "", 2 )]
     [WorkflowTextOrAttribute( "Training Type", "Attribute Value", "The training type that should be assigned to the User.  If left blank or none selected, the Standard Survey will be assigned.", false, "", "", 3, "TType" )]
@@ -30,6 +51,12 @@ namespace com.kfs.MinistrySafe.Workflow.Action.MinistrySafe
     [EncryptedTextField( "API Key", "Optional API Key to override Global Attribute.", false, "", "Advanced", 0 )]
     [BooleanField( "Staging Mode", "Flag indicating if Ministry Safe Staging Mode should be used.", false, "Advanced", 1 )]
     [BooleanField( "Use Workflow Id", "Flag indicating if the Workflow Id should be used as the Ministry Safe External Id.", true, "Advanced", 2 )]
+
+    #endregion
+
+    /// <summary>
+    /// Creates a user at Ministry Safe for the specified Person and stores the Ministry Safe User Id in a Workflow Attribute.
+    /// </summary>
     public class MinistrySafeCreateUser : ActionComponent
     {
         /// <summary>
