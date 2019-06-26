@@ -1,25 +1,52 @@
-﻿using System;
+﻿// <copyright>
+// Copyright by the Spark Development Network
+//
+// Licensed under the Rock Community License (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.rockrms.com/license
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+// <notice>
+// This file contains modifications by Kingdom First Solutions
+// and is a derivative work.
+//
+// Modification (including but not limited to):
+// * Added the ability to create multiple connection requests with a single action.
+// </notice>
+//
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
 using Rock.Model;
-using Rock.Security;
 using Rock.Web.Cache;
 using Rock.Workflow;
 
-namespace com.kfs.Workflow.Action
+namespace rocks.kfs.Workflow.Action
 {
-    /// <summary>
-    /// Creates new connection requests.
-    /// </summary>
-    [ActionCategory( "Connections" )]
-    [Description( "Creates new connection requests." )]
+    #region Action Attributes
+
+    [ActionCategory( "KFS: Connections" )]
+    [Description( "Creates multiple connection requests." )]
     [Export( typeof( ActionComponent ) )]
     [ExportMetadata( "ComponentName", "Connection Requests Create" )]
+
+    #endregion
+
+    #region Action Settings
 
     [WorkflowAttribute( "Person Attribute", "The Person attribute that contains the person that connection request should be created for.", true, "", "", 0, null,
         new string[] { "Rock.Field.Types.PersonFieldType" } )]
@@ -32,6 +59,11 @@ namespace com.kfs.Workflow.Action
     [WorkflowAttribute( "Connection Comment Attribute", "An optional attribute that contains the comment to use for the request.", false, "", "", 5, null,
         new string[] { "Rock.Field.Types.TextFieldType", "Rock.Field.Types.MemoFieldType" } )]
 
+    #endregion
+
+    /// <summary>
+    /// Creates multiple connection requests.
+    /// </summary>
     public class CreateConnectionRequests : ActionComponent
     {
         /// <summary>
@@ -61,7 +93,7 @@ namespace com.kfs.Workflow.Action
             // Get the opportunity
             List<Guid> opportunityTypeGuids = Array.ConvertAll( action.GetWorklowAttributeValue( GetAttributeValue( action, "ConnectionOpportunitiesAttribute" ).AsGuid() ).Split( ',' ), s => new Guid( s ) ).ToList();
 
-            foreach (var opportunityTypeGuid in opportunityTypeGuids)
+            foreach ( var opportunityTypeGuid in opportunityTypeGuids )
             {
                 ConnectionOpportunity opportunity = null;
                 opportunity = new ConnectionOpportunityService( rockContext ).Get( opportunityTypeGuid );

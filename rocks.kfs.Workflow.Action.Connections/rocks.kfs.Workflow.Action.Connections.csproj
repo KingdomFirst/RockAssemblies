@@ -7,8 +7,8 @@
     <ProjectGuid>{2C11BB41-CB40-4DC7-ADA7-393B764392F2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>com.kfs.Workflow.Action.Connections</RootNamespace>
-    <AssemblyName>com.kfs.Workflow.Action.Connections</AssemblyName>
+    <RootNamespace>rocks.kfs.Workflow.Action.Connections</RootNamespace>
+    <AssemblyName>rocks.kfs.Workflow.Action.Connections</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -48,7 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CreateConnectionRequests.cs" />
-    <Compile Include="SetConnectionRequestConnector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
