@@ -1,26 +1,48 @@
-﻿using System;
+﻿// <copyright>
+// Copyright 2019 by Kingdom First Solutions
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using com.kfs.Reach.Reporting;
+
 using Newtonsoft.Json;
 using RestSharp.Authenticators;
+
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
 using Rock.Financial;
 using Rock.Model;
 using Rock.Web.Cache;
+using rocks.kfs.Reach.Reporting;
 
-namespace com.kfs.Reach
+namespace rocks.kfs.Reach
 {
-    /// <summary>
-    /// Reach Payment Gateway
-    /// </summary>
+    #region Assembly Attributes
+
     [Description( "Reach Gateway" )]
     [Export( typeof( GatewayComponent ) )]
     [ExportMetadata( "ComponentName", "Reach Gateway" )]
+
+    #endregion
+
+    #region Assembly Settings
+
     [TextField( "Reach Domain", "This is your organization's custom domain, typically [CHURCH].reachapp.co.", true, "", "", 0 )]
     [TextField( "API Key", "Enter the API key provided in your Reach Account", true, "", "", 1 )]
     [TextField( "API Secret", "Enter the API secret provided in your Reach account", true, "", "", 2 )]
@@ -30,6 +52,12 @@ namespace com.kfs.Reach
     [DefinedValueField( Rock.SystemGuid.DefinedType.FINANCIAL_SOURCE_TYPE, "Source Type", "Select the defined value that new transactions should be attributed with.", true, false, "74650f5b-3e18-43e8-88db-1598deb2ffa0", "", 6 )]
     [DefinedValueField( Rock.SystemGuid.DefinedType.PERSON_CONNECTION_STATUS, "Person Status", "Select the defined value that new people should be created with.", true, false, "", "", 7 )]
     [CustomRadioListField( "Mode", "Mode to use for transactions", "Live,Test", true, "Test", "", 7 )]
+
+    #endregion
+
+    /// <summary>
+    /// Reach Payment Gateway
+    /// </summary>
     public class Gateway : GatewayComponent
     {
         private readonly string DemoUrl = "demo.reachapp.co";
@@ -300,7 +328,7 @@ namespace com.kfs.Reach
                                 var accountGuid = accountMapping.GetAttributeValue( "RockAccount" ).AsGuidOrNull();
                                 if ( accountGuid.HasValue )
                                 {
-                                    rockAccountId = accountLookup.Get( (Guid)accountGuid ).Id;
+                                    rockAccountId = accountLookup.Get( ( Guid ) accountGuid ).Id;
                                 }
                             }
 
@@ -354,7 +382,7 @@ namespace com.kfs.Reach
                         }
                     }
                 }
-                else 
+                else
                 {
                     queryHasResults = false;
                 }
