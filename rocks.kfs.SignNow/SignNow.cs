@@ -37,19 +37,21 @@ using RestSharp;
 
 using Rock;
 using Rock.Attribute;
-using Rock.Communication;
 using Rock.Model;
 using Rock.Security;
 using Rock.Web.Cache;
 
 namespace rocks.kfs.SignNow
 {
-    /// <summary>
-    /// KFS SignNow Digital Signature Provider
-    /// </summary>
+    #region Assembly Attributes
+
     [Description( "SignNow Digital Signature Provider with Merge Fields" )]
     [Export( typeof( DigitalSignatureComponent ) )]
     [ExportMetadata( "ComponentName", "KFS SignNow" )]
+
+    #endregion
+
+    #region Assembly Settings
 
     [TextField( "Username", "Your SignNow Username", true, "", "", 0 )]
     [TextField( "Password", "Your SignNow Password", true, "", "", 1, null, true )]
@@ -60,6 +62,12 @@ namespace rocks.kfs.SignNow
     [TextField( "Cookie Initialization Url", "The URL of the SignNow page to use for setting an initial cookie.", true, "https://mw.signnow.com/setcookie", "Advanced", 0 )]
     [TextField( "Merge Field Attribute Key", "The key name of the merge document template key pair attribute for merge values.", false, "", "Advanced", 1 )]
     [LavaCommandsField( "Enabled Lava Commands", "The Lava commands that should be enabled for merge fields provided to this digital signature provider.", false, "", "Advanced", 2 )]
+
+    #endregion
+
+    /// <summary>
+    /// KFS SignNow Digital Signature Provider
+    /// </summary>
     public class SignNow : DigitalSignatureComponent
     {
         /// <summary>
@@ -312,9 +320,9 @@ namespace rocks.kfs.SignNow
                         // begin sign now sdk workaround
                         // sign now Update() uses PUT rather than POST
                         //
-                            
+
                         var useAPISandbox = GetAttributeValue( "UseAPISandbox" ).AsBoolean();
-                            
+
                         var client = new RestClient();
                         client.BaseUrl = new Uri( useAPISandbox ? "https://api-eval.signnow.com/" : "https://api.signnow.com/" );
 
@@ -492,7 +500,7 @@ namespace rocks.kfs.SignNow
             {
                 errors.Add( "Invalid Assigned To Person or Email!" );
             }
-            
+
             if ( errors.Any() )
             {
                 return false;
@@ -532,9 +540,8 @@ namespace rocks.kfs.SignNow
 
             string subject = string.Format( "Digital Signature Request from {0}", orgAbbrev );
             string message = string.Format( "{0} has requested a digital signature for a '{1}' document for {2}.",
-                GlobalAttributesCache.Value( "OrganizationName" ), document.SignatureDocumentTemplate.Name, 
+                GlobalAttributesCache.Value( "OrganizationName" ), document.SignatureDocumentTemplate.Name,
                 document.AppliesToPersonAlias != null ? document.AppliesToPersonAlias.Person.FullName : document.AssignedToPersonAlias.Person.FullName );
-
 
             dynamic inviteObj = null;
             JArray roles = getDocumentRes.Value<JArray>( "roles" );
@@ -712,7 +719,7 @@ namespace rocks.kfs.SignNow
                 JArray invites = getDocumentRes.Value<JArray>( "field_invites" );
                 if ( invites != null )
                 {
-                    foreach( JObject invite in invites )
+                    foreach ( JObject invite in invites )
                     {
                         string inviteStatus = invite.Value<string>( "status" );
                         if ( inviteStatus == "expired" )
@@ -778,7 +785,7 @@ namespace rocks.kfs.SignNow
                 msgs.Add( "API Call returned a null result!" );
             }
             else
-            { 
+            {
                 JArray errors = jObject.Value<JArray>( "errors" );
                 if ( errors != null )
                 {
@@ -795,11 +802,7 @@ namespace rocks.kfs.SignNow
                 }
             }
 
-
             return msgs;
-
         }
-
-
     }
 }
