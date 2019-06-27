@@ -1,4 +1,20 @@
-﻿using System;
+﻿// <copyright>
+// Copyright 2019 by Kingdom First Solutions
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -8,7 +24,7 @@ using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
 
-namespace com.kfs.Intacct
+namespace rocks.kfs.Intacct
 {
     public class IntacctJournal
     {
@@ -177,7 +193,7 @@ namespace com.kfs.Intacct
         private List<JournalEntryLine> GetGlEntries( FinancialBatch financialBatch )
         {
             var rockContext = new RockContext();
-            
+
             //
             // Group/Sum Transactions by Account and Project since Project can come from Account or Transaction Details
             //
@@ -190,8 +206,8 @@ namespace com.kfs.Intacct
                     transactionDetail.LoadAttributes();
                     transactionDetail.Account.LoadAttributes();
 
-                    var detailProject = transactionDetail.GetAttributeValue( "com.kfs.Intacct.PROJECTID" ).AsGuidOrNull();
-                    var accountProject = transactionDetail.Account.GetAttributeValue( "com.kfs.Intacct.PROJECTID" ).AsGuidOrNull();
+                    var detailProject = transactionDetail.GetAttributeValue( "rocks.kfs.Intacct.PROJECTID" ).AsGuidOrNull();
+                    var accountProject = transactionDetail.Account.GetAttributeValue( "rocks.kfs.Intacct.PROJECTID" ).AsGuidOrNull();
 
                     var projectCode = string.Empty;
                     if ( detailProject != null )
@@ -248,11 +264,11 @@ namespace com.kfs.Intacct
                 var batchSummaryItem = new GLBatchTotals()
                 {
                     Amount = summary.Amount,
-                    CreditAccount = account.GetAttributeValue( "com.kfs.Intacct.ACCOUNTNO" ),
-                    DebitAccount = account.GetAttributeValue( "com.kfs.Intacct.DEBITACCOUNTNO" ),
-                    Class = account.GetAttributeValue( "com.kfs.Intacct.CLASSID" ),
-                    Department = account.GetAttributeValue( "com.kfs.Intacct.DEPARTMENT" ),
-                    Location =account.GetAttributeValue( "com.kfs.Intacct.LOCATION" ),
+                    CreditAccount = account.GetAttributeValue( "rocks.kfs.Intacct.ACCOUNTNO" ),
+                    DebitAccount = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITACCOUNTNO" ),
+                    Class = account.GetAttributeValue( "rocks.kfs.Intacct.CLASSID" ),
+                    Department = account.GetAttributeValue( "rocks.kfs.Intacct.DEPARTMENT" ),
+                    Location = account.GetAttributeValue( "rocks.kfs.Intacct.LOCATION" ),
                     Project = summary.Project,
                     CustomDimensions = customDimensionValues
                 };
@@ -266,12 +282,12 @@ namespace com.kfs.Intacct
         private List<string> GetCustomDimensions()
         {
             var knownDimensions = new List<string>();
-            knownDimensions.Add( "com.kfs.Intacct.ACCOUNTNO" );
-            knownDimensions.Add( "com.kfs.Intacct.DEBITACCOUNTNO" );
-            knownDimensions.Add( "com.kfs.Intacct.CLASSID" );
-            knownDimensions.Add( "com.kfs.Intacct.DEPARTMENT" );
-            knownDimensions.Add( "com.kfs.Intacct.LOCATION" );
-            knownDimensions.Add( "com.kfs.Intacct.PROJECTID" );
+            knownDimensions.Add( "rocks.kfs.Intacct.ACCOUNTNO" );
+            knownDimensions.Add( "rocks.kfs.Intacct.DEBITACCOUNTNO" );
+            knownDimensions.Add( "rocks.kfs.Intacct.CLASSID" );
+            knownDimensions.Add( "rocks.kfs.Intacct.DEPARTMENT" );
+            knownDimensions.Add( "rocks.kfs.Intacct.LOCATION" );
+            knownDimensions.Add( "rocks.kfs.Intacct.PROJECTID" );
 
             var rockContext = new RockContext();
             var accountCategoryId = new CategoryService( rockContext ).Queryable().FirstOrDefault( c => c.Guid.Equals( new System.Guid( "7361A954-350A-41F1-9D94-AD2CF4030CA5" ) ) ).Id;

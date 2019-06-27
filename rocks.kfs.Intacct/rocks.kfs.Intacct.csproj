@@ -7,9 +7,9 @@
     <ProjectGuid>{CEAE6A36-B38B-4F9B-87CA-15C7E0714296}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>com.kfs.Intacct</RootNamespace>
-    <AssemblyName>com.kfs.Intacct</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <RootNamespace>rocks.kfs.Intacct</RootNamespace>
+    <AssemblyName>rocks.kfs.Intacct</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -65,10 +65,8 @@
   <ItemGroup>
     <Compile Include="IntacctJournal.cs" />
     <Compile Include="IntacctModels.cs" />
-    <Compile Include="Migrations\001_AddIntacctAttributes.cs" />
-    <Compile Include="Migrations\002_AddDefinedTypeDetail.cs" />
+    <Compile Include="Migrations\001_AddSystemData.cs" />
     <Compile Include="IntacctEndpoint.cs" />
-    <Compile Include="Migrations\003_AddBlockToBatchDetails.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
