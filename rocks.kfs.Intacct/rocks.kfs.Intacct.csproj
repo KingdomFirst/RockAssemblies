@@ -4,15 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7221FE6E-8508-4779-AA3F-40CD27AFD7FC}</ProjectGuid>
+    <ProjectGuid>{CEAE6A36-B38B-4F9B-87CA-15C7E0714296}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>rocks.kfs.rvc.NPSWorkflow</RootNamespace>
-    <AssemblyName>rocks.kfs.rvc.NPSWorkflow</AssemblyName>
+    <RootNamespace>rocks.kfs.Intacct</RootNamespace>
+    <AssemblyName>rocks.kfs.Intacct</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,6 +30,26 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="dotless.Core, Version=1.5.2.0, Culture=neutral, PublicKeyToken=96b446c9e63eae34, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\dotless.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DotLiquid, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="EntityFramework">
+      <HintPath>..\..\RockWeb\Bin\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\..\RockWeb\Bin\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.Utilities">
+      <HintPath>..\..\RockWeb\Bin\EntityFramework.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin">
+      <HintPath>..\..\RockWeb\Bin\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>..\..\RockWeb\Bin\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Rock">
       <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
     </Reference>
@@ -45,7 +63,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Migrations\001_AddNPSBaseWorkflow.cs" />
+    <Compile Include="IntacctJournal.cs" />
+    <Compile Include="IntacctModels.cs" />
+    <Compile Include="Migrations\001_AddSystemData.cs" />
+    <Compile Include="IntacctEndpoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

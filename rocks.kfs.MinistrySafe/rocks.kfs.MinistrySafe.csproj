@@ -4,15 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7221FE6E-8508-4779-AA3F-40CD27AFD7FC}</ProjectGuid>
+    <ProjectGuid>{4DA9EFFE-7D29-45F5-8F39-63A6D6F3014A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>rocks.kfs.rvc.NPSWorkflow</RootNamespace>
-    <AssemblyName>rocks.kfs.rvc.NPSWorkflow</AssemblyName>
+    <RootNamespace>rocks.kfs.MinistrySafe</RootNamespace>
+    <AssemblyName>rocks.kfs.MinistrySafe</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,10 +30,30 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotLiquid">
+      <HintPath>..\..\RockWeb\Bin\DotLiquid.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework">
+      <HintPath>..\..\RockWeb\Bin\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\..\RockWeb\Bin\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.Utilities">
+      <HintPath>..\..\RockWeb\Bin\EntityFramework.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>..\..\RockWeb\Bin\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Rock">
       <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -45,8 +63,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Migrations\001_AddNPSBaseWorkflow.cs" />
+    <Compile Include="Migrations\001_AddSystemData.cs" />
+    <Compile Include="MinistrySafe.cs" />
+    <Compile Include="SystemGuid\Attribute.cs" />
+    <Compile Include="SystemGuid\Category.cs" />
+    <Compile Include="SystemGuid\DefinedType.cs" />
+    <Compile Include="SystemGuid\PersonBadge.cs" />
+    <Compile Include="Trainings.cs" />
+    <Compile Include="Users.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Workflow\Action\MinistrySafe\MinistrySafeCreateUser.cs" />
+    <Compile Include="Workflow\Action\MinistrySafe\MinistrySafeGetUserResults.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

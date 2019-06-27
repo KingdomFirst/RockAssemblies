@@ -4,15 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7221FE6E-8508-4779-AA3F-40CD27AFD7FC}</ProjectGuid>
+    <ProjectGuid>{69909880-CBCA-4505-8A03-14B55E8CABBE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>rocks.kfs.rvc.NPSWorkflow</RootNamespace>
-    <AssemblyName>rocks.kfs.rvc.NPSWorkflow</AssemblyName>
+    <RootNamespace>rocks.kfs.Storage.Provider.FTP</RootNamespace>
+    <AssemblyName>rocks.kfs.Storage.Provider.FTP</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,11 +30,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Rock">
       <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,8 +54,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Migrations\001_AddNPSBaseWorkflow.cs" />
+    <Compile Include="Migrations\001_AddSystemData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="FTPStorage.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\rocks.kfs.FTPHelper\rocks.kfs.FTPHelper.csproj">
+      <Project>{14c14a9a-6cee-46ef-873f-26864777942c}</Project>
+      <Name>rocks.kfs.FTPHelper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

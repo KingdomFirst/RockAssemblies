@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7221FE6E-8508-4779-AA3F-40CD27AFD7FC}</ProjectGuid>
+    <ProjectGuid>{14C14A9A-6CEE-46EF-873F-26864777942C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>rocks.kfs.rvc.NPSWorkflow</RootNamespace>
-    <AssemblyName>rocks.kfs.rvc.NPSWorkflow</AssemblyName>
+    <RootNamespace>rocks.kfs.FTPHelper</RootNamespace>
+    <AssemblyName>rocks.kfs.FTPHelper</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -45,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Migrations\001_AddNPSBaseWorkflow.cs" />
+    <Compile Include="FTPHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
