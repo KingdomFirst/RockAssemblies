@@ -17,7 +17,7 @@
 using Rock.Plugin;
 using Rock.SystemGuid;
 
-namespace com.kfs.Workflow.Action.CheckIn.Migrations
+namespace rocks.kfs.Workflow.Action.CheckIn.Migrations
 {
     [MigrationNumber( 2, "1.8.0" )]
     public class AddOccurrenceClosedAttribute : Migration
@@ -27,9 +27,23 @@ namespace com.kfs.Workflow.Action.CheckIn.Migrations
         /// </summary>
         public override void Up()
         {
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.AttendanceOccurrence", FieldType.BOOLEAN, "", "", "Occurrence Closed", "", 0, "False", "B271037B-01AD-4270-B688-63DE29022915", "rocks.kfs.OccurrenceClosed" );
+            // reset the attribute key
+            Sql( @"
+                UPDATE [Attribute]
+                SET [Key] = 'OccurrenceClosed'
+                WHERE [Guid] = 'B271037B-01AD-4270-B688-63DE29022915'
+            " );
+
+            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.AttendanceOccurrence", FieldType.BOOLEAN, "", "", "Occurrence Closed", "", 0, "False", "B271037B-01AD-4270-B688-63DE29022915" );
             RockMigrationHelper.UpdateAttributeQualifier( "B271037B-01AD-4270-B688-63DE29022915", "falsetext", "No", "04C24C40-85AF-421E-AFDE-6BA97ED085C3" );
             RockMigrationHelper.UpdateAttributeQualifier( "B271037B-01AD-4270-B688-63DE29022915", "truetext", "Yes", "4B0E9B0B-45FE-4BBC-B4FB-75D459D8281A" );
+
+            // set the attribute key
+            Sql( @"
+                UPDATE [Attribute]
+                SET [Key] = 'rocks.kfs.OccurrenceClosed'
+                WHERE [Guid] = 'B271037B-01AD-4270-B688-63DE29022915'
+            " );
         }
 
         /// <summary>

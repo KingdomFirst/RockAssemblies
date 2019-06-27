@@ -16,9 +16,9 @@
 //
 using Rock.Plugin;
 
-namespace com.kfs.Workflow.Action.CheckIn.Migrations
+namespace rocks.kfs.Workflow.Action.CheckIn.Migrations
 {
-    [MigrationNumber( 2, "1.8.0" )]
+    [MigrationNumber( 3, "1.8.0" )]
     public class MoveBlockLocation : Migration
     {
         /// <summary>
@@ -26,11 +26,7 @@ namespace com.kfs.Workflow.Action.CheckIn.Migrations
         /// </summary>
         public override void Up()
         {
-            Sql( @"
-                UPDATE [BlockType]
-                SET [Path] = '~/Plugins/rocks_kfs/CheckIn/Manager/Locations.ascx'
-                WHERE [Path] = '~/Plugins/com_kfs/CheckIn/Manager/Locations.ascx'
-            " );
+            RockMigrationHelper.RenameBlockType( "~/Plugins/com_kfs/CheckIn/Manager/Locations.ascx", "~/Plugins/rocks_kfs/CheckIn/Manager/Locations.ascx" );
         }
 
         /// <summary>
