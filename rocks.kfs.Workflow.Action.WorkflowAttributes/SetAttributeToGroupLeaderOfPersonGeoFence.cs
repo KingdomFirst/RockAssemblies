@@ -40,12 +40,15 @@ namespace rocks.kfs.Workflow.Action.WorkflowAttributes
     #endregion
 
     #region Action Settings
+
     [GroupTypeField( "Group Type", "The type of group to use which has geo-fence locations.", true, "", "", 0 )]
     [CustomDropdownListField( "Role", "Optional role to limit scope of 'IsLeader'.", "SELECT r.Guid AS [Value], t.Name + ' - ' + r.Name AS [Text] FROM GroupTypeRole r JOIN GroupType t ON r.GroupTypeId = t.Id ORDER BY t.Name, r.Name", false, "", "", 1 )]
     [WorkflowAttribute( "Person", "The attribute of the person to have map locations evaluated in selected group type.", true, "", "", 2, null,
         new string[] { "Rock.Field.Types.TextFieldType", "Rock.Field.Types.PersonFieldType" } )]
     [WorkflowAttribute( "Leader", "The attribute to set to the group leader.", true, "", "", 3, null,
         new string[] { "Rock.Field.Types.TextFieldType", "Rock.Field.Types.PersonFieldType" } )]
+
+    #endregion
 
     /// <summary>
     /// Sets an attribute equal to the person who created workflow (if known).
