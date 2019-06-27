@@ -1,4 +1,28 @@
-﻿using System;
+﻿// <copyright>
+// Copyright by the Spark Development Network
+//
+// Licensed under the Rock Community License (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.rockrms.com/license
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+// <notice>
+// This file contains modifications by Kingdom First Solutions
+// and is a derivative work.
+//
+// Modification (including but not limited to):
+// * Added the ability to load balance the selected location.
+// </notice>
+//
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -13,16 +37,26 @@ using Rock.Model;
 using Rock.Workflow;
 using Rock.Workflow.Action.CheckIn;
 
-namespace com.kfs.Workflow.Action.CheckIn
+namespace rocks.kfs.Workflow.Action.CheckIn
 {
-    /// <summary>
-    /// Adds the locations for each members group types
-    /// </summary>
+    #region Action Attributes
+
     [ActionCategory( "KFS: Check-In" )]
     [Description( "If group allows, the locations will be sorted by number of current attendees" )]
     [Export( typeof( ActionComponent ) )]
     [ExportMetadata( "ComponentName", "Load Balance Locations" )]
+
+    #endregion
+
+    #region Action Settings
+
     [BooleanField( "Load All", "By default locations are only loaded for the selected person and group type.  Select this option to load locations for all the loaded people and group types." )]
+
+    #endregion
+
+    /// <summary>
+    /// Adds the locations for each members group types
+    /// </summary>
     public class LoadBalanceLocations : CheckInActionComponent
     {
         /// <summary>
@@ -58,14 +92,14 @@ namespace com.kfs.Workflow.Action.CheckIn
                                     var closedGroupLocationIds = new AttendanceOccurrenceService( rockContext )
                                                     .Queryable()
                                                     .AsNoTracking()
-                                                    .Where( o => 
-                                                        o.GroupId == group.Group.Id && 
+                                                    .Where( o =>
+                                                        o.GroupId == group.Group.Id &&
                                                         o.OccurrenceDate == RockDateTime.Today )
-                                                    .WhereAttributeValue(rockContext, "com.kfs.OccurrenceClosed", "True")
+                                                    .WhereAttributeValue( rockContext, "rocks.kfs.OccurrenceClosed", "True" )
                                                     .Select( l => l.LocationId )
                                                     .ToList();
 
-                                    var loadBalance = group.Group.GetAttributeValue( "com.kfs.LoadBalanceLocations" ).AsBoolean();
+                                    var loadBalance = group.Group.GetAttributeValue( "rocks.kfs.LoadBalanceLocations" ).AsBoolean();
                                     if ( loadBalance && loadAll )
                                     {
                                         group.Locations.Clear();
@@ -97,7 +131,7 @@ namespace com.kfs.Workflow.Action.CheckIn
                                         sortedLocationAttendance.Sort( ( x, y ) => x.Key.Location.Name.CompareTo( y.Key.Location.Name ) );
                                         sortedLocationAttendance.Sort( ( x, y ) => x.Value.CompareTo( y.Value ) );
                                         var order = 0;
-                                        foreach (var checkInLocationPair in sortedLocationAttendance)
+                                        foreach ( var checkInLocationPair in sortedLocationAttendance )
                                         {
                                             var checkInLocation = checkInLocationPair.Key;
                                             checkInLocation.Order = order;

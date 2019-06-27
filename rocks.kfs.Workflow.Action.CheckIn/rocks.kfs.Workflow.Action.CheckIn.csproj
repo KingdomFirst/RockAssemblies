@@ -7,8 +7,8 @@
     <ProjectGuid>{82D1A502-2C15-4D26-AB94-45647F55F055}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>com.kfs.Workflow.Action.CheckIn</RootNamespace>
-    <AssemblyName>com.kfs.Workflow.Action.CheckIn</AssemblyName>
+    <RootNamespace>rocks.kfs.Workflow.Action.CheckIn</RootNamespace>
+    <AssemblyName>rocks.kfs.Workflow.Action.CheckIn</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -42,9 +42,9 @@
     <Reference Include="EntityFramework.SqlServer">
       <HintPath>..\..\RockWeb\Bin\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Rock">
       <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
@@ -63,13 +63,11 @@
     <Compile Include="LoadBalanceLocations.cs" />
     <Compile Include="Migrations\002_AddOccurrenceClosedAttribute.cs" />
     <Compile Include="Migrations\001_AddLoadBalanceAttribute.cs" />
+    <Compile Include="Migrations\003_MoveBlockLocation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
