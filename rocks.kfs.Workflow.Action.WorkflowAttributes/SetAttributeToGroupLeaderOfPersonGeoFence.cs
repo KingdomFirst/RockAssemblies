@@ -25,20 +25,21 @@ using Rock;
 using Rock.Attribute;
 using Rock.Data;
 using Rock.Model;
-using Rock.Security;
 using Rock.Web.Cache;
 using Rock.Workflow;
 
 namespace rocks.kfs.Workflow.Action.WorkflowAttributes
 {
-    /// <summary>
-    /// Sets an attribute equal to the person who created workflow (if known).
-    /// </summary>
-    [ActionCategory( "Workflow Attributes" )]
+    #region Action Attributes
+
+    [ActionCategory( "KFS: Workflow Attributes" )]
     [Description( "Sets an attribute to the leader of the geo fenced group type provided. Returns the first person in a role marked 'Is Leader'." )]
     [Export( typeof( ActionComponent ) )]
     [ExportMetadata( "ComponentName", "Attribute Set to Geo Fenced Group Leader" )]
 
+    #endregion
+
+    #region Action Settings
     [GroupTypeField( "Group Type", "The type of group to use which has geo-fence locations.", true, "", "", 0 )]
     [CustomDropdownListField( "Role", "Optional role to limit scope of 'IsLeader'.", "SELECT r.Guid AS [Value], t.Name + ' - ' + r.Name AS [Text] FROM GroupTypeRole r JOIN GroupType t ON r.GroupTypeId = t.Id ORDER BY t.Name, r.Name", false, "", "", 1 )]
     [WorkflowAttribute( "Person", "The attribute of the person to have map locations evaluated in selected group type.", true, "", "", 2, null,
@@ -46,6 +47,9 @@ namespace rocks.kfs.Workflow.Action.WorkflowAttributes
     [WorkflowAttribute( "Leader", "The attribute to set to the group leader.", true, "", "", 3, null,
         new string[] { "Rock.Field.Types.TextFieldType", "Rock.Field.Types.PersonFieldType" } )]
 
+    /// <summary>
+    /// Sets an attribute equal to the person who created workflow (if known).
+    /// </summary>
     public class SetAttributeToGroupLeader : ActionComponent
     {
         /// <summary>
