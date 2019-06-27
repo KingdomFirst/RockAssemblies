@@ -1,4 +1,3 @@
-
 using Avalanche;
 using Rock.Plugin;
 
@@ -177,7 +176,7 @@ namespace rocks.kfs.Avalanche.Migrations
             ""HorizontalOptions"": ""FillAndExpand"",
             ""VerticalOptions"": ""Start"",
             ""MinimumHeightRequest"": ""70"",
-            ""BackgroundColor"": ""#0094d9""
+            ""BackgroundColor"": ""Black""
         },
         ""Children"": [
             {
@@ -215,17 +214,35 @@ namespace rocks.kfs.Avalanche.Migrations
         }
     },
     {
-        ""Name"": ""Main"",
+        ""Name"": ""Max"",
         ""Type"": ""StackLayout"",
         ""Orientation"": ""Vertical"",
         ""Attributes"": {
             ""VerticalOptions"": ""FillAndExpand""
-        }
-    },
-    {
-        ""Name"": ""Footer"",
-        ""Type"": ""StackLayout"",
-        ""Orientation"": ""Vertical"",
+        },
+        ""Children"": [
+            {
+                ""Name"": ""Container"",
+                ""Type"": ""StackLayout"",
+                ""Orientation"": ""Vertical"",
+                ""ScrollY"": true,
+                ""Attributes"": {
+                    ""VerticalOptions"": ""FillAndExpand""
+                },
+                ""Children"": [
+                    {
+                        ""Name"": ""MainBackground"",
+                        ""Type"": ""StackLayout"",
+                        ""Orientation"": ""Vertical""
+                    },
+                    {
+                        ""Name"": ""Main"",
+                        ""Type"": ""StackLayout"",
+                        ""Orientation"": ""Vertical""
+                    }
+                ]
+            }
+        ]
     }
 ]";
             RockMigrationHelper.UpdateDefinedValue( AvalancheUtilities.LayoutsDefinedType, "Main Page", "MainPage layout to have some different options, came from SECC", "a28546a5-54d8-4a2e-b912-af9f5e2f0aa2", false );
