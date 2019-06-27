@@ -1,25 +1,50 @@
-﻿using System;
+﻿// <copyright>
+// Copyright by the Spark Development Network
+//
+// Licensed under the Rock Community License (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.rockrms.com/license
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+// <notice>
+// This file contains modifications by Kingdom First Solutions
+// and is a derivative work.
+//
+// Modification (including but not limited to):
+// * Added ui from checkin config to be reusable with all groups
+// </notice>
+//
+using System;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+
 using Rock;
 using Rock.Model;
 using Rock.Web.UI.Controls;
 
-namespace com.kfs.EventRegistration.Advanced
+namespace rocks.kfs.EventRegistration.Advanced
 {
     /// <summary>
     /// Report Filter control
     /// </summary>
-    [ToolboxData( "<{0}:ResourceAreaRow runat=server></{0}:ResourceAreaRow>" )]
-    public class ResourceAreaRow : CompositeControl
+    [ToolboxData( "<{0}:ResourceGroupRow runat=server></{0}:ResourceGroupRow>" )]
+    public class ResourceGroupRow : CompositeControl
     {
+        private Group _group;
         private HiddenFieldWithClass _hfExpanded;
-        private HiddenField _hfGroupTypeGuid;
+        private HiddenField _hfGroupGuid;
 
-        private Label _lblAreaRowName;
+        private Label _lblGroupRowName;
 
-        private LinkButton _lbAddArea;
         private LinkButton _lbAddGroup;
 
         /// <summary>
@@ -28,25 +53,11 @@ namespace com.kfs.EventRegistration.Advanced
         /// <value>
         /// The group type unique identifier.
         /// </value>
-        public Guid GroupTypeGuid
+        public Guid GroupGuid
         {
             get
             {
-                return new Guid( _hfGroupTypeGuid.Value );
-            }
-        }
-
-        /// <summary>
-        /// Gets the parent row.
-        /// </summary>
-        /// <value>
-        /// The parent area row.
-        /// </value>
-        public ResourceAreaRow ParentRow
-        {
-            get
-            {
-                return this.Parent as ResourceAreaRow;
+                return new Guid( _hfGroupGuid.Value );
             }
         }
 
@@ -71,26 +82,6 @@ namespace com.kfs.EventRegistration.Advanced
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to enable adding areas.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if [enable adding area]; otherwise, <c>false</c>.
-        /// </value>
-        public bool EnableAddAreas
-        {
-            get
-            {
-                bool? b = ViewState["EnableAddAreas"] as bool?;
-                return ( b == null ) ? false : b.Value;
-            }
-
-            set
-            {
-                ViewState["EnableAddAreas"] = value;
-            }
-        }
-
-        /// <summary>
         /// Gets or sets a value indicating whether to enable adding groups.
         /// </summary>
         /// <value>
@@ -111,17 +102,17 @@ namespace com.kfs.EventRegistration.Advanced
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="ResourceAreaRow"/> is expanded.
+        /// Gets or sets a value indicating whether this <see cref="ResourceGroupRow"/> is expanded.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if enabled or not set; otherwise, <c>false</c>.
+        ///   <c>true</c> if expanded; otherwise, <c>false</c>.
         /// </value>
         public bool Expanded
         {
             get
             {
                 EnsureChildControls();
-                return _hfExpanded.Value.AsBooleanOrNull() ?? true;
+                return _hfExpanded.Value.AsBooleanOrNull() ?? false;
             }
 
             set
@@ -141,23 +132,15 @@ namespace com.kfs.EventRegistration.Advanced
 
             string script = @"
 // fix so that the Remove button will fire its event, but not the parent event
-$('.resource-area a.btn-danger').click(function (event) {
+$('.resource-group a.btn-danger').click(function (event) {
     event.stopImmediatePropagation();
     if ( isDirty() ) {{
         return false;
     }}
 });
 
-// fix so that the Reorder button will fire its event, but not the parent event
-$('.resource-area a.resource-area-reorder').click(function (event) {
-    event.stopImmediatePropagation();
-    if ( isDirty() ) {{
-        return false;
-    }}
-});
-
-// fix so that the Add Sub-Area button will fire its event, but not the parent event
-$('.resource-area a.resource-area-add-area').click(function (event) {
+// fix so that the Edit Group button will fire its event, but not the parent event
+$('.resource-group a.resource-group-edit-group').click(function (event) {
     event.stopImmediatePropagation();
     if ( isDirty() ) {{
         return false;
@@ -165,27 +148,32 @@ $('.resource-area a.resource-area-add-area').click(function (event) {
 });
 
 // fix so that the Add Resource Group button will fire its event, but not the parent event
-$('.resource-area a.resource-area-add-group').click(function (event) {
+$('.resource-group a.resource-group-add-group').click(function (event) {
     event.stopImmediatePropagation();
     if ( isDirty() ) {{
         return false;
     }}
 });";
 
-            ScriptManager.RegisterStartupScript( this.Page, this.Page.GetType(), "ResourceAreaRow", script, true );
+            ScriptManager.RegisterStartupScript( this.Page, this.Page.GetType(), "ResourceGroupRow", script, true );
         }
 
         /// <summary>
         /// Sets the type of the group.
         /// </summary>
-        /// <param name="groupType">Type of the group.</param>
-        public void SetGroupType( GroupType groupType )
+        /// <param name="group">Type of the group.</param>
+        public void SetGroup( Group group )
         {
-            EnsureChildControls();
-            if ( groupType != null )
+            if ( group != null )
             {
-                _hfGroupTypeGuid.Value = groupType.Guid.ToString();
-                _lblAreaRowName.Text = groupType.Name;
+                _group = group;
+                EnsureChildControls();
+                _hfGroupGuid.Value = group.Guid.ToString();
+                _lblGroupRowName.Text = group.Name;
+                if ( !group.IsActive )
+                {
+                    _lblGroupRowName.Text += " <small>(Inactive)</small>";
+                }
             }
         }
 
@@ -199,42 +187,27 @@ $('.resource-area a.resource-area-add-group').click(function (event) {
             _hfExpanded = new HiddenFieldWithClass();
             Controls.Add( _hfExpanded );
             _hfExpanded.ID = this.ID + "_hfExpanded";
-            _hfExpanded.CssClass = "area-expanded";
+            _hfExpanded.CssClass = "group-expanded";
             _hfExpanded.Value = "False";
 
-            _hfGroupTypeGuid = new HiddenField();
-            _hfGroupTypeGuid.ID = this.ID + "_hfGroupTypeGuid";
+            _hfGroupGuid = new HiddenField();
+            _hfGroupGuid.ID = this.ID + "_hfGroupGuid";
+            Controls.Add( _hfGroupGuid );
 
-            Controls.Add( _hfGroupTypeGuid );
-
-            _lblAreaRowName = new Label();
-            _lblAreaRowName.ClientIDMode = ClientIDMode.Static;
-            _lblAreaRowName.ID = this.ID + "_lblAreaRowName";
-
-            Controls.Add( _lblAreaRowName );
-
-            if ( EnableAddAreas )
-            {
-                _lbAddArea = new LinkButton();
-                _lbAddArea.ID = this.ID + "_lblbAddArea";
-                _lbAddArea.CssClass = "btn btn-xs btn-default resource-area-add-area";
-                _lbAddArea.Click += lbAddArea_Click;
-                _lbAddArea.CausesValidation = false;
-                _lbAddArea.ToolTip = "Add New Area";
-                _lbAddArea.Controls.Add( new LiteralControl { Text = "<i class='fa fa-plus'></i> <i class='fa fa-folder-open'></i>" } );
-                Controls.Add( _lbAddArea );
-            }
+            _lblGroupRowName = new Label();
+            _lblGroupRowName.ClientIDMode = ClientIDMode.Static;
+            _lblGroupRowName.ID = this.ID + "_lblGroupRowName";
+            Controls.Add( _lblGroupRowName );
 
             if ( EnableAddGroups )
             {
                 _lbAddGroup = new LinkButton();
                 _lbAddGroup.ID = this.ID + "_lbAddGroup";
-                _lbAddGroup.CssClass = "btn btn-xs btn-default resource-area-add-group";
+                _lbAddGroup.CssClass = "btn btn-xs btn-default resource-group-add-group";
                 _lbAddGroup.Click += lbAddGroup_Click;
                 _lbAddGroup.CausesValidation = false;
                 _lbAddGroup.ToolTip = "Add New Group";
                 _lbAddGroup.Controls.Add( new LiteralControl { Text = "<i class='fa fa-plus'></i> <i class='fa fa-check-circle'></i>" } );
-
                 Controls.Add( _lbAddGroup );
             }
         }
@@ -245,30 +218,28 @@ $('.resource-area a.resource-area-add-group').click(function (event) {
         /// <param name="writer">An <see cref="T:System.Web.UI.HtmlTextWriter" /> that represents the output stream to render HTML content on the client.</param>
         public override void RenderControl( HtmlTextWriter writer )
         {
-            writer.AddAttribute( "data-key", _hfGroupTypeGuid.Value );
+            writer.AddAttribute( "data-key", _hfGroupGuid.Value );
             writer.RenderBeginTag( HtmlTextWriterTag.Li );
 
-            writer.AddAttribute( HtmlTextWriterAttribute.Class, string.Format( "resource-item{0} resource-area rollover-container", Selected ? " resource-item-selected" : "" ) );
+            writer.AddAttribute( HtmlTextWriterAttribute.Class, string.Format( "resource-item{0} resource-group rollover-container {1}", Selected ? " resource-item-selected" : "", !_group.IsActive ? " is-inactive" : "" ) );
             writer.AddAttribute( HtmlTextWriterAttribute.Id, this.ID + "_section" );
             writer.RenderBeginTag( "section" );
 
             // Hidden Field to track expansion
             _hfExpanded.RenderControl( writer );
 
-            writer.WriteLine( "<a class='resource-area-reorder'><i class='fa fa-bars'></i></a>" );
-            writer.WriteLine( "<a class='resource-area-expand'><i class='resource-area-state fa fa-folder-open'></i></a>" );
+            writer.WriteLine( "<a class='resource-group-reorder'><i class='fa fa-bars'></i></a>" );
+            writer.WriteLine( "<a class='resource-group-expand'><i class='resource-group-state fa fa-check-circle'></i></a>" );
 
-            _lblAreaRowName.RenderControl( writer );
+            _lblGroupRowName.RenderControl( writer );
 
             writer.AddAttribute( HtmlTextWriterAttribute.Class, "pull-right resource-item-actions rollover-item" );
             writer.RenderBeginTag( HtmlTextWriterTag.Div );
 
-            _lbAddArea?.RenderControl( writer );
-            writer.Write( " " );
-
             if ( _lbAddGroup != null )
             {
                 _lbAddGroup.RenderControl( writer );
+                writer.Write( " " );
             }
 
             writer.RenderEndTag();  // Div
@@ -280,20 +251,6 @@ $('.resource-area a.resource-area-add-group').click(function (event) {
             }
             writer.RenderBeginTag( HtmlTextWriterTag.Div );
 
-            // Render child area rows
-            var areaRows = this.Controls.OfType<ResourceAreaRow>();
-            if ( areaRows.Any() )
-            {
-                writer.AddAttribute( HtmlTextWriterAttribute.Class, "resource-list js-resource-area-list" );
-                writer.RenderBeginTag( HtmlTextWriterTag.Ul );
-                foreach ( var areaRow in areaRows )
-                {
-                    areaRow.RenderControl( writer );
-                }
-                writer.RenderEndTag();
-            }
-
-            // Render child group rows
             var groupRows = this.Controls.OfType<ResourceGroupRow>();
             if ( groupRows.Any() )
             {
@@ -312,19 +269,6 @@ $('.resource-area a.resource-area-add-group').click(function (event) {
         }
 
         /// <summary>
-        /// Handles the Click event of the lbAddArea control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        protected void lbAddArea_Click( object sender, EventArgs e )
-        {
-            if ( AddAreaClick != null )
-            {
-                AddAreaClick( this, e );
-            }
-        }
-
-        /// <summary>
         /// Handles the Click event of the lbAddGroup control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -338,22 +282,17 @@ $('.resource-area a.resource-area-add-group').click(function (event) {
         }
 
         /// <summary>
-        /// Handles the Click event of the lblDeleteArea control.
+        /// Handles the Click event of the lblDeleteGroup control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        protected void lblDeleteArea_Click( object sender, EventArgs e )
+        protected void lblDeleteGroup_Click( object sender, EventArgs e )
         {
-            if ( DeleteAreaClick != null )
+            if ( DeleteGroupClick != null )
             {
-                DeleteAreaClick( this, e );
+                DeleteGroupClick( this, e );
             }
         }
-
-        /// <summary>
-        /// Occurs when [add area click].
-        /// </summary>
-        public event EventHandler AddAreaClick;
 
         /// <summary>
         /// Occurs when [add group click].
@@ -361,8 +300,8 @@ $('.resource-area a.resource-area-add-group').click(function (event) {
         public event EventHandler AddGroupClick;
 
         /// <summary>
-        /// Occurs when [delete area click].
+        /// Occurs when [delete group click].
         /// </summary>
-        public event EventHandler DeleteAreaClick;
+        public event EventHandler DeleteGroupClick;
     }
 }

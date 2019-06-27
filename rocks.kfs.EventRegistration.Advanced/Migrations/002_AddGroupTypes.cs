@@ -1,14 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// <copyright>
+// Copyright 2019 by Kingdom First Solutions
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Rock;
 using Rock.Data;
 using Rock.Model;
 using Rock.Plugin;
 
-namespace com.kfs.EventRegistration.Advanced.Migrations
+namespace rocks.kfs.EventRegistration.Advanced.Migrations
 {
     [MigrationNumber( 2, "1.8.5" )]
     public class AddGroupTypes : Migration
@@ -36,30 +49,47 @@ namespace com.kfs.EventRegistration.Advanced.Migrations
                 }
             }
 
+            var migrateNamespace = false;
+            var oldNamespace = "com.kfs.EventRegistration.Advanced";
+
+            // check if migration has previously run in case the grouptype check doesn't escape
+            using ( var rockContext = new RockContext() )
+            {
+                var migrationNumber = ( System.Attribute.GetCustomAttribute( this.GetType(), typeof( MigrationNumberAttribute ) ) as MigrationNumberAttribute ).Number;
+                migrateNamespace = new PluginMigrationService( rockContext )
+                    .Queryable()
+                    .Where( m => m.PluginAssemblyName.Equals( oldNamespace, StringComparison.CurrentCultureIgnoreCase ) && m.MigrationNumber == migrationNumber )
+                    .Any();
+            }
+
             // add primary grouptype
-            RockMigrationHelper.AddGroupType( "Advanced Event Registration", "This template triggers advanced features for the Event Registration module.", "Advanced Events", "Member", false, true, true, "fa fa-fire", 0, "", 0, "", AdvancedEventGuid, false);
-            
+            RockMigrationHelper.AddGroupType( "Advanced Event Registration", "This template triggers advanced features for the Event Registration module.", "Advanced Events", "Member", false, true, true, "fa fa-fire", 0, "", 0, "", AdvancedEventGuid, false );
+
             // add grouptype attributes to the primary grouptype
-            AddGroupTypeAttribute( "Rock.Model.GroupType",AdvancedEventGuid,BooleanFieldTypeGuid,"Allow Multiple Registrations",@"Should registrants be allowed to join multiple groups of this type?",0,"False", true, "4F9CA590-882A-4A2A-9262-C9350953C996" );
-            AddGroupTypeAttribute( "Rock.Model.GroupType",AdvancedEventGuid,BooleanFieldTypeGuid,"Allow Volunteer Assignment",@"Should volunteers be allowed to join groups of this type?",1,"False",true,"7129D352-5468-4BD9-BF2E-5CF9758D83BF");
-            AddGroupTypeAttribute( "Rock.Model.GroupType",AdvancedEventGuid,BooleanFieldTypeGuid,"Show On Grid",@"Should the Registrants grid show assignment columns for this type?",2,"False",true,"60BD7029-9D83-42CC-B904-9A1F3A89C1E6");
-            AddGroupTypeAttribute( "Rock.Model.GroupType",AdvancedEventGuid,BooleanFieldTypeGuid,"Display Combined Memberships",@"Should the resource panel display a combined list of groups? If not, each group will be listed separately.",3,"False",true,"7DD366B4-0A8C-4DA0-B14E-A17A1AFF55A6");
-            AddGroupTypeAttribute( "Rock.Model.GroupType",AdvancedEventGuid,BooleanFieldTypeGuid,"Display Separate Roles",@"Should the resource panel display group members separately by role?  If not, group members will be listed together.",4,"False",true,"469BA2BC-FEB5-4C95-9BA2-B382F01C88E3");
+            AddGroupTypeAttribute( "Rock.Model.GroupType", AdvancedEventGuid, BooleanFieldTypeGuid, "Allow Multiple Registrations", @"Should registrants be allowed to join multiple groups of this type?", 0, "False", true, "4F9CA590-882A-4A2A-9262-C9350953C996" );
+            AddGroupTypeAttribute( "Rock.Model.GroupType", AdvancedEventGuid, BooleanFieldTypeGuid, "Allow Volunteer Assignment", @"Should volunteers be allowed to join groups of this type?", 1, "False", true, "7129D352-5468-4BD9-BF2E-5CF9758D83BF" );
+            AddGroupTypeAttribute( "Rock.Model.GroupType", AdvancedEventGuid, BooleanFieldTypeGuid, "Show On Grid", @"Should the Registrants grid show assignment columns for this type?", 2, "False", true, "60BD7029-9D83-42CC-B904-9A1F3A89C1E6" );
+            AddGroupTypeAttribute( "Rock.Model.GroupType", AdvancedEventGuid, BooleanFieldTypeGuid, "Display Combined Memberships", @"Should the resource panel display a combined list of groups? If not, each group will be listed separately.", 3, "False", true, "7DD366B4-0A8C-4DA0-B14E-A17A1AFF55A6" );
+            AddGroupTypeAttribute( "Rock.Model.GroupType", AdvancedEventGuid, BooleanFieldTypeGuid, "Display Separate Roles", @"Should the resource panel display group members separately by role?  If not, group members will be listed together.", 4, "False", true, "469BA2BC-FEB5-4C95-9BA2-B382F01C88E3" );
 
             // add child grouptypes
-            RockMigrationHelper.AddGroupType( "Event Activities", "Activity Groups for Advanced Events.", "Activity", "Participant", false, true, true, "fa fa-futbol-o", 0, AdvancedEventGuid, 0, "", EventActivityGuid, false);
-            RockMigrationHelper.AddGroupType( "Event Lodging", "Lodging Groups for Advanced Events.", "Lodging", "Occupant", false, true, true, "fa fa-bed", 0, AdvancedEventGuid, 0, "", EventLodgingGuid, false);
-            RockMigrationHelper.AddGroupType( "Event Transportation", "Transportation Groups for Advanced Events.", "Vehicle", "Passenger", false, true, true, "fa fa-bus", 0, AdvancedEventGuid, 0, "", EventTransportationGuid, false);
-            RockMigrationHelper.AddGroupType( "Event Volunteers", "Volunteer Groups for Advanced Events.", "Group", "Volunteer", false, true, true, "fa fa-handshake-o", 0, AdvancedEventGuid, 0, GroupTypePurposeServingAreaGuid, EventVolunteerGuid, false);
+            RockMigrationHelper.AddGroupType( "Event Activities", "Activity Groups for Advanced Events.", "Activity", "Participant", false, true, true, "fa fa-futbol-o", 0, AdvancedEventGuid, 0, "", EventActivityGuid, false );
+            RockMigrationHelper.AddGroupType( "Event Lodging", "Lodging Groups for Advanced Events.", "Lodging", "Occupant", false, true, true, "fa fa-bed", 0, AdvancedEventGuid, 0, "", EventLodgingGuid, false );
+            RockMigrationHelper.AddGroupType( "Event Transportation", "Transportation Groups for Advanced Events.", "Vehicle", "Passenger", false, true, true, "fa fa-bus", 0, AdvancedEventGuid, 0, "", EventTransportationGuid, false );
+            RockMigrationHelper.AddGroupType( "Event Volunteers", "Volunteer Groups for Advanced Events.", "Group", "Volunteer", false, true, true, "fa fa-handshake-o", 0, AdvancedEventGuid, 0, GroupTypePurposeServingAreaGuid, EventVolunteerGuid, false );
 
-            Sql( $@"
-                DECLARE @AdvancedEventId INT = (SELECT [ID] FROM GroupType WHERE [Guid] = '{AdvancedEventGuid}')
-                INSERT GroupTypeAssociation (GroupTypeId, ChildGroupTypeId)
-                VALUES (@AdvancedEventId, (SELECT [ID] FROM GroupType WHERE [Guid] = '{EventActivityGuid}')),
-                    (@AdvancedEventId, (SELECT [ID] FROM GroupType WHERE [Guid] = '{EventLodgingGuid}')),
-                    (@AdvancedEventId, (SELECT [ID] FROM GroupType WHERE [Guid] = '{EventTransportationGuid}')),
-                    (@AdvancedEventId, (SELECT [ID] FROM GroupType WHERE [Guid] = '{EventVolunteerGuid}'))
-            ");
+            // only add the association if this is the first time
+            if ( !migrateNamespace )
+            {
+                Sql( $@"
+                    DECLARE @AdvancedEventId INT = (SELECT [ID] FROM GroupType WHERE [Guid] = '{AdvancedEventGuid}')
+                    INSERT GroupTypeAssociation (GroupTypeId, ChildGroupTypeId)
+                    VALUES (@AdvancedEventId, (SELECT [ID] FROM GroupType WHERE [Guid] = '{EventActivityGuid}')),
+                        (@AdvancedEventId, (SELECT [ID] FROM GroupType WHERE [Guid] = '{EventLodgingGuid}')),
+                        (@AdvancedEventId, (SELECT [ID] FROM GroupType WHERE [Guid] = '{EventTransportationGuid}')),
+                        (@AdvancedEventId, (SELECT [ID] FROM GroupType WHERE [Guid] = '{EventVolunteerGuid}'))
+                " );
+            }
 
             // add group roles
             RockMigrationHelper.AddGroupTypeRole( AdvancedEventGuid, "Member", "Member of Advanced Events (not used)", 0, null, null, Guid.NewGuid().ToString(), false, false, true );
@@ -69,7 +99,6 @@ namespace com.kfs.EventRegistration.Advanced.Migrations
             RockMigrationHelper.AddGroupTypeRole( EventTransportationGuid, "Driver", "Driver role for Advanced Event Transportation Groups", 0, null, null, Guid.NewGuid().ToString(), false, true, false );
             RockMigrationHelper.AddGroupTypeRole( EventTransportationGuid, "Passenger", "Passenger role for Advanced Event Transportation Groups", 0, null, null, Guid.NewGuid().ToString(), false, false, true );
             RockMigrationHelper.AddGroupTypeRole( EventVolunteerGuid, "Member", "Member role for Advanced Event Volunteer Groups", 0, null, null, Guid.NewGuid().ToString(), false, false, true );
-                       
         }
 
         /// <summary>
@@ -77,11 +106,11 @@ namespace com.kfs.EventRegistration.Advanced.Migrations
         /// </summary>
         public override void Down()
         {
-            RockMigrationHelper.DeleteAttribute("4F9CA590-882A-4A2A-9262-C9350953C996");    // GroupType - Group Type Attribute, Advanced Event Registration: Allow Multiple Registrations
-            RockMigrationHelper.DeleteAttribute("7129D352-5468-4BD9-BF2E-5CF9758D83BF");    // GroupType - Group Type Attribute, Advanced Event Registration: Allow Volunteer Assignment
-            RockMigrationHelper.DeleteAttribute("7DD366B4-0A8C-4DA0-B14E-A17A1AFF55A6");    // GroupType - Group Type Attribute, Advanced Event Registration: Display Combined Memberships
-            RockMigrationHelper.DeleteAttribute("60BD7029-9D83-42CC-B904-9A1F3A89C1E6");    // GroupType - Group Type Attribute, Advanced Event Registration: Show On Grid
-            RockMigrationHelper.DeleteAttribute("469BA2BC-FEB5-4C95-9BA2-B382F01C88E3");    // GroupType - Group Type Attribute, Advanced Event Registration: Display Separate Roles
+            RockMigrationHelper.DeleteAttribute( "4F9CA590-882A-4A2A-9262-C9350953C996" );    // GroupType - Group Type Attribute, Advanced Event Registration: Allow Multiple Registrations
+            RockMigrationHelper.DeleteAttribute( "7129D352-5468-4BD9-BF2E-5CF9758D83BF" );    // GroupType - Group Type Attribute, Advanced Event Registration: Allow Volunteer Assignment
+            RockMigrationHelper.DeleteAttribute( "7DD366B4-0A8C-4DA0-B14E-A17A1AFF55A6" );    // GroupType - Group Type Attribute, Advanced Event Registration: Display Combined Memberships
+            RockMigrationHelper.DeleteAttribute( "60BD7029-9D83-42CC-B904-9A1F3A89C1E6" );    // GroupType - Group Type Attribute, Advanced Event Registration: Show On Grid
+            RockMigrationHelper.DeleteAttribute( "469BA2BC-FEB5-4C95-9BA2-B382F01C88E3" );    // GroupType - Group Type Attribute, Advanced Event Registration: Display Separate Roles
 
             RockMigrationHelper.DeleteGroupType( EventActivityGuid );
             RockMigrationHelper.DeleteGroupType( EventLodgingGuid );
@@ -173,7 +202,7 @@ namespace com.kfs.EventRegistration.Advanced.Migrations
                         ,{isRequired.Bit()}
                         ,'{guid}')
                 END
-                ");
+                " );
         }
     }
 }
