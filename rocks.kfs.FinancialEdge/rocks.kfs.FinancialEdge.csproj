@@ -7,10 +7,11 @@
     <ProjectGuid>{DFA00918-5DE6-4962-87B0-DB2BBD49C8C1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>com.kfs.FinancialEdge</RootNamespace>
-    <AssemblyName>com.kfs.FinancialEdge</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <RootNamespace>rocks.kfs.FinancialEdge</RootNamespace>
+    <AssemblyName>rocks.kfs.FinancialEdge</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

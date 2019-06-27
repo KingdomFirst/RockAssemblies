@@ -1,4 +1,20 @@
-﻿using System;
+﻿// <copyright>
+// Copyright 2019 by Kingdom First Solutions
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +25,7 @@ using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
 
-namespace com.kfs.FinancialEdge
+namespace rocks.kfs.FinancialEdge
 {
     public class FEJournal
     {
@@ -27,8 +43,8 @@ namespace com.kfs.FinancialEdge
                     transactionDetail.LoadAttributes();
                     transactionDetail.Account.LoadAttributes();
 
-                    var detailProject = transactionDetail.GetAttributeValue( "com.kfs.FinancialEdge.PROJECTID" ).AsGuidOrNull();
-                    var accountProject = transactionDetail.Account.GetAttributeValue( "com.kfs.FinancialEdge.PROJECTID" ).AsGuidOrNull();
+                    var detailProject = transactionDetail.GetAttributeValue( "rocks.kfs.FinancialEdge.PROJECTID" ).AsGuidOrNull();
+                    var accountProject = transactionDetail.Account.GetAttributeValue( "rocks.kfs.FinancialEdge.PROJECTID" ).AsGuidOrNull();
 
                     var projectCode = string.Empty;
                     if ( detailProject != null )
@@ -43,11 +59,11 @@ namespace com.kfs.FinancialEdge
                     var transactionItem = new GLTransaction()
                     {
                         Amount = transactionDetail.Amount,
-                        CreditAccount = transactionDetail.Account.GetAttributeValue( "com.kfs.FinancialEdge.ACCOUNTNO" ),
-                        DebitAccount = transactionDetail.Account.GetAttributeValue( "com.kfs.FinancialEdge.DEBITACCOUNTNO" ),
+                        CreditAccount = transactionDetail.Account.GetAttributeValue( "rocks.kfs.FinancialEdge.ACCOUNTNO" ),
+                        DebitAccount = transactionDetail.Account.GetAttributeValue( "rocks.kfs.FinancialEdge.DEBITACCOUNTNO" ),
                         Project = projectCode,
                         FinancialAccountId = transactionDetail.Account.Id,
-                        DebitProject = transactionDetail.Account.GetAttributeValue( "com.kfs.FinancialEdge.DEBITPROJECTID" ),
+                        DebitProject = transactionDetail.Account.GetAttributeValue( "rocks.kfs.FinancialEdge.DEBITPROJECTID" ),
                     };
 
                     batchTransactions.Add( transactionItem );
