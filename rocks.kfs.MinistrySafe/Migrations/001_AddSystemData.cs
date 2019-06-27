@@ -42,14 +42,14 @@ namespace rocks.kfs.MinistrySafe.Migrations
 
             // Person Attribute Training Type
             RockMigrationHelper.UpdatePersonAttribute( FieldType.DEFINED_VALUE, SystemGuid.Category.MINISTRY_SAFE_PERSON_ATTRIBUTE_CATEGORY, "Ministry Safe Training Type", "MSTrainingType", "", "The Ministry Safe training type that this person completed.", 0, "", SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_TYPE );
-            RockMigrationHelper.AddAttributeQualifier( SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_TYPE, "allowmultiple", "False", "13C4E727-21E2-4A7D-968A-2BA55B5AA567" );
-            RockMigrationHelper.AddAttributeQualifier( SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_TYPE, "definedtype", "", "110572F2-A7EA-40C3-8C93-732313CEACBC" );
-            RockMigrationHelper.AddAttributeQualifier( SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_TYPE, "displaydescription", "True", "61DF6B3C-06B6-488D-ADCC-769A46FBE1EA" );
+            RockMigrationHelper.UpdateAttributeQualifier( SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_TYPE, "allowmultiple", "False", "13C4E727-21E2-4A7D-968A-2BA55B5AA567" );
+            RockMigrationHelper.UpdateAttributeQualifier( SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_TYPE, "definedtype", "", "110572F2-A7EA-40C3-8C93-732313CEACBC" );
+            RockMigrationHelper.UpdateAttributeQualifier( SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_TYPE, "displaydescription", "True", "61DF6B3C-06B6-488D-ADCC-769A46FBE1EA" );
 
             // Person Attribute Test Date
             RockMigrationHelper.UpdatePersonAttribute( FieldType.DATE, SystemGuid.Category.MINISTRY_SAFE_PERSON_ATTRIBUTE_CATEGORY, "Ministry Safe Training Date", "MSTrainingDate", "", "Date the user took the Ministry Safe training.", 1, "", SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_DATE );
-            RockMigrationHelper.AddAttributeQualifier( SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_DATE, "displayDiff", "False", "133DEB74-6412-4DC6-AE3C-EB2E36BD9AC7" );
-            RockMigrationHelper.AddAttributeQualifier( SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_DATE, "format", "", "652B01D4-DF27-4DA8-9D28-9BFFDC3D543C" );
+            RockMigrationHelper.UpdateAttributeQualifier( SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_DATE, "displayDiff", "False", "133DEB74-6412-4DC6-AE3C-EB2E36BD9AC7" );
+            RockMigrationHelper.UpdateAttributeQualifier( SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_DATE, "format", "", "652B01D4-DF27-4DA8-9D28-9BFFDC3D543C" );
 
             // Person Attribute Score
             RockMigrationHelper.UpdatePersonAttribute( FieldType.INTEGER, SystemGuid.Category.MINISTRY_SAFE_PERSON_ATTRIBUTE_CATEGORY, "Ministry Safe Training Score", "MSTrainingScore", "", "The user's score from the Ministry Safe training.", 2, "", SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_SCORE );
@@ -69,8 +69,8 @@ namespace rocks.kfs.MinistrySafe.Migrations
 
             // Person Attribute Result
             RockMigrationHelper.UpdatePersonAttribute( FieldType.BOOLEAN, SystemGuid.Category.MINISTRY_SAFE_PERSON_ATTRIBUTE_CATEGORY, "Ministry Safe Training Result", "MSTrainingResult", "", "The user's pass/fail status from the Ministry Safe training.", 3, "", SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_RESULT );
-            RockMigrationHelper.AddAttributeQualifier( SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_RESULT, "truetext", "Pass", "9FCEE8FD-12C2-4602-AB32-9AC9590F2156" );
-            RockMigrationHelper.AddAttributeQualifier( SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_RESULT, "falsetext", "Fail", "6F4FA3B6-8958-4DDA-AC5B-73DB8500E0C4" );
+            RockMigrationHelper.UpdateAttributeQualifier( SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_RESULT, "truetext", "Pass", "9FCEE8FD-12C2-4602-AB32-9AC9590F2156" );
+            RockMigrationHelper.UpdateAttributeQualifier( SystemGuid.Attribute.MINISTRY_SAFE_PERSON_ATTRIBUTE_TEST_RESULT, "falsetext", "Fail", "6F4FA3B6-8958-4DDA-AC5B-73DB8500E0C4" );
 
             Sql( @"
                 DECLARE @MSResultId INT = ( SELECT [Id] FROM [Attribute] WHERE [Guid] = 'DB9D8876-4550-424D-A019-1AA71F8ADC1D' )
@@ -123,13 +123,19 @@ namespace rocks.kfs.MinistrySafe.Migrations
             #region EntityTypes
 
             Sql( @"
+                    DELETE FROM [EntityType]
+                    WHERE [Name] = 'rocks.kfs.MinistrySafe.Workflow.Action.MinistrySafe.MinistrySafeCreateUser'
+                    
+                    DELETE FROM [EntityType]
+                    WHERE [Name] = 'rocks.kfs.MinistrySafe.Workflow.Action.MinistrySafe.MinistrySafeGetUserResults'
+                    
                     IF EXISTS ( SELECT [Id] FROM [EntityType] WHERE [Guid] = '8A1F13F8-53F6-4108-BFC5-F2131EDFE8E2' )
                     BEGIN
                         UPDATE [EntityType]
                         SET [Name] = 'rocks.kfs.MinistrySafe.Workflow.Action.MinistrySafe.MinistrySafeCreateUser'
                         WHERE [Guid] = '8A1F13F8-53F6-4108-BFC5-F2131EDFE8E2'
                     END
-
+                    
                     IF EXISTS ( SELECT [Id] FROM [EntityType] WHERE [Guid] = '481197B7-50AD-4E7D-BD16-F9B2858891A5' )
                     BEGIN
                         UPDATE [EntityType]
@@ -183,8 +189,8 @@ namespace rocks.kfs.MinistrySafe.Migrations
             RockMigrationHelper.UpdateWorkflowTypeAttribute( "AE617426-E1E3-4E06-B3D8-B7AB1A7B4892", "C0D0D7E2-C3B0-4004-ABEA-4BBFAD10D5D2", "Direct Login Url", "DirectLoginUrl", "The Login Url to send to the person to view training videos", 10, @"", "C9911445-C2AA-47D4-B051-93B42128E35D", false ); // Ministry Safe Training:Direct Login Url
             RockMigrationHelper.UpdateWorkflowTypeAttribute( "AE617426-E1E3-4E06-B3D8-B7AB1A7B4892", "99B090AA-4D7E-46D8-B393-BF945EA1BA8B", "Training Date Attribute", "TrainingDateAttribute", "", 11, @"a5df28ec-04dc-44d5-9a7b-1c6bbc87037c", "A7F8EB85-024C-4F75-874F-78E03CD7EEBA", false ); // Ministry Safe Training:Training Date Attribute
             RockMigrationHelper.UpdateWorkflowTypeAttribute( "AE617426-E1E3-4E06-B3D8-B7AB1A7B4892", "A75DFC58-7A1B-4799-BF31-451B2BBE38FF", "ConnectionRequestId", "ConnectionRequestId", "", 12, @"0", "5FC958C7-98F2-4AC5-ADC3-7A822BA66437", false ); // Ministry Safe Training:ConnectionRequestId
-            RockMigrationHelper.AddAttributeQualifier( "AA0CE3D6-1FEC-48A6-AEE0-97410BBDBC78", "fieldtype", @"ddl", "40EB5429-32DB-48A4-8E17-3E5BE6C24C6D" ); // Ministry Safe Training:Training Result:fieldtype
-            RockMigrationHelper.AddAttributeQualifier( "AA0CE3D6-1FEC-48A6-AEE0-97410BBDBC78", "values", @"Pass,Fail,Pending", "656FD54C-935B-4F80-9729-D55E2C4721AB" ); // Ministry Safe Training:Training Result:values
+            RockMigrationHelper.UpdateAttributeQualifier( "AA0CE3D6-1FEC-48A6-AEE0-97410BBDBC78", "fieldtype", @"ddl", "40EB5429-32DB-48A4-8E17-3E5BE6C24C6D" ); // Ministry Safe Training:Training Result:fieldtype
+            RockMigrationHelper.UpdateAttributeQualifier( "AA0CE3D6-1FEC-48A6-AEE0-97410BBDBC78", "values", @"Pass,Fail,Pending", "656FD54C-935B-4F80-9729-D55E2C4721AB" ); // Ministry Safe Training:Training Result:values
             RockMigrationHelper.UpdateWorkflowActivityType( "AE617426-E1E3-4E06-B3D8-B7AB1A7B4892", true, "Initial Request", "Saves the person and requester and prompts for additional information needed.", true, 0, "CD9029C2-D420-4A0B-AE7C-90D26EA080BF" ); // Ministry Safe Training:Initial Request
             RockMigrationHelper.UpdateWorkflowActivityType( "AE617426-E1E3-4E06-B3D8-B7AB1A7B4892", true, "Approve Request", "Assigns the activity to security team and waits for their approval before submitting the request.", false, 1, "3EC65FD2-A676-4DD5-AA5B-1794662607C3" ); // Ministry Safe Training:Approve Request
             RockMigrationHelper.UpdateWorkflowActivityType( "AE617426-E1E3-4E06-B3D8-B7AB1A7B4892", true, "Review Denial", "Provides the requester a way to add additional information for the security team to approve request.", false, 2, "25B9CF22-C437-40C8-A88B-6C44AD22639B" ); // Ministry Safe Training:Review Denial
@@ -443,9 +449,9 @@ namespace rocks.kfs.MinistrySafe.Migrations
             RockMigrationHelper.UpdateWorkflowTypeAttribute( "E7D5B3F9-45FD-4091-971A-BD5D4BD80538", "1B71FEF4-201F-4D53-8C60-2DF21F1985ED", "Campus", "Campus", "", 1, @"", "C93D7901-A1A6-4DA8-BA7E-F4054DC44C1B", false ); // Ministry Safe Connection:Campus
             RockMigrationHelper.UpdateWorkflowTypeAttribute( "E7D5B3F9-45FD-4091-971A-BD5D4BD80538", "9C204CD0-1233-41C5-818A-C5DA439445AA", "Reason", "Reason", "", 2, @"Ministry Safe Training requested via Connection Request", "EE2F92D8-FDD0-4AD4-8E80-9C4D1EBBAE85", false ); // Ministry Safe Connection:Reason
             RockMigrationHelper.UpdateWorkflowTypeAttribute( "E7D5B3F9-45FD-4091-971A-BD5D4BD80538", "A75DFC58-7A1B-4799-BF31-451B2BBE38FF", "Connection Request Id", "ConnectionRequestId", "", 3, @"0", "04F0BFBA-F5E6-46E4-8F1B-711E5E8BAA35", false ); // Ministry Safe Connection:Connection Request Id
-            RockMigrationHelper.AddAttributeQualifier( "AE8F3513-6B55-486D-AA3E-5E84613607F0", "EnableSelfSelection", @"False", "41D5F2C7-DEB3-43B0-B894-7D314E750A0F" ); // Ministry Safe Connection:Person:EnableSelfSelection
-            RockMigrationHelper.AddAttributeQualifier( "C93D7901-A1A6-4DA8-BA7E-F4054DC44C1B", "includeInactive", @"False", "FAFEC056-54FD-4951-8DB8-2DBC30795F3A" ); // Ministry Safe Connection:Campus:includeInactive
-            RockMigrationHelper.AddAttributeQualifier( "EE2F92D8-FDD0-4AD4-8E80-9C4D1EBBAE85", "ispassword", @"False", "714616BD-9003-460A-B1F6-EA320CCF4293" ); // Ministry Safe Connection:Reason:ispassword
+            RockMigrationHelper.UpdateAttributeQualifier( "AE8F3513-6B55-486D-AA3E-5E84613607F0", "EnableSelfSelection", @"False", "41D5F2C7-DEB3-43B0-B894-7D314E750A0F" ); // Ministry Safe Connection:Person:EnableSelfSelection
+            RockMigrationHelper.UpdateAttributeQualifier( "C93D7901-A1A6-4DA8-BA7E-F4054DC44C1B", "includeInactive", @"False", "FAFEC056-54FD-4951-8DB8-2DBC30795F3A" ); // Ministry Safe Connection:Campus:includeInactive
+            RockMigrationHelper.UpdateAttributeQualifier( "EE2F92D8-FDD0-4AD4-8E80-9C4D1EBBAE85", "ispassword", @"False", "714616BD-9003-460A-B1F6-EA320CCF4293" ); // Ministry Safe Connection:Reason:ispassword
             RockMigrationHelper.UpdateWorkflowActivityType( "E7D5B3F9-45FD-4091-971A-BD5D4BD80538", true, "Start", "", true, 0, "2AB25A27-6097-4B27-A414-49975A0FC740" ); // Ministry Safe Connection:Start
             RockMigrationHelper.UpdateWorkflowActionType( "2AB25A27-6097-4B27-A414-49975A0FC740", "Set Person", 0, "972F19B9-598B-474B-97A4-50E56E7B59D2", true, false, "", "", 1, "", "2F6D1E4E-925A-4DEB-8C66-F0859A19D35A" ); // Ministry Safe Connection:Start:Set Person
             RockMigrationHelper.UpdateWorkflowActionType( "2AB25A27-6097-4B27-A414-49975A0FC740", "Set Campus", 1, "972F19B9-598B-474B-97A4-50E56E7B59D2", true, false, "", "", 1, "", "BDFE1843-FB92-4E55-A86D-6497C2457DE6" ); // Ministry Safe Connection:Start:Set Campus
