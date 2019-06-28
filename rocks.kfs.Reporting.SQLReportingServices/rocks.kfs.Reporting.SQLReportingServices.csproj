@@ -100,7 +100,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
-    <Compile Include="SqlServerTypes\Loader.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
@@ -578,25 +577,15 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="SqlServerTypes\readme.htm" />
-    <Content Include="SqlServerTypes\x64\msvcr120.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SqlServerTypes\x64\SqlServerSpatial140.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SqlServerTypes\x86\msvcr120.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SqlServerTypes\x86\SqlServerSpatial140.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>xcopy /Y /R "$(ProjectDir)bin\Microsoft.ReportViewer.Common.dll" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(ProjectDir)bin\Microsoft.ReportViewer.DataVisualization.dll" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(ProjectDir)bin\Microsoft.ReportViewer.Design.dll" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(ProjectDir)bin\Microsoft.ReportViewer.ProcessingObjectModel.dll" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(ProjectDir)bin\Microsoft.ReportViewer.WebDesign.dll" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(ProjectDir)bin\Microsoft.ReportViewer.WebForms.dll" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(ProjectDir)bin\Microsoft.ReportViewer.WinForms.dll" "$(SolutionDir)RockWeb\bin"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
