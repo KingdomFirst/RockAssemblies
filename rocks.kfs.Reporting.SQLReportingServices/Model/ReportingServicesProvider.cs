@@ -505,7 +505,7 @@ namespace rocks.kfs.Reporting.SQLReportingServices
                 serverRootPath = new Rock.Model.Attribute();
                 serverRootPath.FieldTypeId = FieldTypeCache.Get( Rock.SystemGuid.FieldType.TEXT ).Id;
                 serverRootPath.IsSystem = false;
-                serverRootPath.Name = "Reporting Service Root Folder.";
+                serverRootPath.Name = "Reporting Service Root Folder";
                 serverRootPath.Key = SERVER_ROOT_PATH_KEY;
                 serverRootPath.Description = "Root/Base folder for Rock reports in reporting services.";
                 serverRootPath.IsRequired = false;
