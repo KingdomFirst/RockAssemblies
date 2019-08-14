@@ -155,74 +155,113 @@ namespace rocks.kfs.PersonAudience.Jobs
             {
                 if ( personAudiencesDictionary.Count > 0 )
                 {
-                    var newRockContext = new RockContext();
-                    var attributeId = personAudienceAttributeId.Value;
-                    var modified = 0;
-                    var totalUpdated = 0;
-
-                    // delete the attribute values for people who are not being updated
-                    var peopleToUpdate = personAudiencesDictionary.Keys.ToList();
-                    var attributeValuesToDelete = new AttributeValueService( newRockContext )
-                        .Queryable()
-                        .Where( v => v.AttributeId == attributeId && v.EntityId.HasValue && !peopleToUpdate.Contains( v.EntityId.Value ) );
-                    var totalDeleted = newRockContext.BulkDelete( attributeValuesToDelete, 1000 );
-
-                    // update attribute values for everyone in the dataviews
-                    foreach ( var personAudiences in personAudiencesDictionary )
+                    using ( var newRockContext = new RockContext() )
                     {
-                        var personId = personAudiences.Key;
-                        var value = string.Join( ",", personAudiences.Value );
+                        var attributeId = personAudienceAttributeId.Value;
+                        var totalDeleted = 0;
+                        var totalUpdated = 0;
+                        var modified = 0;
 
-                        var personAttributeValue = newRockContext.AttributeValues.Where( v => v.Attribute.Id == attributeId && v.EntityId == personId ).FirstOrDefault();
+                        var existingAttributeValues = new AttributeValueService( newRockContext )
+                            .Queryable()
+                            .Where( v => v.AttributeId == attributeId && v.EntityId.HasValue )
+                            .ToList();
 
-                        if ( personAttributeValue == null )
+                        foreach ( var av in existingAttributeValues )
                         {
-                            modified++;
-                            totalUpdated++;
-
-                            personAttributeValue = new AttributeValue
+                            if ( !personAudiencesDictionary.ContainsKey( av.EntityId.Value ) )
                             {
-                                AttributeId = attributeId,
-                                EntityId = personId,
-                                Value = value
-                            };
+                                av.Value = string.Empty;
 
-                            newRockContext.AttributeValues.Add( personAttributeValue );
-                        }
-                        else if ( !personAttributeValue.Value.Equals( value, StringComparison.OrdinalIgnoreCase ) )
-                        {
-                            modified++;
-                            totalUpdated++;
-
-                            personAttributeValue.Value = value;
-                            newRockContext.Entry( personAttributeValue ).State = EntityState.Modified;
-                        }
-
-                        // save every 100 changes
-                        if ( modified == 100 )
-                        {
-                            newRockContext.SaveChanges();
-
-                            foreach ( var dbEntityEntry in newRockContext.ChangeTracker.Entries() )
-                            {
-                                if ( dbEntityEntry.Entity != null )
-                                {
-                                    dbEntityEntry.State = EntityState.Detached;
-                                }
+                                totalDeleted++;
+                                modified++;
                             }
 
-                            modified = 0;
+                            // save every 100 changes
+                            if ( modified == 100 )
+                            {
+                                newRockContext.SaveChanges();
+                                DetachAllInContext( newRockContext );
+                                modified = 0;
+                            }
                         }
+
+                        // save any leftover
+                        newRockContext.SaveChanges();
+
+                        // reset context and modified count
+                        DetachAllInContext( newRockContext );
+                        modified = 0;
+
+                        // update attribute values for everyone in the dataviews
+                        foreach ( var personAudiences in personAudiencesDictionary )
+                        {
+                            var personId = personAudiences.Key;
+                            var value = string.Join( ",", personAudiences.Value );
+
+                            var personAttributeValue = newRockContext.AttributeValues.Where( v => v.Attribute.Id == attributeId && v.EntityId == personId ).FirstOrDefault();
+
+                            if ( personAttributeValue == null )
+                            {
+                                personAttributeValue = new AttributeValue
+                                {
+                                    AttributeId = attributeId,
+                                    EntityId = personId,
+                                    Value = value
+                                };
+
+                                newRockContext.AttributeValues.Add( personAttributeValue );
+
+                                totalUpdated++;
+                                modified++;
+                            }
+                            else if ( !personAttributeValue.Value.Equals( value, StringComparison.OrdinalIgnoreCase ) )
+                            {
+                                personAttributeValue.Value = value;
+
+                                totalUpdated++;
+                                modified++;
+                            }
+
+                            // save every 100 changes
+                            if ( modified == 100 )
+                            {
+                                newRockContext.SaveChanges();
+                                DetachAllInContext( newRockContext );
+                                modified = 0;
+                            }
+                        }
+
+                        // save any leftover
+                        newRockContext.SaveChanges();
+
+                        results.AppendLine( $"{ totalUpdated } {"person".PluralizeIf( totalUpdated != 1 )} updated and { totalDeleted } attribute values deleted." );
                     }
-
-                    // save any leftover
-                    newRockContext.SaveChanges();
-
-                    results.AppendLine( $"{ totalUpdated } {"person".PluralizeIf( totalUpdated != 1 )} updated and { totalDeleted } attribute values deleted." );
                 }
             }
 
             context.Result = results.ToString();
+        }
+
+        /// <summary>
+        /// Detach all entity objects from the change tracker that is associated with
+        /// the given RockContext. Any entity that is stored (for example in an Imported...
+        /// variable) should be detached before the function ends. If it is explicitely
+        /// attached and then not detached then when it is attached to another context
+        /// an exception "An entity object cannot be referenced by multiple instances
+        /// of IEntityChangeTracker" occurs.
+        /// Taken from: http://stackoverflow.com/questions/2465933/how-to-clean-up-an-entity-framework-object-context
+        /// </summary>
+        /// <param name="context">The context.</param>
+        private static void DetachAllInContext( RockContext context )
+        {
+            foreach ( var dbEntityEntry in context.ChangeTracker.Entries() )
+            {
+                if ( dbEntityEntry.Entity != null )
+                {
+                    dbEntityEntry.State = EntityState.Detached;
+                }
+            }
         }
     }
 }
