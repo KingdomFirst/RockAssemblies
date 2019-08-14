@@ -32,12 +32,12 @@ namespace rocks.kfs.PersonAudience.Migrations
             var definedTypeId = new DefinedTypeService( new RockContext() ).GetByGuid( Rock.SystemGuid.DefinedType.MARKETING_CAMPAIGN_AUDIENCE_TYPE.AsGuid() ).Id;
 
             // Person Attribute
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.Person", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Audiences", "The target audiences for this person.", 0, "", "67CD39C1-4AEA-4ED1-AB57-608AD6F7DB8B" );
+            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.Person", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Audiences", "The target audiences for this person.", 0, "", "67CD39C1-4AEA-4ED1-AB57-608AD6F7DB8B", "rocks.kfs.Audiences" );
             RockMigrationHelper.UpdateAttributeQualifier( "67CD39C1-4AEA-4ED1-AB57-608AD6F7DB8B", "allowmultiple", "True", "DFBA5F28-774B-45AB-9952-B8BAAB7940D9" );
             RockMigrationHelper.UpdateAttributeQualifier( "67CD39C1-4AEA-4ED1-AB57-608AD6F7DB8B", "definedtype", definedTypeId.ToString(), "041202B3-C6DB-4061-A2C7-FFC31C9637AD" );
 
             // Defined Value Attribute
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.DefinedValue", "BD72BBF1-0269-407E-BDBE-EEED4F1F207F", "DefinedTypeId", definedTypeId.ToString(), "Audience Data View", "The person data view that is associated to this audience.", 0, "", "3E856C6D-0FB4-472F-BCB5-E83D1E45249B" );
+            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.DefinedValue", "BD72BBF1-0269-407E-BDBE-EEED4F1F207F", "DefinedTypeId", definedTypeId.ToString(), "Audience Data View", "The person data view that is associated to this audience.", 0, "", "3E856C6D-0FB4-472F-BCB5-E83D1E45249B", "rocks.kfs.AudienceDataView" );
             RockMigrationHelper.UpdateAttributeQualifier( "3E856C6D-0FB4-472F-BCB5-E83D1E45249B", "entityTypeName", "Rock.Model.Person", "B1C75C98-322B-41A6-A5E7-F106EF22F06B" );
 
             Sql( @"
@@ -48,6 +48,21 @@ namespace rocks.kfs.PersonAudience.Migrations
 	                    UPDATE [Attribute]
 	                    SET [IsGridColumn] = 1
 	                    WHERE [Id] = @AudienceDataViewAttributeId
+                    END
+                " );
+
+            Sql( @"
+                    DECLARE @FamilyAnalyticsCategoryId int = ( SELECT TOP 1 [Id] FROM [Category] WHERE [Guid] = '266A1EA8-425C-7BB0-4191-C2E234D60086' )
+                    DECLARE @AudiencesAttributeId int = ( SELECT TOP 1 [Id] FROM [Attribute] WHERE [Guid] = '67CD39C1-4AEA-4ED1-AB57-608AD6F7DB8B' )
+
+                    IF NOT EXISTS (
+                        SELECT *
+                        FROM [AttributeCategory]
+                        WHERE [AttributeId] = @AudiencesAttributeId
+                        AND [CategoryId] = @FamilyAnalyticsCategoryId )
+                    BEGIN
+                        INSERT INTO [AttributeCategory] ( [AttributeId], [CategoryId] )
+                        VALUES( @AudiencesAttributeId, @FamilyAnalyticsCategoryId )
                     END
                 " );
         }

@@ -71,7 +71,7 @@ namespace rocks.kfs.PersonAudience.Jobs
 
                 foreach ( var audience in audienceDefinedType.DefinedValues )
                 {
-                    var dv = audience.GetAttributeValue( "AudienceDataView" ).AsGuidOrNull();
+                    var dv = audience.GetAttributeValue( "rocks.kfs.AudienceDataView" ).AsGuidOrNull();
                     if ( dv.HasValue )
                     {
                         var dataView = new DataViewService( rockContext ).Get( dv.Value );
@@ -143,36 +143,33 @@ namespace rocks.kfs.PersonAudience.Jobs
 
                     if ( personAudiencesDictionary.Count > 0 )
                     {
-                        var personAudienceAttribute = AttributeCache.Get( "67CD39C1-4AEA-4ED1-AB57-608AD6F7DB8B" );
+                        var personAudienceAttributeId = AttributeCache.Get( "67CD39C1-4AEA-4ED1-AB57-608AD6F7DB8B" )?.Id;
 
-                        if ( personAudienceAttribute != null )
+                        if ( personAudienceAttributeId.HasValue )
                         {
+                            var attributeId = personAudienceAttributeId.Value;
+
                             foreach ( var personAudiences in personAudiencesDictionary )
                             {
-                                var person = new PersonService( rockContext ).Get( personAudiences.Key );
-                                var audiences = string.Join( ",", personAudiences.Value );
+                                var personId = personAudiences.Key;
+                                var value = string.Join( ",", personAudiences.Value );
 
-                                var personAttributeValue = rockContext.AttributeValues.Where( v => v.Attribute.Id == personAudienceAttribute.Id && v.EntityId == person.Id ).FirstOrDefault();
-                                var newAttributeValue = new AttributeValueCache
-                                {
-                                    AttributeId = personAudienceAttribute.Id,
-                                    Value = audiences
-                                };
+                                var personAttributeValue = rockContext.AttributeValues.Where( v => v.Attribute.Id == attributeId && v.EntityId == personId ).FirstOrDefault();
 
                                 if ( personAttributeValue == null )
                                 {
                                     personAttributeValue = new AttributeValue
                                     {
-                                        AttributeId = newAttributeValue.AttributeId,
-                                        EntityId = person.Id,
-                                        Value = newAttributeValue.Value
+                                        AttributeId = attributeId,
+                                        EntityId = personId,
+                                        Value = value
                                     };
 
                                     rockContext.AttributeValues.Add( personAttributeValue );
                                 }
-                                else if ( !personAttributeValue.Value.Equals( newAttributeValue.Value, StringComparison.CurrentCultureIgnoreCase ) )
+                                else if ( !personAttributeValue.Value.Equals( value, StringComparison.OrdinalIgnoreCase ) )
                                 {
-                                    personAttributeValue.Value = newAttributeValue.Value;
+                                    personAttributeValue.Value = value;
                                     rockContext.Entry( personAttributeValue ).State = EntityState.Modified;
                                 }
                             }
