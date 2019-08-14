@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Web;
 
 using Quartz;
@@ -61,6 +62,9 @@ namespace rocks.kfs.PersonAudience.Jobs
         {
             JobDataMap dataMap = context.JobDetail.JobDataMap;
             var commandTimeout = dataMap.GetString( "CommandTimeout" ).AsIntegerOrNull() ?? 180;
+            var results = new StringBuilder();
+
+            var personAudiencesDictionary = new Dictionary<int, HashSet<Guid>>();
 
             using ( var rockContext = new RockContext() )
             {
@@ -117,8 +121,6 @@ namespace rocks.kfs.PersonAudience.Jobs
 
                 if ( audienceDataViews.Count > 0 )
                 {
-                    var personAudiencesDictionary = new Dictionary<int, HashSet<Guid>>();
-
                     foreach ( var dataView in audienceDataViews )
                     {
                         foreach ( var personId in dataView.Value )
@@ -140,46 +142,87 @@ namespace rocks.kfs.PersonAudience.Jobs
                             }
                         }
                     }
-
-                    if ( personAudiencesDictionary.Count > 0 )
-                    {
-                        var personAudienceAttributeId = AttributeCache.Get( "67CD39C1-4AEA-4ED1-AB57-608AD6F7DB8B" )?.Id;
-
-                        if ( personAudienceAttributeId.HasValue )
-                        {
-                            var attributeId = personAudienceAttributeId.Value;
-
-                            foreach ( var personAudiences in personAudiencesDictionary )
-                            {
-                                var personId = personAudiences.Key;
-                                var value = string.Join( ",", personAudiences.Value );
-
-                                var personAttributeValue = rockContext.AttributeValues.Where( v => v.Attribute.Id == attributeId && v.EntityId == personId ).FirstOrDefault();
-
-                                if ( personAttributeValue == null )
-                                {
-                                    personAttributeValue = new AttributeValue
-                                    {
-                                        AttributeId = attributeId,
-                                        EntityId = personId,
-                                        Value = value
-                                    };
-
-                                    rockContext.AttributeValues.Add( personAttributeValue );
-                                }
-                                else if ( !personAttributeValue.Value.Equals( value, StringComparison.OrdinalIgnoreCase ) )
-                                {
-                                    personAttributeValue.Value = value;
-                                    rockContext.Entry( personAttributeValue ).State = EntityState.Modified;
-                                }
-                            }
-                        }
-
-                        rockContext.ChangeTracker.DetectChanges();
-                        rockContext.SaveChanges();
-                    }
+                }
+                else
+                {
+                    results.AppendLine( "The Audience Type Defined Values need to be configured with their corresponding DataViews or no people were found." );
                 }
             }
+
+            var personAudienceAttributeId = AttributeCache.Get( "67CD39C1-4AEA-4ED1-AB57-608AD6F7DB8B" )?.Id;
+
+            if ( personAudienceAttributeId.HasValue )
+            {
+                if ( personAudiencesDictionary.Count > 0 )
+                {
+                    var newRockContext = new RockContext();
+                    var attributeId = personAudienceAttributeId.Value;
+                    var modified = 0;
+                    var totalUpdated = 0;
+
+                    // delete the attribute values for people who are not being updated
+                    var peopleToUpdate = personAudiencesDictionary.Keys.ToList();
+                    var attributeValuesToDelete = new AttributeValueService( newRockContext )
+                        .Queryable()
+                        .Where( v => v.AttributeId == attributeId && v.EntityId.HasValue && !peopleToUpdate.Contains( v.EntityId.Value ) );
+                    var totalDeleted = newRockContext.BulkDelete( attributeValuesToDelete, 1000 );
+
+                    // update attribute values for everyone in the dataviews
+                    foreach ( var personAudiences in personAudiencesDictionary )
+                    {
+                        var personId = personAudiences.Key;
+                        var value = string.Join( ",", personAudiences.Value );
+
+                        var personAttributeValue = newRockContext.AttributeValues.Where( v => v.Attribute.Id == attributeId && v.EntityId == personId ).FirstOrDefault();
+
+                        if ( personAttributeValue == null )
+                        {
+                            modified++;
+                            totalUpdated++;
+
+                            personAttributeValue = new AttributeValue
+                            {
+                                AttributeId = attributeId,
+                                EntityId = personId,
+                                Value = value
+                            };
+
+                            newRockContext.AttributeValues.Add( personAttributeValue );
+                        }
+                        else if ( !personAttributeValue.Value.Equals( value, StringComparison.OrdinalIgnoreCase ) )
+                        {
+                            modified++;
+                            totalUpdated++;
+
+                            personAttributeValue.Value = value;
+                            newRockContext.Entry( personAttributeValue ).State = EntityState.Modified;
+                        }
+
+                        // save every 100 changes
+                        if ( modified == 100 )
+                        {
+                            newRockContext.SaveChanges();
+
+                            foreach ( var dbEntityEntry in newRockContext.ChangeTracker.Entries() )
+                            {
+                                if ( dbEntityEntry.Entity != null )
+                                {
+                                    dbEntityEntry.State = EntityState.Detached;
+                                }
+                            }
+
+                            modified = 0;
+                        }
+                    }
+
+                    // save any leftover
+                    newRockContext.SaveChanges();
+
+                    results.AppendLine( $"{ totalUpdated } {"person".PluralizeIf( totalUpdated != 1 )} updated and { totalDeleted } attribute values deleted." );
+                }
+            }
+
+            context.Result = results.ToString();
         }
     }
 }
