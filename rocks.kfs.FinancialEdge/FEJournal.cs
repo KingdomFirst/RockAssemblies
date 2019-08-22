@@ -108,10 +108,10 @@ namespace rocks.kfs.FinancialEdge
                     AccountNumber = transaction.Account,
                     PostDate = batchDate ?? RockDateTime.Now,
                     EncumbranceStatus = encumbranceStatus,
-                    Type = "C",
+                    Type = transaction.Amount >= 0 ? "C" : "D",
                     Journal = journal,
                     JournalReference = journalReference,
-                    Amount = transaction.Amount,
+                    Amount = transaction.Amount >= 0 ? transaction.Amount : ( transaction.Amount * -1 ),
                     ProjectId = DefinedValueCache.Get( transaction.Project.AsGuid() )?.Value
                 };
 
@@ -125,10 +125,10 @@ namespace rocks.kfs.FinancialEdge
                     AccountNumber = transaction.Account,
                     PostDate = batchDate ?? RockDateTime.Now,
                     EncumbranceStatus = encumbranceStatus,
-                    Type = "D",
+                    Type = transaction.Amount >= 0 ? "D" : "C",
                     Journal = journal,
                     JournalReference = journalReference,
-                    Amount = transaction.Amount,
+                    Amount = transaction.Amount >= 0 ? transaction.Amount : ( transaction.Amount * -1 ),
                     ProjectId = DefinedValueCache.Get( transaction.Project.AsGuid() )?.Value
                 };
 
