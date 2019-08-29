@@ -1,12 +1,12 @@
 [![Kingdom First Solutions](https://www.kingdomfirstsolutions.com/Content/ExternalSite/KFSArt/kingdomfirstlogo.png "Kingdom First Solutions")](https://www.kingdomfirstsolutions.com/rock)
 
-# RockAssembiles
+# RockAssemblies
 
 This is an open-source repository of [Kingdom First Solutions](https://www.kingdomfirstsolutions.com/rock) for all public Rock RMS Assemblies. Remember to check our [RockBlocks](https://github.com/KingdomFirst/RockBlocks) repo.
 
 ## Setup
 
-The [RockAssembiles](https://github.com/KingdomFirst/RockAssembiles) and [RockBlocks](https://github.com/KingdomFirst/RockBlocks) repos are intended to be used together.
+The [RockAssemblies](https://github.com/KingdomFirst/RockAssemblies) and [RockBlocks](https://github.com/KingdomFirst/RockBlocks) repos are intended to be used together.
 
 * `RockAssemblies` should be cloned to a sibling folder of the `RockWeb` folder (for reference relativity).
 * `RockBlocks` should be cloned directly to `Plugins/rock_kfs`.
