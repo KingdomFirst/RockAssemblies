@@ -52,6 +52,7 @@ namespace rocks.kfs.Workflow.Action.Prayer
     [WorkflowAttribute( "Last Name", "The workflow attribute to use for the Last Name.", false, "", "", 9, null, new string[] { "Rock.Field.Types.TextFieldType" } )]
     [WorkflowAttribute( "Email", "The workflow attribute to use for the Email.", false, "", "", 10, null, new string[] { "Rock.Field.Types.EmailFieldType", "Rock.Field.Types.TextFieldType" } )]
     [WorkflowAttribute( "Campus", "The workflow attribute to use for the Campus.", false, "", "", 11, null, new string[] { "Rock.Field.Types.CampusFieldType" } )]
+    [WorkflowAttribute( "Prayer Request", "The attribute to store the created prayer request guid.", true, "", "", 12, null, new string[] { "Rock.Field.Types.TextFieldType" } )]
 
     #endregion
 
@@ -268,6 +269,23 @@ namespace rocks.kfs.Workflow.Action.Prayer
             {
                 rockContext.SaveChanges();
             } );
+
+            if ( request.Guid != null )
+            {
+                // get the attribute to store the request guid
+                var prayerRequestAttriuteGuid = GetAttributeValue( action, "PrayerRequest" ).AsGuidOrNull();
+                if ( prayerRequestAttriuteGuid.HasValue )
+                {
+                    var prayerRequestAttribute = AttributeCache.Get( prayerRequestAttriuteGuid.Value, rockContext );
+                    if ( prayerRequestAttribute != null )
+                    {
+                        if ( prayerRequestAttribute.FieldTypeId == FieldTypeCache.Get( Rock.SystemGuid.FieldType.TEXT.AsGuid(), rockContext ).Id )
+                        {
+                            SetWorkflowAttributeValue( action, prayerRequestAttriuteGuid.Value, request.Guid.ToString() );
+                        }
+                    }
+                }
+            }
 
             return true;
         }
