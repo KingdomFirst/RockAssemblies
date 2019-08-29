@@ -43,7 +43,7 @@ namespace rocks.kfs.Workflow.Action.Prayer
     [IntegerField( "Expires After (Days)", "Number of days until the request will expire (only applies when auto-approved is enabled).", false, 14, "", 0, "ExpireDays" )]
     [BooleanField( "Approved", "Flag indicating if the request should be marked as approved when submitted.", order: 1 )]
     [WorkflowAttribute( "Request", "The workflow attribute to use for the request.", false, "", "", 2, null, new string[] { "Rock.Field.Types.MemoFieldType", "Rock.Field.Types.TextFieldType" } )]
-    [WorkflowAttribute( "Category", "The workflow attribute to use for the Category.", false, "", "", 3, null, new string[] { "Rock.Field.Types.CategoryFieldType", "Rock.Field.Types.TextFieldType" } )]
+    [WorkflowAttribute( "Category", "The workflow attribute to use for the Category.", false, "", "", 3, null, new string[] { "Rock.Field.Types.CategoryFieldType", "Rock.Field.Types.SelectSingleFieldType", "Rock.Field.Types.TextFieldType" } )]
     [WorkflowAttribute( "Allow Comments", "The workflow attribute to use to indicate if comments are allowed.", false, "", "", 4, null, new string[] { "Rock.Field.Types.BooleanFieldType" } )]
     [WorkflowAttribute( "Is Urgent", "The workflow attribute to use to indicate if the request is urgent.", false, "", "", 5, null, new string[] { "Rock.Field.Types.BooleanFieldType" } )]
     [WorkflowAttribute( "Is Public", "The workflow attribute to use to indicate if the request is public.", false, "", "", 6, null, new string[] { "Rock.Field.Types.BooleanFieldType" } )]
