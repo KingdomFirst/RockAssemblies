@@ -149,7 +149,7 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                                         existingWorkflow = new WorkflowService( rockContext )
                                             .Queryable()
                                             .AsNoTracking()
-                                            .FirstOrDefault( w => w.ForeignKey.Equals( foreignKey, StringComparison.OrdinalIgnoreCase ) );
+                                            .FirstOrDefault( w => w.IsActive && w.ForeignKey.Equals( foreignKey, StringComparison.OrdinalIgnoreCase ) );
 
                                         createWorkflow = existingWorkflow.IsNull();
                                     }
