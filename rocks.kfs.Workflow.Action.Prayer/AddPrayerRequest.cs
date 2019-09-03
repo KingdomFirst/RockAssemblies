@@ -273,15 +273,15 @@ namespace rocks.kfs.Workflow.Action.Prayer
             if ( request.Guid != null )
             {
                 // get the attribute to store the request guid
-                var prayerRequestAttriuteGuid = GetAttributeValue( action, "PrayerRequest" ).AsGuidOrNull();
-                if ( prayerRequestAttriuteGuid.HasValue )
+                var prayerRequestAttributeGuid = GetAttributeValue( action, "PrayerRequest" ).AsGuidOrNull();
+                if ( prayerRequestAttributeGuid.HasValue )
                 {
-                    var prayerRequestAttribute = AttributeCache.Get( prayerRequestAttriuteGuid.Value, rockContext );
+                    var prayerRequestAttribute = AttributeCache.Get( prayerRequestAttributeGuid.Value, rockContext );
                     if ( prayerRequestAttribute != null )
                     {
                         if ( prayerRequestAttribute.FieldTypeId == FieldTypeCache.Get( Rock.SystemGuid.FieldType.TEXT.AsGuid(), rockContext ).Id )
                         {
-                            SetWorkflowAttributeValue( action, prayerRequestAttriuteGuid.Value, request.Guid.ToString() );
+                            SetWorkflowAttributeValue( action, prayerRequestAttributeGuid.Value, request.Guid.ToString() );
                         }
                     }
                 }
