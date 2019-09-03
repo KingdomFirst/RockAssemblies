@@ -43,7 +43,7 @@ namespace rocks.kfs.Workflow.Action.Prayer
     [IntegerField( "Expires After (Days)", "Number of days until the request will expire (only applies when auto-approved is enabled).", false, 14, "", 0, "ExpireDays" )]
     [BooleanField( "Approved", "Flag indicating if the request should be marked as approved when submitted.", order: 1 )]
     [WorkflowAttribute( "Request", "The workflow attribute to use for the request.", false, "", "", 2, null, new string[] { "Rock.Field.Types.MemoFieldType", "Rock.Field.Types.TextFieldType" } )]
-    [WorkflowAttribute( "Category", "The workflow attribute to use for the Category.", false, "", "", 3, null, new string[] { "Rock.Field.Types.CategoryFieldType", "Rock.Field.Types.TextFieldType" } )]
+    [WorkflowAttribute( "Category", "The workflow attribute to use for the Category.", false, "", "", 3, null, new string[] { "Rock.Field.Types.CategoryFieldType", "Rock.Field.Types.SelectSingleFieldType", "Rock.Field.Types.TextFieldType" } )]
     [WorkflowAttribute( "Allow Comments", "The workflow attribute to use to indicate if comments are allowed.", false, "", "", 4, null, new string[] { "Rock.Field.Types.BooleanFieldType" } )]
     [WorkflowAttribute( "Is Urgent", "The workflow attribute to use to indicate if the request is urgent.", false, "", "", 5, null, new string[] { "Rock.Field.Types.BooleanFieldType" } )]
     [WorkflowAttribute( "Is Public", "The workflow attribute to use to indicate if the request is public.", false, "", "", 6, null, new string[] { "Rock.Field.Types.BooleanFieldType" } )]
@@ -52,6 +52,7 @@ namespace rocks.kfs.Workflow.Action.Prayer
     [WorkflowAttribute( "Last Name", "The workflow attribute to use for the Last Name.", false, "", "", 9, null, new string[] { "Rock.Field.Types.TextFieldType" } )]
     [WorkflowAttribute( "Email", "The workflow attribute to use for the Email.", false, "", "", 10, null, new string[] { "Rock.Field.Types.EmailFieldType", "Rock.Field.Types.TextFieldType" } )]
     [WorkflowAttribute( "Campus", "The workflow attribute to use for the Campus.", false, "", "", 11, null, new string[] { "Rock.Field.Types.CampusFieldType" } )]
+    [WorkflowAttribute( "Prayer Request", "The attribute to store the created prayer request guid.", true, "", "", 12, null, new string[] { "Rock.Field.Types.TextFieldType" } )]
 
     #endregion
 
@@ -268,6 +269,23 @@ namespace rocks.kfs.Workflow.Action.Prayer
             {
                 rockContext.SaveChanges();
             } );
+
+            if ( request.Guid != null )
+            {
+                // get the attribute to store the request guid
+                var prayerRequestAttributeGuid = GetAttributeValue( action, "PrayerRequest" ).AsGuidOrNull();
+                if ( prayerRequestAttributeGuid.HasValue )
+                {
+                    var prayerRequestAttribute = AttributeCache.Get( prayerRequestAttributeGuid.Value, rockContext );
+                    if ( prayerRequestAttribute != null )
+                    {
+                        if ( prayerRequestAttribute.FieldTypeId == FieldTypeCache.Get( Rock.SystemGuid.FieldType.TEXT.AsGuid(), rockContext ).Id )
+                        {
+                            SetWorkflowAttributeValue( action, prayerRequestAttributeGuid.Value, request.Guid.ToString() );
+                        }
+                    }
+                }
+            }
 
             return true;
         }
