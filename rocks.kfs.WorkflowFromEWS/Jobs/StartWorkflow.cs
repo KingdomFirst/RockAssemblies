@@ -87,7 +87,7 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                     var url = new Uri( dataMap.GetString( "ServerUrl" ) );
                     var maxEmails = dataMap.GetString( "MaxEmails" ).AsInteger();
                     var delete = dataMap.GetString( "DeleteMessages" ).AsBoolean();
-                    var single = dataMap.GetString( "OneWorkflowPerConversation" ).AsBoolean();
+                    var onePer = dataMap.GetString( "OneWorkflowPerConversation" ).AsBoolean();
 
                     Dictionary<string, string> attributeKeyMap = null;
                     var workflowAttributeKeys = dataMap.GetString( "WorkflowAttributes" );
@@ -133,7 +133,7 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                                     var existingWorkflow = new Workflow();
                                     var createWorkflow = true;
 
-                                    if ( single )
+                                    if ( onePer )
                                     {
                                         var conversationId = message.ConversationId.UniqueId.ToString();
 
@@ -149,13 +149,13 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                                         existingWorkflow = new WorkflowService( rockContext )
                                             .Queryable()
                                             .AsNoTracking()
-                                            .FirstOrDefault( w => w.IsActive && w.ForeignKey.Equals( foreignKey, StringComparison.OrdinalIgnoreCase ) );
+                                            .FirstOrDefault( w => w.IsActive && w.ForeignKey.Equals( foreignKey, StringComparison.Ordinal ) );
 
                                         createWorkflow = existingWorkflow.IsNull();
                                     }
                                     else
                                     {
-                                        var emailId = message.ConversationId.UniqueId.ToString();
+                                        var emailId = message.Id.UniqueId.ToString();
 
                                         if ( emailId.Length > 100 )
                                         {
@@ -238,6 +238,8 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                                         }
 
                                         existingWorkflow.SaveAttributeValues();
+
+                                        messages.Add( string.Format( "{0} workflow was appended.", existingWorkflow.Name ) );
                                     }
 
                                     message.IsRead = true;
@@ -278,6 +280,10 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                 {
                     context.Result = "No valid workflow type found.";
                 }
+            }
+            else
+            {
+                context.Result = "Valid workflow type guid was not set.";
             }
         }
     }
