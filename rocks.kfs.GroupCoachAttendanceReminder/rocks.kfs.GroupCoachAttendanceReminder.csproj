@@ -7,8 +7,8 @@
     <ProjectGuid>{5D5B6848-0A00-4BDC-BBD7-8B1783F1EA68}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>rocks.kfs.GroupCoachNotifications</RootNamespace>
-    <AssemblyName>rocks.kfs.GroupCoachNotifications</AssemblyName>
+    <RootNamespace>rocks.kfs.GroupCoachAttendanceReminder</RootNamespace>
+    <AssemblyName>rocks.kfs.GroupCoachAttendanceReminder</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -33,6 +33,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DDay.iCal, Version=1.0.2.575, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="DotLiquid">
       <HintPath>..\..\RockWeb\Bin\DotLiquid.dll</HintPath>
     </Reference>
@@ -75,7 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Jobs\GroupCoachPendingNotifications.cs" />
+    <Compile Include="Jobs\GroupCoachSendAttendanceReminders.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
