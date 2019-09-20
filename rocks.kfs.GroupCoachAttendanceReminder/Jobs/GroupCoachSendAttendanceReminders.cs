@@ -42,13 +42,20 @@ namespace rocks.kfs.GroupCoachAttendanceReminder.Jobs
     /// <summary>
     /// Job to process communications
     /// </summary>
-    [GroupRoleField( null, "Group Role to Send to", "The Group Role the attendance reminders will be sent to, attendance reminders will be sent for the groups of the parent type of role.", true, "", "", 0)]
+    [GroupRoleField( null, "Group Role to Send to", "The Group Role the attendance reminders will be sent to, attendance reminders will be sent for the groups of the parent type of role.", true, "", "", 0 )]
     [SystemEmailField( "System Email", "The system email to use when sending reminder.", true, Rock.SystemGuid.SystemEmail.GROUP_ATTENDANCE_REMINDER, "", 1 )]
     [TextField( "Send Reminders", "Comma delimited list of days after a group meets to send an additional reminder. For example, a value of '2,4' would result in an additional reminder getting sent two and four days after group meets if attendance was not entered.", false, "", "", 2 )]
-    [EmailField( "Staff Email", "Staff email address to send to if no member with coach role is in the group or parent structure." )]
+    [EmailField( "Staff Email", "Staff email address to send to if no member with specified role is in the group or parent structure.", false, "", "", 4 )]
     [DisallowConcurrentExecution]
     public class GroupCoachSendAttendanceReminder : IJob
     {
+        private int attendanceRemindersSent = 0;
+        private int errorCount = 0;
+        private List<string> errorMessages = new List<string>();
+        private Guid systemEmailGuid = Guid.Empty;
+        private List<int> groupsNotified = new List<int>();
+        private string staffEmail = "";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SendCommunications"/> class.
         /// </summary>
@@ -72,12 +79,12 @@ namespace rocks.kfs.GroupCoachAttendanceReminder.Jobs
                 throw new Exception( "No group role/type found" );
             }
 
+            systemEmailGuid = dataMap.GetString( "SystemEmail" ).AsGuid();
+            staffEmail = dataMap.GetString( "StaffEmail" );
+
             var groupTypeRoleService = new GroupTypeRoleService( new RockContext() );
             var groupRole = groupTypeRoleService.Get( groupRoleGuid.Value );
             var groupType = GroupTypeCache.Get( groupRole.GroupType );
-            int attendanceRemindersSent = 0;
-            int errorCount = 0;
-            var errorMessages = new List<string>();
 
             if ( groupType.TakesAttendance && groupType.SendAttendanceReminder )
             {
@@ -205,55 +212,62 @@ namespace rocks.kfs.GroupCoachAttendanceReminder.Jobs
                 // Get the groups that have occurrences
                 var groupIds = occurrences.Where( o => o.Value.Any() ).Select( o => o.Key ).ToList();
 
-                // Get the leaders of those groups
-                var leaders = groupMemberService
+                // Get the members with the specific role of those groups
+                var roleMembers = groupMemberService
                     .Queryable( "Group,Person" ).AsNoTracking()
                     .Where( m =>
                         groupIds.Contains( m.GroupId ) &&
                         m.GroupMemberStatus == GroupMemberStatus.Active &&
-                        m.GroupRole.Equals( groupRole ) &&
+                        m.GroupRoleId.Equals( groupRole.Id ) &&
                         m.Person.Email != null &&
                         m.Person.Email != string.Empty )
                     .ToList();
 
-                // Loop through the leaders
-                foreach ( var leader in leaders )
+                // Loop through the members with specific role
+                foreach ( var member in roleMembers )
                 {
-                    foreach ( var group in occurrences.Where( o => o.Key == leader.GroupId ) )
+                    foreach ( var group in occurrences.Where( o => o.Key == member.GroupId ) )
                     {
-                        var mergeObjects = Rock.Lava.LavaHelper.GetCommonMergeFields(  null, leader.Person );
-                        mergeObjects.Add( "Person", leader.Person );
-                        mergeObjects.Add( "Group", leader.Group );
-                        mergeObjects.Add( "Occurrence", group.Value.Max() );
+                        SendEmailToMember( member, member.Group, group );
+                    }
+                }
 
-                        var recipients = new List<RecipientData>();
-                        recipients.Add( new RecipientData( leader.Person.Email, mergeObjects ) );
+                var roleMembersGroupIds = roleMembers.Select( m => m.GroupId );
 
-                        var emailMessage = new RockEmailMessage( dataMap.GetString( "SystemEmail" ).AsGuid() );
-                        emailMessage.SetRecipients( recipients );
-                        var errors = new List<string>();
-                        emailMessage.Send(out errors);
+                var groupsWithoutRole = groupService
+                    .Queryable().AsNoTracking()
+                    .Where( g =>
+                        groupIds.Contains( g.Id ) &&
+                        !roleMembersGroupIds.Contains( g.Id ) )
+                    .ToList();
 
-                        if (errors.Any())
-                        {
-                            errorCount += errors.Count;
-                            errorMessages.AddRange( errors );
-                        }
-                        else
-                        {
-                            attendanceRemindersSent++;
-                        }
+                foreach ( var group in groupsWithoutRole )
+                {
+                    if ( group.ParentGroupId.HasValue )
+                    {
+                        SendToParentGroupRole( group, group.ParentGroup, groupRole, occurrences, groupMemberService, staffEmail );
+                    }
+                }
 
+                var groupsToNotifyStaff = groupsWithoutRole
+                    .Where( g => !groupsNotified.Contains( g.Id ) )
+                    .ToList();
+
+                foreach ( var group in groupsToNotifyStaff )
+                {
+                    foreach ( var occGroup in occurrences.Where( o => o.Key == group.Id ) )
+                    {
+                        SendEmailToMember( null, group, occGroup );
                     }
                 }
             }
 
             context.Result = string.Format( "{0} attendance reminders sent", attendanceRemindersSent );
-            if (errorMessages.Any())
+            if ( errorMessages.Any() )
             {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine();
-                sb.Append( string.Format( "{0} Errors: ", errorCount ));
+                sb.Append( string.Format( "{0} Errors: ", errorCount ) );
                 errorMessages.ForEach( e => { sb.AppendLine(); sb.Append( e ); } );
                 string errors = sb.ToString();
                 context.Result += errors;
@@ -261,6 +275,81 @@ namespace rocks.kfs.GroupCoachAttendanceReminder.Jobs
                 HttpContext context2 = HttpContext.Current;
                 ExceptionLogService.LogException( exception, context2 );
                 throw exception;
+            }
+        }
+
+        private void SendToParentGroupRole( Group group, Group parentGroup, GroupTypeRole groupRole, Dictionary<int, List<DateTime>> occurrences, GroupMemberService groupMemberService, string staffEmail )
+        {
+            // Get the members with the specific role of those groups
+            var roleMembers = groupMemberService
+                    .Queryable( "Group,Person" ).AsNoTracking()
+                    .Where( m =>
+                        m.GroupId.Equals( parentGroup.Id ) &&
+                        m.GroupMemberStatus == GroupMemberStatus.Active &&
+                        m.GroupRoleId.Equals( groupRole.Id ) &&
+                        m.Person.Email != null &&
+                        m.Person.Email != string.Empty )
+                    .ToList();
+
+            if ( roleMembers.Count > 0 )
+            {
+                // Loop through the members with specific role
+                foreach ( var member in roleMembers )
+                {
+                    foreach ( var occGroup in occurrences.Where( o => o.Key == group.Id ) )
+                    {
+                        SendEmailToMember( member, group, occGroup );
+                    }
+                }
+            }
+            else
+            {
+                if ( parentGroup.ParentGroupId.HasValue )
+                {
+                    SendToParentGroupRole( group, parentGroup.ParentGroup, groupRole, occurrences, groupMemberService, staffEmail );
+                }
+            }
+        }
+
+        private void SendEmailToMember( GroupMember member, Group group, KeyValuePair<int, List<DateTime>> occGroup )
+        {
+            var email = staffEmail;
+            if ( member.IsNotNull() )
+            {
+                email = member.Person.Email;
+            }
+
+            if ( email.IsNotNullOrWhiteSpace() )
+            {
+                groupsNotified.Add( group.Id );
+
+                var mergeObjects = Rock.Lava.LavaHelper.GetCommonMergeFields( null, member.IsNotNull() ? member.Person : null );
+                mergeObjects.Add( "Person", member.IsNotNull() ? member.Person : null );
+                mergeObjects.Add( "Group", group );
+                mergeObjects.Add( "Occurrence", occGroup.Value.Max() );
+
+                var recipients = new List<RecipientData>();
+                recipients.Add( new RecipientData( email, mergeObjects ) );
+
+                var emailMessage = new RockEmailMessage( systemEmailGuid );
+                emailMessage.SetRecipients( recipients );
+                var errors = new List<string>();
+                emailMessage.Send( out errors );
+
+                if ( errors.Any() )
+                {
+                    errorCount += errors.Count;
+                    errorMessages.AddRange( errors );
+                }
+                else
+                {
+                    attendanceRemindersSent++;
+                }
+            }
+            else
+            {
+                errorCount += 1;
+                errorMessages.Add( string.Format( "No email specified for group {0} and no fallback email provided.", group.Id ) );
             }
         }
     }
