@@ -42,9 +42,10 @@ namespace rocks.kfs.GroupCoachAttendanceReminder.Jobs
     /// <summary>
     /// Job to process communications
     /// </summary>
-    [GroupTypeField( "Group Type", "The Group type to send attendance reminders for.", true, Rock.SystemGuid.GroupType.GROUPTYPE_SMALL_GROUP, "", 0 )]
+    [GroupRoleField( null, "Group Role to Send to", "The Group Role the attendance reminders will be sent to, attendance reminders will be sent for the groups of the parent type of role.", true, "", "", 0)]
     [SystemEmailField( "System Email", "The system email to use when sending reminder.", true, Rock.SystemGuid.SystemEmail.GROUP_ATTENDANCE_REMINDER, "", 1 )]
     [TextField( "Send Reminders", "Comma delimited list of days after a group meets to send an additional reminder. For example, a value of '2,4' would result in an additional reminder getting sent two and four days after group meets if attendance was not entered.", false, "", "", 2 )]
+    [EmailField( "Staff Email", "Staff email address to send to if no member with coach role is in the group or parent structure." )]
     [DisallowConcurrentExecution]
     public class GroupCoachSendAttendanceReminder : IJob
     {
@@ -62,7 +63,18 @@ namespace rocks.kfs.GroupCoachAttendanceReminder.Jobs
         public virtual void Execute( IJobExecutionContext context )
         {
             JobDataMap dataMap = context.JobDetail.JobDataMap;
-            var groupType = GroupTypeCache.Get( dataMap.GetString( "GroupType" ).AsGuid() );
+
+            Guid? groupRoleGuid = dataMap.GetString( "GroupRoletoSendto" ).AsGuidOrNull();
+
+            if ( !groupRoleGuid.HasValue || groupRoleGuid == Guid.Empty )
+            {
+                context.Result = "Job failed. Unable to find group role/type";
+                throw new Exception( "No group role/type found" );
+            }
+
+            var groupTypeRoleService = new GroupTypeRoleService( new RockContext() );
+            var groupRole = groupTypeRoleService.Get( groupRoleGuid.Value );
+            var groupType = GroupTypeCache.Get( groupRole.GroupType );
             int attendanceRemindersSent = 0;
             int errorCount = 0;
             var errorMessages = new List<string>();
@@ -199,7 +211,7 @@ namespace rocks.kfs.GroupCoachAttendanceReminder.Jobs
                     .Where( m =>
                         groupIds.Contains( m.GroupId ) &&
                         m.GroupMemberStatus == GroupMemberStatus.Active &&
-                        m.GroupRole.IsLeader &&
+                        m.GroupRole.Equals( groupRole ) &&
                         m.Person.Email != null &&
                         m.Person.Email != string.Empty )
                     .ToList();
