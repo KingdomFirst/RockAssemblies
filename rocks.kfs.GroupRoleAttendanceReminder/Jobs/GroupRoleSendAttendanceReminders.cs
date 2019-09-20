@@ -36,7 +36,7 @@ using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
 
-namespace rocks.kfs.GroupCoachAttendanceReminder.Jobs
+namespace rocks.kfs.GroupRoleAttendanceReminder.Jobs
 {
 
     /// <summary>
@@ -47,7 +47,7 @@ namespace rocks.kfs.GroupCoachAttendanceReminder.Jobs
     [TextField( "Send Reminders", "Comma delimited list of days after a group meets to send an additional reminder. For example, a value of '2,4' would result in an additional reminder getting sent two and four days after group meets if attendance was not entered.", false, "", "", 2 )]
     [EmailField( "Staff Email", "Staff email address to send to if no member with specified role is in the group or parent structure.", false, "", "", 4 )]
     [DisallowConcurrentExecution]
-    public class GroupCoachSendAttendanceReminder : IJob
+    public class GroupRoleSendAttendanceReminder : IJob
     {
         private int attendanceRemindersSent = 0;
         private int errorCount = 0;
@@ -59,7 +59,7 @@ namespace rocks.kfs.GroupCoachAttendanceReminder.Jobs
         /// <summary>
         /// Initializes a new instance of the <see cref="SendCommunications"/> class.
         /// </summary>
-        public GroupCoachSendAttendanceReminder()
+        public GroupRoleSendAttendanceReminder()
         {
         }
 

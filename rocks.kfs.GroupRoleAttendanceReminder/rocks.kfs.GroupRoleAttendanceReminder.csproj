@@ -7,8 +7,8 @@
     <ProjectGuid>{5D5B6848-0A00-4BDC-BBD7-8B1783F1EA68}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>rocks.kfs.GroupCoachAttendanceReminder</RootNamespace>
-    <AssemblyName>rocks.kfs.GroupCoachAttendanceReminder</AssemblyName>
+    <RootNamespace>rocks.kfs.GroupRoleAttendanceReminder</RootNamespace>
+    <AssemblyName>rocks.kfs.GroupRoleAttendanceReminder</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -76,7 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Jobs\GroupCoachSendAttendanceReminders.cs" />
+    <Compile Include="Jobs\GroupRoleSendAttendanceReminders.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
