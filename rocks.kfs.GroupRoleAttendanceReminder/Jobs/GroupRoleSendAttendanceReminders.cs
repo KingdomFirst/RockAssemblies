@@ -38,7 +38,6 @@ using Rock.Web.Cache;
 
 namespace rocks.kfs.GroupRoleAttendanceReminder.Jobs
 {
-
     /// <summary>
     /// Job to process communications
     /// </summary>
@@ -88,7 +87,6 @@ namespace rocks.kfs.GroupRoleAttendanceReminder.Jobs
 
             if ( groupType.TakesAttendance && groupType.SendAttendanceReminder )
             {
-
                 // Get the occurrence dates that apply
                 var dates = new List<DateTime>();
                 dates.Add( RockDateTime.Today );
@@ -132,7 +130,7 @@ namespace rocks.kfs.GroupRoleAttendanceReminder.Jobs
                             m.Person.Email != null &&
                             m.Person.Email != String.Empty ) ) )
                 {
-                    // Add the group 
+                    // Add the group
                     occurrences.Add( group.Id, new List<DateTime>() );
 
                     // Check for a iCal schedule
