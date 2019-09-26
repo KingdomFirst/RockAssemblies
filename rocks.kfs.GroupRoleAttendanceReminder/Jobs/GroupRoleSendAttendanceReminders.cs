@@ -43,7 +43,7 @@ namespace rocks.kfs.GroupRoleAttendanceReminder.Jobs
     /// </summary>
     [GroupRoleField( null, "Group Role to Send to", "The Group Role the attendance reminders will be sent to, attendance reminders will be sent for the groups of the parent type of role.", true, "", "", 0 )]
     [SystemEmailField( "System Email", "The system email to use when sending reminder.", true, Rock.SystemGuid.SystemEmail.GROUP_ATTENDANCE_REMINDER, "", 1 )]
-    [TextField( "Send Reminders", "Comma delimited list of days after a group meets to send an additional reminder. For example, a value of '2,4' would result in an additional reminder getting sent two and four days after group meets if attendance was not entered.", false, "", "", 2 )]
+    [TextField( "Send Reminders", "Comma delimited list of days after a group meets to send a reminder. For example, a value of '2,4' would result in a reminder getting sent two and four days after group meets if attendance was not entered.", true, "", "", 2 )]
     [EmailField( "Staff Email", "Staff email address to send to if no member with specified role is in the group or parent structure.", false, "", "", 4 )]
     [DisallowConcurrentExecution]
     public class GroupRoleSendAttendanceReminder : IJob
@@ -89,7 +89,8 @@ namespace rocks.kfs.GroupRoleAttendanceReminder.Jobs
             {
                 // Get the occurrence dates that apply
                 var dates = new List<DateTime>();
-                dates.Add( RockDateTime.Today );
+                // This job was specifically requested for future reminders only.
+                //dates.Add( RockDateTime.Today );
                 try
                 {
                     string[] reminderDays = dataMap.GetString( "SendReminders" ).Split( ',' );
