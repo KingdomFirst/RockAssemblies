@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Rock.Plugin;
 
-namespace com.kfs.ShelbyBatchExport.Migrations
+namespace rocks.kfs.ShelbyBatchExport.Migrations
 {
     [MigrationNumber( 4, "1.6.9" )]
     public class TransitionFromCodeAttribute : Migration

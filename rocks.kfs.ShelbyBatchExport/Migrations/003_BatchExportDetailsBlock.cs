@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Rock.Plugin;
 
-namespace com.kfs.ShelbyBatchExport.Migrations
+namespace rocks.kfs.ShelbyBatchExport.Migrations
 {
     [MigrationNumber( 3, "1.6.1" )]
     public class BatchExportDetailsBlock : Migration
@@ -17,7 +17,7 @@ namespace com.kfs.ShelbyBatchExport.Migrations
         public override void Up()
         {
             // block type
-            RockMigrationHelper.UpdateBlockType( "Batch Export Details", "Shows date exported and allows for quick access to Export Page", "~/Plugins/com_kfs/Finance/BatchExportDetails.ascx", "KFS > Finance", "6A8AAA9A-67BD-47CA-8FF7-400BDA9FEB2E" );
+            RockMigrationHelper.UpdateBlockType( "Batch Export Details", "Shows date exported and allows for quick access to Export Page", "~/Plugins/rocks_kfs/Finance/BatchExportDetails.ascx", "KFS > Finance", "6A8AAA9A-67BD-47CA-8FF7-400BDA9FEB2E" );
             
             // block type attribute to assign static guid
             RockMigrationHelper.UpdateBlockTypeAttribute( "6A8AAA9A-67BD-47CA-8FF7-400BDA9FEB2E", Rock.SystemGuid.FieldType.PAGE_REFERENCE, "Export Page", "ExportPage", "", "Page where export block is located. If not set, export shortcut will not be displayed.", 0, "", "DD9CD395-A4F0-4110-A349-C44EDFC0258B" );

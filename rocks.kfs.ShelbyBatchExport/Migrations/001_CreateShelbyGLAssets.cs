@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Rock.Plugin;
 
-namespace com.kfs.ShelbyBatchExport.Migrations
+namespace rocks.kfs.ShelbyBatchExport.Migrations
 {
     [MigrationNumber( 1, "1.6.1" )]
     public class CreateShelbyGLAssets : Migration
@@ -17,7 +17,7 @@ namespace com.kfs.ShelbyBatchExport.Migrations
         public override void Up()
         {
             // block and page
-            RockMigrationHelper.AddBlockType( "Shelby GL Export", "Lists all financial batches and provides Shelby GL Export capability", "~/Plugins/com_kfs/Finance/ShelbyGLExport.ascx", "KFS > Finance", "1F50D804-67A0-4348-8DBB-7C1B46280025" );
+            RockMigrationHelper.AddBlockType( "Shelby GL Export", "Lists all financial batches and provides Shelby GL Export capability", "~/Plugins/rocks_kfs/Finance/ShelbyGLExport.ascx", "KFS > Finance", "1F50D804-67A0-4348-8DBB-7C1B46280025" );
             RockMigrationHelper.AddPage( Rock.SystemGuid.Page.FUNCTIONS_FINANCE, "D65F783D-87A9-4CC9-8110-E83466A0EADB", "Shelby GL Export", "", "3F123421-E5DE-474E-9F56-AAFCEDE115EF", "fa fa-archive", "EF65EFF2-99AC-4081-8E09-32A04518683A" );
             RockMigrationHelper.AddBlock( "3F123421-E5DE-474E-9F56-AAFCEDE115EF", "", "1F50D804-67A0-4348-8DBB-7C1B46280025", "Shelby GL Export", "Main", "", "", 0, "E209EFB6-DE18-4DD3-8B15-F7BE418C4955" );
 

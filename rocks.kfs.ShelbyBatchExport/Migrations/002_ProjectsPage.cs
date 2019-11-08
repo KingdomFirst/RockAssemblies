@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Rock.Plugin;
 
-namespace com.kfs.ShelbyBatchExport.Migrations
+namespace rocks.kfs.ShelbyBatchExport.Migrations
 {
     [MigrationNumber( 2, "1.6.1" )]
     public class ProjectsPage : Migration
