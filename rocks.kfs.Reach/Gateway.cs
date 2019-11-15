@@ -248,7 +248,7 @@ namespace rocks.kfs.Reach
             var newTransactions = new List<FinancialTransaction>();
             var categoryResult = Api.PostRequest( categoryUrl, authenticator, null, out errorMessage );
             var categories = JsonConvert.DeserializeObject<List<Reporting.Category>>( categoryResult.ToStringSafe() );
-            var projectResult = Api.PostRequest( categoryUrl, authenticator, null, out errorMessage );
+            var projectResult = Api.PostRequest( projectsUrl, authenticator, null, out errorMessage );
             var projects = JsonConvert.DeserializeObject<List<Reporting.Project>>( projectResult.ToStringSafe() );
             if ( categories == null )
             {
@@ -300,7 +300,7 @@ namespace rocks.kfs.Reach
                                 var project = projects.FirstOrDefault( c => c.id == donationItem.referral_id );
                                 if ( project != null )
                                 {
-                                    reachAccountName = project.title;
+                                    reachAccountName = string.Format("PROJECT {0}", project.title);
                                 }
                             }
                             else
