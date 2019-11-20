@@ -29,15 +29,16 @@ using Rock.Utility;
 using OfficeOpenXml;
 using System.Data;
 using System.ComponentModel;
+using System.Data.Entity;
 
 namespace rocks.kfs.ShelbyFinancials
 {
     public class SFJournal
     {
-        public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period )
+        public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, string DescriptionLava = "" )
         {
             var glExcelLines = new List<GLExcelLine>();
-            var glEntries = GetGlEntries( rockContext, financialBatch, journalCode, period );
+            var glEntries = GetGlEntries( rockContext, financialBatch, journalCode, period, DescriptionLava );
             foreach ( var entry in glEntries )
             {
                 glExcelLines.Add( new GLExcelLine()
@@ -65,12 +66,18 @@ namespace rocks.kfs.ShelbyFinancials
             return glExcelLines;
         }
 
-        private List<JournalEntryLine> GetGlEntries( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period )
+        private List<JournalEntryLine> GetGlEntries( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, string DescriptionLava = "" )
         {
+            if ( string.IsNullOrWhiteSpace( DescriptionLava ) )
+            {
+                DescriptionLava = "{{ Batch.Id }}: {{ Batch.Name }}";
+            }
             //
             // Group/Sum Transactions by Account and Project since Project can come from Account or Transaction Details
             //
             var batchTransactions = new List<GLTransaction>();
+            var registrationLinks = new List<RegistrationInstance>();
+            var groupMemberLinks = new List<GroupMember>();
             foreach ( var transaction in financialBatch.Transactions )
             {
                 transaction.LoadAttributes();
@@ -95,6 +102,36 @@ namespace rocks.kfs.ShelbyFinancials
                     else if ( accountProject != null )
                     {
                         projectCode = DefinedValueCache.Get( ( Guid ) accountProject ).Value;
+                    }
+
+                    if ( transactionDetail.EntityTypeId.HasValue )
+                    {
+                        var registrationEntityType = EntityTypeCache.Get( typeof( Rock.Model.Registration ) );
+                        var groupMemberEntityType = EntityTypeCache.Get( typeof( Rock.Model.GroupMember ) );
+
+                        if ( transactionDetail.EntityId.HasValue && transactionDetail.EntityTypeId == registrationEntityType.CachedEntityTypeId )
+                        {
+                            foreach ( var registration in new RegistrationService( rockContext )
+                                .Queryable().AsNoTracking()
+                                .Where( r =>
+                                    r.RegistrationInstance != null &&
+                                    r.RegistrationInstance.RegistrationTemplate != null &&
+                                    transactionDetail.EntityId.Equals( r.Id ) ) )
+                            {
+                                registrationLinks.Add( registration.RegistrationInstance );
+                            }
+                        }
+                        if ( transactionDetail.EntityId.HasValue && transactionDetail.EntityTypeId == groupMemberEntityType.CachedEntityTypeId )
+                        {
+                            foreach ( var groupMember in new GroupMemberService( rockContext )
+                                .Queryable().AsNoTracking()
+                                .Where( gm =>
+                                    gm.Group != null &&
+                                    transactionDetail.EntityId.Equals( gm.Id ) ) )
+                            {
+                                groupMemberLinks.Add( groupMember );
+                            }
+                        }
                     }
 
                     var transactionItem = new GLTransaction()
@@ -124,6 +161,13 @@ namespace rocks.kfs.ShelbyFinancials
                 var account = new FinancialAccountService( rockContext ).Get( summary.FinancialAccountId );
                 account.LoadAttributes();
 
+                var mergeFields = new Dictionary<string, object>();
+                mergeFields.Add( "Account", account );
+                mergeFields.Add( "Summary", summary );
+                mergeFields.Add( "Batch", financialBatch );
+                mergeFields.Add( "Registration", registrationLinks );
+                mergeFields.Add( "GroupMember", groupMemberLinks );
+
                 var batchSummaryItem = new GLBatchTotals()
                 {
                     CompanyNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Company" ),
@@ -139,7 +183,7 @@ namespace rocks.kfs.ShelbyFinancials
                     Amount = summary.Amount,
                     Project = summary.Project,
                     JournalNumber = financialBatch.Id,
-                    JournalDescription = string.Format("{0}: {1}", financialBatch.Id, financialBatch.Name),
+                    JournalDescription = DescriptionLava.ResolveMergeFields( mergeFields ),
                     Date = financialBatch.BatchStartDateTime ?? RockDateTime.Now,
                     Note = financialBatch.Note
                 };
@@ -550,11 +594,106 @@ namespace rocks.kfs.ShelbyFinancials
             return exportColumns;
         }
 
-        public class GLTransaction
+        public class GLTransaction : Rock.Lava.ILiquidizable
         {
+            [LavaInclude]
             public decimal Amount;
+
+            [LavaInclude]
             public int FinancialAccountId;
+
+            [LavaInclude]
             public string Project;
+
+            #region ILiquidizable
+
+            /// <summary>
+            /// Creates a DotLiquid compatible dictionary that represents the current entity object. 
+            /// </summary>
+            /// <returns>DotLiquid compatible dictionary.</returns>
+            public object ToLiquid()
+            {
+                return this;
+            }
+
+            /// <summary>
+            /// Gets the available keys (for debugging info).
+            /// </summary>
+            /// <value>
+            /// The available keys.
+            /// </value>
+            [LavaIgnore]
+            public virtual List<string> AvailableKeys
+            {
+                get
+                {
+                    var availableKeys = new List<string>();
+
+                    foreach ( var propInfo in GetType().GetProperties() )
+                    {
+                        availableKeys.Add( propInfo.Name );
+                    }
+
+                    return availableKeys;
+                }
+            }
+
+            /// <summary>
+            /// Gets the <see cref="System.Object"/> with the specified key.
+            /// </summary>
+            /// <value>
+            /// The <see cref="System.Object"/>.
+            /// </value>
+            /// <param name="key">The key.</param>
+            /// <returns></returns>
+            [LavaIgnore]
+            public virtual object this[object key]
+            {
+                get
+                {
+                    string propertyKey = key.ToStringSafe();
+                    var propInfo = GetType().GetProperty( propertyKey );
+
+                    try
+                    {
+                        object propValue = null;
+                        if ( propInfo != null )
+                        {
+                            propValue = propInfo.GetValue( this, null );
+                        }
+
+                        if ( propValue is Guid )
+                        {
+                            return ( ( Guid ) propValue ).ToString();
+                        }
+                        else
+                        {
+                            return propValue;
+                        }
+                    }
+                    catch
+                    {
+                        // intentionally ignore
+                    }
+
+                    return null;
+                }
+            }
+
+            /// <summary>
+            /// Determines whether the specified key contains key.
+            /// </summary>
+            /// <param name="key">The key.</param>
+            /// <returns></returns>
+            public virtual bool ContainsKey( object key )
+            {
+                string propertyKey = key.ToStringSafe();
+                var propInfo = GetType().GetProperty( propertyKey );
+
+                return propInfo != null;
+            }
+
+            #endregion
         }
 
         public class GLBatchTotals
