@@ -35,10 +35,10 @@ namespace rocks.kfs.ShelbyFinancials
 {
     public class SFJournal
     {
-        public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, string DescriptionLava = "" )
+        public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava, string DescriptionLava = "" )
         {
             var glExcelLines = new List<GLExcelLine>();
-            var glEntries = GetGlEntries( rockContext, financialBatch, journalCode, period, DescriptionLava );
+            var glEntries = GetGlEntries( rockContext, financialBatch, journalCode, period, ref debugLava, DescriptionLava );
             foreach ( var entry in glEntries )
             {
                 glExcelLines.Add( new GLExcelLine()
@@ -65,8 +65,7 @@ namespace rocks.kfs.ShelbyFinancials
 
             return glExcelLines;
         }
-
-        private List<JournalEntryLine> GetGlEntries( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, string DescriptionLava = "" )
+        private List<JournalEntryLine> GetGlEntries( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava, string DescriptionLava = "" )
         {
             if ( string.IsNullOrWhiteSpace( DescriptionLava ) )
             {
@@ -109,25 +108,25 @@ namespace rocks.kfs.ShelbyFinancials
                         var registrationEntityType = EntityTypeCache.Get( typeof( Rock.Model.Registration ) );
                         var groupMemberEntityType = EntityTypeCache.Get( typeof( Rock.Model.GroupMember ) );
 
-                        if ( transactionDetail.EntityId.HasValue && transactionDetail.EntityTypeId == registrationEntityType.CachedEntityTypeId )
+                        if ( transactionDetail.EntityId.HasValue && transactionDetail.EntityTypeId == registrationEntityType.Id )
                         {
                             foreach ( var registration in new RegistrationService( rockContext )
                                 .Queryable().AsNoTracking()
                                 .Where( r =>
                                     r.RegistrationInstance != null &&
                                     r.RegistrationInstance.RegistrationTemplate != null &&
-                                    transactionDetail.EntityId.Equals( r.Id ) ) )
+                                    r.Id == transactionDetail.EntityId ) )
                             {
                                 registrationLinks.Add( registration.RegistrationInstance );
                             }
                         }
-                        if ( transactionDetail.EntityId.HasValue && transactionDetail.EntityTypeId == groupMemberEntityType.CachedEntityTypeId )
+                        if ( transactionDetail.EntityId.HasValue && transactionDetail.EntityTypeId == groupMemberEntityType.Id )
                         {
                             foreach ( var groupMember in new GroupMemberService( rockContext )
                                 .Queryable().AsNoTracking()
                                 .Where( gm =>
                                     gm.Group != null &&
-                                    transactionDetail.EntityId.Equals( gm.Id ) ) )
+                                    gm.Id == transactionDetail.EntityId ) )
                             {
                                 groupMemberLinks.Add( groupMember );
                             }
@@ -165,8 +164,8 @@ namespace rocks.kfs.ShelbyFinancials
                 mergeFields.Add( "Account", account );
                 mergeFields.Add( "Summary", summary );
                 mergeFields.Add( "Batch", financialBatch );
-                mergeFields.Add( "Registration", registrationLinks );
-                mergeFields.Add( "GroupMember", groupMemberLinks );
+                mergeFields.Add( "Registrations", registrationLinks );
+                mergeFields.Add( "GroupMembers", groupMemberLinks );
 
                 var batchSummaryItem = new GLBatchTotals()
                 {
@@ -187,6 +186,11 @@ namespace rocks.kfs.ShelbyFinancials
                     Date = financialBatch.BatchStartDateTime ?? RockDateTime.Now,
                     Note = financialBatch.Note
                 };
+
+                if ( debugLava.Length < 6 && debugLava.AsBoolean() )
+                {
+                    debugLava = mergeFields.lavaDebugInfo();
+                }
 
                 batchSummary.Add( batchSummaryItem );
             }
@@ -597,13 +601,13 @@ namespace rocks.kfs.ShelbyFinancials
         public class GLTransaction : Rock.Lava.ILiquidizable
         {
             [LavaInclude]
-            public decimal Amount;
+            public decimal Amount { get; set; }
 
             [LavaInclude]
-            public int FinancialAccountId;
+            public int FinancialAccountId { get; set; }
 
             [LavaInclude]
-            public string Project;
+            public string Project { get; set; }
 
             #region ILiquidizable
 
