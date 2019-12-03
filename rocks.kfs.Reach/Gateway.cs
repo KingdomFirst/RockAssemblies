@@ -216,6 +216,7 @@ namespace rocks.kfs.Reach
             var donationUrl = GetBaseUrl( gateway, "donations", out errorMessage );
             var supporterUrl = GetBaseUrl( gateway, "sponsorship_supporters", out errorMessage );
             var categoryUrl = GetBaseUrl( gateway, "donation_categories", out errorMessage );
+            var projectsUrl = GetBaseUrl( gateway, "projects", out errorMessage );
 
             if ( donationUrl.IsNullOrWhiteSpace() || supporterUrl.IsNullOrWhiteSpace() )
             {
@@ -247,6 +248,8 @@ namespace rocks.kfs.Reach
             var newTransactions = new List<FinancialTransaction>();
             var categoryResult = Api.PostRequest( categoryUrl, authenticator, null, out errorMessage );
             var categories = JsonConvert.DeserializeObject<List<Reporting.Category>>( categoryResult.ToStringSafe() );
+            var projectResult = Api.PostRequest( projectsUrl, authenticator, null, out errorMessage );
+            var projects = JsonConvert.DeserializeObject<List<Reporting.Project>>( projectResult.ToStringSafe() );
             if ( categories == null )
             {
                 // errorMessage already set
@@ -289,6 +292,15 @@ namespace rocks.kfs.Reach
                                 if ( category != null )
                                 {
                                     reachAccountName = category.title;
+                                }
+                            }
+                            else if ( donationItem != null && donationItem.referral_type.Equals( "Project", StringComparison.InvariantCultureIgnoreCase ) )
+                            {
+                                // one-time gift, should match a known project
+                                var project = projects.FirstOrDefault( c => c.id == donationItem.referral_id );
+                                if ( project != null )
+                                {
+                                    reachAccountName = string.Format("PROJECT {0}", project.title);
                                 }
                             }
                             else
