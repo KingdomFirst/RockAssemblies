@@ -16,6 +16,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Xml;
 
@@ -190,14 +191,21 @@ namespace rocks.kfs.Intacct
             return doc;
         }
 
-        private List<JournalEntryLine> GetGlEntries( FinancialBatch financialBatch )
+        private List<JournalEntryLine> GetGlEntries( FinancialBatch financialBatch, string DescriptionLava = "" )
         {
+            if ( string.IsNullOrWhiteSpace( DescriptionLava ) )
+            {
+                DescriptionLava = "{{ Batch.Id }}: {{ Batch.Name }}";
+            }
+
             var rockContext = new RockContext();
 
             //
             // Group/Sum Transactions by Account and Project since Project can come from Account or Transaction Details
             //
             var batchTransactions = new List<GLTransaction>();
+            var registrationLinks = new List<RegistrationInstance>();
+            var groupMemberLinks = new List<GroupMember>();
             foreach ( var transaction in financialBatch.Transactions )
             {
                 transaction.LoadAttributes();
@@ -217,6 +225,36 @@ namespace rocks.kfs.Intacct
                     else if ( accountProject != null )
                     {
                         projectCode = DefinedValueCache.Get( ( Guid ) accountProject ).Value;
+                    }
+
+                    if ( transactionDetail.EntityTypeId.HasValue )
+                    {
+                        var registrationEntityType = EntityTypeCache.Get( typeof( Rock.Model.Registration ) );
+                        var groupMemberEntityType = EntityTypeCache.Get( typeof( Rock.Model.GroupMember ) );
+
+                        if ( transactionDetail.EntityId.HasValue && transactionDetail.EntityTypeId == registrationEntityType.Id )
+                        {
+                            foreach ( var registration in new RegistrationService( rockContext )
+                                .Queryable().AsNoTracking()
+                                .Where( r =>
+                                    r.RegistrationInstance != null &&
+                                    r.RegistrationInstance.RegistrationTemplate != null &&
+                                    r.Id == transactionDetail.EntityId ) )
+                            {
+                                registrationLinks.Add( registration.RegistrationInstance );
+                            }
+                        }
+                        if ( transactionDetail.EntityId.HasValue && transactionDetail.EntityTypeId == groupMemberEntityType.Id )
+                        {
+                            foreach ( var groupMember in new GroupMemberService( rockContext )
+                                .Queryable().AsNoTracking()
+                                .Where( gm =>
+                                    gm.Group != null &&
+                                    gm.Id == transactionDetail.EntityId ) )
+                            {
+                                groupMemberLinks.Add( groupMember );
+                            }
+                        }
                     }
 
                     var transactionItem = new GLTransaction()
@@ -261,6 +299,14 @@ namespace rocks.kfs.Intacct
                     }
                 }
 
+                var mergeFields = new Dictionary<string, object>();
+                mergeFields.Add( "Account", account );
+                mergeFields.Add( "Summary", summary );
+                mergeFields.Add( "Batch", financialBatch );
+                mergeFields.Add( "Registrations", registrationLinks );
+                mergeFields.Add( "GroupMembers", groupMemberLinks );
+                mergeFields.Add( "CustomDimensions", customDimensionValues );
+
                 var batchSummaryItem = new GLBatchTotals()
                 {
                     Amount = summary.Amount,
@@ -270,6 +316,7 @@ namespace rocks.kfs.Intacct
                     Department = account.GetAttributeValue( "rocks.kfs.Intacct.DEPARTMENT" ),
                     Location = account.GetAttributeValue( "rocks.kfs.Intacct.LOCATION" ),
                     Project = summary.Project,
+                    Description = DescriptionLava.ResolveMergeFields( mergeFields ),
                     CustomDimensions = customDimensionValues
                 };
 
@@ -320,6 +367,7 @@ namespace rocks.kfs.Intacct
                     DepartmentId = transaction.Department,
                     LocationId = transaction.Location,
                     ProjectId = transaction.Project,
+                    Memo = transaction.Description,
                     CustomFields = transaction.CustomDimensions
                 };
 
@@ -333,6 +381,7 @@ namespace rocks.kfs.Intacct
                     DepartmentId = transaction.Department,
                     LocationId = transaction.Location,
                     ProjectId = transaction.Project,
+                    Memo = transaction.Description,
                     CustomFields = transaction.CustomDimensions
                 };
 

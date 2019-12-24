@@ -90,6 +90,7 @@ namespace rocks.kfs.Intacct
         public string Department;
         public string Location;
         public string Project;
+        public string Description;
         public Dictionary<string, dynamic> CustomDimensions;
     }
 }
