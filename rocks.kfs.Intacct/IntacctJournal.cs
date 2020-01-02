@@ -36,14 +36,14 @@ namespace rocks.kfs.Intacct
         /// <param name="Batch">The Rock FinancialBatch that a Journal Entry will be created from. <see cref="FinancialBatch"/></param>
         /// <param name="JournalId">The Intacct Symbol of the Journal that the Entry should be posted to. For example: GJ</param>
         /// <returns>Returns the XML needed to create an Intacct Journal Entry.</returns>
-        public XmlDocument CreateJournalEntryXML( IntacctAuth AuthCreds, int BatchId, string JournalId )
+        public XmlDocument CreateJournalEntryXML( IntacctAuth AuthCreds, int BatchId, string JournalId, ref string debugLava, string DescriptionLava = "" )
         {
             var doc = new XmlDocument();
             var financialBatch = new FinancialBatchService( new RockContext() ).Get( BatchId );
 
             if ( financialBatch.Id > 0 )
             {
-                var lines = GetGlEntries( financialBatch );
+                var lines = GetGlEntries( financialBatch, ref debugLava, DescriptionLava );
                 if ( lines.Any() )
                 {
                     var batchDate = financialBatch.BatchStartDateTime == null ? RockDateTime.Now.ToShortDateString() : ( ( System.DateTime ) financialBatch.BatchStartDateTime ).ToShortDateString();
@@ -191,7 +191,7 @@ namespace rocks.kfs.Intacct
             return doc;
         }
 
-        private List<JournalEntryLine> GetGlEntries( FinancialBatch financialBatch, string DescriptionLava = "" )
+        private List<JournalEntryLine> GetGlEntries( FinancialBatch financialBatch, ref string debugLava, string DescriptionLava = "" )
         {
             if ( string.IsNullOrWhiteSpace( DescriptionLava ) )
             {
@@ -306,6 +306,11 @@ namespace rocks.kfs.Intacct
                 mergeFields.Add( "Registrations", registrationLinks );
                 mergeFields.Add( "GroupMembers", groupMemberLinks );
                 mergeFields.Add( "CustomDimensions", customDimensionValues );
+
+                if ( debugLava.Length < 6 && debugLava.AsBoolean() )
+                {
+                    debugLava = mergeFields.lavaDebugInfo();
+                }
 
                 var batchSummaryItem = new GLBatchTotals()
                 {
