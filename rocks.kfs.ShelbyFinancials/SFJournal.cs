@@ -166,6 +166,8 @@ namespace rocks.kfs.ShelbyFinancials
                 mergeFields.Add( "Batch", financialBatch );
                 mergeFields.Add( "Registrations", registrationLinks );
                 mergeFields.Add( "GroupMembers", groupMemberLinks );
+                mergeFields.Add( "JournalCode", journalCode );
+                mergeFields.Add( "Period", period );
 
                 var batchSummaryItem = new GLBatchTotals()
                 {
