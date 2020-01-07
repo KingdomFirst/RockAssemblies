@@ -291,7 +291,7 @@ namespace rocks.kfs.Reach
                                 var category = categories.FirstOrDefault( c => c.id == donationItem.referral_id );
                                 if ( category != null )
                                 {
-                                    reachAccountName = category.title;
+                                    reachAccountName = category.title.Trim();
                                 }
                             }
                             else if ( donationItem != null && donationItem.referral_type.Equals( "Project", StringComparison.InvariantCultureIgnoreCase ) )
@@ -300,7 +300,7 @@ namespace rocks.kfs.Reach
                                 var project = projects.FirstOrDefault( c => c.id == donationItem.referral_id );
                                 if ( project != null )
                                 {
-                                    reachAccountName = string.Format("PROJECT {0}", project.title);
+                                    reachAccountName = string.Format("PROJECT {0}", project.title.Trim() );
                                 }
                             }
                             else
