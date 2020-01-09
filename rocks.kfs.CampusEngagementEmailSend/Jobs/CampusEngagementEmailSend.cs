@@ -41,20 +41,17 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
     /// <summary>
     /// Job to process communications
     /// </summary>
-    //[GroupRoleField( null, "Group Role to Send to", "The Group Role the attendance reminders will be sent to, attendance reminders will be sent for the groups of the parent type of role.", true, "", "", 0 )]
     [GroupTypesField( "Group Types", "The group types to include attendance numbers for in the campus engagement email.", true, "", "", 0 )]
     [SystemEmailField( "System Email", "The system email to use when sending the campus engagement email.", true, "", "", 1 )]
-    //[TextField( "Send Reminders", "Comma delimited list of days after a group meets to send a reminder. For example, a value of '2,4' would result in a reminder getting sent two and four days after group meets if attendance was not entered.", true, "", "", 2 )]
-    //[EmailField( "Staff Email", "Staff email address to send to if no member with specified role is in the group or parent structure.", false, "", "", 4 )]
     [DisallowConcurrentExecution]
     public class CampusEngagementEmailSend : IJob
     {
-        //private int attendanceRemindersSent = 0;
+        private int engagementEmailsSent = 0;
         private int errorCount = 0;
 
         private List<string> errorMessages = new List<string>();
         private Guid systemEmailGuid = Guid.Empty;
-        private List<Guid> groupTypes = new List<Guid>();
+        private List<GroupType> groupTypes = new List<GroupType>();     
         //private string staffEmail = "";
 
         /// <summary>
@@ -72,9 +69,12 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
         {
             JobDataMap dataMap = context.JobDetail.JobDataMap;
 
-            //Guid? groupRoleGuid = dataMap.GetString( "GroupRoletoSendto" ).AsGuidOrNull();
+            var groupTypeService = new GroupTypeService( new RockContext() );
 
-            groupTypes = ( dataMap.Get( "GroupTypes" ) as IEnumerable<Guid> ).ToList();
+            groupTypes = new List<GroupType>( groupTypeService.GetByGuids( dataMap.Get( "GroupTypes" ).ToString().Split(',').Select(Guid.Parse).ToList() ) );
+
+
+            //groupTypes = ( dataMap.Get( "GroupTypes" ) as IEnumerable<Guid> ).ToList();
 
             //if ( !groupRoleGuid.HasValue || groupRoleGuid == Guid.Empty )
             //{
@@ -83,21 +83,15 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
             //}
 
             systemEmailGuid = dataMap.GetString( "SystemEmail" ).AsGuid();
-            //staffEmail = dataMap.GetString( "StaffEmail" );
 
-            var groupTypeService = new GroupTypeService( new RockContext() );
-            //var groupRole = groupTypeRoleService.Get( groupRoleGuid.Value );
-
-            foreach ( Guid groupTypeGuid in groupTypes )
-            {
-                GroupType groupType = groupTypeService.Get( groupTypeGuid );
+            foreach ( GroupType groupType in groupTypes )
+            {                                                                  
 
                 if ( groupType.TakesAttendance && groupType.SendAttendanceReminder )
                 {
                     // Get the occurrence dates that apply
-                    var dates = new List<DateTime>();
-                    // This job was specifically requested for future reminders only.
-                    //dates.Add( RockDateTime.Today );
+                    var dates = new List<DateTime>();                     
+
                     try
                     {
                         string[] reminderDays = dataMap.GetString( "SendReminders" ).Split( ',' );
@@ -197,9 +191,10 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
                     // Get the groups that have occurrences
                     var groupIds = occurrences.Where( o => o.Value.Any() ).Select( o => o.Key ).ToList();
                 }
-            }
 
-            //var groupType = GroupTypeCache.Get( groupRole.GroupType );
+                SendEmailToCampusPastors();
+
+            }        
 
             //context.Result = string.Format( "{0} attendance reminders sent", attendanceRemindersSent );
             if ( errorMessages.Any() )
@@ -219,48 +214,60 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
 
         private void SendEmailToCampusPastors()
         {
+            var rockContext = new RockContext();      
+            var campuses = rockContext.Campuses.ToList();
+
+            foreach( Campus campus in campuses )
+            {
+                var pastor = campus.LeaderPersonAlias.Person;
+                var email = pastor.Email;   
+
+                var groupService = new GroupService( rockContext );
+                List<Group> allCampusGroups = new List<Group>();
+
+                foreach( GroupType groupType in groupTypes )
+                {
+                    List<Group> groups = new List<Group>( groupService.GetByGroupTypeId( groupType.Id ) ).Where( g => g.CampusId == campus.Id ).ToList();
+                    allCampusGroups.AddRange( groups );
+                }
+                
+                   
+                if ( email.IsNotNullOrWhiteSpace() )
+                {
+                    //groupsNotified.Add( group.Id );
+
+                    var mergeObjects = Rock.Lava.LavaHelper.GetCommonMergeFields( null, pastor.IsNotNull() ? pastor : null );
+                    mergeObjects.Add( "Person", pastor.IsNotNull() ? pastor : null );
+                    mergeObjects.Add( "Groups", allCampusGroups );
+                    mergeObjects.Add( "Campus", campus );
+
+                    var recipients = new List<RecipientData>();
+                    recipients.Add( new RecipientData( email, mergeObjects ) );
+
+                    var emailMessage = new RockEmailMessage( systemEmailGuid );
+                    emailMessage.SetRecipients( recipients );
+                    var errors = new List<string>();
+                    emailMessage.Send( out errors );
+
+                    if ( errors.Any() )
+                    {
+                        errorCount += errors.Count;
+                        errorMessages.AddRange( errors );
+                    }
+                    else
+                    {
+                        engagementEmailsSent++;
+                    }
+                }
+                else
+                {
+                    errorCount += 1;
+                    errorMessages.Add( string.Format( "No email specified for {0} and no fallback email provided.", pastor.FullName ) );
+                }
+
+
+            }    
         }
 
-        //private void SendEmailToMember( GroupMember member, Group group, KeyValuePair<int, List<DateTime>> occGroup )
-        //{
-        //    var email = staffEmail;
-        //    if ( member.IsNotNull() )
-        //    {
-        //        email = member.Person.Email;
-        //    }
-
-        //    if ( email.IsNotNullOrWhiteSpace() )
-        //    {
-        //        groupsNotified.Add( group.Id );
-
-        //        var mergeObjects = Rock.Lava.LavaHelper.GetCommonMergeFields( null, member.IsNotNull() ? member.Person : null );
-        //        mergeObjects.Add( "Person", member.IsNotNull() ? member.Person : null );
-        //        mergeObjects.Add( "Group", group );
-        //        mergeObjects.Add( "Occurrence", occGroup.Value.Max() );
-
-        //        var recipients = new List<RecipientData>();
-        //        recipients.Add( new RecipientData( email, mergeObjects ) );
-
-        //        var emailMessage = new RockEmailMessage( systemEmailGuid );
-        //        emailMessage.SetRecipients( recipients );
-        //        var errors = new List<string>();
-        //        emailMessage.Send( out errors );
-
-        //        if ( errors.Any() )
-        //        {
-        //            errorCount += errors.Count;
-        //            errorMessages.AddRange( errors );
-        //        }
-        //        else
-        //        {
-        //            attendanceRemindersSent++;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        errorCount += 1;
-        //        errorMessages.Add( string.Format( "No email specified for group {0} and no fallback email provided.", group.Id ) );
-        //    }
-        //}
     }
 }
