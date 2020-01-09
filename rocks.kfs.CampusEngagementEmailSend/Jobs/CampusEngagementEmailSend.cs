@@ -196,7 +196,7 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
 
             }        
 
-            //context.Result = string.Format( "{0} attendance reminders sent", attendanceRemindersSent );
+            context.Result = string.Format( "{0} emails sent", engagementEmailsSent );
             if ( errorMessages.Any() )
             {
                 StringBuilder sb = new StringBuilder();
