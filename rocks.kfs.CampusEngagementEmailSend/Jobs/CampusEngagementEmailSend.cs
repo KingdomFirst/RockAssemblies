@@ -73,128 +73,15 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
 
             groupTypes = new List<GroupType>( groupTypeService.GetByGuids( dataMap.Get( "GroupTypes" ).ToString().Split(',').Select(Guid.Parse).ToList() ) );
 
+            if ( groupTypes.IsNull() || groupTypes.Count == 0 )
+            {
+                context.Result = "Job failed. Unable to find group role/type";
+                throw new Exception( "No group role/type found" );
+            }
 
-            //groupTypes = ( dataMap.Get( "GroupTypes" ) as IEnumerable<Guid> ).ToList();
+            systemEmailGuid = dataMap.GetString( "SystemEmail" ).AsGuid();       
 
-            //if ( !groupRoleGuid.HasValue || groupRoleGuid == Guid.Empty )
-            //{
-            //    context.Result = "Job failed. Unable to find group role/type";
-            //    throw new Exception( "No group role/type found" );
-            //}
-
-            systemEmailGuid = dataMap.GetString( "SystemEmail" ).AsGuid();
-
-            foreach ( GroupType groupType in groupTypes )
-            {                                                                  
-
-                if ( groupType.TakesAttendance && groupType.SendAttendanceReminder )
-                {
-                    // Get the occurrence dates that apply
-                    var dates = new List<DateTime>();                     
-
-                    try
-                    {
-                        string[] reminderDays = dataMap.GetString( "SendReminders" ).Split( ',' );
-                        foreach ( string reminderDay in reminderDays )
-                        {
-                            if ( reminderDay.Trim().IsNotNullOrWhiteSpace() )
-                            {
-                                var reminderDate = RockDateTime.Today.AddDays( 0 - Convert.ToInt32( reminderDay ) );
-                                if ( !dates.Contains( reminderDate ) )
-                                {
-                                    dates.Add( reminderDate );
-                                }
-                            }
-                        }
-                    }
-                    catch { }
-
-                    var rockContext = new RockContext();
-                    var groupService = new GroupService( rockContext );
-                    var groupMemberService = new GroupMemberService( rockContext );
-                    var scheduleService = new ScheduleService( rockContext );
-                    var attendanceOccurrenceService = new AttendanceOccurrenceService( rockContext );
-
-                    var startDate = dates.Min();
-                    var endDate = dates.Max().AddDays( 1 );
-
-                    // Find all 'occurrences' for the groups that occur on the affected dates
-                    var occurrences = new Dictionary<int, List<DateTime>>();
-                    foreach ( var group in groupService
-                        .Queryable( "Schedule" ).AsNoTracking()
-                        .Where( g =>
-                            g.GroupTypeId == groupType.Id &&
-                            g.IsActive &&
-                            g.Schedule != null &&
-                            g.Members.Any( m =>
-                                m.GroupMemberStatus == GroupMemberStatus.Active &&
-                                m.GroupRole.IsLeader &&
-                                m.Person.Email != null &&
-                                m.Person.Email != String.Empty ) ) )
-                    {
-                        // Add the group
-                        occurrences.Add( group.Id, new List<DateTime>() );
-
-                        // Check for a iCal schedule
-                        if ( !string.IsNullOrWhiteSpace( group.Schedule.iCalendarContent ) )
-                        {
-                            // If schedule has an iCal schedule, get occurrences between first and last dates
-                            foreach ( var occurrence in group.Schedule.GetOccurrences( startDate, endDate ) )
-                            {
-                                var startTime = occurrence.Period.StartTime.Value;
-                                if ( dates.Contains( startTime.Date ) )
-                                {
-                                    occurrences[group.Id].Add( startTime );
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // if schedule does not have an iCal, then check for weekly schedule and calculate occurrences starting with first attendance or current week
-                            if ( group.Schedule.WeeklyDayOfWeek.HasValue )
-                            {
-                                foreach ( var date in dates )
-                                {
-                                    if ( date.DayOfWeek == group.Schedule.WeeklyDayOfWeek.Value )
-                                    {
-                                        var startTime = date;
-                                        if ( group.Schedule.WeeklyTimeOfDay.HasValue )
-                                        {
-                                            startTime = startTime.Add( group.Schedule.WeeklyTimeOfDay.Value );
-                                        }
-                                        occurrences[group.Id].Add( startTime );
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Remove any occurrences during group type exclusion date ranges
-                    foreach ( var exclusion in groupType.GroupScheduleExclusions )
-                    {
-                        if ( exclusion.StartDate.HasValue && exclusion.EndDate.HasValue )
-                        {
-                            foreach ( var keyVal in occurrences )
-                            {
-                                foreach ( var occurrenceDate in keyVal.Value.ToList() )
-                                {
-                                    if ( occurrenceDate >= exclusion.StartDate.Value &&
-                                        occurrenceDate < exclusion.EndDate.Value.AddDays( 1 ) )
-                                    {
-                                        keyVal.Value.Remove( occurrenceDate );
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Get the groups that have occurrences
-                    var groupIds = occurrences.Where( o => o.Value.Any() ).Select( o => o.Key ).ToList();
-                }
-
-                SendEmailToCampusPastors();
-
-            }        
+            SendEmailToCampusPastors();
 
             context.Result = string.Format( "{0} emails sent", engagementEmailsSent );
             if ( errorMessages.Any() )
