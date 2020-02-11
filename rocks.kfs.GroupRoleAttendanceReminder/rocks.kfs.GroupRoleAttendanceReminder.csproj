@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{851424E9-6896-418B-8B5D-C609C66C9538}</ProjectGuid>
+    <ProjectGuid>{5D5B6848-0A00-4BDC-BBD7-8B1783F1EA68}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>rocks.kfs.GroupRoleAttendanceReminder</RootNamespace>
@@ -33,9 +33,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DDay.iCal, Version=1.0.2.575, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\RockWeb\Bin\DDay.iCal.dll</HintPath>
-    </Reference>
+    <Reference Include="DDay.iCal, Version=1.0.2.575, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="DotLiquid">
       <HintPath>..\..\RockWeb\Bin\DotLiquid.dll</HintPath>
     </Reference>
