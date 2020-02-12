@@ -35,6 +35,7 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
     /// </summary>
     [GroupTypesField( "Group Types", "The group types to include attendance numbers for in the campus engagement email.", true, "", "", 0 )]
     [SystemEmailField( "System Email", "The system email to use when sending the campus engagement email.", true, "", "", 1 )]
+    [DateRangeField( "Occurence Date Range", "The date range of group attendance occurrences to include in the GoupAttendance Lava object.", true, "", "", 2)]
     [DisallowConcurrentExecution]
     public class CampusEngagementEmailSend : IJob
     {
@@ -43,7 +44,9 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
 
         private List<string> errorMessages = new List<string>();
         private Guid systemEmailGuid = Guid.Empty;
-        private List<GroupType> groupTypes = new List<GroupType>();     
+        private List<GroupType> groupTypes = new List<GroupType>();   
+        private DateTime startDate = new DateTime();
+        private DateTime endDate = new DateTime();
         //private string staffEmail = "";
 
         /// <summary>
@@ -64,6 +67,11 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
             var groupTypeService = new GroupTypeService( new RockContext() );
 
             groupTypes = new List<GroupType>( groupTypeService.GetByGuids( dataMap.Get( "GroupTypes" ).ToString().Split(',').Select(Guid.Parse).ToList() ) );
+
+            string[] dateRange = dataMap.Get( "OccurenceDateRange" ).ToString().Split( ',' );
+
+            startDate = DateTime.Parse( dateRange[0] );
+            endDate = DateTime.Parse( dateRange[1] );
 
             if ( groupTypes.IsNull() || groupTypes.Count == 0 )
             {
@@ -98,52 +106,96 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
 
             foreach( Campus campus in campuses )
             {
-                var pastor = campus.LeaderPersonAlias.Person;
-                var email = pastor.Email;   
-
-                var groupService = new GroupService( rockContext );
-                List<Group> allCampusGroups = new List<Group>();
-
-                foreach( GroupType groupType in groupTypes )
+                if ( campus.IsActive == true )
                 {
-                    List<Group> groups = new List<Group>( groupService.GetByGroupTypeId( groupType.Id ) ).Where( g => g.CampusId == campus.Id ).ToList();
-                    allCampusGroups.AddRange( groups );
-                }
-                
-                   
-                if ( email.IsNotNullOrWhiteSpace() )
-                {
-                    //groupsNotified.Add( group.Id );
-
-                    var mergeObjects = Rock.Lava.LavaHelper.GetCommonMergeFields( null, pastor.IsNotNull() ? pastor : null );
-                    mergeObjects.Add( "Person", pastor.IsNotNull() ? pastor : null );
-                    mergeObjects.Add( "Groups", allCampusGroups );
-                    mergeObjects.Add( "Campus", campus );
-
-                    var recipients = new List<RecipientData>();
-                    recipients.Add( new RecipientData( email, mergeObjects ) );
-
-                    var emailMessage = new RockEmailMessage( systemEmailGuid );
-                    emailMessage.SetRecipients( recipients );
-                    var errors = new List<string>();
-                    emailMessage.Send( out errors );
-
-                    if ( errors.Any() )
+                    Person pastor = new Person();
+                    if ( campus.LeaderPersonAlias.IsNotNull() )
                     {
-                        errorCount += errors.Count;
-                        errorMessages.AddRange( errors );
+                        pastor = campus.LeaderPersonAlias.Person;
                     }
                     else
                     {
-                        engagementEmailsSent++;
+                        errorCount += 1;
+                        errorMessages.Add( string.Format( "No leader specified for {0} campus.", campus.Name ) );
+                        continue;
+                    }
+
+                    string email;
+                    if ( pastor.Email.IsNotNullOrWhiteSpace() )
+                    {
+                        email = pastor.Email;
+                    }
+                    else
+                    {
+                        errorCount += 1;
+                        errorMessages.Add( string.Format( "No email listed for for {0} campus pastor.", campus.Name ) );
+                        continue;
+                    }
+                    
+
+                    var groupService = new GroupService( rockContext );
+                    List<Group> allCampusGroups = new List<Group>();
+
+                    foreach ( GroupType groupType in groupTypes )
+                    {   
+                        List<Group> groups = new List<Group>( groupService.GetByGroupTypeId( groupType.Id ) ).Where( g => g.CampusId == campus.Id ).ToList();
+                        allCampusGroups.AddRange( groups );
+                    }
+
+                    var attendanceOccurrenceService = new AttendanceOccurrenceService( rockContext );
+                    List<AttendanceOccurrence> groupAttendanceOccurrences = new List<AttendanceOccurrence>();
+
+                    foreach ( Group group in allCampusGroups )
+                    {
+                        List<int> groupLocationIds = new List<int>();
+                        List<int> groupScheduleIds = new List<int>();
+
+                        foreach ( GroupLocation loc in group.GroupLocations )
+                        {
+                            groupLocationIds.Add( loc.LocationId );
+
+                            foreach( Schedule schedule in loc.Schedules )
+                            {
+                                groupScheduleIds.Add( schedule.Id );
+                            }
+                        }           
+
+                        List<AttendanceOccurrence> occurrences = new List<AttendanceOccurrence>( attendanceOccurrenceService.GetGroupOccurrences( group, startDate, endDate, groupLocationIds, groupScheduleIds ) ).ToList();
+                        groupAttendanceOccurrences.AddRange( occurrences );
+                    }        
+
+                    if ( email.IsNotNullOrWhiteSpace() )
+                    {    
+                        var mergeObjects = Rock.Lava.LavaHelper.GetCommonMergeFields( null, pastor.IsNotNull() ? pastor : null );
+                        mergeObjects.Add( "Person", pastor.IsNotNull() ? pastor : null );
+                        mergeObjects.Add( "Groups", allCampusGroups );
+                        mergeObjects.Add( "GroupAttendance", groupAttendanceOccurrences );
+                        mergeObjects.Add( "Campus", campus );
+
+                        var recipients = new List<RecipientData>();
+                        recipients.Add( new RecipientData( email, mergeObjects ) );
+
+                        var emailMessage = new RockEmailMessage( systemEmailGuid );
+                        emailMessage.SetRecipients( recipients );
+                        var errors = new List<string>();
+                        emailMessage.Send( out errors );
+
+                        if ( errors.Any() )
+                        {
+                            errorCount += errors.Count;
+                            errorMessages.AddRange( errors );
+                        }
+                        else
+                        {
+                            engagementEmailsSent++;
+                        }
+                    }
+                    else
+                    {
+                        errorCount += 1;
+                        errorMessages.Add( string.Format( "No email specified for {0}.", pastor.FullName ) );
                     }
                 }
-                else
-                {
-                    errorCount += 1;
-                    errorMessages.Add( string.Format( "No email specified for {0} and no fallback email provided.", pastor.FullName ) );
-                }
-
 
             }    
         }
