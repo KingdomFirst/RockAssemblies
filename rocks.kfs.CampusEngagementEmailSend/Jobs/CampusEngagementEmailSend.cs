@@ -27,6 +27,7 @@ using Rock.Communication;
 using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
+using Rock.Web.UI.Controls;
 
 namespace rocks.kfs.CampusEngagementEmailSend.Jobs
 {
@@ -34,8 +35,9 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
     /// Job to process communications
     /// </summary>
     [GroupTypesField( "Group Types", "The group types to include attendance numbers for in the campus engagement email.", true, "", "", 0 )]
-    [SystemEmailField( "System Email", "The system email to use when sending the campus engagement email.", true, "", "", 1 )]
-    [DateRangeField( "Occurence Date Range", "The date range of group attendance occurrences to include in the GoupAttendance Lava object.", true, "", "", 2)]
+    [SlidingDateRangeField( "Occurrence Date Range", "The date range of group attendance occurrences to include in the GoupAttendance Lava object.", required: true, order: 1 )]
+    [SystemEmailField( "System Email", "The system email to use when sending the campus engagement email.", true, "", "", 2 )]
+    
     [DisallowConcurrentExecution]
     public class CampusEngagementEmailSend : IJob
     {
@@ -46,8 +48,7 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
         private Guid systemEmailGuid = Guid.Empty;
         private List<GroupType> groupTypes = new List<GroupType>();   
         private DateTime startDate = new DateTime();
-        private DateTime endDate = new DateTime();
-        //private string staffEmail = "";
+        private DateTime endDate = new DateTime();    
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SendCommunications"/> class.
@@ -68,10 +69,10 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
 
             groupTypes = new List<GroupType>( groupTypeService.GetByGuids( dataMap.Get( "GroupTypes" ).ToString().Split(',').Select(Guid.Parse).ToList() ) );
 
-            string[] dateRange = dataMap.Get( "OccurenceDateRange" ).ToString().Split( ',' );
+            var requestDateRange = SlidingDateRangePicker.CalculateDateRangeFromDelimitedValues( dataMap.Get( "OccurrenceDateRange" ).ToString() ?? "-1||" );
 
-            startDate = DateTime.Parse( dateRange[0] );
-            endDate = DateTime.Parse( dateRange[1] );
+            startDate = (DateTime) requestDateRange.Start;
+            endDate = ( DateTime ) requestDateRange.End;
 
             if ( groupTypes.IsNull() || groupTypes.Count == 0 )
             {
