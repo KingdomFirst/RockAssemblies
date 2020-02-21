@@ -29,7 +29,7 @@ using Rock.Model;
 using Rock.Web.Cache;
 using Rock.Web.UI.Controls;
 
-namespace rocks.kfs.FundraisingParticipantDonations.Jobs
+namespace rocks.kfs.FundraisingParticipantSummary.Jobs
 {
     /// <summary>
     /// Job to process communications
@@ -111,6 +111,7 @@ namespace rocks.kfs.FundraisingParticipantDonations.Jobs
                     if ( email.IsNotNullOrWhiteSpace() )
                     {
                         var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, groupMember.Person );
+                        mergeFields.Add( "BeginDateTime", beginDateTime );
                         mergeFields.Add( "GroupMember", groupMember );
 
                         bool disablePublicContributionRequests = groupMember.GetAttributeValue( "DisablePublicContributionRequests" ).AsBoolean();
@@ -138,13 +139,13 @@ namespace rocks.kfs.FundraisingParticipantDonations.Jobs
                         mergeFields.Add( "AmountLeft", amountLeft );
                         mergeFields.Add( "PercentMet", percentMet );
 
-                        var financialTransactionQry = new FinancialTransactionDetailService( rockContext ).Queryable()
+                        var financialTransactions = new FinancialTransactionDetailService( rockContext ).Queryable()
                             .Where( d => d.EntityTypeId == entityTypeIdGroupMember
                                     && d.EntityId == groupMember.Id
-                                    && d.Transaction.TransactionDateTime >= lastStartDateTime )
+                                    && d.Transaction.TransactionDateTime >= beginDateTime )
                             .OrderByDescending( a => a.Transaction.TransactionDateTime );
 
-                        mergeFields.Add( "Contributions", financialTransactionQry.ToList() );
+                        mergeFields.Add( "Contributions", financialTransactions );
 
                         //var queryParams = new Dictionary<string, string>();
                         //queryParams.Add( "GroupId", group.Id.ToString() );

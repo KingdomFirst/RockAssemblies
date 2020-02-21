@@ -20,8 +20,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "rocks.kfs.FundraisingParticipantDonations" )]
-[assembly: AssemblyProduct( "rocks.kfs.FundraisingParticipantDonations" )]
+[assembly: AssemblyTitle( "rocks.kfs.FundraisingParticipantSummary" )]
+[assembly: AssemblyProduct( "rocks.kfs.FundraisingParticipantSummary" )]
 [assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2019" )]
 
 // Auto increment assembly versions
