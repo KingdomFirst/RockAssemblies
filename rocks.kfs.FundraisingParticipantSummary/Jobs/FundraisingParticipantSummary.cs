@@ -34,8 +34,11 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
     /// <summary>
     /// Job to process communications
     /// </summary>
-    [GroupTypesField( "Group Types", "The group types to send fundraising participant summary emails to.", true, "", "", 0 )]
     [SystemEmailField( "System Email", "The system email to use when sending the fundraising participant summary email.", true, "", "", 2 )]
+    [GroupTypesField( "Group Types", "The group types to send fundraising participant summary emails to.", false, "", "", 0 )]
+    [GroupTypeGroupField( "Group", "If you would like to narrow this job down to a specific group type/group to send the fundraising participant summary email to.", "Select a Group", false )]
+    [BooleanField( "Show Address", "Determines if the Address column should be displayed in the Contributions List.", true )]
+    [BooleanField( "Show Amount", "Determines if the Amount column should be displayed in the Contributions List.", true )]
 
     [DisallowConcurrentExecution]
     public class FundraisingParticipantSummary : IJob
@@ -62,6 +65,9 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
             var JobStartDateTime = RockDateTime.Now;
             var systemEmailGuid = Guid.Empty;
             var groupTypes = new List<int>();
+            var groups = new List<int>();
+            var showAddress = dataMap.Get( "ShowAddress" ).ToString().AsBoolean();
+            var showAmount = dataMap.Get( "ShowAmount" ).ToString().AsBoolean();
 
             using ( var rockContext = new RockContext() )
             {
@@ -80,16 +86,37 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                     lastStartDateTime = job.LastRunDateTime?.AddSeconds( 0.0d - ( double ) job.LastRunDurationSeconds );
                 }
                 var beginDateTime = lastStartDateTime ?? JobStartDateTime.AddDays( -1 );
+                //var beginDateTime = JobStartDateTime.AddDays( -1 );
 
                 var groupTypeService = new GroupTypeService( rockContext );
                 var groupMemberService = new GroupMemberService( rockContext );
+                var groupService = new GroupService( rockContext );
 
                 groupTypes = new List<int>( groupTypeService.GetByGuids( dataMap.Get( "GroupTypes" ).ToString().Split( ',' ).Select( Guid.Parse ).ToList() ).Select( gt => gt.Id ) );
 
-                if ( groupTypes.IsNull() || groupTypes.Count == 0 )
+                var parts = dataMap.Get( "Group" ).ToString().Split( '|' );
+
+                Guid? groupTypeGuid = null;
+                Guid? groupGuid = null;
+                if ( parts.Length >= 1 )
                 {
-                    context.Result = "Job failed. Unable to find group role/type";
-                    throw new Exception( "No group role/type found" );
+                    groupTypeGuid = parts[0].AsGuidOrNull();
+                    if ( parts.Length >= 2 )
+                    {
+                        groupGuid = parts[1].AsGuidOrNull();
+                    }
+                }
+
+                if ( ( groupTypes.IsNull() || groupTypes.Count == 0 ) && !groupGuid.HasValue )
+                {
+                    context.Result = "Job failed. Unable to find group type or selected group. Check your settings.";
+                    throw new Exception( "No group type found or group found." );
+                }
+                Group groupSetting = null;
+                if ( groupGuid.HasValue )
+                {
+                    groupSetting = groupService.Get( groupGuid.Value );
+                    groups = groupService.GetAllDescendents( groupSetting.Id ).Where( g => g.IsActive ).Select( g => g.Id ).ToList();
                 }
 
                 systemEmailGuid = dataMap.GetString( "SystemEmail" ).AsGuid();
@@ -98,27 +125,25 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                     .Queryable( "Group,Person" ).AsNoTracking()
                     .Where( m =>
                         m.GroupMemberStatus == GroupMemberStatus.Active &&
-                        groupTypes.Contains( m.Group.GroupTypeId ) &&
+                        (
+                          ( groupGuid.HasValue && groups.Contains( m.GroupId ) ) ||
+                          ( !groupGuid.HasValue && groupTypes.Contains( m.Group.GroupTypeId ) )
+                        ) &&
                         m.Person.Email != null &&
                         m.Person.Email != string.Empty )
                     .ToList();
 
                 foreach ( var groupMember in groupMembers )
                 {
+                    groupMember.LoadAttributes();
                     var email = groupMember.Person.Email;
                     var group = groupMember.Group;
+                    group.LoadAttributes();
+                    bool disablePublicContributionRequests = groupMember.GetAttributeValue( "DisablePublicContributionRequests" ).AsBoolean();
 
-                    if ( email.IsNotNullOrWhiteSpace() )
+                    // only show Contribution stuff if contribution requests haven't been disabled
+                    if ( email.IsNotNullOrWhiteSpace() && !disablePublicContributionRequests )
                     {
-                        var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, groupMember.Person );
-                        mergeFields.Add( "BeginDateTime", beginDateTime );
-                        mergeFields.Add( "GroupMember", groupMember );
-
-                        bool disablePublicContributionRequests = groupMember.GetAttributeValue( "DisablePublicContributionRequests" ).AsBoolean();
-
-                        // only show Contribution stuff if the current person is the participant and contribution requests haven't been disabled
-                        bool showContributions = !disablePublicContributionRequests;
-
                         // Progress
                         var entityTypeIdGroupMember = EntityTypeCache.GetId<Rock.Model.GroupMember>();
 
@@ -136,46 +161,53 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                         var amountLeft = individualFundraisingGoal - contributionTotal;
                         var percentMet = individualFundraisingGoal > 0 ? contributionTotal * 100 / individualFundraisingGoal : 100;
 
-                        mergeFields.Add( "AmountLeft", amountLeft );
-                        mergeFields.Add( "PercentMet", percentMet );
-
                         var financialTransactions = new FinancialTransactionDetailService( rockContext ).Queryable()
                             .Where( d => d.EntityTypeId == entityTypeIdGroupMember
                                     && d.EntityId == groupMember.Id
                                     && d.Transaction.TransactionDateTime >= beginDateTime )
                             .OrderByDescending( a => a.Transaction.TransactionDateTime );
 
-                        mergeFields.Add( "Contributions", financialTransactions );
-
-                        //var queryParams = new Dictionary<string, string>();
-                        //queryParams.Add( "GroupId", group.Id.ToString() );
-                        //queryParams.Add( "GroupMemberId", groupMember.Id.ToString() );
-                        //mergeFields.Add( "MakeDonationUrl", LinkedPageUrl( "DonationPage", queryParams ) );
-
-                        //string makeDonationButtonText = null;
-                        //makeDonationButtonText = "Make Payment";
-
-                        //mergeFields.Add( "MakeDonationButtonText", makeDonationButtonText );
-
-                        var recipients = new List<RecipientData>();
-                        recipients.Add( new RecipientData( email, mergeFields ) );
-
-                        var emailMessage = new RockEmailMessage( systemEmailGuid );
-                        emailMessage.SetRecipients( recipients );
-                        var errors = new List<string>();
-                        emailMessage.Send( out errors );
-
-                        if ( errors.Any() )
+                        if ( financialTransactions.Any() )
                         {
-                            errorCount += errors.Count;
-                            errorMessages.AddRange( errors );
-                        }
-                        else
-                        {
-                            groupMemberEmails++;
+                            var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, groupMember.Person );
+                            mergeFields.Add( "BeginDateTime", beginDateTime );
+                            mergeFields.Add( "AmountLeft", amountLeft );
+                            mergeFields.Add( "PercentMet", percentMet );
+                            mergeFields.Add( "ShowAddress", showAddress );
+                            mergeFields.Add( "ShowAmount", showAmount );
+                            mergeFields.Add( "GroupMember", groupMember );
+                            mergeFields.Add( "Contributions", financialTransactions );
+
+                            //var queryParams = new Dictionary<string, string>();
+                            //queryParams.Add( "GroupId", group.Id.ToString() );
+                            //queryParams.Add( "GroupMemberId", groupMember.Id.ToString() );
+                            //mergeFields.Add( "MakeDonationUrl", LinkedPageUrl( "DonationPage", queryParams ) );
+
+                            //string makeDonationButtonText = null;
+                            //makeDonationButtonText = "Make Payment";
+
+                            //mergeFields.Add( "MakeDonationButtonText", makeDonationButtonText );
+
+                            var recipients = new List<RecipientData>();
+                            recipients.Add( new RecipientData( email, mergeFields ) );
+
+                            var emailMessage = new RockEmailMessage( systemEmailGuid );
+                            emailMessage.SetRecipients( recipients );
+                            var errors = new List<string>();
+                            emailMessage.Send( out errors );
+
+                            if ( errors.Any() )
+                            {
+                                errorCount += errors.Count;
+                                errorMessages.AddRange( errors );
+                            }
+                            else
+                            {
+                                groupMemberEmails++;
+                            }
                         }
                     }
-                    else
+                    else if ( !disablePublicContributionRequests )
                     {
                         errorCount += 1;
                         errorMessages.Add( string.Format( "No email specified for {0}.", groupMember.Person.FullName ) );
