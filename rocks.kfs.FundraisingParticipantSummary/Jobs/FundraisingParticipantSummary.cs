@@ -34,7 +34,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
     /// <summary>
     /// Job to process communications
     /// </summary>
-    [SystemEmailField( "System Email", "The system email to use when sending the fundraising participant summary email.", true, "", "", 2 )]
+    [SystemEmailField( "System Email", "The system email to use when sending the fundraising participant summary email.", true, "DE953A2C-1AE5-406D-B36C-B8486147D77B", "", 2 )]
     [GroupTypesField( "Group Types", "The group types to send fundraising participant summary emails to.", false, "", "", 0 )]
     [GroupTypeGroupField( "Group", "If you would like to narrow this job down to a specific group type/group to send the fundraising participant summary email to.", "Select a Group", false )]
     [BooleanField( "Show Address", "Determines if the Address column should be displayed in the Contributions List.", true )]
@@ -86,13 +86,18 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                     lastStartDateTime = job.LastRunDateTime?.AddSeconds( 0.0d - ( double ) job.LastRunDurationSeconds );
                 }
                 var beginDateTime = lastStartDateTime ?? JobStartDateTime.AddDays( -1 );
-                //var beginDateTime = JobStartDateTime.AddDays( -1 );
+                //beginDateTime = JobStartDateTime.AddDays( -3 );
 
                 var groupTypeService = new GroupTypeService( rockContext );
                 var groupMemberService = new GroupMemberService( rockContext );
                 var groupService = new GroupService( rockContext );
 
-                groupTypes = new List<int>( groupTypeService.GetByGuids( dataMap.Get( "GroupTypes" ).ToString().Split( ',' ).Select( Guid.Parse ).ToList() ).Select( gt => gt.Id ) );
+                var selectedGroupTypes = dataMap.Get( "GroupTypes" ).ToString().Split( new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries );
+
+                if ( selectedGroupTypes.Any() )
+                {
+                    groupTypes = new List<int>( groupTypeService.GetByGuids( selectedGroupTypes.Select( Guid.Parse ).ToList() ).Select( gt => gt.Id ) );
+                }
 
                 var parts = dataMap.Get( "Group" ).ToString().Split( '|' );
 
@@ -117,6 +122,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                 {
                     groupSetting = groupService.Get( groupGuid.Value );
                     groups = groupService.GetAllDescendents( groupSetting.Id ).Where( g => g.IsActive ).Select( g => g.Id ).ToList();
+                    groups.Add( groupSetting.Id );
                 }
 
                 systemEmailGuid = dataMap.GetString( "SystemEmail" ).AsGuid();
