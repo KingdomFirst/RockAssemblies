@@ -32,13 +32,14 @@ using Rock.Web.UI.Controls;
 namespace rocks.kfs.FundraisingParticipantSummary.Jobs
 {
     /// <summary>
-    /// Job to process communications
+    /// Job to send fundraising participant summary emails with donations since the last run of the job.
     /// </summary>
     [SystemEmailField( "System Email", "The system email to use when sending the fundraising participant summary email.", true, "DE953A2C-1AE5-406D-B36C-B8486147D77B", "", 2 )]
     [GroupTypesField( "Group Types", "The group types to send fundraising participant summary emails to.", false, "", "", 0 )]
     [GroupTypeGroupField( "Group", "If you would like to narrow this job down to a specific group type/group to send the fundraising participant summary email to.", "Select a Group", false )]
-    [BooleanField( "Show Address", "Determines if the Address column should be displayed in the Contributions List.", true )]
-    [BooleanField( "Show Amount", "Determines if the Amount column should be displayed in the Contributions List.", true )]
+    [BooleanField( "Show Address", "Determines if the Address column should be displayed in the Contributions List. (Sent to lava, has to be handled in lava display).", true )]
+    [BooleanField( "Show Amount", "Determines if the Amount column should be displayed in the Contributions List. (Sent to lava, has to be handled in lava display).", true )]
+    [BooleanField( "Send Emails with Zero Donations", "Should the emails to the group members still be sent if they had 0 donations in the time period? The time period for this job is anything since it last ran.", false )]
 
     [DisallowConcurrentExecution]
     public class FundraisingParticipantSummary : IJob
@@ -68,6 +69,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
             var groups = new List<int>();
             var showAddress = dataMap.Get( "ShowAddress" ).ToString().AsBoolean();
             var showAmount = dataMap.Get( "ShowAmount" ).ToString().AsBoolean();
+            var sendZero = dataMap.Get( "SendEmailswithZeroDonations" ).ToString().AsBoolean();
 
             using ( var rockContext = new RockContext() )
             {
@@ -173,7 +175,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                                     && d.Transaction.TransactionDateTime >= beginDateTime )
                             .OrderByDescending( a => a.Transaction.TransactionDateTime );
 
-                        if ( financialTransactions.Any() )
+                        if ( financialTransactions.Any() || sendZero )
                         {
                             var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, groupMember.Person );
                             mergeFields.Add( "BeginDateTime", beginDateTime );
