@@ -28,6 +28,11 @@ namespace rocks.kfs.FundraisingParticipantSummary.Migrations
         {
             // Fundraising Participant Summary
             RockMigrationHelper.UpdateSystemEmail( "Plugins", "Fundraising Participant Summary", "", "", "", "", "", "Summary of Donations for {{ BeginDateTime | Date:'M/d/yyyy' }} - {{ 'Now' | Date:'M/d/yyyy' }}", @"{{ 'Global' | Attribute:'EmailHeader' }}
+{% assign percentWidth = PercentMet -%}
+{% if percentWidth > 100 -%}
+  {% assign percentWidth = 100 -%}
+{% endif -%}
+{% assign percentRounded = PercentMet | Floor -%}
 
 <p>{{ CurrentPerson.NickName }},</p>
 <p>Below you will find a summary of donations for {{ GroupMember.Group.Name }} from {{ BeginDateTime | Date:'M/d/yyyy' }} - {{ 'Now' | Date:'M/d/yyyy' }}.</p>
@@ -40,11 +45,15 @@ namespace rocks.kfs.FundraisingParticipantSummary.Migrations
                 Fundraising Progress
             </label>
             <label class=""pull-right"" style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;display: inline-block;max-width: 100%;margin-bottom: 5px;font-weight: 700;float: right !important;"">                    
-                {{ 'Global' | Attribute:'CurrencySymbol' }}{{ AmountLeft }}                                 
+                {% if AmountLeft >= 0 %}
+                    {{ AmountLeft | FormatAsCurrency }}
+                {% else %}{% assign amountLeftPositive = AmountLeft | Times:-1 %}
+                    {{ FundraisingGoal | Plus:amountLeftPositive | FormatAsCurrency }} / {{ FundraisingGoal | FormatAsCurrency }}
+                {% endif %}                               
             </label>
             <div class=""progress"" style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;height: 20px;margin-bottom: 20px;overflow: hidden;background-color: #f5f5f5;border-radius: 4px;-webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);"">
-                <div class=""progress-bar"" role=""progressbar"" aria-valuenow=""{{ PercentMet }}"" aria-valuemin=""0"" aria-valuemax=""100"" style=""width: {{ PercentMet }}%;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;float: left;height: 100%;font-size: 12px;line-height: 20px;color: #fff;text-align: center;background-color: #428bca;-webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15);box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15);-webkit-transition: width 0.6s ease;-o-transition: width 0.6s ease;transition: width 0.6s ease;"">
-                <span class=""sr-only"" style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;border: 0;clip: rect(0,0,0,0);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;"">{{ PercentMet }}% Complete</span>
+                <div class=""progress-bar"" role=""progressbar"" aria-valuenow=""{{ percentWidth }}"" aria-valuemin=""0"" aria-valuemax=""100"" style=""width: {{ percentWidth }}%;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;float: left;height: 100%;font-size: 12px;line-height: 20px;color: #fff;text-align: center;background-color: #428bca;-webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15);box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15);-webkit-transition: width 0.6s ease;-o-transition: width 0.6s ease;transition: width 0.6s ease;"">
+                <span class=""sr-only"" style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;border: 0;clip: rect(0,0,0,0);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;"">{{ percentRounded }}% Complete</span>
                 </div>
             </div>
         </div>

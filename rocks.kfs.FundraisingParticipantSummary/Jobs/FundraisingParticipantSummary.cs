@@ -179,6 +179,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                         {
                             var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, groupMember.Person );
                             mergeFields.Add( "BeginDateTime", beginDateTime );
+                            mergeFields.Add( "FundraisingGoal", individualFundraisingGoal );
                             mergeFields.Add( "AmountLeft", amountLeft );
                             mergeFields.Add( "PercentMet", percentMet );
                             mergeFields.Add( "ShowAddress", showAddress );
