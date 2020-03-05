@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2019 by Kingdom First Solutions
+// Copyright 2020 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,8 +35,8 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
     /// Job to send fundraising participant summary emails with donations since the last run of the job.
     /// </summary>
     [SystemEmailField( "System Email", "The system email to use when sending the fundraising participant summary email.", true, "DE953A2C-1AE5-406D-B36C-B8486147D77B", "" )]
-    [GroupTypesField( "Group Types", "The group types to send fundraising participant summary emails to.", false, "", "" )]
-    [GroupField( "Group", "If you would like to narrow this job down to a specific group type/group to send the fundraising participant summary email to.", false )]
+    [GroupTypesField( "Group Types", "Use this setting to send the fundraising participant summary email to entire GroupType(s).", false, "", "" )]
+    [GroupField( "Group", "Use this setting to send the fundraising participant summary email to a specific Group and its child Groups.", false )]
     [BooleanField( "Show Address", "Determines if the Address column should be displayed in the Contributions List. (Sent to lava, has to be handled in lava display).", true )]
     [BooleanField( "Show Amount", "Determines if the Amount column should be displayed in the Contributions List. (Sent to lava, has to be handled in lava display).", true )]
     [BooleanField( "Send Emails with Zero Donations", "Should the emails to the group members still be sent if they had 0 donations in the time period? The time period for this job is anything since it last ran.", false )]
@@ -125,9 +125,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                         (
                           ( groupGuid.HasValue && groups.Contains( m.GroupId ) ) ||
                           ( !groupGuid.HasValue && groupTypes.Contains( m.Group.GroupTypeId ) )
-                        ) &&
-                        m.Person.Email != null &&
-                        m.Person.Email != string.Empty )
+                        ) )
                     .ToList();
 
                 foreach ( var groupMember in groupMembers )
@@ -228,11 +226,5 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                 throw exception;
             }
         }
-
-        private void SendEmailToGroupMember()
-        {
-
-        }
-
     }
 }
