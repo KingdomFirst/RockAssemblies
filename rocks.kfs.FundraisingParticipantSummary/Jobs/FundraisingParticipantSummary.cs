@@ -34,9 +34,9 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
     /// <summary>
     /// Job to send fundraising participant summary emails with donations since the last run of the job.
     /// </summary>
-    [SystemEmailField( "System Email", "The system email to use when sending the fundraising participant summary email.", true, "DE953A2C-1AE5-406D-B36C-B8486147D77B", "", 2 )]
+    [SystemEmailField( "System Email", "The system email to use when sending the fundraising participant summary email.", true, "DE953A2C-1AE5-406D-B36C-B8486147D77B", "" )]
     [GroupTypesField( "Group Types", "Use this setting to send the fundraising participant summary email to entire GroupType(s).", false, "", "" )]
-    [GroupTypeGroupField( "Group", "Use this setting to send the fundraising participant summary email to a specific Group and its child Groups.", "Select a Group", false )]
+    [GroupField( "Group", "Use this setting to send the fundraising participant summary email to a specific Group and its child Groups.", false )]
     [BooleanField( "Show Address", "Determines if the Address column should be displayed in the Contributions List. (Sent to lava, has to be handled in lava display).", true )]
     [BooleanField( "Show Amount", "Determines if the Amount column should be displayed in the Contributions List. (Sent to lava, has to be handled in lava display).", true )]
     [BooleanField( "Send Emails with Zero Donations", "Should the emails to the group members still be sent if they had 0 donations in the time period? The time period for this job is anything since it last ran.", false )]
@@ -101,18 +101,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                     groupTypes = new List<int>( groupTypeService.GetByGuids( selectedGroupTypes.Select( Guid.Parse ).ToList() ).Select( gt => gt.Id ) );
                 }
 
-                var parts = dataMap.Get( "Group" ).ToString().Split( '|' );
-
-                Guid? groupTypeGuid = null;
-                Guid? groupGuid = null;
-                if ( parts.Length >= 1 )
-                {
-                    groupTypeGuid = parts[0].AsGuidOrNull();
-                    if ( parts.Length >= 2 )
-                    {
-                        groupGuid = parts[1].AsGuidOrNull();
-                    }
-                }
+                var groupGuid = dataMap.Get( "Group" ).ToString().AsGuidOrNull();
 
                 if ( ( groupTypes.IsNull() || groupTypes.Count == 0 ) && !groupGuid.HasValue )
                 {
@@ -136,7 +125,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                         (
                           ( groupGuid.HasValue && groups.Contains( m.GroupId ) ) ||
                           ( !groupGuid.HasValue && groupTypes.Contains( m.Group.GroupTypeId ) )
-                        )  )
+                        ) )
                     .ToList();
 
                 foreach ( var groupMember in groupMembers )
