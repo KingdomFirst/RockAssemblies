@@ -179,8 +179,12 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
                         locationList.SetListSymbol( "\u2022" );
                         foreach ( var reservationLocation in reservationSummary.Locations )
                         {
-                            var locationListItem = new iTextSharp.text.ListItem( reservationLocation.Location.Name, listItemFontNormal );
-                            locationList.Add( locationListItem );
+                            var listItem = new iTextSharp.text.ListItem( reservationLocation.Location.Name, listItemFontNormal );
+                            if ( reservationLocation.ApprovalState == ReservationLocationApprovalState.Approved )
+                            {
+                                listItem.Add( new Phrase( "\u0034", zapfdingbats ) );
+                            }
+                            locationList.Add( listItem );
                         }
 
                         PdfPCell locationCell = new PdfPCell();
