@@ -206,7 +206,7 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
                         resourceList.SetListSymbol( "\u2022" );
                         foreach ( var reservationResource in reservationSummary.Resources )
                         {
-                            var resourceListItem = new iTextSharp.text.ListItem( string.Format( "{0} ({1})", reservationResource.Resource.Name, reservationResource.Resource.Quantity ), listItemFontNormal );
+                            var resourceListItem = new iTextSharp.text.ListItem( string.Format( "{0} ({1})", reservationResource.Resource.Name, reservationResource.Quantity ), listItemFontNormal );
                             resourceList.Add( resourceListItem );
                         }
 
@@ -252,8 +252,8 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
                             listNoteTable.SpacingBefore = 0;
                             listNoteTable.SpacingAfter = 1;
                             listNoteTable.DefaultCell.BorderWidth = 0;
-                            listNoteTable.DefaultCell.BorderWidthBottom = 1;
-                            listNoteTable.DefaultCell.BorderColorBottom = Color.DARK_GRAY;
+                            //listNoteTable.DefaultCell.BorderWidthBottom = 1;
+                            //listNoteTable.DefaultCell.BorderColorBottom = Color.DARK_GRAY;
                             listNoteTable.AddCell( new Phrase( string.Empty, noteFont ) );
                             var noteCell = new PdfPCell( new Phrase( reservationSummary.Note, noteFont ) );
                             noteCell.Border = 0;
@@ -275,30 +275,80 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
                             listResourceTable.DefaultCell.BorderWidthBottom = 1;
                             listResourceTable.DefaultCell.BorderColorBottom = Color.DARK_GRAY;
 
-                            List resourceTableList = new List( List.UNORDERED, 8f );
-                            resourceTableList.SetListSymbol( "\u2022" );
+                            var addResourceTable = false;
                             foreach ( var reservationResource in reservationSummary.Resources )
                             {
                                 reservationResource.LoadReservationResourceAttributes();
-                                if ( reservationResource.Resource.Attributes != null )
+
+                                if ( reservationResource.Attributes != null && reservationResource.Attributes.Any() )
                                 {
-                                    foreach ( var attribute in reservationResource.Resource.Attributes )
+                                    var headerCell = new PdfPCell( new Phrase( string.Format( "{0} ({1})", reservationResource.Resource.Name, reservationResource.Quantity ), listSubHeaderFont ) );
+                                    headerCell.Border = 0;
+                                    headerCell.Colspan = 8;
+                                    listResourceTable.AddCell( headerCell );
+
+                                    var columnCount = 0;
+
+                                    foreach ( var attributeDict in reservationResource.Attributes )
                                     {
-                                        var resourceListItem = new iTextSharp.text.ListItem( attribute.Value.Name, listItemFontBold );
-                                        resourceTableList.Add( resourceListItem );
-                                        var resourceListItemValue = new iTextSharp.text.ListItem( reservationResource.Reservation.GetAttributeValue( attribute.Key ).ToString(), listItemFontNormal );
-                                        resourceTableList.Add( resourceListItemValue );
+                                        var resourceTableCell = new PdfPCell();
+                                        resourceTableCell.Border = 0;
+                                        resourceTableCell.Colspan = 2;
+
+                                        var attribute = attributeDict.Value;
+                                        var value = reservationResource.GetAttributeValue( attribute.Key );
+                                        var formattedValue = attribute.FieldType.Field.FormatValue( null, attribute.EntityTypeId, reservationResource.Id, value, attribute.QualifierValues, true );
+
+                                        var resourceListItem = new Phrase( attribute.Name, listItemFontBold );
+                                        var resourceListItemValue = new Phrase( formattedValue, listItemFontNormal );
+
+                                        if ( !string.IsNullOrWhiteSpace( value ) )
+                                        {
+                                            if ( columnCount == 8 )
+                                            {
+                                                columnCount = 0;
+                                            }
+                                            columnCount += 2;
+                                            addResourceTable = true;
+                                            resourceTableCell.AddElement( resourceListItem );
+                                            resourceTableCell.AddElement( resourceListItemValue );
+                                            listResourceTable.AddCell( resourceTableCell );
+                                        }
                                     }
+                                    if ( columnCount > 0 && columnCount < 8 )
+                                    {
+                                        PdfPCell columnFillCell = new PdfPCell( new Phrase( Chunk.NEWLINE ) );
+                                        columnFillCell.Border = PdfPCell.NO_BORDER;
+                                        columnFillCell.Colspan = 8 - columnCount;
+                                        columnFillCell.FixedHeight = 15;
+
+                                        listResourceTable.AddCell( columnFillCell );
+                                    }
+
+                                    //For blank line
+                                    PdfPCell blankCell = new PdfPCell( new Phrase( Chunk.NEWLINE ) );
+                                    blankCell.Border = PdfPCell.NO_BORDER;
+                                    blankCell.Colspan = 8;
+                                    blankCell.FixedHeight = 15;
+
+                                    listResourceTable.AddCell( blankCell );
                                 }
+
                             }
 
-                            var resourceTableCell = new PdfPCell();
-                            resourceTableCell.Border = 0;
-                            resourceTableCell.Colspan = 8;
-                            resourceTableCell.AddElement( resourceTableList );
-                            listResourceTable.AddCell( resourceTableCell );
+                            if ( addResourceTable )
+                            {
+                                PdfPCell borderCell = new PdfPCell( new Phrase( Chunk.NEWLINE ) );
+                                borderCell.Colspan = 8;
+                                borderCell.FixedHeight = 5;
+                                borderCell.BorderWidth = 0;
+                                borderCell.BorderWidthBottom = 1;
+                                borderCell.BorderColorBottom = Color.DARK_GRAY;
 
-                            document.Add( listResourceTable );
+                                listResourceTable.AddCell( borderCell );
+
+                                document.Add( listResourceTable );
+                            }
                         }
                     }
                 }
