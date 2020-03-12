@@ -52,7 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LavaLandscapeReportTemplate.cs" />
-    <Compile Include="Migrations\002_RegisterNewReport.cs" />
     <Compile Include="Migrations\001_RegisterReports.cs" />
     <Compile Include="ResourceQuestionReportTemplate.cs" />
     <Compile Include="SPACReportTemplate.cs" />
