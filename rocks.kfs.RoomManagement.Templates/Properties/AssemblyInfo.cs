@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct( "rocks.kfs.RoomManagement.ReportTemplates" )]
-[assembly: AssemblyCopyright("Copyright © Kingdom First Solutions 2019")]
+[assembly: AssemblyCopyright("Copyright © Kingdom First Solutions 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
