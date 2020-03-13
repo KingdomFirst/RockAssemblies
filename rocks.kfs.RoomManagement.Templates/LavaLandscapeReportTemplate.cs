@@ -111,7 +111,7 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
 
             //Setup the document
             StringReader stringReader = new StringReader( mergeHtml );
-            var document = new Document( PageSize.A4.Rotate(), 25, 25, 25, 25 );
+            var document = new Document( PageSize.LETTER.Rotate(), 25, 25, 25, 25 );
             HTMLWorker htmlWorker = new HTMLWorker( document );
 
             using ( var outputStream = new MemoryStream() )

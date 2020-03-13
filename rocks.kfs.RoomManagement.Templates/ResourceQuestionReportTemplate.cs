@@ -103,7 +103,7 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
 
 
             //Setup the document
-            var document = new Document( PageSize.A4.Rotate(), 25, 25, 25, 50 );
+            var document = new Document( PageSize.LETTER.Rotate(), 25, 25, 25, 50 );
 
             var outputStream = new MemoryStream();
             var writer = PdfWriter.GetInstance( document, outputStream );
@@ -153,7 +153,7 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
                     //Build Subheaders
                     var listSubHeaderTable = new PdfPTable( 8 );
                     listSubHeaderTable.LockedWidth = true;
-                    listSubHeaderTable.TotalWidth = PageSize.A4.Rotate().Width - document.LeftMargin - document.RightMargin;
+                    listSubHeaderTable.TotalWidth = PageSize.LETTER.Rotate().Width - document.LeftMargin - document.RightMargin;
                     listSubHeaderTable.HorizontalAlignment = 0;
                     listSubHeaderTable.SpacingBefore = 10;
                     listSubHeaderTable.SpacingAfter = 0;
@@ -182,7 +182,7 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
                         //Build the list item table
                         var listItemTable = new PdfPTable( 8 );
                         listItemTable.LockedWidth = true;
-                        listItemTable.TotalWidth = PageSize.A4.Rotate().Width - document.LeftMargin - document.RightMargin;
+                        listItemTable.TotalWidth = PageSize.LETTER.Rotate().Width - document.LeftMargin - document.RightMargin;
                         listItemTable.HorizontalAlignment = 0;
                         listItemTable.SpacingBefore = 0;
                         listItemTable.SpacingAfter = 1;
@@ -272,7 +272,7 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
                             //document.Add( Chunk.NEWLINE );
                             var listNoteTable = new PdfPTable( 8 );
                             listNoteTable.LockedWidth = true;
-                            listNoteTable.TotalWidth = PageSize.A4.Rotate().Width - document.LeftMargin - document.RightMargin;
+                            listNoteTable.TotalWidth = PageSize.LETTER.Rotate().Width - document.LeftMargin - document.RightMargin;
                             listNoteTable.HorizontalAlignment = 1;
                             listNoteTable.SpacingBefore = 0;
                             listNoteTable.SpacingAfter = 1;
@@ -292,7 +292,7 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
                         {
                             var listResourceTable = new PdfPTable( 8 );
                             listResourceTable.LockedWidth = true;
-                            listResourceTable.TotalWidth = PageSize.A4.Rotate().Width - document.LeftMargin - document.RightMargin;
+                            listResourceTable.TotalWidth = PageSize.LETTER.Rotate().Width - document.LeftMargin - document.RightMargin;
                             listResourceTable.HorizontalAlignment = 1;
                             listResourceTable.SpacingBefore = 0;
                             listResourceTable.SpacingAfter = 1;
@@ -474,7 +474,7 @@ public class ResourceQuestionHeaderFooter : PdfPageEventHelper
             //Build Subheaders
             var listSubHeaderTable = new PdfPTable( 8 );
             listSubHeaderTable.LockedWidth = true;
-            listSubHeaderTable.TotalWidth = PageSize.A4.Rotate().Width - document.LeftMargin - document.RightMargin;
+            listSubHeaderTable.TotalWidth = PageSize.LETTER.Rotate().Width - document.LeftMargin - document.RightMargin;
             listSubHeaderTable.HorizontalAlignment = 0;
             listSubHeaderTable.SpacingBefore = 10;
             listSubHeaderTable.SpacingAfter = 0;
