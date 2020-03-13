@@ -78,7 +78,7 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
 
 
             //Setup the document
-            var document = new Document( PageSize.A4.Rotate(), 25, 25, 25, 25 );
+            var document = new Document( PageSize.A4.Rotate(), 25, 25, 25, 50 );
 
             var outputStream = new MemoryStream();
             var writer = PdfWriter.GetInstance( document, outputStream );
@@ -447,7 +447,7 @@ public class ResourceQuestionHeaderFooter : PdfPageEventHelper
             document.Add( new Paragraph( CalendarDate, HeaderFont ) );
 
             //Build Subheaders
-            var listSubHeaderTable = new PdfPTable( 4 );
+            var listSubHeaderTable = new PdfPTable( 8 );
             listSubHeaderTable.LockedWidth = true;
             listSubHeaderTable.TotalWidth = PageSize.A4.Rotate().Width - document.LeftMargin - document.RightMargin;
             listSubHeaderTable.HorizontalAlignment = 0;
