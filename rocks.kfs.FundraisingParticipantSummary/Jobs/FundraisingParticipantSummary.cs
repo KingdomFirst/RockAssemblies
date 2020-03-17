@@ -168,6 +168,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                             mergeFields.Add( "BeginDateTime", beginDateTime );
                             mergeFields.Add( "FundraisingGoal", individualFundraisingGoal );
                             mergeFields.Add( "AmountLeft", amountLeft );
+                            mergeFields.Add( "ContributionTotal", contributionTotal );
                             mergeFields.Add( "PercentMet", percentMet );
                             mergeFields.Add( "ShowAddress", showAddress );
                             mergeFields.Add( "ShowAmount", showAmount );
