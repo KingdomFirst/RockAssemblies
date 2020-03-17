@@ -34,20 +34,17 @@ using com.centralaz.RoomManagement.ReportTemplates;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Rock;
-using Rock.Data;
-using Rock.Model;
 
 namespace rocks.kfs.RoomManagement.ReportTemplates
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [System.ComponentModel.Description( "Resource question report template" )]
     [Export( typeof( ReportTemplate ) )]
     [ExportMetadata( "ComponentName", "Resource Questions" )]
     public class ResourceQuestionReportTemplate : ReportTemplate
     {
-
         /// <summary>
         /// Gets or sets the exceptions.
         /// </summary>
@@ -101,7 +98,6 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
             .Select( r => r.ToList() )
             .ToList();
 
-
             //Setup the document
             var document = new Document( PageSize.LETTER.Rotate(), 25, 25, 25, 50 );
 
@@ -139,7 +135,7 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
 
             Font zapfdingbats = new Font( Font.ZAPFDINGBATS );
 
-            // Populate the Lists            
+            // Populate the Lists
             foreach ( var reservationDay in reservationSummaries )
             {
                 var firstReservation = reservationDay.FirstOrDefault();
@@ -201,7 +197,6 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
                         //    listItemTable.DefaultCell.BorderWidthBottom = 1;
                         //    listItemTable.DefaultCell.BorderColorBottom = Color.DARK_GRAY;
                         //}
-
 
                         //Add the list items
                         listItemTable.AddCell( new Phrase( reservationSummary.ReservationName, listItemFontNormal ) );
@@ -377,7 +372,6 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
 
                                     listResourceTable.AddCell( blankCell );
                                 }
-
                             }
 
                             if ( addResourceTable )
@@ -415,24 +409,29 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
 public class ResourceQuestionHeaderFooter : PdfPageEventHelper
 {
     // This is the contentbyte object of the writer
-    PdfContentByte cb;
+    private PdfContentByte cb;
+
     // we will put the final number of pages in a template
-    PdfTemplate template;
+    private PdfTemplate template;
+
     // this is the BaseFont we are going to use for the header / footer
-    BaseFont bf = null;
+    private BaseFont bf = null;
+
     // This keeps track of the creation time
-    DateTime PrintTime = DateTime.Now;
+    private DateTime PrintTime = DateTime.Now;
 
     #region Properties
+
     private string _Title;
+
     public string Title
     {
         get { return _Title; }
         set { _Title = value; }
     }
 
-
     private string _CalendarDate;
+
     public string CalendarDate
     {
         get { return _CalendarDate; }
@@ -440,24 +439,31 @@ public class ResourceQuestionHeaderFooter : PdfPageEventHelper
     }
 
     private string _HeaderLeft;
+
     public string HeaderLeft
     {
         get { return _HeaderLeft; }
         set { _HeaderLeft = value; }
     }
+
     private string _HeaderRight;
+
     public string HeaderRight
     {
         get { return _HeaderRight; }
         set { _HeaderRight = value; }
     }
+
     private Font _HeaderFont;
+
     public Font HeaderFont
     {
         get { return _HeaderFont; }
         set { _HeaderFont = value; }
     }
+
     private Font _SubHeaderFont;
+
     public Font SubHeaderFont
     {
         get { return _SubHeaderFont; }
@@ -465,13 +471,15 @@ public class ResourceQuestionHeaderFooter : PdfPageEventHelper
     }
 
     private bool _IsHeaderShown;
+
     public bool IsHeaderShown
     {
         get { return _IsHeaderShown; }
         set { _IsHeaderShown = value; }
     }
 
-    #endregion
+    #endregion Properties
+
     // we override the onOpenDocument method
     public override void OnOpenDocument( PdfWriter writer, Document document )
     {
@@ -543,6 +551,7 @@ public class ResourceQuestionHeaderFooter : PdfPageEventHelper
         pageSize.GetBottom( 30 ), 0 );
         cb.EndText();
     }
+
     public override void OnCloseDocument( PdfWriter writer, Document document )
     {
         base.OnCloseDocument( writer, document );
@@ -552,5 +561,4 @@ public class ResourceQuestionHeaderFooter : PdfPageEventHelper
         template.ShowText( "" + ( writer.PageNumber - 1 ) );
         template.EndText();
     }
-
 }
