@@ -178,6 +178,14 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
                         {
                             PageEventHandler.IsHeaderShown = false;
                         }
+                        var keepTogetherEvent = new PdfPTable( 1 );
+                        keepTogetherEvent.LockedWidth = true;
+                        keepTogetherEvent.TotalWidth = PageSize.LETTER.Rotate().Width - document.LeftMargin - document.RightMargin;
+                        keepTogetherEvent.KeepTogether = true;
+                        keepTogetherEvent.HorizontalAlignment = 0;
+                        keepTogetherEvent.SpacingBefore = 0;
+                        keepTogetherEvent.SpacingAfter = 1;
+                        keepTogetherEvent.DefaultCell.BorderWidth = 0;
 
                         //Build the list item table
                         var listItemTable = new PdfPTable( 8 );
@@ -265,7 +273,12 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
                         //}
                         listItemTable.AddCell( contactCell );
 
-                        document.Add( listItemTable );
+                        //document.Add( listItemTable );
+
+                        PdfPCell eventRow = new PdfPCell();
+                        eventRow.Border = 0;
+                        eventRow.AddElement( listItemTable );
+                        keepTogetherEvent.AddCell( eventRow );
 
                         if ( !string.IsNullOrWhiteSpace( reservationSummary.Note ) )
                         {
@@ -285,7 +298,12 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
                             noteCell.Colspan = 7;
                             listNoteTable.AddCell( noteCell );
 
-                            document.Add( listNoteTable );
+                            //document.Add( listNoteTable );
+
+                            PdfPCell noteRow = new PdfPCell();
+                            noteRow.Border = 0;
+                            noteRow.AddElement( listNoteTable );
+                            keepTogetherEvent.AddCell( noteRow );
                         }
 
                         if ( reservationSummary.Resources.Any() )
@@ -299,6 +317,7 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
                             listResourceTable.DefaultCell.BorderWidth = 0;
                             listResourceTable.DefaultCell.BorderWidthBottom = 1;
                             listResourceTable.DefaultCell.BorderColorBottom = Color.DARK_GRAY;
+                            listResourceTable.KeepTogether = true;
 
                             var addResourceTable = false;
                             foreach ( var reservationResource in reservationSummary.Resources )
@@ -372,9 +391,15 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
 
                                 listResourceTable.AddCell( borderCell );
 
-                                document.Add( listResourceTable );
+                                //document.Add( listResourceTable );
+
+                                PdfPCell resourceRow = new PdfPCell();
+                                resourceRow.Border = 0;
+                                resourceRow.AddElement( listResourceTable );
+                                keepTogetherEvent.AddCell( resourceRow );
                             }
                         }
+                        document.Add( keepTogetherEvent );
                     }
                 }
                 document.NewPage();
