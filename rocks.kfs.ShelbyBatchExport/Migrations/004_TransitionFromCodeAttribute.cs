@@ -17,13 +17,13 @@ namespace rocks.kfs.ShelbyBatchExport.Migrations
         public override void Up()
         {
             // transaction project
-            RockMigrationHelper.UpdateAttributeQualifier( "365134A6-D516-48E0-AC67-A011D5D59D99", "displaydescription", "True", "4287FEEF-4AB5-4F16-A872-546A393F2DB8" );
+            RockMigrationHelper.UpdateAttributeQualifier( "D15927A2-C163-4286-AC8E-5FD081E753FA", "displaydescription", "True", "BF34ACD9-17AC-41A4-B1B0-7053F04DAC01" );
 
             // transaction detail project
-            RockMigrationHelper.UpdateAttributeQualifier( "951FAFFD-0513-4E31-9271-87853469E85E", "displaydescription", "True", "A0679A5F-A76A-4408-9900-C576CC20E18F" );
+            RockMigrationHelper.UpdateAttributeQualifier( "C02C812E-AEEE-4D22-A13C-796558CD429D", "displaydescription", "True", "D70E0ADC-06C1-4CB6-8330-85EBC7613D2A" );
 
             // account default project
-            RockMigrationHelper.UpdateAttributeQualifier( "85422EA2-AC4E-44E5-99B9-30C131116734", "displaydescription", "True", "DA83FED2-1E06-44A7-8E40-AAECE75169D4" );
+            RockMigrationHelper.UpdateAttributeQualifier( "94E413D7-C6EB-4041-9E86-44269FFB9858", "displaydescription", "True", "F6B0784C-067B-4DF8-96E9-CA7EEE5D71D8" );
 
             // Clear all cached items
             Rock.Web.Cache.RockCache.ClearAllCachedItems();
