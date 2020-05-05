@@ -37,6 +37,7 @@ using iTextSharp.text.pdf;
 using Rock;
 using Rock.Data;
 using Rock.Model;
+using Document = iTextSharp.text.Document;
 
 namespace rocks.kfs.RoomManagement.ReportTemplates
 {
@@ -109,7 +110,7 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
             var writer = PdfWriter.GetInstance( document, outputStream );
 
             // Our custom Header and Footer is done using Event Handler
-            TwoColumnHeaderFooter PageEventHandler = new TwoColumnHeaderFooter();
+            SPACTwoColumnHeaderFooter PageEventHandler = new SPACTwoColumnHeaderFooter();
             writer.PageEvent = PageEventHandler;
 
             // Define the page header
@@ -300,7 +301,7 @@ namespace rocks.kfs.RoomManagement.ReportTemplates
     }
 }
 
-public class TwoColumnHeaderFooter : PdfPageEventHelper
+public class SPACTwoColumnHeaderFooter : PdfPageEventHelper
 {
     // This is the contentbyte object of the writer
     PdfContentByte cb;

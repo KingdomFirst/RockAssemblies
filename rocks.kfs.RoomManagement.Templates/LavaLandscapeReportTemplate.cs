@@ -37,6 +37,7 @@ using iTextSharp.text.pdf;
 using Rock;
 using Rock.Data;
 using Rock.Model;
+using Document = iTextSharp.text.Document;
 
 namespace rocks.kfs.RoomManagement.ReportTemplates
 {
