@@ -136,8 +136,9 @@ namespace rocks.kfs.Reach.Reporting
         /// <param name="lookupContext">The lookup context.</param>
         /// <param name="donation">The donation.</param>
         /// <param name="connectionStatusId">The connection status identifier.</param>
+        /// <param name="updatePrimaryEmail">Whether or not this method should update the primary email address on the person.</param>
         /// <returns></returns>
-        public static Task<int?> FindPersonAsync( RockContext lookupContext, Donation donation, int connectionStatusId )
+        public static Task<int?> FindPersonAsync( RockContext lookupContext, Donation donation, int connectionStatusId, bool updatePrimaryEmail )
         {
             // specifically using Task.Run instead of Task.Factory.StartNew( longRunning)
             // see https://blog.stephencleary.com/2013/08/startnew-is-dangerous.html
@@ -146,7 +147,7 @@ namespace rocks.kfs.Reach.Reporting
                 // look for a single existing person by person fields
                 int? primaryAliasId = null;
                 var reachSearchKey = string.Format( "{0}_{1}", donation.supporter_id, "reach" );
-                var person = new PersonService( lookupContext ).FindPerson( donation.first_name, donation.last_name, donation.email, true, true );
+                var person = new PersonService( lookupContext ).FindPerson( donation.first_name, donation.last_name, donation.email, updatePrimaryEmail, true );
                 if ( person == null )
                 {
                     // check by the search key
