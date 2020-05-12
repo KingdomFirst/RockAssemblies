@@ -52,6 +52,7 @@ namespace rocks.kfs.Reach
     [DefinedValueField( Rock.SystemGuid.DefinedType.FINANCIAL_SOURCE_TYPE, "Source Type", "Select the defined value that new transactions should be attributed with.", true, false, "74650f5b-3e18-43e8-88db-1598deb2ffa0", "", 6 )]
     [DefinedValueField( Rock.SystemGuid.DefinedType.PERSON_CONNECTION_STATUS, "Person Status", "Select the defined value that new people should be created with.", true, false, "", "", 7 )]
     [CustomRadioListField( "Mode", "Mode to use for transactions", "Live,Test", true, "Test", "", 7 )]
+    [BooleanField( "Update Primary Email", "Should the Reach account update the primary Rock email on transaction download?", false, "", 8 )]
 
     #endregion
 
@@ -235,6 +236,7 @@ namespace rocks.kfs.Reach
             var connectionStatus = DefinedValueCache.Get( GetAttributeValue( gateway, "PersonStatus" ) );
             var reachSourceType = DefinedValueCache.Get( GetAttributeValue( gateway, "SourceType" ) );
             var defaultAccount = accountLookup.Get( GetAttributeValue( gateway, "DefaultAccount" ).AsGuid() );
+            var updatePrimaryEmail = GetAttributeValue( gateway, "UpdatePrimaryEmail" ).AsBoolean();
             if ( connectionStatus == null || reachAccountMaps == null || reachSourceType == null || defaultAccount == null )
             {
                 errorMessage = "The Reach Account Map, Person Status, Source Type, or Default Account is not configured correctly in gateway settings.";
@@ -281,7 +283,7 @@ namespace rocks.kfs.Reach
                         if ( transaction == null )
                         {
                             // find or create this person asynchronously for performance
-                            var personAlias = Api.FindPersonAsync( lookupContext, donation, connectionStatus.Id );
+                            var personAlias = Api.FindPersonAsync( lookupContext, donation, connectionStatus.Id, updatePrimaryEmail );
 
                             var reachAccountName = string.Empty;
                             var donationItem = donation.line_items.FirstOrDefault();
