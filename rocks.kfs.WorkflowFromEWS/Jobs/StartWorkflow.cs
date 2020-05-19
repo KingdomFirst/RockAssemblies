@@ -116,7 +116,7 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                             var sf = new SearchFilter.SearchFilterCollection( LogicalOperator.And, new SearchFilter.IsEqualTo( EmailMessageSchema.IsRead, false ) );
                             var view = new ItemView( maxEmails );
                             view.PropertySet = findItemPropertySet;
-                            view.OrderBy.Add( ItemSchema.DateTimeReceived, SortDirection.Ascending );
+                            view.OrderBy.Add( ItemSchema.DateTimeReceived, SortDirection.Descending );
                             var findResults = service.FindItems( folderId, sf, view );
 
                             if ( findResults.Items.Count > 0 )
@@ -149,7 +149,7 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                                         existingWorkflow = new WorkflowService( rockContext )
                                             .Queryable()
                                             .AsNoTracking()
-                                            .FirstOrDefault( w => w.IsActive && w.ForeignKey.Equals( foreignKey, StringComparison.Ordinal ) );
+                                            .FirstOrDefault( w => w.ActivatedDateTime.HasValue && !w.CompletedDateTime.HasValue && w.ForeignKey.Equals( foreignKey, StringComparison.Ordinal ) );
 
                                         createWorkflow = existingWorkflow.IsNull();
                                     }
