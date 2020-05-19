@@ -39,7 +39,14 @@ namespace rocks.kfs.Vimeo
                 var video = await client.GetVideoAsync( videoId );
                 videoInfo.vimeoId = videoId;
                 videoInfo.name = video.name;
-                videoInfo.description = string.Format( "<p>{0}</p>", video.description.Replace( "\n", "<br>" ) );
+                if ( !string.IsNullOrWhiteSpace( video.description ) )
+                {
+                    videoInfo.description = string.Format( "<p>{0}</p>", video.description.Replace( "\n", "<br>" ) );
+                }
+                else
+                {
+                    videoInfo.description = "";
+                }
                 videoInfo.duration = video.duration;
                 videoInfo.hdLink = video.HighDefinitionVideoSecureLink;
                 videoInfo.sdLink = video.StandardVideoSecureLink;
