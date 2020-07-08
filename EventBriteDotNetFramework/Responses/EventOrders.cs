@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Arena.Custom.KFS.Eventbrite.Entities;
-using Arena.Custom.KFS.Eventbrite.Responses;
+using EventBriteDotNetFramework.Entities;
+using EventBriteDotNetFramework.Responses;
 
 
 namespace EventBriteDotNetFramework.Responses

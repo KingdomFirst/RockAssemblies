@@ -22,39 +22,5 @@ namespace EventBriteDotNetFramework.Entities
         public long Event_Id { get; set; }
         public long Order_Id { get; set; }
         public long Ticket_Class_Id { get; set; }
-        public Dictionary<int, string> ArenaStatus
-        {
-            get
-            {
-                var retVar = new Dictionary<int, string>();
-                var lookupid = -1;
-                var statusnote = Status;
-                var lookups = new Core.LookupCollection( Guid.Parse( "705F785D-36DB-4BF2-9C35-2A7F72A55731" ) );
-
-                switch ( Status )
-                {
-                    case "Attending":
-                        lookupid = lookups.FirstOrDefault( l => l.Qualifier == "A" ).LookupID;
-                        break;
-                    case "Deleted":
-                        lookupid = lookups.FirstOrDefault( l => l.Qualifier == "D" ).LookupID;
-                        statusnote = "Deleted on Eventbrite";
-                        break;
-                    case "Not Attending":
-                    case "Refunded":
-                        lookupid = lookups.FirstOrDefault( l => l.Qualifier == "D" ).LookupID;
-                        statusnote = "Refunded on Eventbrite";
-                        break;
-                    default:
-                        lookupid = lookups.FirstOrDefault( l => l.Qualifier == "D" ).LookupID;
-                        statusnote = "Unknown";
-                        break;
-                }
-
-                retVar.Add( lookupid, statusnote );
-
-                return retVar;
-            }
-        }
     }
 }

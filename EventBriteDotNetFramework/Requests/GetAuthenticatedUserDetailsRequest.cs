@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Arena.Custom.KFS.Eventbrite.Entities;
+using EventBriteDotNetFramework.Entities;
 
 namespace EventBriteDotNetFramework.Requests
 {
