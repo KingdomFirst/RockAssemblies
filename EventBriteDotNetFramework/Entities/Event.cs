@@ -18,7 +18,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace EventBriteDotNetFramework.Entities
+namespace EventbriteDotNetFramework.Entities
 {
     public class Event
     {

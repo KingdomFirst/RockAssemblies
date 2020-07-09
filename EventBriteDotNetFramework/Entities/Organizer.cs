@@ -14,7 +14,7 @@
 // limitations under the License.
 // </copyright>
 //
-namespace EventBriteDotNetFramework.Entities
+namespace EventbriteDotNetFramework.Entities
 {
   public class Organizer
   {

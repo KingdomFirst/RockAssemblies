@@ -16,7 +16,7 @@
 //
 using RestSharp.Deserializers;
 
-namespace EventBriteDotNetFramework.Entities
+namespace EventbriteDotNetFramework.Entities
 {
     public class HybridString
     {

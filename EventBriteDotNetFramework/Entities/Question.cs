@@ -20,7 +20,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EventBriteDotNetFramework.Entities
+namespace EventbriteDotNetFramework.Entities
 {
     public class QuestionEntity
     {

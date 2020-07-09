@@ -14,7 +14,7 @@
 // limitations under the License.
 // </copyright>
 //
-namespace EventBriteDotNetFramework
+namespace EventbriteDotNetFramework
 {
     using System;
     using System.Collections.Generic;
@@ -22,7 +22,7 @@ namespace EventBriteDotNetFramework
     using System.Globalization;
     using System.Linq;
     using Entities;
-    using EventBriteDotNetFramework.Responses;
+    using EventbriteDotNetFramework.Responses;
     using RestSharp;
 
     public class EBApi

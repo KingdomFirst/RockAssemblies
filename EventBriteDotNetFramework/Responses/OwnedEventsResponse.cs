@@ -17,9 +17,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using EventBriteDotNetFramework.Entities;
+using EventbriteDotNetFramework.Entities;
 
-namespace EventBriteDotNetFramework.Responses
+namespace EventbriteDotNetFramework.Responses
 {
   public class OwnedEventsResponse
   {

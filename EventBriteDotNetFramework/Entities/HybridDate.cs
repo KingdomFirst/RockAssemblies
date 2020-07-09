@@ -16,7 +16,7 @@
 //
 using System;
 
-namespace EventBriteDotNetFramework.Entities
+namespace EventbriteDotNetFramework.Entities
 {
   public class HybridDate
   {

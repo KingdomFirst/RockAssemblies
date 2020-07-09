@@ -19,11 +19,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using EventBriteDotNetFramework.Entities;
-using EventBriteDotNetFramework.Responses;
+using EventbriteDotNetFramework.Entities;
+using EventbriteDotNetFramework.Responses;
 
 
-namespace EventBriteDotNetFramework.Responses
+namespace EventbriteDotNetFramework.Responses
 {
     public class EventOrders
     {

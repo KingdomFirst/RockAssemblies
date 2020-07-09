@@ -20,9 +20,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using EventBriteDotNetFramework.Entities;
+using EventbriteDotNetFramework.Entities;
 
-namespace EventBriteDotNetFramework.Requests
+namespace EventbriteDotNetFramework.Requests
 {
   public class GetOrganizerByIdRequest : IRequest<Organizer>
   {

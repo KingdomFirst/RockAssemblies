@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 
 
-namespace EventBriteDotNetFramework.Entities
+namespace EventbriteDotNetFramework.Entities
 {
     public class Order
     {

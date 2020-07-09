@@ -15,7 +15,7 @@
 // </copyright>
 //
 
-namespace EventBriteDotNetFramework.Responses
+namespace EventbriteDotNetFramework.Responses
 {
   public class Pagination
   {

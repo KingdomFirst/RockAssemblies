@@ -19,9 +19,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using EventBriteDotNetFramework.Entities;
+using EventbriteDotNetFramework.Entities;
 
-namespace EventBriteDotNetFramework
+namespace EventbriteDotNetFramework
 {
     public class EventbriteEvents
     {

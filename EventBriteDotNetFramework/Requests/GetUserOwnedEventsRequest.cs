@@ -20,9 +20,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using EventBriteDotNetFramework.Responses;
+using EventbriteDotNetFramework.Responses;
 
-namespace EventBriteDotNetFramework.Requests
+namespace EventbriteDotNetFramework.Requests
 {
   public class GetUserOwnedEventsRequest : IRequest<OwnedEventsResponse>
   {
