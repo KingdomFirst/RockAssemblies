@@ -20,6 +20,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EventbriteDotNetFramework;
 using EventbriteDotNetFramework.Entities;
 using EventbriteDotNetFramework.Responses;
 using Rock.Data;
@@ -38,10 +39,20 @@ namespace rocks.kfs.Eventbrite
         public static Guid KFSEBPersonId = new Guid( "E6F108EB-066B-4628-9F75-21830B8ECC90" );
         public static Guid KFSEBProfileMemberFieldModules = new Guid( "261FAF99-E93C-4FD2-9817-634073C64B5E" );
 
+        public static EBApi Api()
+        {
+            return new EBApi( Settings.GetAccessToken() );
+        }
+
+        public static EBApi Api( string oAuthToken )
+        {
+            return new EBApi( oAuthToken );
+        }
+
         public static bool EBUsageCheck( NameValueCollection queryString )
         {
             var retVar = false;
-            var evnt = GetEventFromQS( queryString );
+            var evnt = GetGroupFromQS( queryString );
             //retVar = evnt.CustomFieldModules.FirstOrDefault( fm => fm.Guid.Equals( KFSEBCustomFieldModule ) ) != null;
             return retVar;
         }
@@ -49,7 +60,7 @@ namespace rocks.kfs.Eventbrite
         public static bool EBLinkCheck( NameValueCollection queryString )
         {
             var retVar = false;
-            var evnt = GetEventFromQS( queryString );
+            var evnt = GetGroupFromQS( queryString );
             //retVar = evnt.ForiegnKey != "";
             return retVar;
         }
@@ -61,36 +72,22 @@ namespace rocks.kfs.Eventbrite
             return EBLinkCheck( crazyTalk );
         }
 
-        public static bool EBoAuthCheck( NameValueCollection queryString )
+        public static bool EBoAuthCheck()
         {
             var retVar = false;
-            retVar = GetEBoAuth( queryString ) != "";
+            var getUser = new EBApi( Settings.GetAccessToken() ).GetUser();
+            if ( getUser != null && getUser.Id != 0 )
+            {
+                retVar = true;
+            }
             return retVar;
         }
 
-        public static string GetEBoAuth( NameValueCollection queryString )
-        {
-            var retVar = "";
-            var evnt = GetEventFromQS( queryString );
-            //var cf = evnt.GetAttributeValue().FirstOrDefault( fv => fv.Guid.Equals( KFSEBoAuthTokenCustomField ) );
-            //if ( cf != null )
-            //{
-            //    retVar = cf.SelectedValue;
-            //}
-            return retVar;
-        }
-
-        public static string GetEBoAuth( int profile_id )
-        {
-            var ThisIsKindOfStupid = new NameValueCollection();
-            ThisIsKindOfStupid.Add( "profile", profile_id.ToString() );
-            return GetEBoAuth( ThisIsKindOfStupid );
-        }
-        private static Group GetEventFromQS( NameValueCollection qs )
+        private static Group GetGroupFromQS( NameValueCollection qs )
         {
             if ( qs["GroupId"] != null && int.Parse( qs["GroupId"] ) > 0 )
             {
-                return new GroupService(new RockContext()).Get( int.Parse( qs["GroupId"] ) );
+                return new GroupService( new RockContext() ).Get( int.Parse( qs["GroupId"] ) );
             }
             else
             {

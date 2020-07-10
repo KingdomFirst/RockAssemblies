@@ -56,11 +56,11 @@ namespace rocks.kfs.Eventbrite.Field.Types
                     {
                         if ( condensed )
                         {
-                            formattedValue = eventbriteEvent.Name.Text;
+                            formattedValue = string.Format( "{0} - {1} ({2})", eventbriteEvent.Name.Text, eventbriteEvent.Start.Local, eventbriteEvent.Status );
                         }
                         else
                         {
-                            formattedValue = eventbriteEvent.Name.Html;
+                            formattedValue = string.Format( "{0} - {1} ({2})", eventbriteEvent.Name.Html, eventbriteEvent.Start.Local, eventbriteEvent.Status );
                         }
                     }
                 }
@@ -84,13 +84,13 @@ namespace rocks.kfs.Eventbrite.Field.Types
             var editControl = new RockDropDownList { ID = id };
             editControl.Items.Add( new ListItem() );
 
-            var ownedEvents = new EBApi( Settings.GetAccessToken() ).GetOwnedEvents();
+            var ownedEvents = new EBApi( Settings.GetAccessToken() ).GetOrganizationEvents();
 
             if ( ownedEvents != null && ownedEvents.Events != null )
             {
                 foreach ( var template in ownedEvents.Events )
                 {
-                    editControl.Items.Add( new ListItem( template.Name.Text.ToString(), template.Id.ToString() ) );
+                    editControl.Items.Add( new ListItem( string.Format( "{0} - {1} ({2})", template.Name.Text.ToString(), template.Start.Local, template.Status ), template.Id.ToString() ) );
                 }
 
                 return editControl;

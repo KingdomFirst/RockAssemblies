@@ -49,6 +49,41 @@ namespace rocks.kfs.Eventbrite
         }
 
         /// <summary>
+        /// Gets the organization id value.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetOrganizationId()
+        {
+            string orgId = null;
+            using ( RockContext rockContext = new RockContext() )
+            {
+                var settings = GetSettings( rockContext );
+                if ( settings != null )
+                {
+
+                    orgId = GetSettingValue( settings, "EBOrganizationId", true );
+                }
+            }
+            return orgId;
+        }
+
+        /// <summary>
+        /// Saves the organization id value.
+        /// </summary>
+        /// <param name="value">The value.</param>
+
+        public static void SaveOrganizationId( string value )
+        {
+            using ( var rockContext = new RockContext() )
+            {
+                var settings = GetSettings( rockContext );
+                SetSettingValue( rockContext, settings, "EBOrganizationId", value, true );
+
+                rockContext.SaveChanges();
+            }
+        }
+
+        /// <summary>
         /// Gets the settings.
         /// </summary>
         /// <param name="rockContext">The rock context.</param>

@@ -113,7 +113,7 @@ namespace EventbriteDotNetFramework
         {
             var request = new RestRequest
             {
-                Resource = "/users/me/organizations",
+                Resource = "/users/me/organizations/",
                 RootElement = "UserOrganizationsResponse"
             };
 

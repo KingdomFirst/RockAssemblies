@@ -26,7 +26,7 @@ namespace rocks.kfs.Eventbrite.Migrations
         /// Operations to be performed during the upgrade process.
         /// </summary>
         public override void Up()
-        {        
+        {
             // Assign GUID to Eventbrite and add security
             RockMigrationHelper.UpdateEntityType( "rocks.kfs.Eventbrite.Eventbrite", EBGuid.EntityType.EVENTBRITE, false, true );
             RockMigrationHelper.AddSecurityAuthForEntityType( "rocks.kfs.Eventbrite.Eventbrite", 0, Rock.Security.Authorization.VIEW, true, Rock.SystemGuid.Group.GROUP_ADMINISTRATORS, 0, "C0B244D2-F2F4-4AFE-9081-4AB119BB7EB3" );
