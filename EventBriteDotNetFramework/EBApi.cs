@@ -31,13 +31,40 @@ namespace EventbriteDotNetFramework
         private string _oauthtoken;
         private long _me;
         private User _user;
+        private long? _org;
 
+        public long OrganizationId
+        {
+            get
+            {
+                if ( !_org.HasValue )
+                {
+                    var organizations = GetOrganizations();
+                    if ( organizations != null && organizations.Organizations.Any() )
+                    {
+                        _org = organizations.Organizations.Select( o => o.Id ).FirstOrDefault();
+                    }
+                }
+                return _org.Value;
+            }
+            set
+            {
+                _org = value;
+            }
+        }
         //Initializer
         public EBApi( string oAuthToken )
         {
             _oauthtoken = oAuthToken;
             _user = GetUser();
             _me = _user.Id;
+        }
+        public EBApi( string oAuthToken, long orgId )
+        {
+            _oauthtoken = oAuthToken;
+            _user = GetUser();
+            _me = _user.Id;
+            _org = orgId;
         }
 
         //Base Execute
@@ -72,15 +99,25 @@ namespace EventbriteDotNetFramework
             return Execute<User>( request );
         }
 
-        public OwnedEventsResponse GetOwnedEvents()
+        public OrganizationEventsResponse GetOrganizationEvents()
         {
             var request = new RestRequest
             {
-                Resource = string.Format( "/users/{0}/owned_events/", _me ),
-                RootElement = "OwnedEventsRespoonse"
+                Resource = string.Format( "/organizations/{0}/events/", OrganizationId ),
+                RootElement = "OrganizationEventsResponse"
             };
 
-            return Execute<OwnedEventsResponse>( request );
+            return Execute<OrganizationEventsResponse>( request );
+        }
+        public UserOrganizationsResponse GetOrganizations()
+        {
+            var request = new RestRequest
+            {
+                Resource = "/users/me/organizations",
+                RootElement = "UserOrganizationsResponse"
+            };
+
+            return Execute<UserOrganizationsResponse>( request );
         }
 
         public Event GetEventById( long id )
@@ -157,10 +194,10 @@ namespace EventbriteDotNetFramework
 
         #region Mixed Methods
 
-        public OwnedEventsResponse GetOwnedEvents( bool RSVP = false )
+        public OrganizationEventsResponse GetOrganizationEvents( bool RSVP = false )
         {
-            var evnts = GetOwnedEvents();
-            var retVar = new OwnedEventsResponse
+            var evnts = GetOrganizationEvents();
+            var retVar = new OrganizationEventsResponse
             {
                 Pagination = evnts.Pagination,
                 Events = new List<Event>()
