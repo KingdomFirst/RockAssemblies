@@ -53,7 +53,7 @@ namespace EventbriteDotNetFramework.Entities
         public object[] Categories { get; set; }
 
         public string Status { get; set; }
-        public bool ArenaRSVPEvent( string oAuthToken )
+        public bool IsRSVPEvent( string oAuthToken )
         {
             var retVar = false;
             var eb = new EBApi( oAuthToken );

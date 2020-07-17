@@ -92,8 +92,7 @@ namespace EventbriteDotNetFramework
         {
             var request = new RestRequest
             {
-                Resource = "/users/me/",
-                RootElement = "User"
+                Resource = "/users/me/"
             };
 
             return Execute<User>( request );
@@ -103,8 +102,7 @@ namespace EventbriteDotNetFramework
         {
             var request = new RestRequest
             {
-                Resource = string.Format( "/organizations/{0}/events/", OrganizationId ),
-                RootElement = "OrganizationEventsResponse"
+                Resource = string.Format( "/organizations/{0}/events/", OrganizationId )
             };
 
             return Execute<OrganizationEventsResponse>( request );
@@ -113,8 +111,7 @@ namespace EventbriteDotNetFramework
         {
             var request = new RestRequest
             {
-                Resource = "/users/me/organizations/",
-                RootElement = "UserOrganizationsResponse"
+                Resource = "/users/me/organizations/"
             };
 
             return Execute<UserOrganizationsResponse>( request );
@@ -124,8 +121,7 @@ namespace EventbriteDotNetFramework
         {
             var request = new RestRequest
             {
-                Resource = string.Format( "/events/{0}/", id.ToString() ),
-                RootElement = "Event"
+                Resource = string.Format( "/events/{0}/", id.ToString() )
             };
 
             return Execute<Event>( request );
@@ -140,8 +136,7 @@ namespace EventbriteDotNetFramework
         {
             var request = new RestRequest
             {
-                Resource = string.Format( "events/{0}/orders/?page={1}", id.ToString(), page.ToString() ),
-                RootElement = "EventOrders"
+                Resource = string.Format( "events/{0}/orders/?page={1}", id.ToString(), page.ToString() )
             };
 
             return Execute<EventOrders>( request );
@@ -156,8 +151,7 @@ namespace EventbriteDotNetFramework
         {
             var request = new RestRequest
             {
-                Resource = string.Format( "events/{0}/orders/?page={1}&expand=attendees", id.ToString(), page.ToString() ),
-                RootElement = "EventOrders"
+                Resource = string.Format( "events/{0}/orders/?page={1}&expand=attendees", id.ToString(), page.ToString() )
             };
 
             return Execute<EventOrders>( request );
@@ -167,8 +161,7 @@ namespace EventbriteDotNetFramework
         {
             var request = new RestRequest
             {
-                Resource = string.Format( "events/{0}/ticket_classes/", id.ToString() ),
-                RootElement = "EventTicketClasses"
+                Resource = string.Format( "events/{0}/ticket_classes/", id.ToString() )
             };
 
             return Execute<EventTicketClasses>( request );
@@ -183,8 +176,7 @@ namespace EventbriteDotNetFramework
         {
             var request = new RestRequest
             {
-                Resource = string.Format( "events/{0}/canned_questions/?page={1}", id.ToString(), page.ToString() ),
-                RootElement = "EventCannedQuestions"
+                Resource = string.Format( "events/{0}/canned_questions/?page={1}", id.ToString(), page.ToString() )
             };
 
             return Execute<EventCannedQuestions>( request );
