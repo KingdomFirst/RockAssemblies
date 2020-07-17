@@ -14,19 +14,28 @@
 // limitations under the License.
 // </copyright>
 //
-namespace rocks.kfs.Eventbrite.EBGuid
+using Rock;
+using Rock.Plugin;
+
+namespace rocks.kfs.Eventbrite.Migrations
 {
-    public static class FieldType
+    [MigrationNumber( 3, "1.9.0" )]
+    public partial class FieldType : Migration
     {
         /// <summary>
-        /// Eventbrite Event Field Type
+        /// Operations to be performed during the upgrade process.
         /// </summary>
-        public const string EVENTBRITE_EVENT = "904A0CD2-217C-4CC0-B26D-5D0B48487D21";
+        public override void Up()
+        {
+            RockMigrationHelper.UpdateFieldType( "Eventbrite Person", "", "rocks.kfs.Eventbrite", "rocks.kfs.Eventbrite.Field.Types.EventbritePersonFieldType", EBGuid.FieldType.EVENTBRITE_PERSON );
+        }
 
         /// <summary>
-        /// Eventbrite Event Field Type
+        /// Operations to be performed during the downgrade process.
         /// </summary>
-        public const string EVENTBRITE_PERSON = "3BB985EA-DC6A-4292-99D2-63F16F25A592";
-
+        public override void Down()
+        {
+          
+        }
     }
 }

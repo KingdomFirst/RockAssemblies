@@ -17,14 +17,17 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EventbriteDotNetFramework;
 using EventbriteDotNetFramework.Entities;
 using EventbriteDotNetFramework.Responses;
+using Rock;
 using Rock.Data;
 using Rock.Model;
+using Rock.Web.Cache;
 
 namespace rocks.kfs.Eventbrite
 {
@@ -39,6 +42,13 @@ namespace rocks.kfs.Eventbrite
         public static Guid KFSEBPersonId = new Guid( "E6F108EB-066B-4628-9F75-21830B8ECC90" );
         public static Guid KFSEBProfileMemberFieldModules = new Guid( "261FAF99-E93C-4FD2-9817-634073C64B5E" );
 
+        private static int recordTypePersonId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() ).Id;
+        private static int recordStatusPendingId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_PENDING.AsGuid() ).Id;
+        private static int homePhoneValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_PHONE_TYPE_HOME ).Id;
+        private static int homeLocationValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.GROUP_LOCATION_TYPE_HOME ).Id;
+        private static int mobilePhoneValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_PHONE_TYPE_MOBILE ).Id;
+        private static int workPhoneValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_PHONE_TYPE_WORK ).Id;
+
         public static EBApi Api()
         {
             return new EBApi( Settings.GetAccessToken() );
@@ -49,27 +59,36 @@ namespace rocks.kfs.Eventbrite
             return new EBApi( oAuthToken );
         }
 
+        public static bool EBUsageCheck( int id )
+        {
+            var mockQuerystring = new NameValueCollection();
+            mockQuerystring.Add( "GroupId", id.ToString() );
+            return EBUsageCheck( mockQuerystring );
+        }
+
         public static bool EBUsageCheck( NameValueCollection queryString )
         {
             var retVar = false;
-            var evnt = GetGroupFromQS( queryString );
-            //retVar = evnt.CustomFieldModules.FirstOrDefault( fm => fm.Guid.Equals( KFSEBCustomFieldModule ) ) != null;
+            var group = GetGroupFromQS( queryString );
+            retVar = GetGroupEBEventId( group ) != null;
             return retVar;
         }
 
-        public static bool EBLinkCheck( NameValueCollection queryString )
+        private static AttributeValueCache GetGroupEBEventId( Group group )
         {
-            var retVar = false;
-            var evnt = GetGroupFromQS( queryString );
-            //retVar = evnt.ForiegnKey != "";
-            return retVar;
-        }
+            AttributeValueCache retVar = null;
+            var ebFieldType = FieldTypeCache.Get( EBGuid.FieldType.EVENTBRITE_EVENT.AsGuid() );
+            if ( ebFieldType != null )
+            {
+                group.LoadAttributes();
+                var attribute = group.Attributes.Select( a => a.Value ).FirstOrDefault( a => a.FieldTypeId == ebFieldType.Id );
+                if ( attribute != null )
+                {
+                    retVar = group.AttributeValues.Select( av => av.Value ).FirstOrDefault( av => av.AttributeId == attribute.Id && av.Value != "" );
+                }
+            }
 
-        public static bool EBLinkCheck( int ArenaEventId )
-        {
-            var crazyTalk = new NameValueCollection();
-            crazyTalk.Add( "profile", ArenaEventId.ToString() );
-            return EBLinkCheck( crazyTalk );
+            return retVar;
         }
 
         public static bool EBoAuthCheck()
@@ -96,24 +115,21 @@ namespace rocks.kfs.Eventbrite
         }
 
         public static void SyncEvent(
-            int profileid,
-            int ProfileSource = 272,
-            int ProfileStatus = 255,
-            int organizationID = 1,
-            int DQProfileSource = 272,
-            int DQProfileStatus = 255,
-            int DQProfileID = -1,
+            int groupid,
+            bool updatePrimaryEmail = false,
             string userid = "Eventbrite",
-            DefinedValue RecordStatusValue = null,
-            int MemberStatus = 957 )
+            int recordStatusId = 5,
+            int connectionStatusId = 66 )
         {
             //Setup
-            //var profile = new Core.Profile( profileid );
-            //var eb = new EBApi( GetEBoAuth( profileid ) );
-            //var evntid = long.Parse( profile.ForiegnKey.Substring( 2 ) );
-            //var ebOrders = new List<Order>();
-            //var matcher = new KFSPersonMatch();
-            //var ebEvent = eb.GetEventById( evntid );
+            var rockContext = new RockContext();
+            var group = new GroupService( rockContext ).Get( groupid );
+            var eb = new EBApi( Settings.GetAccessToken() );
+            var groupEBEventIDAttr = GetGroupEBEventId( group );
+            var evntid = long.Parse( groupEBEventIDAttr != null ? groupEBEventIDAttr.Value.SplitDelimitedValues( "^" )[0] : "0" );
+            //var connectionStatus = DefinedValueCache.Get( GetAttributeValue( gateway, "PersonStatus" ) );
+            var ebOrders = new List<Order>();
+            var ebEvent = eb.GetEventById( evntid );
 
             ///* Refactor 6/27 notes:
             // * Eventbrite Event = Arena Event Tag
@@ -128,207 +144,237 @@ namespace rocks.kfs.Eventbrite
             // * 4b Create or match person as necessary.
             // * */
 
-            ////Get Event Brite Attendees
-            //var ebOrderGet = eb.GetExpandedOrdersById( evntid );
-            //ebOrders.AddRange( ebOrderGet.Orders );
-            //if ( ebOrderGet.Pagination.PageCount > 1 )
+            //Get Event Brite Attendees
+            var ebOrderGet = eb.GetExpandedOrdersById( evntid );
+            ebOrders.AddRange( ebOrderGet.Orders );
+            if ( ebOrderGet.Pagination.PageCount > 1 )
+            {
+                var looper = new EventOrders();
+                for ( int i = 2; i <= ebOrderGet.Pagination.PageCount; i++ )
+                {
+                    looper = eb.GetExpandedOrdersById( evntid, i );
+                    ebOrders.AddRange( looper.Orders );
+                }
+            }
+
+            //Get Arena Attendees
+            var ArenaGetter = new KFSRegistrationCollection();
+            var arRegistrations = ArenaGetter.GetEventbriteRegistrants( groupid );
+
+            var groupMemberService = new GroupMemberService( rockContext );
+            var occurrenceService = new AttendanceOccurrenceService( rockContext );
+            var attendanceService = new AttendanceService( rockContext );
+            var personAliasService = new PersonAliasService( rockContext );
+
+            //if ( group.GroupType.EnableRSVP )
             //{
-            //    var looper = new EventOrders();
-            //    for ( int i = 2; i <= ebOrderGet.Pagination.PageCount; i++ )
-            //    {
-            //        looper = eb.GetExpandedOrdersById( evntid, i );
-            //        ebOrders.AddRange( looper.Orders );
-            //    }
+            foreach ( var order in ebOrders )
+            {
+                foreach ( var attendee in order.Attendees )
+                {
+                    if ( string.IsNullOrWhiteSpace( attendee.Profile.Email ) )
+                    {
+                        attendee.Profile.Email = order.Email;
+                    }
+
+                    if ( !string.IsNullOrWhiteSpace( attendee.Profile.First_Name ) && !string.IsNullOrWhiteSpace( attendee.Profile.Last_Name ) && !string.IsNullOrWhiteSpace( attendee.Profile.Email ) )
+                    {
+                        var person = MatchOrAddPerson( rockContext, attendee.Profile, connectionStatusId, updatePrimaryEmail );
+                        var matchedRegistration = MatchRegistration( group.Members, order, person.Id, group );
+                        if ( matchedRegistration == null )
+                        {
+                            var member = new GroupMember
+                            {
+                                GroupId = group.Id,
+                                Person = person,
+                                GuestCount = order.Attendees.Count,
+                                GroupRoleId = group.GroupType.DefaultGroupRoleId.Value,
+                                GroupMemberStatus = GroupMemberStatus.Active
+                            };
+
+                            groupMemberService.Add( member );
+
+                            SetPersonData( rockContext, person, attendee, group );
+                        }
+                        // Get all the occurrences for this group for the selected dates, location and schedule
+                        var occurrences = new AttendanceOccurrenceService( rockContext )
+                            .GetGroupOccurrences( group, ebEvent.Start.Local.Date, ebEvent.End.Local.Date, new List<int>(), new List<int>() )
+                            .ToList();
+
+                        //Record Attendance
+                        if ( attendee.Checked_In )
+                        {
+                            var occ = occurrences.FirstOrDefault( o => o.OccurrenceDate.Date.Equals( ebEvent.Start.Local.Date ) );
+                            if ( occ == null )
+                            {
+                                occ = new AttendanceOccurrence();
+                                occ.GroupId = group.Id;
+                                occ.OccurrenceDate = ebEvent.Start.Local.Date;
+                                occurrenceService.Add( occ );
+                            }
+
+                            var existingAttendees = occ.Attendees.ToList();
+
+                            var attendance = existingAttendees
+                                .Where( a => a.PersonAlias.PersonId == person.Id )
+                                .FirstOrDefault();
+
+                            if ( attendance == null )
+                            {
+                                int? personAliasId = personAliasService.GetPrimaryAliasId( person.Id );
+                                if ( personAliasId.HasValue )
+                                {
+                                    attendance = new Attendance();
+                                    attendance.PersonAliasId = personAliasId;
+                                    attendance.StartDateTime = occ.Schedule != null && occ.Schedule.HasSchedule() ? occ.OccurrenceDate.Date.Add( occ.Schedule.StartTimeOfDay ) : occ.OccurrenceDate;
+                                    attendance.DidAttend = true;
+
+                                    occ.Attendees.Add( attendance );
+                                }
+                            }
+                            else
+                            {
+                                // Otherwise, only record that they attended -- don't change their attendance startDateTime 
+                                attendance.DidAttend = true;
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            rockContext.SaveChanges();
             //}
-
-            ////Get Arena Attendees
-            //var ArenaGetter = new KFSRegistrationCollection();
-            //var arRegistrations = ArenaGetter.GetEventbriteRegistrants( profileid );
-
-            //switch ( profile.ProfileType )
+            //else
             //{
-            //    // Only syncing event profile types is currently supported.
-            //    case ProfileType.Event:
-
-            //        var arenaEvent = new EventProfile( profile.ProfileID );
-            //        if ( arenaEvent.IsRSVPEvent )
+            //    foreach ( var order in ebOrders )
+            //    {
+            //        if ( !string.IsNullOrWhiteSpace( order.First_Name ) && !string.IsNullOrWhiteSpace( order.Last_Name ) && !string.IsNullOrWhiteSpace( order.Email ) )
             //        {
-            //            foreach ( var order in ebOrders )
+            //            var currentRegistration = new Registration();
+            //            var person = MatchOrAddPerson( rockContext, order, connectionStatusId, updatePrimaryEmail );
+            //            var matchedRegistration = MatchRegistration( arRegistrations, order, person.PersonID, profile.ProfileID );
+            //            if ( matchedRegistration == null || matchedRegistration.Registrant.ProfileID != profile.ProfileID && order.Attendees.Count > 0 )
             //            {
-            //                if ( !string.IsNullOrWhiteSpace( order.First_Name ) && !string.IsNullOrWhiteSpace( order.Last_Name ) && !string.IsNullOrWhiteSpace( order.Email ) )
+            //                currentRegistration = new Registration
             //                {
-            //                    var person = matcher.MatchOrAddPerson( order.First_Name,
-            //                                order.First_Name,
-            //                                order.Last_Name,
-            //                                null,
-            //                                order.Email,
-            //                                MemberStatus,
-            //                                RecordStatus,
-            //                                organizationID,
-            //                                DQProfileID,
-            //                                DQProfileSource,
-            //                                DQProfileStatus
-            //                                );
-            //                    var matchedRegistration = MatchRegistration( arRegistrations, order, person.PersonID, profile.ProfileID );
-            //                    if ( matchedRegistration == null || matchedRegistration.Registrant.ProfileID != profile.ProfileID )
+            //                    ProfileId = profile.ProfileID,
+            //                    Owner = person,
+            //                    RSVPCount = -1,
+            //                    RegistrantCount = order.Attendees.Count
+            //                };
+            //                currentRegistration.Save( userid );
+            //            }
+            //            else
+            //            {
+            //                currentRegistration = matchedRegistration.Registrant.Registration;
+            //            }
+
+            //            foreach ( var attendee in order.Attendees )
+            //            {
+            //                if ( string.IsNullOrWhiteSpace( attendee.Profile.Email ) )
+            //                {
+            //                    attendee.Profile.Email = order.Email;
+            //                }
+
+            //                if ( !string.IsNullOrWhiteSpace( attendee.Profile.First_Name ) && !string.IsNullOrWhiteSpace( attendee.Profile.Last_Name ) && !string.IsNullOrWhiteSpace( attendee.Profile.Email ) )
+            //                {
+            //                    var match = matcher.MatchOrAddPerson( attendee.Profile.First_Name,
+            //                    attendee.Profile.First_Name,
+            //                    attendee.Profile.Last_Name,
+            //                    null,
+            //                    attendee.Profile.Email,
+            //                    MemberStatus,
+            //                    RecordStatus,
+            //                    organizationID,
+            //                    DQProfileID,
+            //                    DQProfileSource,
+            //                    DQProfileStatus
+            //                    );
+
+            //                    var registrantTest = new Registrant( profile.ProfileID, match.PersonID );
+            //                    if ( registrantTest.ProfileID == -1 )
             //                    {
-            //                        var reg = new Registration
-            //                        {
-            //                            ProfileId = profile.ProfileID,
-            //                            Owner = person,
-            //                            RSVPCount = order.Attendees.Count,
-            //                            RegistrantCount = -1
-            //                        };
-            //                        reg.Save( userid );
             //                        var rgnt = new Registrant
             //                        {
-            //                            PersonID = person.PersonID,
+            //                            PersonID = match.PersonID,
             //                            ProfileID = profile.ProfileID,
-            //                            Registration = reg
+            //                            Registration = currentRegistration,
+            //                            Status = new Lookup( attendee.ArenaStatus.First().Key ),
+            //                            StatusReason = attendee.ArenaStatus.First().Value,
+            //                            Notes = attendee.ArenaStatus.First().Value
             //                        };
             //                        rgnt.Save( userid );
 
-            //                        SetPersonData( person, order.Attendees[0], profile, organizationID );
-            //                    }
-            //                    //Record Attendance
-            //                    if ( order.Attendees[0].Checked_In && profile.Occurrences.Count != 0 )
-            //                    {
-            //                        var occ = profile.Occurrences.FirstOrDefault( o => o.StartTime.Date.Equals( ebEvent.Start.Local.Date ) );
-            //                        var occAtt = new OccurrenceAttendance( occ.OccurrenceID, person.PersonID )
-            //                        {
-            //                            Attended = true,
-            //                            CheckInTime = ebEvent.Start.Local
-            //                        };
-            //                        if ( occAtt.OccurrenceID == -1 )
-            //                        {
-            //                            occAtt.OccurrenceID = occ.OccurrenceID;
-            //                        }
-            //                        occAtt.Save( "Eventbrite" );
-            //                    }
-            //                }
-            //            }
-            //        }
-            //        else
-            //        {
-            //            foreach ( var order in ebOrders )
-            //            {
-            //                if ( !string.IsNullOrWhiteSpace( order.First_Name ) && !string.IsNullOrWhiteSpace( order.Last_Name ) && !string.IsNullOrWhiteSpace( order.Email ) )
-            //                {
-            //                    var currentRegistration = new Registration();
-            //                    var person = matcher.MatchOrAddPerson( order.First_Name,
-            //                                order.First_Name,
-            //                                order.Last_Name,
-            //                                null,
-            //                                order.Email,
-            //                                MemberStatus,
-            //                                RecordStatus,
-            //                                organizationID,
-            //                                DQProfileID,
-            //                                DQProfileSource,
-            //                                DQProfileStatus
-            //                                );
-            //                    var matchedRegistration = MatchRegistration( arRegistrations, order, person.PersonID, profile.ProfileID );
-            //                    if ( matchedRegistration == null || matchedRegistration.Registrant.ProfileID != profile.ProfileID && order.Attendees.Count > 0 )
-            //                    {
-            //                        currentRegistration = new Registration
-            //                        {
-            //                            ProfileId = profile.ProfileID,
-            //                            Owner = person,
-            //                            RSVPCount = -1,
-            //                            RegistrantCount = order.Attendees.Count
-            //                        };
-            //                        currentRegistration.Save( userid );
+            //                        SetPersonData( match, attendee, profile, organizationID );
             //                    }
             //                    else
             //                    {
-            //                        currentRegistration = matchedRegistration.Registrant.Registration;
-            //                    }
-
-            //                    foreach ( var attendee in order.Attendees )
-            //                    {
-            //                        if ( string.IsNullOrWhiteSpace( attendee.Profile.Email ) )
-            //                        {
-            //                            attendee.Profile.Email = order.Email;
-            //                        }
-
-            //                        if ( !string.IsNullOrWhiteSpace( attendee.Profile.First_Name ) && !string.IsNullOrWhiteSpace( attendee.Profile.Last_Name ) && !string.IsNullOrWhiteSpace( attendee.Profile.Email ) )
-            //                        {
-            //                            var match = matcher.MatchOrAddPerson( attendee.Profile.First_Name,
-            //                            attendee.Profile.First_Name,
-            //                            attendee.Profile.Last_Name,
-            //                            null,
-            //                            attendee.Profile.Email,
-            //                            MemberStatus,
-            //                            RecordStatus,
-            //                            organizationID,
-            //                            DQProfileID,
-            //                            DQProfileSource,
-            //                            DQProfileStatus
-            //                            );
-
-            //                            var registrantTest = new Registrant( profile.ProfileID, match.PersonID );
-            //                            if ( registrantTest.ProfileID == -1 )
-            //                            {
-            //                                var rgnt = new Registrant
-            //                                {
-            //                                    PersonID = match.PersonID,
-            //                                    ProfileID = profile.ProfileID,
-            //                                    Registration = currentRegistration,
-            //                                    Status = new Lookup( attendee.ArenaStatus.First().Key ),
-            //                                    StatusReason = attendee.ArenaStatus.First().Value,
-            //                                    Notes = attendee.ArenaStatus.First().Value
-            //                                };
-            //                                rgnt.Save( userid );
-
-            //                                SetPersonData( match, attendee, profile, organizationID );
-            //                            }
-            //                            else
-            //                            {
-            //                                var registrant = new Arena.Event.Registrant( profile.ProfileID, match.PersonID );
-            //                                registrant.Status = new Lookup( attendee.ArenaStatus.First().Key );
-            //                                registrant.StatusReason = attendee.ArenaStatus.First().Value;
-            //                                registrant.Save( userid );
-            //                            }
-            //                        }
+            //                        var registrant = new Arena.Event.Registrant( profile.ProfileID, match.PersonID );
+            //                        registrant.Status = new Lookup( attendee.ArenaStatus.First().Key );
+            //                        registrant.StatusReason = attendee.ArenaStatus.First().Value;
+            //                        registrant.Save( userid );
             //                    }
             //                }
             //            }
             //        }
-
-            //        break;
-            //}
-
-            //// Write the Sync Time
-            //using ( var context = ContextHelper.GetArenaContext() )
-            //{
-            //    var cf = context.core_custom_field.FirstOrDefault( ccf => ccf.guid.Equals( KFSEBEventSyncTimeCustomField ) );
-            //    var syncTime = new ProfileCustomFieldValue( profile.ProfileID, cf.custom_field_id )
-            //    {
-            //        SelectedValue = DateTime.Now.ToString( "g", CultureInfo.CreateSpecificCulture( "en-us" ) )
-            //    };
-            //    if ( syncTime.ProfileId == -1 )
-            //    {
-            //        syncTime.ProfileId = profile.ProfileID;
             //    }
-            //    syncTime.Save( "Eventbrite" );
             //}
+
+
+            // Write the Sync Time
+            group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, string.Format( "{0}^{1}", groupEBEventIDAttr.Value, DateTime.Now.ToString( "g", CultureInfo.CreateSpecificCulture( "en-us" ) ) ) );
+            group.SaveAttributeValue( groupEBEventIDAttr.AttributeKey, rockContext );
         }
 
+        private static Person MatchOrAddPerson( RockContext rockContext, Profile profile, int connectionStatusId, bool updatePrimaryEmail )
+        {
+            var person = new PersonService( rockContext ).FindPerson( profile.First_Name, profile.Last_Name, profile.Email, updatePrimaryEmail, true );
+            if ( person == null )
+            {
+                //// check by the search key
+                //var existingSearchKey = new PersonSearchKeyService( rockContext ).Queryable().FirstOrDefault( k => k.SearchValue.Equals( searchKey, StringComparison.InvariantCultureIgnoreCase ) );
+                //if ( existingSearchKey != null )
+                //{
+                //    person = existingSearchKey.PersonAlias.Person;
+                //}
+                //else
+                //{
+                // create the person since they don't exist
+                using ( var newRockContext = new RockContext() )
+                {
+                    person = new Person
+                    {
+                        Guid = Guid.NewGuid(),
+                        Gender = Gender.Unknown,
+                        FirstName = profile.First_Name,
+                        LastName = profile.Last_Name,
+                        Email = profile.Email,
+                        IsEmailActive = true,
+                        EmailPreference = EmailPreference.EmailAllowed,
+                        RecordStatusValueId = recordStatusPendingId,
+                        RecordTypeValueId = recordTypePersonId,
+                        ConnectionStatusValueId = connectionStatusId
+                    };
 
-        //private static Core.Address GetArenaAddress( Entities.Address EBAddress )
-        //{
-        //    var retVar = new Core.Address
-        //    {
-        //        StreetLine1 = EBAddress.Address_1 != null ? EBAddress.Address_1 : "",
-        //        StreetLine2 = EBAddress.Address_2 != null ? EBAddress.Address_2 : "",
-        //        City = EBAddress.City != null ? EBAddress.City : "",
-        //        State = EBAddress.Region != null ? EBAddress.Region : "",
-        //        PostalCode = EBAddress.Postal_Code != null ? EBAddress.Postal_Code : "",
-        //        Country = EBAddress.Country != null ? EBAddress.Country : ""
-        //    };
-        //    retVar.Save( "Eventbrite", true, true );
-        //    return retVar;
-        //}
+                    // save so the person alias is attributed for the search key
+                    PersonService.SaveNewPerson( person, newRockContext );
+
+                    //// add the search key
+                    //new PersonSearchKeyService( newRockContext ).Add( new PersonSearchKey
+                    //{
+                    //    SearchTypeValueId = searchKeyValueId,
+                    //    SearchValue = reachSearchKey,
+                    //    PersonAliasId = person.PrimaryAliasId
+                    //} );
+                    newRockContext.SaveChanges();
+
+                }
+                //} // If we ever enable searchKey capability
+            }
+
+            return person;
+        }
 
         public static void LinkEvents( Group profile, Event evnt )
         {
@@ -376,115 +422,163 @@ namespace rocks.kfs.Eventbrite
 
 
 
-        private static void SetPersonData( Person person, Attendee attendee, Group profile, int organizationID )
+        private static void SetPersonData( RockContext rockContext, Person person, Attendee attendee, Group group )
         {
-            ////Address
-            //if ( attendee.Profile.Addresses.Home != null && attendee.Profile.Addresses.Home.Address_1 != null && person.Addresses.PrimaryAddress() == null )
-            //{
-            //    var pa = new Address
-            //    {
-            //        PersonID = person.PersonID,
-            //        Address = GetArenaAddress( attendee.Profile.Addresses.Home ),
-            //        AddressType = new Lookup( SystemLookup.AddressType_Home ), //Home/Main address type
-            //        Primary = true
-            //    };
-            //    pa.save();
-            //    person.Addresses.Add( pa );
-            //    person.Addresses.Save( person.PersonID, "Eventbrite" );
-            //}
-            ////Phone
-            //var homePhone = person.Phones.FirstOrDefault( hp => hp.PhoneType.Equals( new Lookup( SystemLookup.PhoneType_Home ) ) );
-            //var cellPhone = person.Phones.FirstOrDefault( cp => cp.PhoneType.Equals( new Lookup( SystemLookup.PhoneType_Cell ) ) );
-            //var workPhone = person.Phones.FirstOrDefault( wp => wp.PhoneType.Equals( new Lookup( SystemLookup.PhoneType_Business ) ) );
-            //if ( attendee.Profile.Home_Phone != null && homePhone == null )
-            //{
-            //    var pp = new PersonPhone( person.PersonID, new Lookup( SystemLookup.PhoneType_Home ), attendee.Profile.Home_Phone );
-            //    pp.Save( organizationID );
-            //}
-            //if ( attendee.Profile.Cell_Phone != null && cellPhone == null )
-            //{
-            //    var pp = new PersonPhone( person.PersonID, new Lookup( SystemLookup.PhoneType_Cell ), attendee.Profile.Cell_Phone );
-            //    pp.Save( organizationID );
-            //}
-            //if ( attendee.Profile.Work_Phone != null && workPhone == null )
-            //{
-            //    var pp = new PersonPhone( person.PersonID, new Lookup( SystemLookup.PhoneType_Business ), attendee.Profile.Work_Phone );
-            //    pp.Save( organizationID );
-            //}
-            ////Gender
-            //if ( ( person.Gender == Gender.Unknown || person.Gender == Gender.Undefined ) && attendee.Profile.Gender != null )
-            //{
-            //    switch ( attendee.Profile.Gender.ToLower() )
-            //    {
-            //        case "male":
-            //            person.Gender = Gender.Male;
-            //            break;
-            //        case "female":
-            //            person.Gender = Gender.Female;
-            //            break;
-            //        default:
-            //            person.Gender = Gender.Unknown;
-            //            break;
-            //    }
-            //    person.Save( organizationID, "Eventbrite", true );
-            //}
-            ////Birthdate
-            //if ( ( person.BirthDate == null || person.BirthDate == DateTime.MinValue || person.BirthDate == new DateTime( 1900, 1, 1 ) ) && ( attendee.Profile.Birth_Date != null || attendee.Profile.Birth_Date != DateTime.MinValue ) )
-            //{
-            //    person.BirthDate = attendee.Profile.Birth_Date;
-            //    person.Save( organizationID, "Eventbrite", true );
-            //}
+            //Address
+            if ( attendee.Profile.Addresses.Home != null && attendee.Profile.Addresses.Home.Address_1 != null && !person.PrimaryFamily.GroupLocations.Any( gl => gl.GroupLocationTypeValueId == homeLocationValueId ) )
+            {
+                var familyGroup = person.GetFamily( rockContext );
+                var location = new LocationService( rockContext ).Get( attendee.Profile.Addresses.Home.Address_1, attendee.Profile.Addresses.Home.Address_2, attendee.Profile.Addresses.Home.City, attendee.Profile.Addresses.Home.Region, attendee.Profile.Addresses.Home.Postal_Code, attendee.Profile.Addresses.Home.Country );
+                if ( familyGroup != null && location != null )
+                {
+                    familyGroup.GroupLocations.Add( new GroupLocation
+                    {
+                        GroupLocationTypeValueId = homeLocationValueId,
+                        LocationId = location.Id,
+                        IsMailingLocation = true,
+                        IsMappedLocation = true
+                    } );
+                }
+            }
+            //Phone
+            var homePhone = person.PhoneNumbers.FirstOrDefault( hp => hp.NumberTypeValueId.Equals( homePhoneValueId ) );
+            var mobilePhone = person.PhoneNumbers.FirstOrDefault( mp => mp.NumberTypeValueId.Equals( mobilePhoneValueId ) );
+            var workPhone = person.PhoneNumbers.FirstOrDefault( wp => wp.NumberTypeValueId.Equals( workPhoneValueId ) );
+            if ( attendee.Profile.Home_Phone != null && homePhone == null )
+            {
+                person.PhoneNumbers.Add( new PhoneNumber
+                {
+                    Number = attendee.Profile.Home_Phone,
+                    NumberTypeValueId = homePhoneValueId,
+                    Guid = Guid.NewGuid(),
+                    CreatedDateTime = attendee.Created,
+                    ModifiedDateTime = attendee.Changed
+                } );
 
-            ////Set Custom Field Value
-            //var ebidcfid = -1;
-            //var eboidcfid = -1;
-            //var ebtccfid = -1;
-            //using ( var context = ContextHelper.GetArenaContext() )
-            //{
-            //    ebidcfid = context.core_custom_field.FirstOrDefault( cf => cf.guid.Equals( KFSEBPersonId ) ).custom_field_id;
-            //    eboidcfid = context.core_custom_field.FirstOrDefault( cf => cf.guid.Equals( KFSEBPersonOrderIDField ) ).custom_field_id;
-            //    ebtccfid = context.core_custom_field.FirstOrDefault( cf => cf.guid.Equals( KFSEBPersonTicketClassField ) ).custom_field_id;
-            //}
-            //var ebid = new ProfileMemberFieldValue( profile.ProfileID, person.PersonID, ebidcfid );
-            //if ( ebid.PersonId == -1 )
-            //{
-            //    ebid.PersonId = person.PersonID;
-            //    ebid.ProfileId = profile.ProfileID;
-            //}
-            //ebid.SelectedValue = attendee.Id;
-            //ebid.Save( "Eventbrite" );
+            }
+            if ( attendee.Profile.Cell_Phone != null && mobilePhone == null )
+            {
+                person.PhoneNumbers.Add( new PhoneNumber
+                {
+                    Number = attendee.Profile.Cell_Phone,
+                    NumberTypeValueId = mobilePhoneValueId,
+                    Guid = Guid.NewGuid(),
+                    CreatedDateTime = attendee.Created,
+                    ModifiedDateTime = attendee.Changed
+                } );
+            }
+            if ( attendee.Profile.Work_Phone != null && workPhone == null )
+            {
+                person.PhoneNumbers.Add( new PhoneNumber
+                {
+                    Number = attendee.Profile.Work_Phone,
+                    NumberTypeValueId = workPhoneValueId,
+                    Guid = Guid.NewGuid(),
+                    CreatedDateTime = attendee.Created,
+                    ModifiedDateTime = attendee.Changed
+                } );
+            }
+            //Gender
+            if ( person.Gender == Gender.Unknown && attendee.Profile.Gender != null )
+            {
+                switch ( attendee.Profile.Gender.ToLower() )
+                {
+                    case "male":
+                        person.Gender = Gender.Male;
+                        break;
+                    case "female":
+                        person.Gender = Gender.Female;
+                        break;
+                    default:
+                        person.Gender = Gender.Unknown;
+                        break;
+                }
+            }
+            //Birthdate
+            if ( ( person.BirthDate == null || person.BirthDate == DateTime.MinValue || person.BirthDate == new DateTime( 1900, 1, 1 ) ) && ( attendee.Profile.Birth_Date != null || attendee.Profile.Birth_Date != DateTime.MinValue ) )
+            {
+                person.SetBirthDate( attendee.Profile.Birth_Date );
+            }
+            rockContext.SaveChanges();
 
-            //var eboid = new ProfileMemberFieldValue( profile.ProfileID, person.PersonID, eboidcfid );
-            //if ( eboid.PersonId == -1 )
-            //{
-            //    eboid.PersonId = person.PersonID;
-            //    eboid.ProfileId = profile.ProfileID;
-            //}
-            //eboid.SelectedValue = attendee.Order_Id.ToString();
-            //eboid.Save( "Eventbrite" );
+            // Attribute Values in our special eventBritePerson field type are stored as a delimitted string Eventbrite Id^Ticket Class^Eventbrite Order Id
+            var ebPersonVal = string.Format( "{0}^{1}^{2}", attendee.Id, attendee.Ticket_Class_Name, attendee.Order_Id.ToString() );
 
-            //var ebtcid = new ProfileMemberFieldValue( profile.ProfileID, person.PersonID, ebtccfid );
-            //if ( ebtcid.PersonId == -1 )
-            //{
-            //    ebtcid.PersonId = person.PersonID;
-            //    ebtcid.ProfileId = profile.ProfileID;
-            //}
-            //ebtcid.SelectedValue = attendee.Ticket_Class_Name;
-            //ebtcid.Save( "Eventbrite" );
+            var groupMember = group.Members.FirstOrDefault( gm => gm.PersonId == person.Id );
+            if ( groupMember != null )
+            {
+                var attributeKey = "";
+
+                var ebPersonFieldType = FieldTypeCache.Get( EBGuid.FieldType.EVENTBRITE_PERSON.AsGuid() );
+                if ( ebPersonFieldType != null )
+                {
+                    groupMember.LoadAttributes( rockContext );
+                    var attribute = groupMember.Attributes.Select( a => a.Value ).FirstOrDefault( a => a.FieldTypeId == ebPersonFieldType.Id );
+                    if ( attribute != null )
+                    {
+                        attributeKey = attribute.Key;
+                    }
+
+                }
+
+                groupMember.SetAttributeValue( attributeKey, ebPersonVal );
+                groupMember.SaveAttributeValue( attributeKey, rockContext );
+            }
+
+            //rockContext.SaveChanges();
         }
 
-        //private static KFSEventbriteRegistrant MatchRegistration( List<KFSEventbriteRegistrant> arRegistrations, Order Order, int PersonID, int ProfileID )
-        //{
-        //    var retVar = new KFSEventbriteRegistrant();
+        private static GroupMember MatchRegistration( ICollection<GroupMember> groupMembers, Order order, int PersonId, Group group )
+        {
 
-        //    retVar = arRegistrations.FirstOrDefault( ar => ar.MemberFieldValuesByGuid != null && ar.MemberFieldValuesByGuid[KFSEBPersonOrderIDField] == Order.Id.ToString() );
+            GroupMember retVar = null;
+            var attributeKey = "";
 
-        //    if ( retVar == null )
-        //    {
-        //        retVar = arRegistrations.FirstOrDefault( ar => ar.Registrant != null && ar.Registrant.ProfileID == ProfileID && ar.Registrant.PersonID == PersonID );
-        //    }
+            var ebPersonFieldType = FieldTypeCache.Get( EBGuid.FieldType.EVENTBRITE_PERSON.AsGuid() );
+            if ( ebPersonFieldType != null )
+            {
+                var groupMember = group.Members.FirstOrDefault();
+                if ( groupMember != null )
+                {
+                    groupMember.LoadAttributes();
+                    var attribute = groupMember.Attributes.Select( a => a.Value ).FirstOrDefault( a => a.FieldTypeId == ebPersonFieldType.Id );
+                    if ( attribute != null )
+                    {
+                        attributeKey = attribute.Key;
+                        //retVar = group.AttributeValues.Select( av => av.Value ).FirstOrDefault( av => av.AttributeId == attribute.Id && av.Value != "" );
+                    }
+                }
 
-        //    return retVar;
-        //}
+            }
+
+            // Attribute Values in our special eventBritePerson field type are stored as a delimitted string Eventbrite Id^Ticket Class^Eventbrite Order Id
+            foreach ( var gm in groupMembers )
+            {
+                gm.LoadAttributes();
+                var attributeVal = gm.GetAttributeValue( attributeKey );
+                //if ( gm.AttributeValues != null && 
+                //     gm.AttributeValues.Values != null && 
+                //     gm.AttributeValues.Values.FirstOrDefault( av => av.AttributeId == attributeId 
+                //                                                     && av.Value != null 
+                //                                                     && av.Value != ""
+                //                                                     && av.Value.SplitDelimitedValues( "^" )[2] == order.Id.ToString() // 2 = Eventbrite Order Id
+                //     ) != null 
+                //)
+                if ( attributeVal.IsNotNullOrWhiteSpace() && attributeVal.SplitDelimitedValues( "^" )[2] == order.Id.ToString() )
+                {
+                    retVar = gm;
+                    break;
+                }
+            }
+            //retVar = arRegistrations.FirstOrDefault( ar => ar.MemberFieldValuesByGuid != null && ar.MemberFieldValuesByGuid[KFSEBPersonOrderIDField] == Order.Id.ToString() );
+
+            if ( retVar == null )
+            {
+                retVar = groupMembers.FirstOrDefault( gm => gm.Person != null && gm.PersonId == PersonId );
+                //retVar = arRegistrations.FirstOrDefault( ar => ar.Registrant != null && ar.Registrant.ProfileID == ProfileID && ar.Registrant.PersonID == PersonID );
+            }
+
+            return retVar;
+        }
     }
 }

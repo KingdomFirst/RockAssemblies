@@ -14,8 +14,10 @@
 // limitations under the License.
 // </copyright>
 //
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using EventbriteDotNetFramework;
@@ -27,7 +29,8 @@ using rocks.kfs.Eventbrite.Utility.ExtensionMethods;
 
 namespace rocks.kfs.Eventbrite.Field.Types
 {
-    class EventbriteEventFieldType : FieldType
+    [Serializable]
+    public class EventbriteEventFieldType : FieldType
     {
 
         #region Edit Control
@@ -45,23 +48,40 @@ namespace rocks.kfs.Eventbrite.Field.Types
         public override string FormatValue( Control parentControl, string value, Dictionary<string, ConfigurationValue> configurationValues, bool condensed )
         {
             string formattedValue = value;
-
-            long? longVal = value.AsLongOrNull();
+            var splitVal = value.SplitDelimitedValues( "^" );
+            long? longVal = splitVal[0].AsLongOrNull();
             if ( longVal.HasValue )
             {
-                using ( var rockContext = new RockContext() )
+                var eb = new EBApi( Settings.GetAccessToken() );
+                var eventbriteEvent = eb.GetEventById( longVal.Value );
+                var linkedEventTickets = eb.GetTicketsById( longVal.Value );
+                var sold = 0;
+                var total = 0;
+                foreach ( var ticket in linkedEventTickets.Ticket_Classes )
                 {
-                    var eventbriteEvent = new EBApi( Settings.GetAccessToken() ).GetEventById( longVal.Value );
-                    if ( eventbriteEvent != null )
+                    sold += ticket.QuantitySold;
+                    total += ticket.QuantityTotal;
+                }
+                var available = total - sold;
+
+                if ( eventbriteEvent != null )
+                {
+                    if ( condensed )
                     {
-                        if ( condensed )
-                        {
-                            formattedValue = string.Format( "{0} - {1} ({2})", eventbriteEvent.Name.Text, eventbriteEvent.Start.Local, eventbriteEvent.Status );
-                        }
-                        else
-                        {
-                            formattedValue = string.Format( "{0} - {1} ({2})", eventbriteEvent.Name.Html, eventbriteEvent.Start.Local, eventbriteEvent.Status );
-                        }
+                        formattedValue = string.Format( "{0} - {1} ({2})", eventbriteEvent.Name.Text, eventbriteEvent.Start.Local, eventbriteEvent.Status );
+                    }
+                    else
+                    {
+                        var eventbriteStatus = new StringBuilder();
+                        eventbriteStatus.Append( "<dl>" );
+                        eventbriteStatus.AppendFormat( "<dd>{0} - {1} ({2})</dd>", eventbriteEvent.Name.Html, eventbriteEvent.Start.Local, eventbriteEvent.Status );
+                        eventbriteStatus.AppendFormat( "<dt>Link</dt><dd><a href={0}>{0}</a></dd>", eventbriteEvent.Url );
+                        eventbriteStatus.AppendFormat( "<dt>Capacity</dt><dd>{0}</dd>", eventbriteEvent.Capacity.ToString() );
+                        eventbriteStatus.AppendFormat( "<dt>Tickets</dt><dd>{0} Available + {1} Sold = {2} Total</dd>", available, sold, total );
+                        eventbriteStatus.AppendFormat( "<dt>Synced</dt><dd>{0}</dd>", ( splitVal.Length > 1 ) ? splitVal[1] : "Never" );
+                        eventbriteStatus.Append( "</dl>" );
+
+                        formattedValue = eventbriteStatus.ToString();
                     }
                 }
             }
@@ -81,6 +101,7 @@ namespace rocks.kfs.Eventbrite.Field.Types
         /// </returns>
         public override Control EditControl( Dictionary<string, ConfigurationValue> configurationValues, string id )
         {
+            var parentControl = new Panel();
             var editControl = new RockDropDownList { ID = id };
             editControl.Items.Add( new ListItem() );
 
@@ -92,8 +113,38 @@ namespace rocks.kfs.Eventbrite.Field.Types
                 {
                     editControl.Items.Add( new ListItem( string.Format( "{0} - {1} ({2})", template.Name.Text.ToString(), template.Start.Local, template.Status ), template.Id.ToString() ) );
                 }
+                parentControl.Controls.Add( editControl );
 
-                return editControl;
+                long? longVal = editControl.SelectedValue.AsLongOrNull();
+                if ( longVal.HasValue )
+                {
+                    var eb = new EBApi( Settings.GetAccessToken() );
+                    var eventbriteEvent = eb.GetEventById( longVal.Value );
+                    var linkedEventTickets = eb.GetTicketsById( longVal.Value );
+                    var sold = 0;
+                    var total = 0;
+                    foreach ( var ticket in linkedEventTickets.Ticket_Classes )
+                    {
+                        sold += ticket.QuantitySold;
+                        total += ticket.QuantityTotal;
+                    }
+                    var available = total - sold;
+
+                    if ( eventbriteEvent != null )
+                    {
+                        var eventbriteStatus = new StringBuilder();
+                        eventbriteStatus.Append( "<dl>" );
+                        eventbriteStatus.AppendFormat( "<dd>{0} - {1} ({2})</dd>", eventbriteEvent.Name.Html, eventbriteEvent.Start.Local, eventbriteEvent.Status );
+                        eventbriteStatus.AppendFormat( "<dd><a href={0}>{0}</a></dd>", eventbriteEvent.Url );
+                        eventbriteStatus.Append( eventbriteEvent.Capacity.ToString() );
+                        eventbriteStatus.AppendFormat( "<dd>{0} Available + {1} Sold = {2} Total</dd>", available, sold, total );
+                        eventbriteStatus.Append( "</dl>" );
+
+                        parentControl.Controls.Add( new LiteralControl( eventbriteStatus.ToString() ) );
+                    }
+                }
+
+                return parentControl;
             }
 
             return null;
@@ -107,7 +158,8 @@ namespace rocks.kfs.Eventbrite.Field.Types
         /// <returns></returns>
         public override string GetEditValue( Control control, Dictionary<string, ConfigurationValue> configurationValues )
         {
-            var editControl = control as ListControl;
+            var parentControl = control as Panel;
+            var editControl = parentControl.Controls.OfType<RockDropDownList>().FirstOrDefault();
             if ( editControl != null )
             {
                 return editControl.SelectedValue;
@@ -124,10 +176,11 @@ namespace rocks.kfs.Eventbrite.Field.Types
         /// <param name="value">The value.</param>
         public override void SetEditValue( Control control, Dictionary<string, ConfigurationValue> configurationValues, string value )
         {
-            var editControl = control as ListControl;
+            var parentControl = control as Panel;
+            var editControl = parentControl.Controls.OfType<RockDropDownList>().FirstOrDefault();
             if ( editControl != null )
             {
-                editControl.SetValue( value );
+                editControl.SetValue( value.SplitDelimitedValues( "^" )[0] );
             }
         }
 

@@ -31,6 +31,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotLiquid, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="EntityFramework">
       <HintPath>..\..\RockWeb\Bin\EntityFramework.dll</HintPath>
     </Reference>
@@ -54,9 +55,11 @@
     <Compile Include="Entities\RockEventbriteEvent.cs" />
     <Compile Include="Entities\Attendee.cs" />
     <Compile Include="EventbriteEvents.cs" />
+    <Compile Include="Field\Types\EventbritePersonFieldType.cs" />
     <Compile Include="Field\Types\EventbriteEventFieldType.cs" />
     <Compile Include="KFSRegistrationCollection.cs" />
     <Compile Include="Eventbrite.cs" />
+    <Compile Include="Migrations\003_FieldType.cs" />
     <Compile Include="Migrations\002_CreateAttributes.cs" />
     <Compile Include="Migrations\001_Init.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

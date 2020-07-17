@@ -19,107 +19,148 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Rock;
+using Rock.Model;
+using Rock.Web.Cache;
+using rocks.kfs.Eventbrite;
 
 namespace EventbriteDotNetFramework.Entities
 {
     public class RockEventbriteEvent
     {
-        //private Event _ebevent;
-        //private EventProfile _arenaevent;
-        //private int _arenaeventid;
-        //private EBApi _eb;
+        private Event _ebevent;
+        private Group _rockGroup;
+        private int _rockGroupId;
+        private EBApi _eb;
 
-        public RockEventbriteEvent( int ArenaEventId )
+        public RockEventbriteEvent( int GroupId )
         {
-            //LoadArenaEvent( ArenaEventId );
-            //if ( EBApi.EBLinkCheck( ArenaEventId ) )
-            //{
-            //    LoadEventbriteEvent();
-            //}
+            LoadRockGroup( GroupId );
+            if ( Eventbrite.EBUsageCheck( GroupId ) )
+            {
+                LoadEventbriteEvent();
+            }
+        }
+        public RockEventbriteEvent( Group group )
+        {
+            LoadRockGroup( group );
+            if ( Eventbrite.EBUsageCheck( group.Id ) )
+            {
+                LoadEventbriteEvent();
+            }
         }
 
-        //public Event EventbriteEvent
-        //{
-        //    get
-        //    {
-        //        return _ebevent;
-        //    }
-        //}
-        //public EventProfile ArenaEvent
-        //{
-        //    get
-        //    {
-        //        return _arenaevent;
-        //    }
-        //}
-        //public string oAuthToken
-        //{
-        //    get
-        //    {
-        //        return EBApi.GetEBoAuth( _arenaevent.ProfileID );
-        //    }
-        //}
-        //public string ArenaEventName
-        //{
-        //    get
-        //    {
-        //        return _arenaevent.Title;
-        //    }
-        //}
-        //public string EventbriteEventName
-        //{
-        //    get
-        //    {
-        //        return _ebevent.Name.Text;
-        //    }
-        //}
-        //public int ArenaEventId
-        //{
-        //    get
-        //    {
-        //        return _arenaevent.ProfileID;
-        //    }
-        //}
-        //public string LastSynced
-        //{
-        //    get
-        //    {
-        //        var sync = _arenaevent.CustomFieldValues.FirstOrDefault( cf => cf.Guid.Equals( new Guid( "7F95AD8D-A58C-4E8B-B7F6-291571BBD7F6" ) ) );
-        //        if ( sync != null && sync.SelectedValue != null )
-        //        {
-        //            return _arenaevent.CustomFieldValues.FirstOrDefault( cf => cf.Guid.Equals( new Guid( "7F95AD8D-A58C-4E8B-B7F6-291571BBD7F6" ) ) ).SelectedValue;
-        //        }
-        //        else
-        //        {
-        //            return "Never";
-        //        }
+        public Event EventbriteEvent
+        {
+            get
+            {
+                return _ebevent;
+            }
+        }
+        public Group RockGroup
+        {
+            get
+            {
+                return _rockGroup;
+            }
+        }
+
+        public string RockGroupName
+        {
+            get
+            {
+                return _rockGroup.Name;
+            }
+        }
+        public string EventbriteEventName
+        {
+            get
+            {
+                return _ebevent.Name.Text;
+            }
+        }
+        public int RockGroupId
+        {
+            get
+            {
+                return _rockGroup.Id;
+            }
+        }
+        public string LastSynced
+        {
+            get
+            {
+                var sync = "";
+                var ebFieldType = FieldTypeCache.Get( rocks.kfs.Eventbrite.EBGuid.FieldType.EVENTBRITE_EVENT.AsGuid() );
+                if ( ebFieldType != null )
+                {
+                    _rockGroup.LoadAttributes();
+                    var attribute = _rockGroup.Attributes.Select( a => a.Value ).FirstOrDefault( a => a.FieldTypeId == ebFieldType.Id );
+                    if ( attribute != null )
+                    {
+                        var attributeVal = _rockGroup.AttributeValues.Select( av => av.Value ).FirstOrDefault( av => av.AttributeId == attribute.Id && av.Value != "" );
+                        if ( attributeVal != null )
+                        {
+                            var splitVal = attributeVal.Value.SplitDelimitedValues( "^" );
+                            if ( splitVal.Length > 1 )
+                            {
+                                sync = splitVal[1];
+                            }
+                        }
+                    }
+                }
+                if ( sync.IsNotNullOrWhiteSpace() )
+                {
+                    return sync;
+                }
+                else
+                {
+                    return "Never";
+                }
 
 
-        //    }
-        //}
-        //private void LoadArenaEvent( int id )
-        //{
-        //    _arenaevent = new EventProfile( id );
-        //    _arenaeventid = _arenaevent.ProfileID;
-        //}
-        //private void LoadEventbriteEvent()
-        //{
-        //    if ( _arenaevent == null )
-        //    {
-        //        return;
-        //    }
-        //    _eb = new EBApi( EBApi.GetEBoAuth( _arenaevent.ProfileID ) );
-        //    var ebevents = _eb.GetOwnedEvents();
-        //    var testId = new long();
-        //    long.TryParse( _arenaevent.ForiegnKey.Substring( 2 ), out testId );
-        //    foreach ( var evnt in ebevents.Events )
-        //    {
-        //        if ( evnt.Id == testId )
-        //        {
-        //            _ebevent = evnt;
-        //        }
-        //    }
-        //}
+            }
+        }
+        private void LoadRockGroup( Group group )
+        {
+            _rockGroup = group;
+            _rockGroupId = _rockGroup.Id;
+        }
+        private void LoadRockGroup( int id )
+        {
+            _rockGroup = new GroupService( new Rock.Data.RockContext() ).Get( id );
+            _rockGroupId = _rockGroup.Id;
+        }
+        private void LoadEventbriteEvent()
+        {
+            if ( _rockGroup == null )
+            {
+                return;
+            }
+            _eb = new EBApi( Settings.GetAccessToken() );
+            var ebevents = _eb.GetOrganizationEvents();
+            var testId = new long();
+            var ebFieldType = FieldTypeCache.Get( rocks.kfs.Eventbrite.EBGuid.FieldType.EVENTBRITE_EVENT.AsGuid() );
+            if ( ebFieldType != null )
+            {
+                _rockGroup.LoadAttributes();
+                var attribute = _rockGroup.Attributes.Select( a => a.Value ).FirstOrDefault( a => a.FieldTypeId == ebFieldType.Id );
+                if ( attribute != null )
+                {
+                    var attributeVal = _rockGroup.AttributeValues.Select( av => av.Value ).FirstOrDefault( av => av.AttributeId == attribute.Id && av.Value != "" );
+                    if ( attributeVal != null )
+                    {
+                        long.TryParse( attributeVal.Value.SplitDelimitedValues( "^" )[0], out testId );
+                    }
+                }
+            }
+            foreach ( var evnt in ebevents.Events )
+            {
+                if ( evnt.Id == testId )
+                {
+                    _ebevent = evnt;
+                }
+            }
+        }
     }
 }

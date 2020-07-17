@@ -20,7 +20,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EventbriteDotNetFramework.Entities;
+using Rock;
 using Rock.Model;
+using Rock.Web.Cache;
 
 namespace EventbriteDotNetFramework
 {
@@ -39,24 +41,15 @@ namespace EventbriteDotNetFramework
         public List<RockEventbriteEvent> Events()
         {
             var retVar = new List<RockEventbriteEvent>();
-            //IQueryable<core_profile> AllEBEvents;
-            //IQueryable<core_profile> FilteredEvents;
-
-            //using ( var context = ContextHelper.GetArenaContext() )
-            //{
-            //    AllEBEvents = context.core_profile.Where( cp => cp.foreign_key.Substring( 0, 2 ).Equals( "EB" ) );
-
-
-            //    FilteredEvents = AllEBEvents;
-            //    if ( _person != null )
-            //    {
-            //        FilteredEvents = FilteredEvents.Where( e => e.owner_id.Equals( _person.PersonID ) );
-            //    }
-            //    foreach ( var fe in FilteredEvents.ToList() )
-            //    {
-            //        retVar.Add( new ArenaEventbriteEvent( fe.profile_id ) );
-            //    }
-            //}
+            var ebFieldType = FieldTypeCache.Get( rocks.kfs.Eventbrite.EBGuid.FieldType.EVENTBRITE_EVENT.AsGuid() );
+            if ( ebFieldType != null )
+            {
+                var groups = new GroupService( new Rock.Data.RockContext() ).Queryable().Where( g => g.Attributes.Any( a => a.Value.FieldTypeId == ebFieldType.Id ) );
+                foreach ( var group in groups.ToList() )
+                {
+                    retVar.Add( new RockEventbriteEvent( group ) );
+                }
+            }
             return retVar;
         }
 
