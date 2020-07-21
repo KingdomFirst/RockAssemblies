@@ -28,6 +28,7 @@ using Rock;
 using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
+using rocks.kfs.Eventbrite.Utility.ExtensionMethods;
 
 namespace rocks.kfs.Eventbrite
 {
@@ -91,6 +92,30 @@ namespace rocks.kfs.Eventbrite
             return retVar;
         }
 
+        public static Group GetGroupByEBEventId( string ebEventId )
+        {
+            return GetGroupByEBEventId( ebEventId.AsLong() );
+        }
+
+        public static Group GetGroupByEBEventId( long ebEventId )
+        {
+            Group retVar = null;
+            var ebFieldType = FieldTypeCache.Get( EBGuid.FieldType.EVENTBRITE_EVENT.AsGuid() );
+            if ( ebFieldType != null )
+            {
+                using ( var rockContext = new RockContext() )
+                {
+                    var attributeVal = new AttributeValueService( rockContext ).Queryable().FirstOrDefault( av => av.Attribute.FieldTypeId == ebFieldType.Id && av.Value.SplitDelimitedValues( "^" )[0].Equals( ebEventId.ToString() ) );
+                    if ( attributeVal != null )
+                    {
+                        retVar = new GroupService( rockContext ).Get( attributeVal.Guid );
+                    }
+                }
+            }
+
+            return retVar;
+        }
+
         public static bool EBoAuthCheck()
         {
             var retVar = false;
@@ -100,6 +125,13 @@ namespace rocks.kfs.Eventbrite
                 retVar = true;
             }
             return retVar;
+        }
+
+        private static Group GetGroup( int id )
+        {
+            var mockQuerystring = new NameValueCollection();
+            mockQuerystring.Add( "GroupId", id.ToString() );
+            return GetGroupFromQS( mockQuerystring );
         }
 
         private static Group GetGroupFromQS( NameValueCollection qs )
@@ -181,7 +213,7 @@ namespace rocks.kfs.Eventbrite
                     {
                         var person = MatchOrAddPerson( rockContext, attendee.Profile, connectionStatusId, updatePrimaryEmail );
                         var matchedRegistration = MatchRegistration( group.Members, order, person.Id, group );
-                        if ( matchedRegistration == null )
+                        if ( matchedRegistration == null && ( order.Status != "deleted" || order.Status != "abandoned" ) )
                         {
                             var member = new GroupMember
                             {
@@ -196,10 +228,17 @@ namespace rocks.kfs.Eventbrite
 
                             SetPersonData( rockContext, person, attendee, group );
                         }
+                        else if ( matchedRegistration != null && order.Status == "deleted" )
+                        {
+                            matchedRegistration.GroupMemberStatus = GroupMemberStatus.Inactive;
+                            matchedRegistration.Note = "Eventbrite order deleted!";
+
+                            //groupMemberService.Delete( matchedRegistration );
+                        }
                         // Get all the occurrences for this group for the selected dates, location and schedule
                         var occurrences = new AttendanceOccurrenceService( rockContext )
-                            .GetGroupOccurrences( group, ebEvent.Start.Local.Date, ebEvent.End.Local.Date, new List<int>(), new List<int>() )
-                            .ToList();
+                        .GetGroupOccurrences( group, ebEvent.Start.Local.Date, ebEvent.End.Local.Date, new List<int>(), new List<int>() )
+                        .ToList();
 
                         //Record Attendance
                         if ( attendee.Checked_In )
@@ -323,7 +362,7 @@ namespace rocks.kfs.Eventbrite
 
 
             // Write the Sync Time
-            group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, string.Format( "{0}^{1}", groupEBEventIDAttr.Value, DateTime.Now.ToString( "g", CultureInfo.CreateSpecificCulture( "en-us" ) ) ) );
+            group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, string.Format( "{0}^{1}", groupEBEventIDAttr.Value.SplitDelimitedValues( "^" )[0], DateTime.Now.ToString( "g", CultureInfo.CreateSpecificCulture( "en-us" ) ) ) );
             group.SaveAttributeValue( groupEBEventIDAttr.AttributeKey, rockContext );
         }
 
@@ -400,27 +439,22 @@ namespace rocks.kfs.Eventbrite
             //}
         }
 
-        public static void UnlinkEvents( int v )
+        public static void UnlinkEvents( int id )
         {
-            //using ( var context = ContextHelper.GetArenaContext() )
-            //{
-            //    var cp = context.core_profile.FirstOrDefault( p => p.profile_id.Equals( v ) );
-            //    cp.foreign_key = "";
-            //    var fm = context.core_custom_field_module.FirstOrDefault( f => f.guid.Equals( KFSEBProfileMemberFieldModules ) );
-            //    var cpfm = new ProfileMemberFieldModule( v, fm.custom_field_module_id );
-            //    cpfm.Active = false;
-            //    cpfm.ProfileId = v;
-            //    cpfm.Save( "Eventbrite" );
-            //    context.SaveChanges();
-            //}
+            var group = GetGroup( id );
+            UnlinkEvents( group );
         }
 
-        public static void UnlinkEvents( Group ep )
+        public static void UnlinkEvents( Group group )
         {
-            UnlinkEvents( ep.Id );
+            var groupEBEventIDAttr = GetGroupEBEventId( group );
+
+            using ( var rockContext = new RockContext() )
+            {
+                group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, string.Empty );
+                group.SaveAttributeValue( groupEBEventIDAttr.AttributeKey, rockContext );
+            }
         }
-
-
 
         private static void SetPersonData( RockContext rockContext, Person person, Attendee attendee, Group group )
         {

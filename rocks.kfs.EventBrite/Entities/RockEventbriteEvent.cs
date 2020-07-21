@@ -76,7 +76,11 @@ namespace EventbriteDotNetFramework.Entities
         {
             get
             {
-                return _ebevent.Name.Text;
+                if (_ebevent != null)
+                {
+                    return _ebevent.Name.Text;
+                }
+                return string.Empty;
             }
         }
         public int RockGroupId

@@ -21,6 +21,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EventbriteDotNetFramework.Entities;
 using Rock;
+using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
 
@@ -44,10 +45,14 @@ namespace EventbriteDotNetFramework
             var ebFieldType = FieldTypeCache.Get( rocks.kfs.Eventbrite.EBGuid.FieldType.EVENTBRITE_EVENT.AsGuid() );
             if ( ebFieldType != null )
             {
-                var groups = new GroupService( new Rock.Data.RockContext() ).Queryable().Where( g => g.Attributes.Any( a => a.Value.FieldTypeId == ebFieldType.Id ) );
-                foreach ( var group in groups.ToList() )
+                using ( RockContext rockContext = new RockContext() )
                 {
-                    retVar.Add( new RockEventbriteEvent( group ) );
+                    var attributeValues = new AttributeValueService( rockContext ).Queryable().Where( av => av.Attribute.FieldTypeId == ebFieldType.Id && av.EntityId.HasValue && av.Value != "" ).Select( av => av.EntityId.Value );
+                    var groups = new GroupService( rockContext ).GetListByIds( attributeValues.ToList() );
+                    foreach ( var group in groups )
+                    {
+                        retVar.Add( new RockEventbriteEvent( group ) );
+                    }
                 }
             }
             return retVar;

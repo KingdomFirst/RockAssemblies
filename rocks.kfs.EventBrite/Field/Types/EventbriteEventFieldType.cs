@@ -158,8 +158,7 @@ namespace rocks.kfs.Eventbrite.Field.Types
         /// <returns></returns>
         public override string GetEditValue( Control control, Dictionary<string, ConfigurationValue> configurationValues )
         {
-            var parentControl = control as Panel;
-            var editControl = parentControl.Controls.OfType<RockDropDownList>().FirstOrDefault();
+            var editControl = control as RockDropDownList;
             if ( editControl != null )
             {
                 return editControl.SelectedValue;
