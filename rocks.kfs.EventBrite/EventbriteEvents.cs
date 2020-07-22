@@ -14,35 +14,22 @@
 // limitations under the License.
 // </copyright>
 //
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EventbriteDotNetFramework.Entities;
 using Rock;
 using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
 
-namespace EventbriteDotNetFramework
+namespace rocks.kfs.Eventbrite
 {
     public class EventbriteEvents
     {
-        private Person _person = null;
-        private string _oauthtoken = null;
-
-        public EventbriteEvents() { }
-
-        public EventbriteEvents( Person owner )
-        {
-            _person = owner;
-        }
-
         public List<RockEventbriteEvent> Events()
         {
             var retVar = new List<RockEventbriteEvent>();
-            var ebFieldType = FieldTypeCache.Get( rocks.kfs.Eventbrite.EBGuid.FieldType.EVENTBRITE_EVENT.AsGuid() );
+            var ebFieldType = FieldTypeCache.Get( EBGuid.FieldType.EVENTBRITE_EVENT.AsGuid() );
             if ( ebFieldType != null )
             {
                 using ( RockContext rockContext = new RockContext() )
@@ -57,6 +44,5 @@ namespace EventbriteDotNetFramework
             }
             return retVar;
         }
-
     }
 }

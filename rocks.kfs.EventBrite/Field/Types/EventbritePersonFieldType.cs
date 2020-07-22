@@ -49,9 +49,13 @@ namespace rocks.kfs.Eventbrite.Field.Types
             string formattedValue = value;
 
             var splitValues = value.SplitDelimitedValues( "^" );
-            if ( splitValues.Length > 2 )
+            if ( splitValues.Length > 3 )
             {
-                formattedValue = string.Format( "<strong>Attendee id:</strong> {0}, <strong>Ticket Class:</strong> {1}, <strong>Order id:</strong> {2}", splitValues[0], splitValues[1], splitValues[2] );
+                formattedValue = string.Format( "<strong>Ticket Qty:</strong> {3}, <strong>Ticket Class:</strong> {1}, <strong>Attendee id:</strong> {0}, <strong>Order id:</strong> {2}", splitValues[0], splitValues[1], splitValues[2], splitValues[3] );
+            }
+            else if ( splitValues.Length > 2 )
+            {
+                formattedValue = string.Format( "<strong>Ticket Class:</strong> {1}, <strong>Attendee id:</strong> {0}, <strong>Order id:</strong> {2}", splitValues[0], splitValues[1], splitValues[2] );
             }
             else
             {
@@ -107,7 +111,10 @@ namespace rocks.kfs.Eventbrite.Field.Types
             if ( editControl != null )
             {
                 var splitValues = value.SplitDelimitedValues( "^" );
-                if ( splitValues.Length > 2 )
+                if ( splitValues.Length > 3 )
+                {
+                    editControl.Text = string.Format( "<dl><dt>Attendee id:</dt><dd>{0}</dd><dt>Ticket Class:</dt><dd>{1}</dd><dt>Order id:</dt><dd>{2}</dd><dt>Ticket Quantity:</dt><dd>{3}</dd></dl>", splitValues[0], splitValues[1], splitValues[2], splitValues[3] );
+                } else if ( splitValues.Length > 2 )
                 {
                     editControl.Text = string.Format( "<dl><dt>Attendee id:</dt><dd>{0}</dd><dt>Ticket Class:</dt><dd>{1}</dd><dt>Order id:</dt><dd>{2}</dd></dl>", splitValues[0], splitValues[1], splitValues[2] );
                 }
@@ -116,6 +123,34 @@ namespace rocks.kfs.Eventbrite.Field.Types
                     editControl.Text = value;
                 }
             }
+        }
+
+        #endregion
+
+
+        #region Filter Control
+
+        /// <summary>
+        /// Creates the control needed to filter (query) values using this field type.
+        /// </summary>
+        /// <param name="configurationValues">The configuration values.</param>
+        /// <param name="id">The identifier.</param>
+        /// <param name="required">if set to <c>true</c> [required].</param>
+        /// <param name="filterMode">The filter mode.</param>
+        /// <returns></returns>
+        public override System.Web.UI.Control FilterControl( System.Collections.Generic.Dictionary<string, ConfigurationValue> configurationValues, string id, bool required, Rock.Reporting.FilterMode filterMode )
+        {
+            // This field type does not support filtering
+            return null;
+        }
+
+        /// <summary>
+        /// Determines whether this filter has a filter control
+        /// </summary>
+        /// <returns></returns>
+        public override bool HasFilterControl()
+        {
+            return false;
         }
 
         #endregion
