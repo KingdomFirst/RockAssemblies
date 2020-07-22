@@ -53,6 +53,19 @@ namespace EventbriteDotNetFramework.Entities
         public object[] Categories { get; set; }
 
         public string Status { get; set; }
+
+        public bool IsRSVPEvent( EBApi eb )
+        {
+            var retVar = false;
+            var cq = eb.GetEventCannedQuestionsById( Id );
+            var test = cq.Questions.FirstOrDefault( q => q.Respondent.Equals( "attendee", StringComparison.CurrentCultureIgnoreCase ) );
+            if ( test == null )
+            {
+                retVar = true;
+            }
+            return retVar;
+        }
+
         public bool IsRSVPEvent( string oAuthToken )
         {
             var retVar = false;
