@@ -53,7 +53,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\RockEventbriteEvent.cs" />
-    <Compile Include="Entities\Attendee.cs" />
     <Compile Include="Entities\WebhookResponse.cs" />
     <Compile Include="EventbriteEvents.cs" />
     <Compile Include="Field\Types\EventbritePersonFieldType.cs" />

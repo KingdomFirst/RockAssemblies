@@ -92,7 +92,7 @@ namespace EventbriteDotNetFramework
         {
             var request = new RestRequest
             {
-                Resource = "/users/me/"
+                Resource = "users/me/"
             };
 
             return Execute<User>( request );
@@ -102,7 +102,7 @@ namespace EventbriteDotNetFramework
         {
             var request = new RestRequest
             {
-                Resource = string.Format( "/organizations/{0}/events/", OrganizationId )
+                Resource = string.Format( "organizations/{0}/events/", OrganizationId )
             };
 
             return Execute<OrganizationEventsResponse>( request );
@@ -111,7 +111,7 @@ namespace EventbriteDotNetFramework
         {
             var request = new RestRequest
             {
-                Resource = "/users/me/organizations/"
+                Resource = "users/me/organizations/"
             };
 
             return Execute<UserOrganizationsResponse>( request );
@@ -121,7 +121,7 @@ namespace EventbriteDotNetFramework
         {
             var request = new RestRequest
             {
-                Resource = string.Format( "/events/{0}/", id.ToString() )
+                Resource = string.Format( "events/{0}/", id.ToString() )
             };
 
             return Execute<Event>( request );

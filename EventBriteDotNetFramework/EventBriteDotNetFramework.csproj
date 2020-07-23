@@ -72,14 +72,12 @@
     <Compile Include="Requests\GetOrganizerByIdRequest.cs" />
     <Compile Include="Requests\GetUserDetailsByIdRequest.cs" />
     <Compile Include="Requests\GetOrganizationEventsRequest.cs" />
-    <Compile Include="Requests\GetUserOwnedEventsRequest.cs" />
     <Compile Include="Requests\IRequest.cs" />
     <Compile Include="Responses\EventCannedQuestions.cs" />
     <Compile Include="Responses\EventOrders.cs" />
     <Compile Include="Responses\EventTicketClasses.cs" />
     <Compile Include="Responses\UserOrganizationsResponse.cs" />
     <Compile Include="Responses\OrganizationEventsResponse.cs" />
-    <Compile Include="Responses\OwnedEventsResponse.cs" />
     <Compile Include="Responses\Pagination.cs" />
   </ItemGroup>
   <ItemGroup>
