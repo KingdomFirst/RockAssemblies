@@ -344,24 +344,31 @@ namespace rocks.kfs.Eventbrite
             return person;
         }
 
-        public static void LinkEvents( Group group, long evnt )
+        public static bool LinkEvents( Group group, long evnt )
         {
-            var groupEBEventIDAttr = GetGroupEBEventId( group );
-
-            if ( groupEBEventIDAttr != null )
+            var retVar = false;
+            var ebFieldType = FieldTypeCache.Get( EBGuid.FieldType.EVENTBRITE_EVENT.AsGuid() );
+            if ( ebFieldType != null )
             {
-                using ( var rockContext = new RockContext() )
+                group.LoadAttributes();
+                var attribute = group.Attributes.Select( a => a.Value ).FirstOrDefault( a => a.FieldTypeId == ebFieldType.Id );
+                if ( attribute != null )
                 {
-                    group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, evnt );
-                    group.SaveAttributeValue( groupEBEventIDAttr.AttributeKey, rockContext );
+                    using ( var rockContext = new RockContext() )
+                    {
+                        group.SetAttributeValue( attribute.Key, evnt );
+                        group.SaveAttributeValue( attribute.Key, rockContext );
+                        retVar = true;
+                    }
                 }
             }
+            return retVar;
         }
 
-        public static void LinkEvents( int groupId, long evnt )
+        public static bool LinkEvents( int groupId, long evnt )
         {
             var group = GetGroup( groupId );
-            LinkEvents( group, evnt );
+            return LinkEvents( group, evnt );
         }
 
         public static void UnlinkEvents( int id )
