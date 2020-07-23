@@ -158,41 +158,11 @@ namespace rocks.kfs.Eventbrite.Field.Types
                 {
                     editControl.Attributes["data-syncdate"] = valueSplit[1];
                 }
-
-                long? longVal = valueSplit[0].AsLongOrNull();
-                if ( longVal.HasValue )
-                {
-                    var eb = new EBApi( Settings.GetAccessToken() );
-                    var eventbriteEvent = eb.GetEventById( longVal.Value );
-                    var linkedEventTickets = eb.GetTicketsById( longVal.Value );
-                    var sold = 0;
-                    var total = 0;
-                    foreach ( var ticket in linkedEventTickets.Ticket_Classes )
-                    {
-                        sold += ticket.QuantitySold;
-                        total += ticket.QuantityTotal;
-                    }
-                    var available = total - sold;
-
-                    if ( eventbriteEvent != null )
-                    {
-                        var eventbriteStatus = new StringBuilder();
-                        eventbriteStatus.Append( "<dl>" );
-                        eventbriteStatus.AppendFormat( "<dt>Currently Selected Event:</dt><dd>{0} - {1} ({2})</dd>", eventbriteEvent.Name.Html, eventbriteEvent.Start.Local, eventbriteEvent.Status );
-                        eventbriteStatus.AppendFormat( "<dd><strong>Link:</strong> <a href={0}>{0}</a></dd>", eventbriteEvent.Url );
-                        eventbriteStatus.AppendFormat( "<dd><strong>Capacity:</strong> {0}</dd>", eventbriteEvent.Capacity.ToString() );
-                        eventbriteStatus.AppendFormat( "<dd><strong>Tickets:</strong> {0} Available + {1} Sold = {2} Total</dd>", available, sold, total );
-                        eventbriteStatus.AppendFormat( "<dd><strong>Synced:</strong> {0}</dd>", ( valueSplit.Length > 1 ) ? valueSplit[1] : "Never" );
-                        eventbriteStatus.Append( "<dd class='text-danger'>Warning, if you edit the event linked to this group any previously synced members will remain in the group with old order id's." );
-                        eventbriteStatus.Append( "</dl>" );
-
-                        parentControl.Controls.Add( new LiteralControl( eventbriteStatus.ToString() ) );
-                    }
-                }
+                parentControl.Controls.Add( new LiteralControl( "<span class='text-danger'>Warning, if you edit the event linked to this group, any previously synced members will remain in the group with old order id's.</span>" ) );
             }
         }
-
-        #endregion
-
     }
+
+    #endregion
+
 }

@@ -19,7 +19,7 @@ using Rock.Plugin;
 
 namespace rocks.kfs.Eventbrite.Migrations
 {
-    [MigrationNumber( 4, "1.9.0" )]
+    [MigrationNumber( 2, "1.9.0" )]
     public partial class PageAndBlocks : Migration
     {
         /// <summary>
