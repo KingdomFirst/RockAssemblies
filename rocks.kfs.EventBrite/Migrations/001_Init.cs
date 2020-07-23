@@ -42,6 +42,11 @@ namespace rocks.kfs.Eventbrite.Migrations
         public override void Down()
         {
           
+            RockMigrationHelper.DeleteFieldType( EBGuid.FieldType.EVENTBRITE_EVENT );
+            RockMigrationHelper.DeleteSecurityAuth( "DEA223C7-3691-464F-8B74-6408C7A0ACD1" );
+            RockMigrationHelper.DeleteSecurityAuth( "760E19ED-B2E1-46B8-8004-25777B1AF4E0" );
+            RockMigrationHelper.DeleteSecurityAuth( "C0B244D2-F2F4-4AFE-9081-4AB119BB7EB3" );
+            RockMigrationHelper.DeleteEntityType( EBGuid.EntityType.EVENTBRITE );
         }
     }
 }

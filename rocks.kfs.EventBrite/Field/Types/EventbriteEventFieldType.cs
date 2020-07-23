@@ -113,36 +113,8 @@ namespace rocks.kfs.Eventbrite.Field.Types
                 {
                     editControl.Items.Add( new ListItem( string.Format( "{0} - {1} ({2})", template.Name.Text.ToString(), template.Start.Local, template.Status ), template.Id.ToString() ) );
                 }
+                editControl.Attributes["data-syncdate"] = "Never";
                 parentControl.Controls.Add( editControl );
-
-                long? longVal = editControl.SelectedValue.AsLongOrNull();
-                if ( longVal.HasValue )
-                {
-                    var eb = new EBApi( Settings.GetAccessToken() );
-                    var eventbriteEvent = eb.GetEventById( longVal.Value );
-                    var linkedEventTickets = eb.GetTicketsById( longVal.Value );
-                    var sold = 0;
-                    var total = 0;
-                    foreach ( var ticket in linkedEventTickets.Ticket_Classes )
-                    {
-                        sold += ticket.QuantitySold;
-                        total += ticket.QuantityTotal;
-                    }
-                    var available = total - sold;
-
-                    if ( eventbriteEvent != null )
-                    {
-                        var eventbriteStatus = new StringBuilder();
-                        eventbriteStatus.Append( "<dl>" );
-                        eventbriteStatus.AppendFormat( "<dd>{0} - {1} ({2})</dd>", eventbriteEvent.Name.Html, eventbriteEvent.Start.Local, eventbriteEvent.Status );
-                        eventbriteStatus.AppendFormat( "<dd><a href={0}>{0}</a></dd>", eventbriteEvent.Url );
-                        eventbriteStatus.Append( eventbriteEvent.Capacity.ToString() );
-                        eventbriteStatus.AppendFormat( "<dd>{0} Available + {1} Sold = {2} Total</dd>", available, sold, total );
-                        eventbriteStatus.Append( "</dl>" );
-
-                        parentControl.Controls.Add( new LiteralControl( eventbriteStatus.ToString() ) );
-                    }
-                }
 
                 return parentControl;
             }
@@ -161,7 +133,8 @@ namespace rocks.kfs.Eventbrite.Field.Types
             var editControl = control as RockDropDownList;
             if ( editControl != null )
             {
-                return editControl.SelectedValue;
+                var syncDate = editControl.Attributes["data-syncdate"];
+                return string.Format( "{0}^{1}", editControl.SelectedValue, syncDate );
             }
 
             return null;
@@ -179,7 +152,43 @@ namespace rocks.kfs.Eventbrite.Field.Types
             var editControl = parentControl.Controls.OfType<RockDropDownList>().FirstOrDefault();
             if ( editControl != null )
             {
-                editControl.SetValue( value.SplitDelimitedValues( "^" )[0] );
+                var valueSplit = value.SplitDelimitedValues( "^" );
+                editControl.SetValue( valueSplit[0] );
+                if ( valueSplit.Length > 1 )
+                {
+                    editControl.Attributes["data-syncdate"] = valueSplit[1];
+                }
+
+                long? longVal = valueSplit[0].AsLongOrNull();
+                if ( longVal.HasValue )
+                {
+                    var eb = new EBApi( Settings.GetAccessToken() );
+                    var eventbriteEvent = eb.GetEventById( longVal.Value );
+                    var linkedEventTickets = eb.GetTicketsById( longVal.Value );
+                    var sold = 0;
+                    var total = 0;
+                    foreach ( var ticket in linkedEventTickets.Ticket_Classes )
+                    {
+                        sold += ticket.QuantitySold;
+                        total += ticket.QuantityTotal;
+                    }
+                    var available = total - sold;
+
+                    if ( eventbriteEvent != null )
+                    {
+                        var eventbriteStatus = new StringBuilder();
+                        eventbriteStatus.Append( "<dl>" );
+                        eventbriteStatus.AppendFormat( "<dt>Currently Selected Event:</dt><dd>{0} - {1} ({2})</dd>", eventbriteEvent.Name.Html, eventbriteEvent.Start.Local, eventbriteEvent.Status );
+                        eventbriteStatus.AppendFormat( "<dd><strong>Link:</strong> <a href={0}>{0}</a></dd>", eventbriteEvent.Url );
+                        eventbriteStatus.AppendFormat( "<dd><strong>Capacity:</strong> {0}</dd>", eventbriteEvent.Capacity.ToString() );
+                        eventbriteStatus.AppendFormat( "<dd><strong>Tickets:</strong> {0} Available + {1} Sold = {2} Total</dd>", available, sold, total );
+                        eventbriteStatus.AppendFormat( "<dd><strong>Synced:</strong> {0}</dd>", ( valueSplit.Length > 1 ) ? valueSplit[1] : "Never" );
+                        eventbriteStatus.Append( "<dd class='text-danger'>Warning, if you edit the event linked to this group any previously synced members will remain in the group with old order id's." );
+                        eventbriteStatus.Append( "</dl>" );
+
+                        parentControl.Controls.Add( new LiteralControl( eventbriteStatus.ToString() ) );
+                    }
+                }
             }
         }
 

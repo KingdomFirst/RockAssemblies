@@ -60,6 +60,7 @@
     <Compile Include="Field\Types\EventbriteEventFieldType.cs" />
     <Compile Include="KFSRegistrationCollection.cs" />
     <Compile Include="Eventbrite.cs" />
+    <Compile Include="Migrations\004_PageAndBlocks.cs" />
     <Compile Include="Migrations\003_FieldType.cs" />
     <Compile Include="Migrations\002_CreateAttributes.cs" />
     <Compile Include="Migrations\001_Init.cs" />

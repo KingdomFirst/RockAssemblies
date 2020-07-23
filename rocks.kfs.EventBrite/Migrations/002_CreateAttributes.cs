@@ -36,7 +36,8 @@ namespace rocks.kfs.Eventbrite.Migrations
         /// </summary>
         public override void Down()
         {
-          
+            RockMigrationHelper.DeleteAttribute( "BC105CFA-A663-47E3-9B5B-47591D0BC668" );
+            RockMigrationHelper.DeleteAttribute( "8C3D6321-B6D3-42FA-ABA2-36ECC4C21D9D" );
         }
     }
 }
