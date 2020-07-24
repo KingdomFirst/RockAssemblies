@@ -163,21 +163,24 @@ namespace rocks.kfs.Eventbrite
             var ebOrders = new List<Order>();
             var ebEvent = eb.GetEventById( evntid );
             var IsRSVPEvent = ebEvent.IsRSVPEvent( eb );
+            var gmPersonAttributeKey = "";
 
-            ///* Refactor 6/27 notes:
-            // * Eventbrite Event = Arena Event Tag
-            // * Eventbrite Order = Arena Registration
-            // * Eventbrite Attendee = Arena Registrant
-            // *
-            // * 1 Get Eventbrite event with all attendees
-            // * 2 Get Arena Event
-            // * 3 Get Arena Registrations
-            // * 4 If Eventbrite/Arena event is RSVP, ignore attendees and just record the orders=registrations with count
-            // * 4a Else for each eventbrite order find each attendee and make sure there is a registrant for each attendee
-            // * 4b Create or match person as necessary.
-            // * */
+            var ebPersonFieldType = FieldTypeCache.Get( EBGuid.FieldType.EVENTBRITE_PERSON.AsGuid() );
+            if ( ebPersonFieldType != null )
+            {
+                var groupMember = group.Members.FirstOrDefault();
+                if ( groupMember != null )
+                {
+                    groupMember.LoadAttributes( rockContext );
+                    var attribute = groupMember.Attributes.Select( a => a.Value ).FirstOrDefault( a => a.FieldTypeId == ebPersonFieldType.Id );
+                    if ( attribute != null )
+                    {
+                        gmPersonAttributeKey = attribute.Key;
+                    }
+                }
+            }
 
-            //Get Event Brite Attendees
+            //Get Eventbrite Attendees
             var ebOrderGet = eb.GetExpandedOrdersById( evntid );
             ebOrders.AddRange( ebOrderGet.Orders );
             if ( ebOrderGet.Pagination.PageCount > 1 )
@@ -189,10 +192,6 @@ namespace rocks.kfs.Eventbrite
                     ebOrders.AddRange( looper.Orders );
                 }
             }
-
-            //Get Arena Attendees
-            var ArenaGetter = new KFSRegistrationCollection();
-            var arRegistrations = ArenaGetter.GetEventbriteRegistrants( groupid );
 
             var groupMemberService = new GroupMemberService( rockContext );
             var occurrenceService = new AttendanceOccurrenceService( rockContext );
@@ -227,7 +226,7 @@ namespace rocks.kfs.Eventbrite
                     if ( !string.IsNullOrWhiteSpace( attendee.Profile.First_Name ) && !string.IsNullOrWhiteSpace( attendee.Profile.Last_Name ) && !string.IsNullOrWhiteSpace( attendee.Profile.Email ) )
                     {
                         var person = MatchOrAddPerson( rockContext, attendee.Profile, connectionStatusId, updatePrimaryEmail );
-                        var matchedRegistration = MatchRegistration( group.Members, order, person.Id );
+                        var matchedRegistration = MatchRegistration( group.Members, order, person.Id, gmPersonAttributeKey, rockContext );
                         if ( matchedRegistration == null && ( order.Status != "deleted" || order.Status != "abandoned" ) )
                         {
                             var member = new GroupMember
@@ -494,33 +493,20 @@ namespace rocks.kfs.Eventbrite
             //rockContext.SaveChanges();
         }
 
-        private static GroupMember MatchRegistration( ICollection<GroupMember> groupMembers, Order order, int PersonId )
+        private static GroupMember MatchRegistration( ICollection<GroupMember> groupMembers, Order order, int PersonId, string attributeKey, RockContext rockContext = null )
         {
-
-            GroupMember retVar = null;
-            var attributeKey = "";
-
-            var ebPersonFieldType = FieldTypeCache.Get( EBGuid.FieldType.EVENTBRITE_PERSON.AsGuid() );
-            if ( ebPersonFieldType != null )
+            if ( rockContext == null )
             {
-                var groupMember = groupMembers.FirstOrDefault();
-                if ( groupMember != null )
-                {
-                    groupMember.LoadAttributes();
-                    var attribute = groupMember.Attributes.Select( a => a.Value ).FirstOrDefault( a => a.FieldTypeId == ebPersonFieldType.Id );
-                    if ( attribute != null )
-                    {
-                        attributeKey = attribute.Key;
-                    }
-                }
+                rockContext = new RockContext();
             }
+            GroupMember retVar = null;
 
             // Attribute Values in our special eventBritePerson field type are stored as a delimitted string Eventbrite Id^Ticket Class^Eventbrite Order Id^RSVP/Ticket Count
             foreach ( var gm in groupMembers )
             {
-                gm.LoadAttributes();
+                gm.LoadAttributes( rockContext );
                 var attributeVal = gm.GetAttributeValue( attributeKey );
-                if ( attributeVal.IsNotNullOrWhiteSpace() && attributeVal.SplitDelimitedValues( "^" )[2] == order.Id.ToString() )
+                if ( attributeVal.IsNotNullOrWhiteSpace() && attributeVal.SplitDelimitedValues( "^" )[2] == order.Id.ToString() && gm.Person != null && gm.PersonId == PersonId )
                 {
                     retVar = gm;
                     break;

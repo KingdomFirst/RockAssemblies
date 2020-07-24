@@ -38,6 +38,7 @@ namespace rocks.kfs.Eventbrite.Migrations
             RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "7B62C3FA-8AA9-4DFE-B9A9-F7CA86AE99C2", "BD53F9C9-EBA9-4D3F-82EA-DE5DD34A8108", "Group Detail", "GroupDetail", "Group Detail", @"", 0, @"", "4AD0CADF-9733-4CE1-B405-0B81AE7426EB" );
             RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "7B62C3FA-8AA9-4DFE-B9A9-F7CA86AE99C2", "18E29E23-B43B-4CF7-AE41-C85672C09F50", "New Group Type", "NewGroupType", "New Group Type", @"Group type to be used when creating new groups", 0, @"", "1A2A8938-FB9D-4434-8135-3535EA2A016D" );
             RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "7B62C3FA-8AA9-4DFE-B9A9-F7CA86AE99C2", "F4399CEF-827B-48B2-A735-F7806FCFE8E8", "New Group Parent", "NewGroupParent", "New Group Parent", @"Where new groups, if created, will be placed under.", 0, @"", "10164E92-1898-4ABC-928F-8E5728BE4B9C" );
+            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "7B62C3FA-8AA9-4DFE-B9A9-F7CA86AE99C2", "BD0D9B57-2A41-4490-89FF-F01DAB7D4904", "New Event Statuses", "NewEventStatuses", "New Event Statuses", @"Which event statuses from Eventbrite would you like to be available for creating new groups?", 0, @"live,completed,draft,canceled,started,ended", "F881E5C4-86DD-4B4C-B260-E02119B1425D" );
 
             RockMigrationHelper.AddBlockAttributeValue( "9EEC9E8B-6153-4313-9250-6A8AF0D348A0", "4AD0CADF-9733-4CE1-B405-0B81AE7426EB", @"4e237286-b715-4109-a578-c1445ec02707,2bc75af5-44ad-4ba3-90d3-15d936f722e8" );
         }
@@ -48,6 +49,7 @@ namespace rocks.kfs.Eventbrite.Migrations
         public override void Down()
         {
             RockMigrationHelper.DeleteBlockAttributeValue( "9EEC9E8B-6153-4313-9250-6A8AF0D348A0", "4AD0CADF-9733-4CE1-B405-0B81AE7426EB" );
+            RockMigrationHelper.DeleteBlockAttribute( "F881E5C4-86DD-4B4C-B260-E02119B1425D" );
             RockMigrationHelper.DeleteBlockAttribute( "10164E92-1898-4ABC-928F-8E5728BE4B9C" );
             RockMigrationHelper.DeleteBlockAttribute( "1A2A8938-FB9D-4434-8135-3535EA2A016D" );
             RockMigrationHelper.DeleteBlockAttribute( "4AD0CADF-9733-4CE1-B405-0B81AE7426EB" );

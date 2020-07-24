@@ -57,7 +57,6 @@
     <Compile Include="EventbriteEvents.cs" />
     <Compile Include="Field\Types\EventbritePersonFieldType.cs" />
     <Compile Include="Field\Types\EventbriteEventFieldType.cs" />
-    <Compile Include="KFSRegistrationCollection.cs" />
     <Compile Include="Eventbrite.cs" />
     <Compile Include="Migrations\002_PageAndBlocks.cs" />
     <Compile Include="Migrations\001_Init.cs" />

@@ -34,7 +34,8 @@ namespace rocks.kfs.Eventbrite
             {
                 using ( RockContext rockContext = new RockContext() )
                 {
-                    var attributeValues = new AttributeValueService( rockContext ).Queryable().Where( av => av.Attribute.FieldTypeId == ebFieldType.Id && av.EntityId.HasValue && av.Value != "" ).Select( av => av.EntityId.Value );
+                    var attributes = new AttributeService( rockContext ).GetByFieldTypeId( ebFieldType.Id ).Select( a => a.Id );
+                    var attributeValues = new AttributeValueService( rockContext ).Queryable().Where( av => attributes.Contains( av.AttributeId ) && av.EntityId.HasValue && av.Value != "" ).Select( av => av.EntityId.Value );
                     var groups = new GroupService( rockContext ).GetListByIds( attributeValues.ToList() );
                     foreach ( var group in groups )
                     {

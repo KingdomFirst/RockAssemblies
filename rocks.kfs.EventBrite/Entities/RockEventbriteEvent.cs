@@ -72,7 +72,7 @@ namespace EventbriteDotNetFramework.Entities
         {
             get
             {
-                if (_ebevent != null)
+                if ( _ebevent != null )
                 {
                     return _ebevent.Name.Text;
                 }
@@ -84,6 +84,13 @@ namespace EventbriteDotNetFramework.Entities
             get
             {
                 return _rockGroup.Id;
+            }
+        }
+        public long EventbriteEventId
+        {
+            get
+            {
+                return _ebevent.Id;
             }
         }
         public string LastSynced
