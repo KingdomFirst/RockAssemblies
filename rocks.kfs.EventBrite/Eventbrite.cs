@@ -34,15 +34,6 @@ namespace rocks.kfs.Eventbrite
 {
     public class Eventbrite
     {
-        public static Guid KFSEBCustomFieldModule = new Guid( "61A4DB64-9642-45BB-B3EC-4B83FB7CE18C" );
-        public static Guid KFSEBoAuthTokenCustomField = new Guid( "E92C6D9C-CC5C-412D-BB8B-12C33B78A314" );
-        public static Guid KFSEBEventNameCustomField = new Guid( "B47A6592-935F-43F9-B311-133D704E94A7" );
-        public static Guid KFSEBEventSyncTimeCustomField = new Guid( "7F95AD8D-A58C-4E8B-B7F6-291571BBD7F6" );
-        public static Guid KFSEBPersonOrderIDField = new Guid( "2D365D1B-3F74-45E2-A03A-AC2C219B3F52" );
-        public static Guid KFSEBPersonTicketClassField = new Guid( "3C79F12F-7314-4536-A46D-EBA250738833" );
-        public static Guid KFSEBPersonId = new Guid( "E6F108EB-066B-4628-9F75-21830B8ECC90" );
-        public static Guid KFSEBProfileMemberFieldModules = new Guid( "261FAF99-E93C-4FD2-9817-634073C64B5E" );
-
         private static int recordTypePersonId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() ).Id;
         private static int recordStatusPendingId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_PENDING.AsGuid() ).Id;
         private static int homePhoneValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_PHONE_TYPE_HOME ).Id;
