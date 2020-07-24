@@ -113,7 +113,7 @@ namespace rocks.kfs.Eventbrite.Field.Types
                 {
                     editControl.Items.Add( new ListItem( string.Format( "{0} - {1} ({2})", template.Name.Text.ToString(), template.Start.Local, template.Status ), template.Id.ToString() ) );
                 }
-                editControl.Attributes["data-syncdate"] = "Never";
+                editControl.Attributes["data-syncdate"] = "";
                 parentControl.Controls.Add( editControl );
 
                 return parentControl;
@@ -134,7 +134,10 @@ namespace rocks.kfs.Eventbrite.Field.Types
             if ( editControl != null )
             {
                 var syncDate = editControl.Attributes["data-syncdate"];
-                return string.Format( "{0}^{1}", editControl.SelectedValue, syncDate );
+                if ( editControl.SelectedValue.IsNotNullOrWhiteSpace() )
+                {
+                    return string.Format( "{0}^{1}", editControl.SelectedValue, syncDate );
+                }
             }
 
             return null;
@@ -152,13 +155,16 @@ namespace rocks.kfs.Eventbrite.Field.Types
             var editControl = parentControl.Controls.OfType<RockDropDownList>().FirstOrDefault();
             if ( editControl != null )
             {
-                var valueSplit = value.SplitDelimitedValues( "^" );
-                editControl.SetValue( valueSplit[0] );
-                if ( valueSplit.Length > 1 )
+                if ( value.IsNotNullOrWhiteSpace() )
                 {
-                    editControl.Attributes["data-syncdate"] = valueSplit[1];
+                    var valueSplit = value.SplitDelimitedValues( "^" );
+                    editControl.SetValue( valueSplit[0] );
+                    if ( valueSplit.Length > 1 )
+                    {
+                        editControl.Attributes["data-syncdate"] = valueSplit[1];
+                    }
+                    parentControl.Controls.Add( new LiteralControl( "<span class='text-danger'>Warning, if you edit the event linked to this group, any previously synced members will remain in the group with old order id's.</span>" ) );
                 }
-                parentControl.Controls.Add( new LiteralControl( "<span class='text-danger'>Warning, if you edit the event linked to this group, any previously synced members will remain in the group with old order id's.</span>" ) );
             }
         }
     }
