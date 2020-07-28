@@ -321,8 +321,8 @@ namespace rocks.kfs.Eventbrite
             }
             rockContext.SaveChanges();
 
-            group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, string.Format( "{0}^{1}", groupEBEventIDAttr.Value.SplitDelimitedValues( "^" )[0], RockDateTime.Now.ToString( "g", CultureInfo.CreateSpecificCulture( "en-us" ) ) ) );
-            group.SaveAttributeValue( groupEBEventIDAttr.AttributeKey, rockContext );
+            //group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, string.Format( "{0}^{1}", groupEBEventIDAttr.Value.SplitDelimitedValues( "^" )[0], RockDateTime.Now.ToString( "g", CultureInfo.CreateSpecificCulture( "en-us" ) ) ) );
+            //group.SaveAttributeValue( groupEBEventIDAttr.AttributeKey, rockContext );
 
             var tasks = new[]
             {
@@ -350,8 +350,13 @@ namespace rocks.kfs.Eventbrite
             SyncAttendee( rockContext, attendee, order, group, groupMemberService, personAliasService, occ, occ.Attendees.ToList(), attendee.Event_Id, ebEvent.IsRSVPEvent( eb ), gmPersonAttributeKey, false );
             rockContext.SaveChanges();
 
-            group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, string.Format( "{0}^{1}", groupEBEventIDAttr.Value.SplitDelimitedValues( "^" )[0], RockDateTime.Now.ToString( "g", CultureInfo.CreateSpecificCulture( "en-us" ) ) ) );
-            group.SaveAttributeValue( groupEBEventIDAttr.AttributeKey, rockContext );
+            //group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, string.Format( "{0}^{1}", groupEBEventIDAttr.Value.SplitDelimitedValues( "^" )[0], RockDateTime.Now.ToString( "g", CultureInfo.CreateSpecificCulture( "en-us" ) ) ) );
+            //group.SaveAttributeValue( groupEBEventIDAttr.AttributeKey, rockContext );
+
+            var tasks = new[]
+            {
+                Task.Run(() => SyncEvent( group.Id, ThrottleSync: true ))
+            };
         }
 
         private static void SyncAttendee( RockContext rockContext, Attendee attendee, Order order, Group group, GroupMemberService groupMemberService, PersonAliasService personAliasService, AttendanceOccurrence occ, List<Attendance> existingAttendees, long evntid, bool IsRSVPEvent, string gmPersonAttributeKey, bool updatePrimaryEmail, int recordStatusId = 5, int connectionStatusId = 66, bool EnableLogging = false )
