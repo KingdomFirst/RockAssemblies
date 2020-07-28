@@ -16,9 +16,11 @@
 //
 using System.Linq;
 using Rock;
+using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
 using rocks.kfs.Eventbrite;
+using rocks.kfs.Eventbrite.Utility.ExtensionMethods;
 
 namespace EventbriteDotNetFramework.Entities
 {
@@ -28,22 +30,27 @@ namespace EventbriteDotNetFramework.Entities
         private Group _rockGroup;
         private int _rockGroupId;
         private EBApi _eb;
+        private RockContext _rockContext;
+        private long _evntId;
+        private string _synced;
 
         public RockEventbriteEvent( int GroupId )
         {
+            _rockContext = new RockContext();
             LoadRockGroup( GroupId );
-            if ( Eventbrite.EBUsageCheck( GroupId ) )
-            {
-                LoadEventbriteEvent();
-            }
+            //if ( Eventbrite.EBUsageCheck( GroupId ) )
+            //{
+            //    LoadEventbriteEvent();
+            //}
         }
         public RockEventbriteEvent( Group group )
         {
+            _rockContext = new RockContext();
             LoadRockGroup( group );
-            if ( Eventbrite.EBUsageCheck( group.Id ) )
-            {
-                LoadEventbriteEvent();
-            }
+            //if ( Eventbrite.EBUsageCheck( group.Id ) )
+            //{
+            //    LoadEventbriteEvent();
+            //}
         }
 
         public Event EventbriteEvent
@@ -90,35 +97,16 @@ namespace EventbriteDotNetFramework.Entities
         {
             get
             {
-                return _ebevent.Id;
+                return _evntId;
             }
         }
         public string LastSynced
         {
             get
             {
-                var sync = "";
-                var ebFieldType = FieldTypeCache.Get( rocks.kfs.Eventbrite.EBGuid.FieldType.EVENTBRITE_EVENT.AsGuid() );
-                if ( ebFieldType != null )
+                if ( _synced.IsNotNullOrWhiteSpace() )
                 {
-                    _rockGroup.LoadAttributes();
-                    var attribute = _rockGroup.Attributes.Select( a => a.Value ).FirstOrDefault( a => a.FieldTypeId == ebFieldType.Id );
-                    if ( attribute != null )
-                    {
-                        var attributeVal = _rockGroup.AttributeValues.Select( av => av.Value ).FirstOrDefault( av => av.AttributeId == attribute.Id && av.Value != "" );
-                        if ( attributeVal != null )
-                        {
-                            var splitVal = attributeVal.Value.SplitDelimitedValues( "^" );
-                            if ( splitVal.Length > 1 )
-                            {
-                                sync = splitVal[1];
-                            }
-                        }
-                    }
-                }
-                if ( sync.IsNotNullOrWhiteSpace() )
-                {
-                    return sync;
+                    return _synced;
                 }
                 else
                 {
@@ -132,11 +120,34 @@ namespace EventbriteDotNetFramework.Entities
         {
             _rockGroup = group;
             _rockGroupId = _rockGroup.Id;
+
+            var ebFieldType = FieldTypeCache.Get( rocks.kfs.Eventbrite.EBGuid.FieldType.EVENTBRITE_EVENT.AsGuid() );
+            if ( ebFieldType != null )
+            {
+                _rockGroup.LoadAttributes( _rockContext );
+                var attribute = _rockGroup.Attributes.Select( a => a.Value ).FirstOrDefault( a => a.FieldTypeId == ebFieldType.Id );
+                if ( attribute != null )
+                {
+                    var attributeVal = _rockGroup.AttributeValues.Select( av => av.Value ).FirstOrDefault( av => av.AttributeId == attribute.Id && av.Value != "" );
+                    if ( attributeVal != null )
+                    {
+                        var splitVal = attributeVal.Value.SplitDelimitedValues( "^" );
+                        if ( splitVal.Length > 0 )
+                        {
+                            _evntId = splitVal[0].AsLong();
+                        }
+                        if ( splitVal.Length > 1 )
+                        {
+                            _synced = splitVal[1];
+                        }
+                    }
+                }
+            }
         }
         private void LoadRockGroup( int id )
         {
-            _rockGroup = new GroupService( new Rock.Data.RockContext() ).Get( id );
-            _rockGroupId = _rockGroup.Id;
+            var group = new GroupService( _rockContext ).Get( id );
+            LoadRockGroup( group );
         }
         private void LoadEventbriteEvent()
         {
@@ -144,8 +155,6 @@ namespace EventbriteDotNetFramework.Entities
             {
                 return;
             }
-            _eb = new EBApi( Settings.GetAccessToken() );
-            var ebevents = _eb.GetOrganizationEvents();
             var testId = new long();
             var ebFieldType = FieldTypeCache.Get( rocks.kfs.Eventbrite.EBGuid.FieldType.EVENTBRITE_EVENT.AsGuid() );
             if ( ebFieldType != null )
@@ -161,12 +170,10 @@ namespace EventbriteDotNetFramework.Entities
                     }
                 }
             }
-            foreach ( var evnt in ebevents.Events )
+            if ( testId > 0 )
             {
-                if ( evnt.Id == testId )
-                {
-                    _ebevent = evnt;
-                }
+                _eb = new EBApi( Settings.GetAccessToken() );
+                _ebevent = _eb.GetEventById( testId );
             }
         }
     }

@@ -116,6 +116,15 @@ namespace EventbriteDotNetFramework
 
             return Execute<OrganizationEventsResponse>( request );
         }
+        public OrganizationEventsResponse GetOrganizationEvents( int page, string status = "all", int pageSize = 50 )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "organizations/{0}/events/?status={1}&page_size={2}&page={3}", OrganizationId, status, pageSize, page.ToString()  )
+            };
+
+            return Execute<OrganizationEventsResponse>( request );
+        }
         public OrganizationEventsResponse GetOrganizationEvents( int page )
         {
             var request = new RestRequest

@@ -21,6 +21,7 @@ using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using EventbriteDotNetFramework;
+using EventbriteDotNetFramework.Responses;
 using Rock;
 using Rock.Data;
 using Rock.Field;
@@ -104,12 +105,22 @@ namespace rocks.kfs.Eventbrite.Field.Types
             var parentControl = new Panel();
             var editControl = new RockDropDownList { ID = id };
             editControl.Items.Add( new ListItem() );
+            var eb = new EBApi( Settings.GetAccessToken() );
 
-            var ownedEvents = new EBApi( Settings.GetAccessToken() ).GetOrganizationEvents();
-
-            if ( ownedEvents != null && ownedEvents.Events != null )
+            var organizationEvents = eb.GetOrganizationEvents( "all", 500 );
+            if ( organizationEvents.Pagination.Has_More_Items )
             {
-                foreach ( var template in ownedEvents.Events )
+                var looper = new OrganizationEventsResponse();
+                for ( int i = 2; i <= organizationEvents.Pagination.PageCount; i++ )
+                {
+                    looper = eb.GetOrganizationEvents( i, "all", 500 );
+                    organizationEvents.Events.AddRange( looper.Events );
+                }
+            }
+
+            if ( organizationEvents != null && organizationEvents.Events != null )
+            {
+                foreach ( var template in organizationEvents.Events )
                 {
                     editControl.Items.Add( new ListItem( string.Format( "{0} - {1} ({2})", template.Name.Text.ToString(), template.Start.Local, template.Status ), template.Id.ToString() ) );
                 }
