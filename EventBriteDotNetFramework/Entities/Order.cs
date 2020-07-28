@@ -29,7 +29,8 @@ namespace EventbriteDotNetFramework.Entities
         public string Last_Name { get; set; }
         public string Email { get; set; }
         public OrderCosts Costs { get; set; }
-        public string Event_Id { get; set; }
+        public long Event_Id { get; set; }
+        public Event Event { get; set; }
         public string Time_Remaining { get; set; }
         public string Resource_Uri { get; set; }
         public long Id { get; set; }

@@ -107,6 +107,33 @@ namespace EventbriteDotNetFramework
 
             return Execute<OrganizationEventsResponse>( request );
         }
+        public OrganizationEventsResponse GetOrganizationEvents( string status = "all", int pageSize = 50 )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "organizations/{0}/events/?status={1}&page_size={2}", OrganizationId, status, pageSize )
+            };
+
+            return Execute<OrganizationEventsResponse>( request );
+        }
+        public OrganizationEventsResponse GetOrganizationEvents( int page )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "organizations/{0}/events/?page={1}", OrganizationId, page.ToString() )
+            };
+
+            return Execute<OrganizationEventsResponse>( request );
+        }
+        public OrganizationEventsResponse GetOrganizationEvents( int page, string status )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "organizations/{0}/events/?page={1}&status={2}", OrganizationId, page.ToString(), status )
+            };
+
+            return Execute<OrganizationEventsResponse>( request );
+        }
         public UserOrganizationsResponse GetOrganizations()
         {
             var request = new RestRequest
@@ -156,6 +183,43 @@ namespace EventbriteDotNetFramework
 
             return Execute<EventOrders>( request );
         }
+        public Order GetOrderById( long id )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "orders/{0}/", id.ToString() )
+            };
+
+            return Execute<Order>( request );
+        }
+        public Order GetExpandedOrderById( long id )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "orders/{0}/?expand=attendees", id.ToString() )
+            };
+
+            return Execute<Order>( request );
+        }
+        public Order GetOrder( string apiUrl )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "{0}", apiUrl.Replace( BaseUrl, "" ) )
+            };
+
+            return Execute<Order>( request );
+        }
+
+        public Order GetOrder( string apiUrl, string expand )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "{0}?expand={1}", apiUrl.Replace( BaseUrl, "" ), expand )
+            };
+
+            return Execute<Order>( request );
+        }
 
         public EventTicketClasses GetTicketsById( long id )
         {
@@ -180,6 +244,36 @@ namespace EventbriteDotNetFramework
             };
 
             return Execute<EventCannedQuestions>( request );
+        }
+
+        public Attendee GetAttendee( string apiUrl )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "{0}", apiUrl.Replace( BaseUrl, "" ) )
+            };
+
+            return Execute<Attendee>( request );
+        }
+
+        public Attendee GetAttendee( string apiUrl, string expand )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "{0}?expand={1}", apiUrl.Replace( BaseUrl, "" ), expand )
+            };
+
+            return Execute<Attendee>( request );
+        }
+
+        public Attendee GetAttendee( long evntid, long id )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "events/{0}/attendees/{1}", evntid.ToString(), id.ToString() )
+            };
+
+            return Execute<Attendee>( request );
         }
 
         #endregion

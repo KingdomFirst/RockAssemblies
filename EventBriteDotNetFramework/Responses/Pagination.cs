@@ -17,11 +17,13 @@
 
 namespace EventbriteDotNetFramework.Responses
 {
-  public class Pagination
-  {
-    public int ObjectCount { get; set; }
-    public int PageNumber { get; set; }
-    public int PageSize { get; set; }
-    public int PageCount { get; set; }
-  }
+    public class Pagination
+    {
+        public int ObjectCount { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public int PageCount { get; set; }
+        public string Continuation { get; set; }
+        public bool Has_More_Items { get; set; }
+    }
 }

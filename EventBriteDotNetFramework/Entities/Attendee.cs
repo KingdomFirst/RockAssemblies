@@ -36,7 +36,9 @@ namespace EventbriteDotNetFramework.Entities
         public string Status { get; set; }
         public string Ticket_Class_Name { get; set; }
         public long Event_Id { get; set; }
+        public Event Event { get; set; }
         public long Order_Id { get; set; }
+        public Order Order { get; set; }
         public long Ticket_Class_Id { get; set; }
     }
 }
