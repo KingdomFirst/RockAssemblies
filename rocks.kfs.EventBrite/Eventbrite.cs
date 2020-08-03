@@ -21,6 +21,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using EventbriteDotNetFramework;
 using EventbriteDotNetFramework.Entities;
 using EventbriteDotNetFramework.Responses;
@@ -164,20 +165,9 @@ namespace rocks.kfs.Eventbrite
             //Setup
             var rockContext = new RockContext();
 
-            var rockLogger = new ServiceLogService( rockContext );
-            var serviceLog = new ServiceLog();
             if ( EnableLogging )
             {
-                new ServiceLog
-                {
-                    Name = "Eventbrite",
-                    Type = "SyncEvent",
-                    LogDateTime = RockDateTime.Now,
-                    Input = string.Format( "GroupId:{0}", groupid ),
-                    Result = "Started",
-                    Success = true
-                };
-                rockLogger.Add( serviceLog );
+                LogEvent( rockContext, "SyncEvent", string.Format( "GroupId:{0}", groupid ), "Started" );
             }
 
             var group = new GroupService( rockContext ).Get( groupid );
@@ -195,16 +185,7 @@ namespace rocks.kfs.Eventbrite
 
             if ( EnableLogging )
             {
-                serviceLog = new ServiceLog
-                {
-                    Name = "Eventbrite",
-                    Type = "SyncEvent",
-                    LogDateTime = RockDateTime.Now,
-                    Input = string.Format( "Group: {0}", group ),
-                    Result = "Got Group and EBEventId from Group.",
-                    Success = true
-                };
-                rockLogger.Add( serviceLog );
+                LogEvent( rockContext, "SyncEvent", string.Format( "Group: {0}", group ), "Got Group and EBEventId from Group." );
             }
 
             var ebOrders = new List<Order>();
@@ -214,16 +195,7 @@ namespace rocks.kfs.Eventbrite
 
             if ( EnableLogging )
             {
-                serviceLog = new ServiceLog
-                {
-                    Name = "Eventbrite",
-                    Type = "SyncEvent",
-                    LogDateTime = RockDateTime.Now,
-                    Input = string.Format( "eb.GetEventById({0})", evntid ),
-                    Result = "eb.GetEventById and get Person Attribute Key",
-                    Success = true
-                };
-                rockLogger.Add( serviceLog );
+                LogEvent( rockContext, "SyncEvent", string.Format( "eb.GetEventById({0})", evntid ), "eb.GetEventById and get Person Attribute Key" );
             }
 
             //Get Eventbrite Attendees
@@ -241,16 +213,7 @@ namespace rocks.kfs.Eventbrite
 
             if ( EnableLogging )
             {
-                serviceLog = new ServiceLog
-                {
-                    Name = "Eventbrite",
-                    Type = "SyncEvent",
-                    LogDateTime = RockDateTime.Now,
-                    Input = string.Format( "GetExpandedOrdersById:{0}", evntid ),
-                    Result = string.Format( "Result count: {0}", ebOrders.Count ),
-                    Success = true
-                };
-                rockLogger.Add( serviceLog );
+                LogEvent( rockContext, "SyncEvent", string.Format( "GetExpandedOrdersById:{0}", evntid ), string.Format( "Result count: {0}", ebOrders.Count ) );
             }
 
             var groupMemberService = new GroupMemberService( rockContext );
@@ -261,16 +224,7 @@ namespace rocks.kfs.Eventbrite
             var existingAttendees = occ.Attendees.ToList();
             if ( EnableLogging )
             {
-                serviceLog = new ServiceLog
-                {
-                    Name = "Eventbrite",
-                    Type = "SyncEvent",
-                    LogDateTime = RockDateTime.Now,
-                    Input = string.Format( "GroupId: {0} Evntid: {1}", groupid, evntid ),
-                    Result = "Begin For each order in ebOrders",
-                    Success = true
-                };
-                rockLogger.Add( serviceLog );
+                LogEvent( rockContext, "SyncEvent", string.Format( "GroupId: {0} Evntid: {1}", groupid, evntid ), "Begin For each order in ebOrders" );
             }
             foreach ( var order in ebOrders )
             {
@@ -282,16 +236,7 @@ namespace rocks.kfs.Eventbrite
 
             if ( EnableLogging )
             {
-                serviceLog = new ServiceLog
-                {
-                    Name = "Eventbrite",
-                    Type = "SyncEvent",
-                    LogDateTime = RockDateTime.Now,
-                    Input = string.Format( "End Sync for Group: {0}", groupid ),
-                    Result = "End Sync and Write SyncTime to Group",
-                    Success = true
-                };
-                rockLogger.Add( serviceLog );
+                LogEvent( rockContext, "SyncEvent", string.Format( "End Sync for Group: {0}", groupid ), "End Sync and Write SyncTime to Group" );
             }
             rockContext.SaveChanges();
 
@@ -306,28 +251,36 @@ namespace rocks.kfs.Eventbrite
             var rockContext = new RockContext();
             var group = GetGroupByEBEventId( order.Event_Id, rockContext );
             var ebEvent = order.Event;
-            var groupEBEventIDAttr = GetGroupEBEventId( group );
-
-            var gmPersonAttributeKey = GetPersonAttributeKey( rockContext, group );
-
-            var groupMemberService = new GroupMemberService( rockContext );
-            var personAliasService = new PersonAliasService( rockContext );
-
-            AttendanceOccurrence occ = GetOrAddOccurrence( rockContext, group, ebEvent );
-
-            foreach(var attendee in order.Attendees)
+            //var groupEBEventIDAttr = GetGroupEBEventId( group );
+            if ( group != null && ebEvent != null )
             {
-                SyncAttendee( rockContext, attendee, order, group, groupMemberService, personAliasService, occ, occ.Attendees.ToList(), order.Event_Id, ebEvent.IsRSVPEvent( eb ), gmPersonAttributeKey, false );
+                var gmPersonAttributeKey = GetPersonAttributeKey( rockContext, group );
+
+                var groupMemberService = new GroupMemberService( rockContext );
+                var personAliasService = new PersonAliasService( rockContext );
+
+                AttendanceOccurrence occ = GetOrAddOccurrence( rockContext, group, ebEvent );
+
+                foreach ( var attendee in order.Attendees )
+                {
+                    SyncAttendee( rockContext, attendee, order, group, groupMemberService, personAliasService, occ, occ.Attendees.ToList(), order.Event_Id, ebEvent.IsRSVPEvent( eb ), gmPersonAttributeKey, false );
+                }
+                rockContext.SaveChanges();
+
+                //group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, string.Format( "{0}^{1}", groupEBEventIDAttr.Value.SplitDelimitedValues( "^" )[0], RockDateTime.Now.ToString( "g", CultureInfo.CreateSpecificCulture( "en-us" ) ) ) );
+                //group.SaveAttributeValue( groupEBEventIDAttr.AttributeKey, rockContext );
+
+                var tasks = new[]
+                {
+                    Task.Run(() => SyncEvent( group.Id, ThrottleSync: true ))
+                };
             }
-            rockContext.SaveChanges();
-
-            //group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, string.Format( "{0}^{1}", groupEBEventIDAttr.Value.SplitDelimitedValues( "^" )[0], RockDateTime.Now.ToString( "g", CultureInfo.CreateSpecificCulture( "en-us" ) ) ) );
-            //group.SaveAttributeValue( groupEBEventIDAttr.AttributeKey, rockContext );
-
-            var tasks = new[]
+            else
             {
-                Task.Run(() => SyncEvent( group.Id, ThrottleSync: true ))
-            };
+                HttpContext httpContext = HttpContext.Current;
+                var logException = new Exception( string.Format( "Eventbrite SyncOrder, Group not found for Event: {0}", order.Event_Id ), new Exception( string.Format( "Sync api request: {0}", apiUrl ) ) );
+                ExceptionLogService.LogException( logException, httpContext );
+            }
         }
 
         public static void SyncAttendee( string apiUrl )
@@ -338,31 +291,39 @@ namespace rocks.kfs.Eventbrite
             var rockContext = new RockContext();
             var group = GetGroupByEBEventId( attendee.Event_Id, rockContext );
             var ebEvent = attendee.Event;
-            var groupEBEventIDAttr = GetGroupEBEventId( group );
+            //var groupEBEventIDAttr = GetGroupEBEventId( group );
 
-            var gmPersonAttributeKey = GetPersonAttributeKey( rockContext, group );
-
-            var groupMemberService = new GroupMemberService( rockContext );
-            var personAliasService = new PersonAliasService( rockContext );
-
-            AttendanceOccurrence occ = GetOrAddOccurrence( rockContext, group, ebEvent );
-
-            SyncAttendee( rockContext, attendee, order, group, groupMemberService, personAliasService, occ, occ.Attendees.ToList(), attendee.Event_Id, ebEvent.IsRSVPEvent( eb ), gmPersonAttributeKey, false );
-            rockContext.SaveChanges();
-
-            //group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, string.Format( "{0}^{1}", groupEBEventIDAttr.Value.SplitDelimitedValues( "^" )[0], RockDateTime.Now.ToString( "g", CultureInfo.CreateSpecificCulture( "en-us" ) ) ) );
-            //group.SaveAttributeValue( groupEBEventIDAttr.AttributeKey, rockContext );
-
-            var tasks = new[]
+            if ( group != null && ebEvent != null )
             {
-                Task.Run(() => SyncEvent( group.Id, ThrottleSync: true ))
-            };
+                var gmPersonAttributeKey = GetPersonAttributeKey( rockContext, group );
+
+                var groupMemberService = new GroupMemberService( rockContext );
+                var personAliasService = new PersonAliasService( rockContext );
+
+                AttendanceOccurrence occ = GetOrAddOccurrence( rockContext, group, ebEvent );
+
+                SyncAttendee( rockContext, attendee, order, group, groupMemberService, personAliasService, occ, occ.Attendees.ToList(), attendee.Event_Id, ebEvent.IsRSVPEvent( eb ), gmPersonAttributeKey, false );
+                rockContext.SaveChanges();
+
+                //group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, string.Format( "{0}^{1}", groupEBEventIDAttr.Value.SplitDelimitedValues( "^" )[0], RockDateTime.Now.ToString( "g", CultureInfo.CreateSpecificCulture( "en-us" ) ) ) );
+                //group.SaveAttributeValue( groupEBEventIDAttr.AttributeKey, rockContext );
+
+                var tasks = new[]
+                {
+                    Task.Run(() => SyncEvent( group.Id, ThrottleSync: true ))
+                };
+            }
+            else
+            {
+                HttpContext httpContext = HttpContext.Current;
+                var logException = new Exception( string.Format( "Eventbrite SyncAttendee, Group not found for Event: {0}", attendee.Event_Id ), new Exception( string.Format( "Sync api request: {0}", apiUrl ) ) );
+                ExceptionLogService.LogException( logException, httpContext );
+            }
+
         }
 
         private static void SyncAttendee( RockContext rockContext, Attendee attendee, Order order, Group group, GroupMemberService groupMemberService, PersonAliasService personAliasService, AttendanceOccurrence occ, List<Attendance> existingAttendees, long evntid, bool IsRSVPEvent, string gmPersonAttributeKey, bool updatePrimaryEmail, int recordStatusId = 5, int connectionStatusId = 66, bool EnableLogging = false )
         {
-            var rockLogger = new ServiceLogService( rockContext );
-            var serviceLog = new ServiceLog();
             if ( string.IsNullOrWhiteSpace( attendee.Profile.Email ) )
             {
                 attendee.Profile.Email = order.Email;
@@ -405,16 +366,7 @@ namespace rocks.kfs.Eventbrite
                 {
                     if ( EnableLogging )
                     {
-                        serviceLog = new ServiceLog
-                        {
-                            Name = "Eventbrite",
-                            Type = "SyncEvent",
-                            LogDateTime = RockDateTime.Now,
-                            Input = string.Format( "Attendee.Checked_in", evntid ),
-                            Result = "True",
-                            Success = true
-                        };
-                        rockLogger.Add( serviceLog );
+                        LogEvent( rockContext, "SyncAttendee", string.Format( "Attendee.Checked_in", evntid ), "True" );
                     }
 
                     var attendance = existingAttendees
@@ -447,21 +399,10 @@ namespace rocks.kfs.Eventbrite
 
         private static Person MatchOrAddPerson( RockContext rockContext, Profile profile, int connectionStatusId, bool updatePrimaryEmail, bool EnableLogging = false )
         {
-            var rockLogger = new ServiceLogService( rockContext );
-            var serviceLog = new ServiceLog();
-
+            var logString = string.Format( "Match or Add Person Profile: {0} {1} ({2})", profile.First_Name, profile.Last_Name, profile.Email );
             if ( EnableLogging )
             {
-                serviceLog = new ServiceLog
-                {
-                    Name = "Eventbrite",
-                    Type = "MatchOrAddPerson",
-                    LogDateTime = RockDateTime.Now,
-                    Input = string.Format( "Match or Add Person Profile: {0}", profile ),
-                    Result = "Start",
-                    Success = true
-                };
-                rockLogger.Add( serviceLog );
+                LogEvent( rockContext, "MatchOrAddPerson", logString, "Start" );
             }
 
             var person = new PersonService( rockContext ).FindPerson( profile.First_Name, profile.Last_Name, profile.Email, updatePrimaryEmail, true );
@@ -478,22 +419,56 @@ namespace rocks.kfs.Eventbrite
                 // create the person since they don't exist
                 //using ( var newRockContext = new RockContext() )
                 //{
-                person = new Person
+                if ( profile.First_Name.Length <= 50 && profile.Last_Name.Length <= 50 && profile.Email.Length <= 75 && System.Text.RegularExpressions.Regex.IsMatch( profile.Email, @"^[\w\.\'_%-]+(\+[\w-]*)?@([\w-]+\.)+[\w-]+" ) )
                 {
-                    Guid = Guid.NewGuid(),
-                    Gender = Gender.Unknown,
-                    FirstName = profile.First_Name,
-                    LastName = profile.Last_Name,
-                    Email = profile.Email,
-                    IsEmailActive = true,
-                    EmailPreference = EmailPreference.EmailAllowed,
-                    RecordStatusValueId = recordStatusPendingId,
-                    RecordTypeValueId = recordTypePersonId,
-                    ConnectionStatusValueId = connectionStatusId
-                };
+                    person = new Person
+                    {
+                        Guid = Guid.NewGuid(),
+                        Gender = Gender.Unknown,
+                        FirstName = profile.First_Name,
+                        LastName = profile.Last_Name,
+                        Email = profile.Email,
+                        IsEmailActive = true,
+                        EmailPreference = EmailPreference.EmailAllowed,
+                        RecordStatusValueId = recordStatusPendingId,
+                        RecordTypeValueId = recordTypePersonId,
+                        ConnectionStatusValueId = connectionStatusId
+                    };
+                    PersonService.SaveNewPerson( person, rockContext );
+                }
+                else if ( profile.First_Name.Length <= 50 && profile.Last_Name.Length <= 50 )
+                {
+                    person = new Person
+                    {
+                        Guid = Guid.NewGuid(),
+                        Gender = Gender.Unknown,
+                        FirstName = profile.First_Name,
+                        LastName = profile.Last_Name,
+                        Email = "",
+                        IsEmailActive = true,
+                        EmailPreference = EmailPreference.EmailAllowed,
+                        RecordStatusValueId = recordStatusPendingId,
+                        RecordTypeValueId = recordTypePersonId,
+                        ConnectionStatusValueId = connectionStatusId
+                    };
+                    PersonService.SaveNewPerson( person, rockContext );
 
-                // save so the person alias is attributed for the search key
-                PersonService.SaveNewPerson( person, rockContext );
+                    HttpContext httpContext = HttpContext.Current;
+                    var e = new Exception( string.Format( "Person saved without Email address due to a validation error: {0} PersonId: {1}", profile.Email, person.Id ) );
+                    ExceptionLogService.LogException( e, httpContext );
+                }
+                else
+                {
+                    var errorMsg = string.Format( "Error with profile information, unable to save. FirstName: {0} LastName: {1} Email: {0}", profile.First_Name, profile.Last_Name, profile.Email );
+                    if ( EnableLogging )
+                    {
+                        LogEvent( rockContext, "MatchOrAddPerson", logString, errorMsg );
+                    }
+                    HttpContext httpContext = HttpContext.Current;
+                    var e = new Exception( errorMsg );
+                    ExceptionLogService.LogException( e, httpContext );
+                }
+
 
                 //// add the search key
                 //new PersonSearchKeyService( newRockContext ).Add( new PersonSearchKey
@@ -510,18 +485,26 @@ namespace rocks.kfs.Eventbrite
 
             if ( EnableLogging )
             {
-                serviceLog = new ServiceLog
-                {
-                    Name = "Eventbrite",
-                    Type = "MatchOrAddPerson",
-                    LogDateTime = RockDateTime.Now,
-                    Input = string.Format( "Match or Add Person Profile: {0}", profile ),
-                    Result = "End",
-                    Success = true
-                };
-                rockLogger.Add( serviceLog );
+                LogEvent( rockContext, "MatchOrAddPerson", logString, "End" );
             }
             return person;
+        }
+
+        private static ServiceLog LogEvent( RockContext rockContext, string type, string input, string result )
+        {
+            var rockLogger = new ServiceLogService( rockContext );
+            ServiceLog serviceLog = new ServiceLog
+            {
+                Name = "Eventbrite",
+                Type = type,
+                LogDateTime = RockDateTime.Now,
+                Input = input,
+                Result = result,
+                Success = true
+            };
+            rockLogger.Add( serviceLog );
+            rockContext.SaveChanges();
+            return serviceLog;
         }
 
         public static bool LinkEvents( Group group, long evnt )
@@ -570,20 +553,9 @@ namespace rocks.kfs.Eventbrite
 
         private static void SetPersonData( RockContext rockContext, Person person, Attendee attendee, Group group, int attendeeCount, bool EnableLogging = false )
         {
-            var rockLogger = new ServiceLogService( rockContext );
-            var serviceLog = new ServiceLog();
             if ( EnableLogging )
             {
-                serviceLog = new ServiceLog
-                {
-                    Name = "Eventbrite",
-                    Type = "SetPersonData",
-                    LogDateTime = RockDateTime.Now,
-                    Input = string.Format( "Person: {0} Attendee: {1} Group: {2}", person, attendee, group ),
-                    Result = "Start",
-                    Success = true
-                };
-                rockLogger.Add( serviceLog );
+                LogEvent( rockContext, "SetPersonData", string.Format( "Person: {0} Attendee: {1} Group: {2}", person, attendee.Id, group ), "Start" );
             }
 
             //Address
@@ -663,16 +635,7 @@ namespace rocks.kfs.Eventbrite
             }
             if ( EnableLogging )
             {
-                serviceLog = new ServiceLog
-                {
-                    Name = "Eventbrite",
-                    Type = "SetPersonData",
-                    LogDateTime = RockDateTime.Now,
-                    Input = string.Format( "Person: {0} Attendee: {1} Group: {2}", person, attendee, group ),
-                    Result = "Set person info complete. Start Attribute check/update.",
-                    Success = true
-                };
-                rockLogger.Add( serviceLog );
+                LogEvent( rockContext, "SetPersonData", string.Format( "Person: {0} Attendee: {1} Group: {2}", person, attendee.Id, group ), "Set person info complete. Start Attribute check/update." );
             }
             rockContext.SaveChanges();
 
@@ -704,16 +667,7 @@ namespace rocks.kfs.Eventbrite
 
                 if ( EnableLogging )
                 {
-                    serviceLog = new ServiceLog
-                    {
-                        Name = "Eventbrite",
-                        Type = "SetPersonData",
-                        LogDateTime = RockDateTime.Now,
-                        Input = string.Format( "Person: {0} Attendee: {1} Group: {2}", person, attendee, group ),
-                        Result = "Updated person attribute.",
-                        Success = true
-                    };
-                    rockLogger.Add( serviceLog );
+                    LogEvent( rockContext, "SetPersonData", string.Format( "Person: {0} Attendee: {1} Group: {2}", person, attendee.Id, group ), "Updated person attribute." );
                 }
             }
 
@@ -722,20 +676,9 @@ namespace rocks.kfs.Eventbrite
 
         private static GroupMember MatchRegistration( ICollection<GroupMember> groupMembers, Order order, int PersonId, string attributeKey, RockContext rockContext = null, bool EnableLogging = false )
         {
-            var rockLogger = new ServiceLogService( rockContext );
-            var serviceLog = new ServiceLog();
             if ( EnableLogging )
             {
-                serviceLog = new ServiceLog
-                {
-                    Name = "Eventbrite",
-                    Type = "MatchRegistration",
-                    LogDateTime = RockDateTime.Now,
-                    Input = string.Format( "GroupMembers: {0} Order: {1} PersonId: {2}", groupMembers.Count, order, PersonId ),
-                    Result = "Start Match",
-                    Success = true
-                };
-                rockLogger.Add( serviceLog );
+                LogEvent( rockContext, "MatchRegistration", string.Format( "GroupMembers: {0} Order: {1} PersonId: {2}", groupMembers.Count, order.Id, PersonId ), "Start Match" );
             }
 
             if ( rockContext == null )
@@ -766,16 +709,7 @@ namespace rocks.kfs.Eventbrite
 
             if ( EnableLogging )
             {
-                serviceLog = new ServiceLog
-                {
-                    Name = "Eventbrite",
-                    Type = "MatchRegistration",
-                    LogDateTime = RockDateTime.Now,
-                    Input = string.Format( "GroupMembers: {0} Order: {1} PersonId: {2}", groupMembers.Count, order, PersonId ),
-                    Result = "End Match",
-                    Success = true
-                };
-                rockLogger.Add( serviceLog );
+                LogEvent( rockContext, "MatchRegistration", string.Format( "GroupMembers: {0} Order: {1} PersonId: {2} Matched: {3}", groupMembers.Count, order.Id, PersonId, retVar ), "End Match" );
             }
 
             return retVar;
