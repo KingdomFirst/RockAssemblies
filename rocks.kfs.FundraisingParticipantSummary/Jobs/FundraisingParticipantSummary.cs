@@ -34,7 +34,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
     /// <summary>
     /// Job to send fundraising participant summary emails with donations since the last run of the job.
     /// </summary>
-    [SystemEmailField( "System Email", "The system email to use when sending the fundraising participant summary email.", true, "DE953A2C-1AE5-406D-B36C-B8486147D77B", "" )]
+    [SystemCommunicationField( "System Email", "The system email to use when sending the fundraising participant summary email.", true, "DE953A2C-1AE5-406D-B36C-B8486147D77B", "" )]
     [GroupTypesField( "Group Types", "Use this setting to send the fundraising participant summary email to entire GroupType(s).", false, "", "" )]
     [GroupField( "Group", "Use this setting to send the fundraising participant summary email to a specific Group and its child Groups.", false )]
     [BooleanField( "Show Address", "Determines if the Address column should be displayed in the Contributions List. (Sent to lava, has to be handled in lava display).", true )]
@@ -112,7 +112,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                 if ( groupGuid.HasValue )
                 {
                     groupSetting = groupService.Get( groupGuid.Value );
-                    groups = groupService.GetAllDescendents( groupSetting.Id ).Where( g => g.IsActive ).Select( g => g.Id ).ToList();
+                    groups = groupService.GetAllDescendentGroupIds( groupSetting.Id, false );
                     groups.Add( groupSetting.Id );
                 }
 
@@ -132,6 +132,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                 {
                     groupMember.LoadAttributes();
                     var email = groupMember.Person.Email;
+                    var person = groupMember.Person;
                     var group = groupMember.Group;
                     group.LoadAttributes();
                     bool disablePublicContributionRequests = groupMember.GetAttributeValue( "DisablePublicContributionRequests" ).AsBoolean();
@@ -185,8 +186,8 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
 
                             //mergeFields.Add( "MakeDonationButtonText", makeDonationButtonText );
 
-                            var recipients = new List<RecipientData>();
-                            recipients.Add( new RecipientData( email, mergeFields ) );
+                            var recipients = new List<RockMessageRecipient>();
+                            recipients.Add( new RockEmailMessageRecipient( person, mergeFields ) );
 
                             var emailMessage = new RockEmailMessage( systemEmailGuid );
                             emailMessage.SetRecipients( recipients );
