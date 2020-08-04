@@ -40,9 +40,13 @@ namespace EventbriteDotNetFramework
                 if ( !_org.HasValue )
                 {
                     var organizations = GetOrganizations();
-                    if ( organizations != null && organizations.Organizations.Any() )
+                    if ( organizations != null && organizations.Organizations != null && organizations.Organizations.Any() )
                     {
                         _org = organizations.Organizations.Select( o => o.Id ).FirstOrDefault();
+                    } 
+                    else
+                    {
+                        return 0;
                     }
                 }
                 return _org.Value;
