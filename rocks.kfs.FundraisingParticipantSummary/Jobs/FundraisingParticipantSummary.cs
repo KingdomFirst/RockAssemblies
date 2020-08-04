@@ -27,20 +27,18 @@ using Rock.Communication;
 using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
-using Rock.Web.UI.Controls;
 
 namespace rocks.kfs.FundraisingParticipantSummary.Jobs
 {
     /// <summary>
     /// Job to send fundraising participant summary emails with donations since the last run of the job.
     /// </summary>
-    [SystemEmailField( "System Email", "The system email to use when sending the fundraising participant summary email.", true, "DE953A2C-1AE5-406D-B36C-B8486147D77B", "" )]
+    [SystemCommunicationField( "System Communication", "The system communication to use when sending the fundraising participant summary email.", true, "553B6FCA-9AFF-4618-BDE9-FF41A1EC689E", "" )]
     [GroupTypesField( "Group Types", "Use this setting to send the fundraising participant summary email to entire GroupType(s).", false, "", "" )]
     [GroupField( "Group", "Use this setting to send the fundraising participant summary email to a specific Group and its child Groups.", false )]
     [BooleanField( "Show Address", "Determines if the Address column should be displayed in the Contributions List. (Sent to lava, has to be handled in lava display).", true )]
     [BooleanField( "Show Amount", "Determines if the Amount column should be displayed in the Contributions List. (Sent to lava, has to be handled in lava display).", true )]
     [BooleanField( "Send Emails with Zero Donations", "Should the emails to the group members still be sent if they had 0 donations in the time period? The time period for this job is anything since it last ran.", false )]
-
     [DisallowConcurrentExecution]
     public class FundraisingParticipantSummary : IJob
     {
@@ -64,7 +62,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
         {
             var dataMap = context.JobDetail.JobDataMap;
             var JobStartDateTime = RockDateTime.Now;
-            var systemEmailGuid = Guid.Empty;
+            var systemCommunicationGuid = Guid.Empty;
             var groupTypes = new List<int>();
             var groups = new List<int>();
             var showAddress = dataMap.Get( "ShowAddress" ).ToString().AsBoolean();
@@ -112,11 +110,11 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                 if ( groupGuid.HasValue )
                 {
                     groupSetting = groupService.Get( groupGuid.Value );
-                    groups = groupService.GetAllDescendents( groupSetting.Id ).Where( g => g.IsActive ).Select( g => g.Id ).ToList();
+                    groups = groupService.GetAllDescendentGroupIds( groupSetting.Id, false );
                     groups.Add( groupSetting.Id );
                 }
 
-                systemEmailGuid = dataMap.GetString( "SystemEmail" ).AsGuid();
+                systemCommunicationGuid = dataMap.GetString( "SystemCommunication" ).AsGuid();
 
                 var groupMembers = groupMemberService
                     .Queryable( "Group,Person" ).AsNoTracking()
@@ -132,6 +130,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                 {
                     groupMember.LoadAttributes();
                     var email = groupMember.Person.Email;
+                    var person = groupMember.Person;
                     var group = groupMember.Group;
                     group.LoadAttributes();
                     bool disablePublicContributionRequests = groupMember.GetAttributeValue( "DisablePublicContributionRequests" ).AsBoolean();
@@ -185,10 +184,10 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
 
                             //mergeFields.Add( "MakeDonationButtonText", makeDonationButtonText );
 
-                            var recipients = new List<RecipientData>();
-                            recipients.Add( new RecipientData( email, mergeFields ) );
+                            var recipients = new List<RockMessageRecipient>();
+                            recipients.Add( new RockEmailMessageRecipient( person, mergeFields ) );
 
-                            var emailMessage = new RockEmailMessage( systemEmailGuid );
+                            var emailMessage = new RockEmailMessage( systemCommunicationGuid );
                             emailMessage.SetRecipients( recipients );
                             var errors = new List<string>();
                             emailMessage.Send( out errors );
@@ -209,7 +208,6 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                         errorCount += 1;
                         errorMessages.Add( string.Format( "No email specified for {0}.", groupMember.Person.FullName ) );
                     }
-
                 }
             }
             context.Result = string.Format( "{0} emails sent", groupMemberEmails );

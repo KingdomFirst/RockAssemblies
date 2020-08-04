@@ -79,7 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Jobs\FundraisingParticipantSummary.cs" />
-    <Compile Include="Migrations\001_AddSystemEmail.cs" />
+    <Compile Include="Migrations\001_AddSystemCommunication.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
