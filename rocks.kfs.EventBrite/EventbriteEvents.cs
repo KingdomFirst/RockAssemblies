@@ -26,7 +26,7 @@ namespace rocks.kfs.Eventbrite
 {
     public class EventbriteEvents
     {
-        public List<RockEventbriteEvent> Events()
+        public List<RockEventbriteEvent> Events( bool loadEventbriteEvent = false )
         {
             var retVar = new List<RockEventbriteEvent>();
             var ebFieldType = FieldTypeCache.Get( EBGuid.FieldType.EVENTBRITE_EVENT.AsGuid() );
@@ -39,7 +39,7 @@ namespace rocks.kfs.Eventbrite
                     var groups = new GroupService( rockContext ).GetListByIds( attributeValues.ToList() );
                     foreach ( var group in groups )
                     {
-                        retVar.Add( new RockEventbriteEvent( group ) );
+                        retVar.Add( new RockEventbriteEvent( group, loadEventbriteEvent ) );
                     }
                 }
             }

@@ -34,23 +34,23 @@ namespace EventbriteDotNetFramework.Entities
         private long _evntId;
         private string _synced;
 
-        public RockEventbriteEvent( int GroupId )
+        public RockEventbriteEvent( int GroupId, bool loadEventbriteEvent = false )
         {
             _rockContext = new RockContext();
             LoadRockGroup( GroupId );
-            //if ( Eventbrite.EBUsageCheck( GroupId ) )
-            //{
-            //    LoadEventbriteEvent();
-            //}
+            if ( loadEventbriteEvent && Eventbrite.EBUsageCheck( GroupId ) )
+            {
+                LoadEventbriteEvent();
+            }
         }
-        public RockEventbriteEvent( Group group )
+        public RockEventbriteEvent( Group group, bool loadEventbriteEvent = false )
         {
             _rockContext = new RockContext();
             LoadRockGroup( group );
-            //if ( Eventbrite.EBUsageCheck( group.Id ) )
-            //{
-            //    LoadEventbriteEvent();
-            //}
+            if ( loadEventbriteEvent && Eventbrite.EBUsageCheck( group.Id ) )
+            {
+                LoadEventbriteEvent();
+            }
         }
 
         public Event EventbriteEvent
@@ -155,25 +155,10 @@ namespace EventbriteDotNetFramework.Entities
             {
                 return;
             }
-            var testId = new long();
-            var ebFieldType = FieldTypeCache.Get( rocks.kfs.Eventbrite.EBGuid.FieldType.EVENTBRITE_EVENT.AsGuid() );
-            if ( ebFieldType != null )
-            {
-                _rockGroup.LoadAttributes();
-                var attribute = _rockGroup.Attributes.Select( a => a.Value ).FirstOrDefault( a => a.FieldTypeId == ebFieldType.Id );
-                if ( attribute != null )
-                {
-                    var attributeVal = _rockGroup.AttributeValues.Select( av => av.Value ).FirstOrDefault( av => av.AttributeId == attribute.Id && av.Value != "" );
-                    if ( attributeVal != null )
-                    {
-                        long.TryParse( attributeVal.Value.SplitDelimitedValues( "^" )[0], out testId );
-                    }
-                }
-            }
-            if ( testId > 0 )
+            if ( _evntId > 0 )
             {
                 _eb = new EBApi( Settings.GetAccessToken() );
-                _ebevent = _eb.GetEventById( testId );
+                _ebevent = _eb.GetEventById( _evntId );
             }
         }
     }
