@@ -67,12 +67,6 @@
     <Compile Include="Entities\UserEmail.cs" />
     <Compile Include="Entities\Venue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Requests\GetUserOrganizationsRequest.cs" />
-    <Compile Include="Requests\GetAuthenticatedUserDetailsRequest.cs" />
-    <Compile Include="Requests\GetOrganizerByIdRequest.cs" />
-    <Compile Include="Requests\GetUserDetailsByIdRequest.cs" />
-    <Compile Include="Requests\GetOrganizationEventsRequest.cs" />
-    <Compile Include="Requests\IRequest.cs" />
     <Compile Include="Responses\EventCannedQuestions.cs" />
     <Compile Include="Responses\EventOrders.cs" />
     <Compile Include="Responses\EventTicketClasses.cs" />
