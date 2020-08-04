@@ -18,7 +18,7 @@ using Rock.Plugin;
 
 namespace rocks.kfs.FundraisingParticipantSummary.Migrations
 {
-    [MigrationNumber( 2, "1.10.2" )]
+    [MigrationNumber( 1, "1.10.2" )]
     internal class AddSystemCommunication : Migration
     {
         /// <summary>
@@ -44,12 +44,12 @@ namespace rocks.kfs.FundraisingParticipantSummary.Migrations
             <label style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;display: inline-block;max-width: 100%;margin-bottom: 5px;font-weight: 700;"">
                 Fundraising Progress
             </label>
-            <label class=""pull-right"" style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;display: inline-block;max-width: 100%;margin-bottom: 5px;font-weight: 700;float: right !important;"">                    
+            <label class=""pull-right"" style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;display: inline-block;max-width: 100%;margin-bottom: 5px;font-weight: 700;float: right !important;"">
                 {% if AmountLeft >= 0 %}
                     {{ AmountLeft | FormatAsCurrency }}
                 {% else %}{% assign amountLeftPositive = AmountLeft | Times:-1 %}
                     {{ FundraisingGoal | Plus:amountLeftPositive | FormatAsCurrency }} / {{ FundraisingGoal | FormatAsCurrency }}
-                {% endif %}                               
+                {% endif %}
             </label>
             <div class=""progress"" style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;height: 20px;margin-bottom: 20px;overflow: hidden;background-color: #f5f5f5;border-radius: 4px;-webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);"">
                 <div class=""progress-bar"" role=""progressbar"" aria-valuenow=""{{ percentWidth }}"" aria-valuemin=""0"" aria-valuemax=""100"" style=""width: {{ percentWidth }}%;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;float: left;height: 100%;font-size: 12px;line-height: 20px;color: #fff;text-align: center;background-color: #428bca;-webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15);box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15);-webkit-transition: width 0.6s ease;-o-transition: width 0.6s ease;transition: width 0.6s ease;"">
@@ -66,7 +66,6 @@ namespace rocks.kfs.FundraisingParticipantSummary.Migrations
         </div>
     </div>
 </div>
-
 
             <br style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;"">
 {%- assign contributionsSize = Contributions | Size %}{% assign colspan = 2 -%}
@@ -108,8 +107,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Migrations
 	</div>
 {%- endfor -%}
 </div>
-{{ 'Global' | Attribute:'EmailFooter' }}", "DE953A2C-1AE5-406D-B36C-B8486147D77B" );
-
+{{ 'Global' | Attribute:'EmailFooter' }}", "553B6FCA-9AFF-4618-BDE9-FF41A1EC689E" );
         }
 
         /// <summary>
@@ -118,8 +116,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Migrations
         public override void Down()
         {
             // Fundraising Participant Summary
-            RockMigrationHelper.DeleteSystemCommunication( "DE953A2C-1AE5-406D-B36C-B8486147D77B" );
+            RockMigrationHelper.DeleteSystemCommunication( "553B6FCA-9AFF-4618-BDE9-FF41A1EC689E" );
         }
-
     }
 }
