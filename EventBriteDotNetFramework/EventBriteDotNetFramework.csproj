@@ -48,7 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EBApi.cs" />
-    <Compile Include="Entities\AccessToken.cs" />
     <Compile Include="Entities\Address.cs" />
     <Compile Include="Entities\Attendee.cs" />
     <Compile Include="Entities\Choice.cs" />
@@ -73,6 +72,7 @@
     <Compile Include="Responses\UserOrganizationsResponse.cs" />
     <Compile Include="Responses\OrganizationEventsResponse.cs" />
     <Compile Include="Responses\Pagination.cs" />
+    <Compile Include="Responses\WebhookResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
