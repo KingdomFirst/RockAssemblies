@@ -351,7 +351,7 @@ namespace rocks.kfs.Eventbrite
                     }
 
                     var attendance = occ.Attendees
-                        .Where( a => a.PersonAlias.PersonId == person.Id )
+                        .Where( a => a.PersonAlias != null && a.PersonAlias.PersonId == person.Id )
                         .FirstOrDefault();
 
                     if ( attendance == null )
