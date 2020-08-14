@@ -34,6 +34,7 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
 {
     [LavaCommandsField( "Enabled Lava Commands", "The Lava commands that should be enabled for this job.", false, order: 0 )]
     [IntegerField( "Command Timeout", "Maximum amount of time (in seconds) to wait for the each group communication creation to complete.", false, 180, "General", 1, "CommandTimeout" )]
+    [IntegerField( "Last Run Buffer", "Use this setting to add a buffer to not double send, too large of a buffer may cause messages to be missed. By default this job will send any communications that have been scheduled since the last run date time minus the LastRunDurationSeconds, due to the way some server schedules run it is possible to be a few seconds off and double send.", false, -5, "General", 2 )]
 
     /// <summary>
     /// Job to send scheduled group SMS messages.
@@ -63,6 +64,7 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
         {
             var dataMap = context.JobDetail.JobDataMap;
             int? commandTimeout = dataMap.GetString( "CommandTimeout" ).AsIntegerOrNull();
+            int? lastRunBuffer = dataMap.GetString( "LastRunBuffer" ).AsIntegerOrNull();
             var enabledLavaCommands = dataMap.GetString( "EnabledLavaCommands" );
             var JobStartDateTime = RockDateTime.Now;
             var dateAttributes = new List<AttributeValue>();
@@ -89,7 +91,7 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
 
                     if ( job != null && job.Guid != Rock.SystemGuid.ServiceJob.JOB_PULSE.AsGuid() )
                     {
-                        lastStartDateTime = job.LastRunDateTime?.AddSeconds( 0.0d - ( double ) job.LastRunDurationSeconds );
+                        lastStartDateTime = job.LastRunDateTime?.AddSeconds( 0.0d - ( double ) ( job.LastRunDurationSeconds + lastRunBuffer ) );
                     }
                     var beginDateTime = lastStartDateTime ?? JobStartDateTime.AddDays( -1 );
 
