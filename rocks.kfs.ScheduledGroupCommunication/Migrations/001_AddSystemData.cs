@@ -94,7 +94,7 @@ namespace rocks.kfs.ScheduledGroupCommunication.Migrations
             }
             else
             {
-                // create the attirbute matrix template and get it's id to assign to the attributes we'll create
+                // create the attribute matrix template and get it's id to assign to the attributes we'll create
                 var attributeMatrixTemplateEmail = new AttributeMatrixTemplate
                 {
                     Name = "Scheduled Emails",
