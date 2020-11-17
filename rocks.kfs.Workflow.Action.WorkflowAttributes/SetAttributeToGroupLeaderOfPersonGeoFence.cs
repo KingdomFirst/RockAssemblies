@@ -72,7 +72,7 @@ namespace rocks.kfs.Workflow.Action.WorkflowAttributes
             Guid? personAttributeGuid = GetAttributeValue( action, "Person" ).AsGuidOrNull();
             if ( personAttributeGuid.HasValue )
             {
-                Guid? personAliasGuid = action.GetWorklowAttributeValue( personAttributeGuid.Value ).AsGuidOrNull();
+                Guid? personAliasGuid = action.GetWorkflowAttributeValue( personAttributeGuid.Value ).AsGuidOrNull();
                 if ( personAliasGuid.HasValue )
                 {
                     var personAlias = new PersonAliasService( rockContext ).Get( personAliasGuid.Value );

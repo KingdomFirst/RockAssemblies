@@ -31,7 +31,7 @@ using System.ComponentModel.Composition;
 using Rock;
 using Rock.Attribute;
 using Rock.Model;
-using Rock.PersonProfile;
+using Rock.Badge;
 using Rock.Web;
 using Rock.Web.Cache;
 
@@ -53,7 +53,7 @@ namespace rocks.kfs.PersonProfile.Badge
         /// </summary>
         /// <param name="badge">The badge.</param>
         /// <param name="writer">The writer.</param>
-        public override void Render( PersonBadgeCache badge, System.Web.UI.HtmlTextWriter writer )
+        public override void Render( BadgeCache badge, System.Web.UI.HtmlTextWriter writer )
         {
             Guid? groupTypeGuid = GetAttributeValue( badge, "GroupType" ).AsGuid();
             string badgeColor = GetAttributeValue( badge, "BadgeColor" );
@@ -117,7 +117,7 @@ Sys.Application.add_load(function () {{
         /// In each <see cref="System.Collections.Generic.KeyValuePair{String,String}"/> the key value is a <see cref="System.String"/> that represents the name of the query string
         /// parameter, and the value is a <see cref="System.String"/> that represents the query string value..</param>
         /// <returns>A <see cref="System.String"/> representing the URL to the linked <see cref="Rock.Model.Page"/>. </returns>
-        public virtual string LinkedPageUrl( PersonBadgeCache badge, string attributeKey, Dictionary<string, string> queryParams = null )
+        public virtual string LinkedPageUrl( BadgeCache badge, string attributeKey, Dictionary<string, string> queryParams = null )
         {
             var pageReference = new PageReference( GetAttributeValue( badge, attributeKey ), queryParams );
             if ( pageReference.PageId > 0 )

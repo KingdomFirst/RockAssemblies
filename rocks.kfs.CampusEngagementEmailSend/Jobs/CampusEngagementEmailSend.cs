@@ -36,7 +36,7 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
     /// </summary>
     [GroupTypesField( "Group Types", "The group types to include attendance numbers for in the campus engagement email.", true, "", "", 0 )]
     [SlidingDateRangeField( "Occurrence Date Range", "The date range of group attendance occurrences to include in the GoupAttendance Lava object.", required: true, order: 1 )]
-    [SystemEmailField( "System Email", "The system email to use when sending the campus engagement email.", true, "", "", 2 )]
+    [SystemCommunicationField( "System Email", "The system email to use when sending the campus engagement email.", true, "", "", 2 )]
 
     [DisallowConcurrentExecution]
     public class CampusEngagementEmailSend : IJob
