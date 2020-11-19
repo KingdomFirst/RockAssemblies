@@ -37,6 +37,7 @@
       <HintPath>..\..\RockWeb\Bin\DDay.iCal.dll</HintPath>
     </Reference>
     <Reference Include="DotLiquid">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\DotLiquid.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework">
