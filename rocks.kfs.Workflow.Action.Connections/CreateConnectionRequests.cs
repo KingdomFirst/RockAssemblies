@@ -80,7 +80,7 @@ namespace rocks.kfs.Workflow.Action
 
             // Get the person
             PersonAlias personAlias = null;
-            Guid personAliasGuid = action.GetWorklowAttributeValue( GetAttributeValue( action, "PersonAttribute" ).AsGuid() ).AsGuid();
+            Guid personAliasGuid = action.GetWorkflowAttributeValue( GetAttributeValue( action, "PersonAttribute" ).AsGuid() ).AsGuid();
             personAlias = new PersonAliasService( rockContext ).Get( personAliasGuid );
             if ( personAlias == null )
             {
@@ -91,7 +91,7 @@ namespace rocks.kfs.Workflow.Action
             var connectionRequestService = new ConnectionRequestService( rockContext );
 
             // Get the opportunity
-            List<Guid> opportunityTypeGuids = Array.ConvertAll( action.GetWorklowAttributeValue( GetAttributeValue( action, "ConnectionOpportunitiesAttribute" ).AsGuid() ).Split( ',' ), s => new Guid( s ) ).ToList();
+            List<Guid> opportunityTypeGuids = Array.ConvertAll( action.GetWorkflowAttributeValue( GetAttributeValue( action, "ConnectionOpportunitiesAttribute" ).AsGuid() ).Split( ',' ), s => new Guid( s ) ).ToList();
 
             foreach ( var opportunityTypeGuid in opportunityTypeGuids )
             {
@@ -109,7 +109,7 @@ namespace rocks.kfs.Workflow.Action
                 Guid? connectionStatusAttributeGuid = GetAttributeValue( action, "ConnectionStatusAttribute" ).AsGuidOrNull();
                 if ( connectionStatusAttributeGuid.HasValue )
                 {
-                    connectionStatusGuid = action.GetWorklowAttributeValue( connectionStatusAttributeGuid.Value ).AsGuidOrNull();
+                    connectionStatusGuid = action.GetWorkflowAttributeValue( connectionStatusAttributeGuid.Value ).AsGuidOrNull();
                     if ( connectionStatusGuid.HasValue )
                     {
                         status = opportunity.ConnectionType.ConnectionStatuses
@@ -139,7 +139,7 @@ namespace rocks.kfs.Workflow.Action
                 Guid? campusAttributeGuid = GetAttributeValue( action, "CampusAttribute" ).AsGuidOrNull();
                 if ( campusAttributeGuid.HasValue )
                 {
-                    Guid? campusGuid = action.GetWorklowAttributeValue( campusAttributeGuid.Value ).AsGuidOrNull();
+                    Guid? campusGuid = action.GetWorkflowAttributeValue( campusAttributeGuid.Value ).AsGuidOrNull();
                     if ( campusGuid.HasValue )
                     {
                         var campus = CampusCache.Get( campusGuid.Value );
@@ -151,7 +151,7 @@ namespace rocks.kfs.Workflow.Action
                 }
 
                 // Get the Comment
-                String comment = action.GetWorklowAttributeValue( GetAttributeValue( action, "ConnectionCommentAttribute" ).AsGuid() );
+                String comment = action.GetWorkflowAttributeValue( GetAttributeValue( action, "ConnectionCommentAttribute" ).AsGuid() );
 
                 //var connectionRequestService = new ConnectionRequestService( rockContext );
 

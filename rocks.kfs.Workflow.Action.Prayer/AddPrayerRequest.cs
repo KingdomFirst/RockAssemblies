@@ -95,7 +95,7 @@ namespace rocks.kfs.Workflow.Action.Prayer
             Guid? personAttributeGuid = GetAttributeValue( action, "Person" ).AsGuidOrNull();
             if ( personAttributeGuid.HasValue )
             {
-                Guid? personAliasGuid = action.GetWorklowAttributeValue( personAttributeGuid.Value ).AsGuidOrNull();
+                Guid? personAliasGuid = action.GetWorkflowAttributeValue( personAttributeGuid.Value ).AsGuidOrNull();
                 if ( personAliasGuid.HasValue )
                 {
                     var personAlias = new PersonAliasService( rockContext ).Get( personAliasGuid.Value );
@@ -123,7 +123,7 @@ namespace rocks.kfs.Workflow.Action.Prayer
                 Guid? firstNameAttributeGuid = GetAttributeValue( action, "FirstName" ).AsGuidOrNull();
                 if ( firstNameAttributeGuid.HasValue )
                 {
-                    var firstName = action.GetWorklowAttributeValue( firstNameAttributeGuid.Value );
+                    var firstName = action.GetWorkflowAttributeValue( firstNameAttributeGuid.Value );
                     if ( !string.IsNullOrWhiteSpace( firstName ) )
                     {
                         requestFirstName = firstName;
@@ -133,7 +133,7 @@ namespace rocks.kfs.Workflow.Action.Prayer
                 Guid? lastNameAttributeGuid = GetAttributeValue( action, "LastName" ).AsGuidOrNull();
                 if ( lastNameAttributeGuid.HasValue )
                 {
-                    var lastName = action.GetWorklowAttributeValue( lastNameAttributeGuid.Value );
+                    var lastName = action.GetWorkflowAttributeValue( lastNameAttributeGuid.Value );
                     if ( !string.IsNullOrWhiteSpace( lastName ) )
                     {
                         requestLastName = lastName;
@@ -143,7 +143,7 @@ namespace rocks.kfs.Workflow.Action.Prayer
                 Guid? emailAttributeGuid = GetAttributeValue( action, "Email" ).AsGuidOrNull();
                 if ( emailAttributeGuid.HasValue )
                 {
-                    var email = action.GetWorklowAttributeValue( emailAttributeGuid.Value );
+                    var email = action.GetWorkflowAttributeValue( emailAttributeGuid.Value );
                     if ( !string.IsNullOrWhiteSpace( email ) )
                     {
                         requestEmail = email;
@@ -153,7 +153,7 @@ namespace rocks.kfs.Workflow.Action.Prayer
                 Guid? campusAttributeGuid = GetAttributeValue( action, "Campus" ).AsGuidOrNull();
                 if ( campusAttributeGuid.HasValue )
                 {
-                    var campus = action.GetWorklowAttributeValue( campusAttributeGuid.Value ).AsGuidOrNull();
+                    var campus = action.GetWorkflowAttributeValue( campusAttributeGuid.Value ).AsGuidOrNull();
                     if ( campus.HasValue )
                     {
                         requestCampusId = CampusCache.Get( campus.Value ).Id;
@@ -165,7 +165,7 @@ namespace rocks.kfs.Workflow.Action.Prayer
             Guid? requestTextAttributeGuid = GetAttributeValue( action, "Request" ).AsGuidOrNull();
             if ( requestTextAttributeGuid.HasValue )
             {
-                var requestAttributeText = action.GetWorklowAttributeValue( requestTextAttributeGuid.Value );
+                var requestAttributeText = action.GetWorkflowAttributeValue( requestTextAttributeGuid.Value );
                 if ( !string.IsNullOrWhiteSpace( requestAttributeText ) )
                 {
                     requestText = requestAttributeText;
@@ -176,7 +176,7 @@ namespace rocks.kfs.Workflow.Action.Prayer
             Guid? cateogryAttributeGuid = GetAttributeValue( action, "Category" ).AsGuidOrNull();
             if ( cateogryAttributeGuid.HasValue )
             {
-                var categoryGuid = action.GetWorklowAttributeValue( cateogryAttributeGuid.Value ).AsGuidOrNull();
+                var categoryGuid = action.GetWorkflowAttributeValue( cateogryAttributeGuid.Value ).AsGuidOrNull();
                 if ( categoryGuid.HasValue )
                 {
                     categoryId = CategoryCache.Get( categoryGuid.Value ).Id;
@@ -187,7 +187,7 @@ namespace rocks.kfs.Workflow.Action.Prayer
             Guid? allowCommentsAttributeGuid = GetAttributeValue( action, "AllowComments" ).AsGuidOrNull();
             if ( allowCommentsAttributeGuid.HasValue )
             {
-                var commentsAllowed = action.GetWorklowAttributeValue( allowCommentsAttributeGuid.Value ).AsBooleanOrNull();
+                var commentsAllowed = action.GetWorkflowAttributeValue( allowCommentsAttributeGuid.Value ).AsBooleanOrNull();
                 if ( commentsAllowed.HasValue )
                 {
                     allowComments = commentsAllowed;
@@ -198,7 +198,7 @@ namespace rocks.kfs.Workflow.Action.Prayer
             Guid? isUrgentAttributeGuid = GetAttributeValue( action, "IsUrgent" ).AsGuidOrNull();
             if ( isUrgentAttributeGuid.HasValue )
             {
-                var urgent = action.GetWorklowAttributeValue( isUrgentAttributeGuid.Value ).AsBooleanOrNull();
+                var urgent = action.GetWorkflowAttributeValue( isUrgentAttributeGuid.Value ).AsBooleanOrNull();
                 if ( urgent.HasValue )
                 {
                     isUrgent = urgent;
@@ -209,7 +209,7 @@ namespace rocks.kfs.Workflow.Action.Prayer
             Guid? isPublicAttributeGuid = GetAttributeValue( action, "IsPublic" ).AsGuidOrNull();
             if ( isPublicAttributeGuid.HasValue )
             {
-                var publicValue = action.GetWorklowAttributeValue( isPublicAttributeGuid.Value ).AsBooleanOrNull();
+                var publicValue = action.GetWorkflowAttributeValue( isPublicAttributeGuid.Value ).AsBooleanOrNull();
                 if ( publicValue.HasValue )
                 {
                     isPublic = publicValue;

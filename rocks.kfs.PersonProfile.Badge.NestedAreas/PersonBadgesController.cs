@@ -41,13 +41,13 @@ namespace rocks.kfs.PersonBadges.Rest
     /// <summary>
     ///
     /// </summary>
-    public class rocks_kfs_PersonBadges_Rest_PersonBadgesController : ApiControllerBase, IHasCustomRoutes
+    public class rocks_kfs_PersonBadges_Rest_PersonBadgesController : ApiControllerBase, IHasCustomHttpRoutes
     {
         /// <summary>
         /// Add in the routes that are supported by this badge
         /// </summary>
         /// <param name="routes">The RouteCollection that we shyould add any additional routes to.</param>
-        public void AddRoutes( System.Web.Routing.RouteCollection routes )
+        public void AddRoutes( HttpRouteCollection routes )
         {
             routes.MapHttpRoute(
                 name: "rocks.kfs.PersonBadges.Rest.PersonBadgesController",
