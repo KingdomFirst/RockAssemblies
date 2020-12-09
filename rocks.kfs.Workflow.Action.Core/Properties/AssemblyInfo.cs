@@ -20,11 +20,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("rocks.kfs.Workflow.Action.SignNow")]
+[assembly: AssemblyTitle("rocks.kfs.Workflow.Action.Core")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("rocks.kfs.Workflow.Action.SignNow")]
+[assembly: AssemblyProduct("rocks.kfs.Workflow.Action.Core")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2020" )]

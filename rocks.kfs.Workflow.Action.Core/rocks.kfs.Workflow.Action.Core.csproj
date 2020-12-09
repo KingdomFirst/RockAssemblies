@@ -7,8 +7,8 @@
     <ProjectGuid>{4CDCD152-1CDA-4A9A-9B22-22AD9316EFB6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>rocks.kfs.Workflow.Action.SignNow</RootNamespace>
-    <AssemblyName>rocks.kfs.Workflow.Action.SignNow</AssemblyName>
+    <RootNamespace>rocks.kfs.Workflow.Action.Core</RootNamespace>
+    <AssemblyName>rocks.kfs.Workflow.Action.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>false</Deterministic>
@@ -31,7 +31,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Rock">
+      <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -45,4 +49,8 @@
     <Compile Include="RequestSignature.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y /R "$(TargetPath)" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)RockWeb\bin"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
