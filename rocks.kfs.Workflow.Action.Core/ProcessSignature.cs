@@ -24,9 +24,9 @@ namespace rocks.kfs.Workflow.Action.Core
     #endregion
 
     #region Action Settings
-    [CustomDropdownListField( "Signature Document Template", "The signature document type to check for with this action runs.", "SELECT Id AS Value, Name AS Text FROM SignatureDocumentTemplate ORDER BY Name", true, order: 0, key: AttributeKeys.DocumentTemplate )]
+    [CustomDropdownListField( "Signature Document Template", "The signature document template to check for when this action runs.", "SELECT Id AS Value, Name AS Text FROM SignatureDocumentTemplate ORDER BY Name", true, order: 0, key: AttributeKeys.DocumentTemplate )]
     [WorkflowAttribute( "Signature Document", "The workflow attribute to store the created digital signature document in.", true, "", "", 1, AttributeKeys.SignatureDocument, new string[] { "Rock.Field.Types.FileFieldType" } )]
-    [WorkflowAttribute( "Person", "The workflow attribute of the person the signature request will go to. ", true, "", "", 2, AttributeKeys.Person, new string[] { "Rock.Field.Types.PersonFieldType" } )]
+    [WorkflowAttribute( "Person", "The workflow attribute of the person the signature request was sent to. ", true, "", "", 2, AttributeKeys.Person, new string[] { "Rock.Field.Types.PersonFieldType" } )]
     #endregion
 
     /// <summary>
