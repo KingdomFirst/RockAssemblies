@@ -27,9 +27,9 @@ Two new KFS actions are added under KFS: Core.
 
 **Request Signature**
 
-The block will need to be manually added to wherever you wish for it to be used. Such as a new page Check-in > Attendance Report.
-
 ![](../.screenshots/WorkflowActionCore/screenshot2.png)
+
+**Process Signature**
 
 ![](../.screenshots/WorkflowActionCore/screenshot3.png)
 

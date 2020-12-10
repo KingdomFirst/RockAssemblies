@@ -26,7 +26,7 @@ namespace rocks.kfs.Workflow.Action.Core
     #region Action Settings
     [CustomDropdownListField( "Signature Document Template", "The signature document template to check for when this action runs.", "SELECT Id AS Value, Name AS Text FROM SignatureDocumentTemplate ORDER BY Name", true, order: 0, key: AttributeKeys.DocumentTemplate )]
     [WorkflowAttribute( "Signature Document", "The workflow attribute to store the created digital signature document in.", true, "", "", 1, AttributeKeys.SignatureDocument, new string[] { "Rock.Field.Types.FileFieldType" } )]
-    [WorkflowAttribute( "Person", "The workflow attribute of the person the signature request was sent to. ", true, "", "", 2, AttributeKeys.Person, new string[] { "Rock.Field.Types.PersonFieldType" } )]
+    [WorkflowAttribute( "Signer", "The workflow attribute of the person the signature request was sent to. ", true, "", "", 2, AttributeKeys.Person, new string[] { "Rock.Field.Types.PersonFieldType" } )]
     #endregion
 
     /// <summary>
@@ -94,11 +94,9 @@ namespace rocks.kfs.Workflow.Action.Core
                    .OrderByDescending( d => d.LastStatusDate.Value )
                    .FirstOrDefault();
 
-                var documentTemplate = new SignatureDocumentTemplateService( rockContext ).Get( documentTemplateId.Value );
-
-                if ( documentTemplate != null && signatureDocument != null )
+                if ( signatureDocument != null )
                 {
-                    // get the attribute to store the request guid
+                    // get the attribute to store the document/file guid
                     var signatureDocumentAttributeGuid = GetAttributeValue( action, AttributeKeys.SignatureDocument ).AsGuidOrNull();
                     if ( signatureDocumentAttributeGuid.HasValue )
                     {

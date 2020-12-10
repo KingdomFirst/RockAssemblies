@@ -27,7 +27,7 @@ namespace rocks.kfs.Workflow.Action.Core
     #region Action Settings
     [CustomDropdownListField( "Signature Document Template", "The signature document template to send out when this action runs.", "SELECT Id AS Value, Name AS Text FROM SignatureDocumentTemplate ORDER BY Name", true, order: 0, key: AttributeKeys.DocumentTemplate )]
     [WorkflowAttribute( "Signature Document", "The attribute to store the created digital signature document in. On this action it will be used to check if the document has been signed before sending the invite again.", true, "", "", 1, AttributeKeys.SignatureDocument, new string[] { "Rock.Field.Types.FileFieldType" } )]
-    [WorkflowAttribute( "Person", "The workflow attribute of the person the signature request will go to. ", true, "", "", 2, AttributeKeys.Person, new string[] { "Rock.Field.Types.PersonFieldType" } )]
+    [WorkflowAttribute( "Signer", "The workflow attribute of the person the signature request will go to. ", true, "", "", 2, AttributeKeys.Person, new string[] { "Rock.Field.Types.PersonFieldType" } )]
     #endregion
 
     /// <summary>
@@ -114,7 +114,7 @@ namespace rocks.kfs.Workflow.Action.Core
 
                 if ( documentTemplate != null && signatureDocument != null )
                 {
-                    // get the attribute to store the request guid
+                    // get the attribute to store the document/file guid
                     var signatureDocumentAttributeGuid = GetAttributeValue( action, AttributeKeys.SignatureDocument ).AsGuidOrNull();
                     if ( signatureDocumentAttributeGuid.HasValue )
                     {
@@ -150,7 +150,7 @@ namespace rocks.kfs.Workflow.Action.Core
                     sendDocumentTxn.SignatureDocumentTemplateId = documentTemplateId.Value;
                     sendDocumentTxn.AppliesToPersonAliasId = person.PrimaryAliasId ?? 0;
                     sendDocumentTxn.AssignedToPersonAliasId = person.PrimaryAliasId ?? 0;
-                    sendDocumentTxn.DocumentName = string.Format( "{0}_{1}", action.Activity.Workflow.Name, person.FullName.RemoveSpecialCharacters() );
+                    sendDocumentTxn.DocumentName = string.Format( "{0}_{1}", action.Activity.Workflow.Name.RemoveSpecialCharacters(), person.FullName.RemoveSpecialCharacters() );
                     sendDocumentTxn.Email = person.Email;
                     Rock.Transactions.RockQueue.TransactionQueue.Enqueue( sendDocumentTxn );
                     return true;
