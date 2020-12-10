@@ -9,7 +9,6 @@ using Rock;
 using Rock.Attribute;
 using Rock.Data;
 using Rock.Model;
-using Rock.Security;
 using Rock.Web.Cache;
 using Rock.Workflow;
 
@@ -18,22 +17,22 @@ namespace rocks.kfs.Workflow.Action.Core
     #region Action Attributes
 
     [ActionCategory( "KFS: Core" )]
-    [Description( "Creates a new signature request for the workflow." )]
+    [Description( "Processes the signature request for the workflow. This is used in conjunction with the request signature action to hold the activity up until the document has been signed." )]
     [Export( typeof( ActionComponent ) )]
-    [ExportMetadata( "ComponentName", "Request Signature" )]
+    [ExportMetadata( "ComponentName", "Process Signature" )]
 
     #endregion
 
     #region Action Settings
-    [CustomDropdownListField( "Signature Document Template", "The signature document type to send out when this action runs.", "SELECT Id AS Value, Name AS Text FROM SignatureDocumentTemplate ORDER BY Name", true, order: 0, key: AttributeKeys.DocumentTemplate )]
-    [WorkflowAttribute( "Signature Document", "The attribute to store the created digital signature document in. On this action it will be used to check if the document has been signed before sending the invite again.", true, "", "", 1, AttributeKeys.SignatureDocument, new string[] { "Rock.Field.Types.FileFieldType" } )]
+    [CustomDropdownListField( "Signature Document Template", "The signature document type to check for with this action runs.", "SELECT Id AS Value, Name AS Text FROM SignatureDocumentTemplate ORDER BY Name", true, order: 0, key: AttributeKeys.DocumentTemplate )]
+    [WorkflowAttribute( "Signature Document", "The workflow attribute to store the created digital signature document in.", true, "", "", 1, AttributeKeys.SignatureDocument, new string[] { "Rock.Field.Types.FileFieldType" } )]
     [WorkflowAttribute( "Person", "The workflow attribute of the person the signature request will go to. ", true, "", "", 2, AttributeKeys.Person, new string[] { "Rock.Field.Types.PersonFieldType" } )]
     #endregion
 
     /// <summary>
     /// Creates a new prayer request.
     /// </summary>
-    public class RequestSignature : ActionComponent
+    public class ProcessSignature : ActionComponent
     {
         #region Attribute Keys
 
@@ -59,7 +58,6 @@ namespace rocks.kfs.Workflow.Action.Core
 
             var documentTemplateId = GetAttributeValue( action, AttributeKeys.DocumentTemplate ).AsIntegerOrNull();
             Person person = null;
-            DigitalSignatureComponent DigitalSignatureComponent = null;
 
             // get person
             Guid? personAttributeGuid = GetAttributeValue( action, AttributeKeys.Person ).AsGuidOrNull();
@@ -82,12 +80,6 @@ namespace rocks.kfs.Workflow.Action.Core
                 return false;
             }
 
-            if ( string.IsNullOrWhiteSpace( person.Email ) )
-            {
-                errorMessages.Add( "There is no valid email address set on the person." );
-                return false;
-            }
-
             if ( documentTemplateId.HasValue )
             {
                 var signatureDocument = new SignatureDocumentService( rockContext )
@@ -103,14 +95,6 @@ namespace rocks.kfs.Workflow.Action.Core
                    .FirstOrDefault();
 
                 var documentTemplate = new SignatureDocumentTemplateService( rockContext ).Get( documentTemplateId.Value );
-                if ( documentTemplate.ProviderEntityType != null )
-                {
-                    var provider = DigitalSignatureContainer.GetComponent( documentTemplate.ProviderEntityType.Name );
-                    if ( provider != null && provider.IsActive )
-                    {
-                        DigitalSignatureComponent = provider;
-                    }
-                }
 
                 if ( documentTemplate != null && signatureDocument != null )
                 {
@@ -144,26 +128,14 @@ namespace rocks.kfs.Workflow.Action.Core
                         return false;
                     }
                 }
-                else if ( DigitalSignatureComponent != null )
-                {
-                    var sendDocumentTxn = new Rock.Transactions.SendDigitalSignatureRequestTransaction();
-                    sendDocumentTxn.SignatureDocumentTemplateId = documentTemplateId.Value;
-                    sendDocumentTxn.AppliesToPersonAliasId = person.PrimaryAliasId ?? 0;
-                    sendDocumentTxn.AssignedToPersonAliasId = person.PrimaryAliasId ?? 0;
-                    sendDocumentTxn.DocumentName = string.Format( "{0}_{1}", action.Activity.Workflow.Name, person.FullName.RemoveSpecialCharacters() );
-                    sendDocumentTxn.Email = person.Email;
-                    Rock.Transactions.RockQueue.TransactionQueue.Enqueue( sendDocumentTxn );
-                    return true;
-                }
                 else
                 {
-                    errorMessages.Add( "There was an error loading the Digital Signature component, please check your document template." );
                     return false;
                 }
             }
             else
             {
-                errorMessages.Add( "There was no valid document template id set on this action" );
+                errorMessages.Add( "There was no valid document template id set on this action." );
                 return false;
             }
         }
