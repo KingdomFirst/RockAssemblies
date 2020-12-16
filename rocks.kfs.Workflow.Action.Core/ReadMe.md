@@ -16,6 +16,7 @@ Quick Links:
 
 ## What's New
 ---
+- Added new setting "Minutes to Timeout" to Process Signature action.
 - Released v1
 
 ## Configuration
@@ -29,6 +30,16 @@ Two new KFS actions are added under KFS: Core.
 
 ![](../.screenshots/WorkflowActionCore/screenshot2.png)
 
+    Name: Action name
+    
+    Action Type: Request Signature
+    
+    Signature Document Template: The signature document template to send out when this action runs.
+    
+    Signature Document: The workflow attribute to store the created digital signature document in.
+       
+    Signer: The workflow attribute of the person the signature request will go to.
+
 **Process Signature**
 
 ![](../.screenshots/WorkflowActionCore/screenshot3.png)
@@ -36,13 +47,15 @@ Two new KFS actions are added under KFS: Core.
 ```
     Name: Action name
 
-    Action Type: Request Signature/Process Signature
+    Action Type: Process Signature
 
-    Signature Document Template: The signature document template to send out/check for when this action runs.
+    Signature Document Template: The signature document template to check for when this action runs.
 
     Signature Document: The workflow attribute to store the created digital signature document in.
    
-    Person: The workflow attribute of the person the signature request will go to.
+    Signer: The workflow attribute of the person the signature request was sent to.
+    
+    Minutes to Timeout: The number of minutes to wait for a signature before timing out the action (marking the action as successful to move on) Default: 2880 (2 Days).
     
 ```
 
