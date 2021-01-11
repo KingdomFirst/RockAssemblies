@@ -27,6 +27,7 @@ namespace rocks.kfs.Workflow.Action.Core
     [CustomDropdownListField( "Signature Document Template", "The signature document template to check for when this action runs.", "SELECT Id AS Value, Name AS Text FROM SignatureDocumentTemplate ORDER BY Name", true, order: 0, key: AttributeKeys.DocumentTemplate )]
     [WorkflowAttribute( "Signature Document", "The workflow attribute to store the created digital signature document in.", true, "", "", 1, AttributeKeys.SignatureDocument, new string[] { "Rock.Field.Types.FileFieldType" } )]
     [WorkflowAttribute( "Signer", "The workflow attribute of the person the signature request was sent to. ", true, "", "", 2, AttributeKeys.Person, new string[] { "Rock.Field.Types.PersonFieldType" } )]
+    [IntegerField( "Minutes To Timeout", "The number of minutes to wait for a signature before timing out the action (marking the action as successful to move on) Default: 2880 (2 Days).", true, 2880, key: AttributeKeys.MinutesToTimeout, order: 3 )]
     #endregion
 
     /// <summary>
@@ -41,6 +42,7 @@ namespace rocks.kfs.Workflow.Action.Core
             public const string SignatureDocument = "SignatureDocument";
             public const string DocumentTemplate = "SignatureDocumentTemplate";
             public const string Person = "Person";
+            public const string MinutesToTimeout = "MinutesToTimeout";
         }
 
         #endregion
@@ -128,6 +130,22 @@ namespace rocks.kfs.Workflow.Action.Core
                 }
                 else
                 {
+                    var now = RockDateTime.Now;
+                    var activatedDateTime = GetDateTimeActivated( action );
+
+                    int? minutes = GetAttributeValue( action, AttributeKeys.MinutesToTimeout ).AsIntegerOrNull();
+                    if ( minutes.HasValue )
+                    {
+                        if ( activatedDateTime.AddMinutes( minutes.Value ).CompareTo( now ) <= 0 )
+                        {
+                            action.AddLogEntry( string.Format( "{0:N0} minutes have passed. Process timed out.", minutes.Value ), true );
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
                     return false;
                 }
             }
@@ -136,6 +154,57 @@ namespace rocks.kfs.Workflow.Action.Core
                 errorMessages.Add( "There was no valid document template id set on this action." );
                 return false;
             }
+        }
+
+        private DateTime GetDateTimeActivated( WorkflowAction action )
+        {
+            var dateActivated = RockDateTime.Now;
+
+            string AttrKey = action.ActionTypeCache.Guid.ToString();
+
+            if ( !action.Activity.Attributes.ContainsKey( AttrKey ) )
+            {
+                var attribute = new Rock.Model.Attribute
+                {
+                    EntityTypeId = action.Activity.TypeId,
+                    EntityTypeQualifierColumn = "ActivityTypeId",
+                    EntityTypeQualifierValue = action.Activity.ActivityTypeId.ToString(),
+                    Name = "Process Signature Activated",
+                    Key = AttrKey,
+                    FieldTypeId = FieldTypeCache.Get( Rock.SystemGuid.FieldType.TEXT.AsGuid() ).Id
+                };
+
+                using ( var newRockContext = new RockContext() )
+                {
+                    new AttributeService( newRockContext ).Add( attribute );
+                    newRockContext.SaveChanges();
+                }
+
+                action.Activity.Attributes.Add( AttrKey, AttributeCache.Get( attribute ) );
+                var attributeValue = new AttributeValueCache
+                {
+                    AttributeId = attribute.Id,
+                    Value = dateActivated.ToString( "o" )
+                };
+                action.Activity.AttributeValues.Add( AttrKey, attributeValue );
+
+                action.AddLogEntry( string.Format( "Process Signature Activated at {0}", dateActivated ), true );
+            }
+            else
+            {
+                DateTime? activated = action.Activity.GetAttributeValue( AttrKey ).AsDateTime();
+                if ( activated.HasValue )
+                {
+                    return activated.Value;
+                }
+                else
+                {
+                    action.Activity.SetAttributeValue( AttrKey, dateActivated.ToString( "o" ) );
+                    action.AddLogEntry( string.Format( "Process Signature Activated at {0}", dateActivated ), true );
+                }
+            }
+
+            return dateActivated;
         }
     }
 }
