@@ -173,8 +173,8 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
                         mergeObjects.Add( "GroupAttendance", groupAttendanceOccurrences );
                         mergeObjects.Add( "Campus", campus );
 
-                        var recipients = new List<RecipientData>();
-                        recipients.Add( new RecipientData( email, mergeObjects ) );
+                        var recipients = new List<RockEmailMessageRecipient>();
+                        recipients.Add( new RockEmailMessageRecipient( pastor, mergeObjects ) );
 
                         var emailMessage = new RockEmailMessage( systemEmailGuid );
                         emailMessage.SetRecipients( recipients );
