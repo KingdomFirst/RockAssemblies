@@ -327,8 +327,8 @@ namespace rocks.kfs.GroupRoleAttendanceReminder.Jobs
                 mergeObjects.Add( "Group", group );
                 mergeObjects.Add( "Occurrence", occGroup.Value.Max() );
 
-                var recipients = new List<RecipientData>();
-                recipients.Add( new RecipientData( email, mergeObjects ) );
+                var recipients = new List<RockEmailMessageRecipient>();
+                recipients.Add( RockEmailMessageRecipient.CreateAnonymous( email, mergeObjects ) );
 
                 var emailMessage = new RockEmailMessage( systemEmailGuid );
                 emailMessage.SetRecipients( recipients );
