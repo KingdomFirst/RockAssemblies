@@ -196,7 +196,20 @@ namespace rocks.kfs.Reach.Reporting
                             if ( donation.address1.IsNotNullOrWhiteSpace() )
                             {
                                 var familyGroup = person.GetFamily( rockContext );
-                                var location = new LocationService( rockContext ).Get( donation.address1, donation.address2, donation.city, donation.state, donation.postal, donation.country );
+                                var countryValue = donation.country;
+                                var countryDV = DefinedTypeCache.Get( Rock.SystemGuid.DefinedType.LOCATION_COUNTRIES.AsGuid() )
+                                                .GetDefinedValueFromValue( countryValue );
+                                if ( countryDV == null )
+                                {
+                                    var countriesDT = DefinedTypeCache.Get( Rock.SystemGuid.DefinedType.LOCATION_COUNTRIES.AsGuid() );
+                                    countryDV = countriesDT.DefinedValues.FirstOrDefault( dv => dv.Description.Contains( countryValue ) );
+                                    if ( countryDV != null && countryDV.Value.IsNotNullOrWhiteSpace() )
+                                    {
+                                        countryValue = countryDV.Value;
+                                    }
+                                }
+
+                                var location = new LocationService( rockContext ).Get( donation.address1, donation.address2, donation.city, donation.state, donation.postal, countryValue );
                                 if ( familyGroup != null && location != null )
                                 {
                                     familyGroup.GroupLocations.Add( new GroupLocation
