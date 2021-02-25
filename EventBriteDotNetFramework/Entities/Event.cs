@@ -26,7 +26,7 @@ namespace EventbriteDotNetFramework.Entities
 
         public HybridString Name { get; set; }
 
-        public HybridString Description { get; set; }
+        public string Summary { get; set; }
 
         public Organizer Organizer { get; set; }
 
