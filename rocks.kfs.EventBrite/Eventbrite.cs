@@ -504,10 +504,11 @@ namespace rocks.kfs.Eventbrite
                 LogEvent( rockContext, "SetPersonData", string.Format( "Person: {0} Attendee: {1} Group: {2}", person, attendee.Id, group ), "Start" );
             }
 
+            var familyGroup = person.GetFamily( rockContext );
+
             //Address
-            if ( attendee.Profile.Addresses.Home != null && attendee.Profile.Addresses.Home.Address_1 != null && !person.PrimaryFamily.GroupLocations.Any( gl => gl.GroupLocationTypeValueId == homeLocationValueId ) )
+            if ( attendee.Profile.Addresses.Home != null && attendee.Profile.Addresses.Home.Address_1 != null &&  familyGroup != null && familyGroup.GroupLocations != null && !familyGroup.GroupLocations.Any( gl => gl.GroupLocationTypeValueId == homeLocationValueId )  )
             {
-                var familyGroup = person.GetFamily( rockContext );
                 var location = new LocationService( rockContext ).Get( attendee.Profile.Addresses.Home.Address_1, attendee.Profile.Addresses.Home.Address_2, attendee.Profile.Addresses.Home.City, attendee.Profile.Addresses.Home.Region, attendee.Profile.Addresses.Home.Postal_Code, attendee.Profile.Addresses.Home.Country );
                 if ( familyGroup != null && location != null )
                 {
