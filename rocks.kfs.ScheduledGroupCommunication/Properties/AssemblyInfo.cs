@@ -22,10 +22,10 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle( "rocks.kfs.ScheduledGroupCommunication" )]
 [assembly: AssemblyProduct( "rocks.kfs.ScheduledGroupCommunication" )]
-[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2019" )]
+[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2021" )]
 
 // Auto increment assembly versions
-[assembly: AssemblyVersion( "1.4.*" )]
+[assembly: AssemblyVersion( "1.5.*" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
