@@ -594,7 +594,9 @@ xcopy /Y /R "$(ProjectDir)bin\Microsoft.ReportViewer.Design.dll" "$(SolutionDir)
 xcopy /Y /R "$(ProjectDir)bin\Microsoft.ReportViewer.ProcessingObjectModel.dll" "$(SolutionDir)RockWeb\bin"
 xcopy /Y /R "$(ProjectDir)bin\Microsoft.ReportViewer.WebDesign.dll" "$(SolutionDir)RockWeb\bin"
 xcopy /Y /R "$(ProjectDir)bin\Microsoft.ReportViewer.WebForms.dll" "$(SolutionDir)RockWeb\bin"
-xcopy /Y /R "$(ProjectDir)bin\Microsoft.ReportViewer.WinForms.dll" "$(SolutionDir)RockWeb\bin"</PostBuildEvent>
+xcopy /Y /R "$(ProjectDir)bin\Microsoft.ReportViewer.WinForms.dll" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(TargetPath)" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)RockWeb\bin"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

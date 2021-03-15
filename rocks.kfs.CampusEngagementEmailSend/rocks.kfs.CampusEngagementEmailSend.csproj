@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{ffba8255-9719-4e64-aaf1-42d19d9e2617}</ProjectGuid>
+    <ProjectGuid>{FFBA8255-9719-4E64-AAF1-42D19D9E2617}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>rocks.kfs.CampusEngagementEmailSend</RootNamespace>
@@ -92,6 +92,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y /R "$(TargetPath)" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)RockWeb\bin"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
