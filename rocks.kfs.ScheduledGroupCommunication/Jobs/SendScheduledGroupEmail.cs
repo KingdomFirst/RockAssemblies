@@ -188,7 +188,7 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
                                 {
                                     personIdHash.Add( member.PersonId );
                                     var communicationRecipient = new CommunicationRecipient();
-                                    communicationRecipient.PersonAliasId = member.Person.PrimaryAliasId.Value;
+                                    communicationRecipient.PersonAliasId = member.Person.PrimaryAliasId;
                                     communicationRecipient.AdditionalMergeValues = new Dictionary<string, object>();
                                     communicationRecipient.AdditionalMergeValues.Add( "GroupMember", member );
                                     //communicationRecipient.AdditionalMergeValues.Add( "Group", group );
