@@ -44,12 +44,16 @@ namespace rocks.kfs.Eventbrite
 
         public static EBApi Api()
         {
-            return new EBApi( Settings.GetAccessToken() );
+            return new EBApi( Settings.GetAccessToken(), Settings.GetOrganizationId().ToLong( 0 ) );
         }
 
         public static EBApi Api( string oAuthToken )
         {
             return new EBApi( oAuthToken );
+        }
+        public static EBApi Api( string oAuthToken, long orgId )
+        {
+            return new EBApi( oAuthToken, orgId );
         }
 
         public static bool EBUsageCheck( int id )
@@ -171,7 +175,7 @@ namespace rocks.kfs.Eventbrite
             }
 
             var group = new GroupService( rockContext ).Get( groupid );
-            var eb = new EBApi( Settings.GetAccessToken() );
+            var eb = new EBApi( Settings.GetAccessToken(), Settings.GetOrganizationId().ToLong( 0 ) );
             var groupEBEventIDAttr = GetGroupEBEventId( group );
             var groupEBEventAttrSplit = groupEBEventIDAttr.Value.SplitDelimitedValues( "^" );
             var evntid = long.Parse( groupEBEventIDAttr != null ? groupEBEventAttrSplit[0] : "0" );
@@ -244,7 +248,7 @@ namespace rocks.kfs.Eventbrite
         }
         public static void SyncOrder( string apiUrl )
         {
-            var eb = new EBApi( Settings.GetAccessToken() );
+            var eb = new EBApi( Settings.GetAccessToken(), Settings.GetOrganizationId().ToLong( 0 ) );
             var order = eb.GetOrder( apiUrl, "event,attendees" );
             var rockContext = new RockContext();
             var group = GetGroupByEBEventId( order.Event_Id, rockContext );
@@ -275,7 +279,7 @@ namespace rocks.kfs.Eventbrite
 
         public static void SyncAttendee( string apiUrl )
         {
-            var eb = new EBApi( Settings.GetAccessToken() );
+            var eb = new EBApi( Settings.GetAccessToken(), Settings.GetOrganizationId().ToLong( 0 ) );
             var attendee = eb.GetAttendee( apiUrl, "event,order" );
             var order = attendee.Order;
             var rockContext = new RockContext();
