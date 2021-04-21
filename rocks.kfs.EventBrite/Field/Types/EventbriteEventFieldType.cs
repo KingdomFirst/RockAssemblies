@@ -50,7 +50,7 @@ namespace rocks.kfs.Eventbrite.Field.Types
         {
             string formattedValue = value;
             var splitVal = value.SplitDelimitedValues( "^" );
-            long? longVal = splitVal[0].AsLongOrNull();
+            long? longVal = ( splitVal.Count() > 0 ) ? splitVal[0].AsLongOrNull() : null;
             if ( longVal.HasValue )
             {
                 var eb = new EBApi( Settings.GetAccessToken(), Settings.GetOrganizationId().ToLong( 0 ) );
