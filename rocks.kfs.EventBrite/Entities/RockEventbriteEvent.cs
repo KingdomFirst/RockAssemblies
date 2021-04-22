@@ -157,7 +157,7 @@ namespace EventbriteDotNetFramework.Entities
             }
             if ( _evntId > 0 )
             {
-                _eb = new EBApi( Settings.GetAccessToken() );
+                _eb = new EBApi( Settings.GetAccessToken(), Settings.GetOrganizationId().ToLong( 0 ) );
                 _ebevent = _eb.GetEventById( _evntId );
             }
         }

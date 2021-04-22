@@ -50,10 +50,10 @@ namespace rocks.kfs.Eventbrite.Field.Types
         {
             string formattedValue = value;
             var splitVal = value.SplitDelimitedValues( "^" );
-            long? longVal = splitVal[0].AsLongOrNull();
+            long? longVal = ( splitVal.Count() > 0 ) ? splitVal[0].AsLongOrNull() : null;
             if ( longVal.HasValue )
             {
-                var eb = new EBApi( Settings.GetAccessToken() );
+                var eb = new EBApi( Settings.GetAccessToken(), Settings.GetOrganizationId().ToLong( 0 ) );
                 var eventbriteEvent = eb.GetEventById( longVal.Value );
                 var linkedEventTickets = eb.GetTicketsById( longVal.Value );
                 var sold = 0;
@@ -105,7 +105,7 @@ namespace rocks.kfs.Eventbrite.Field.Types
             var parentControl = new Panel();
             var editControl = new RockDropDownList { ID = id };
             editControl.Items.Add( new ListItem() );
-            var eb = new EBApi( Settings.GetAccessToken() );
+            var eb = new EBApi( Settings.GetAccessToken(), Settings.GetOrganizationId().ToLong( 0 ) );
 
             var organizationEvents = eb.GetOrganizationEvents( "all", 500 );
             if ( organizationEvents.Pagination.Has_More_Items )
