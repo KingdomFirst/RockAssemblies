@@ -1,7 +1,12 @@
 ![KFSBanner (3)](https://user-images.githubusercontent.com/81330042/118855629-938f0f00-b89b-11eb-8b82-7496ebd61e08.jpg)
 
 
+
 # Send Scheduled Group Communications
+*Tested/Supported in Rock version:  8.0-12.0*   
+*Created:  11/20/2018*  
+*Updated:  8/28/2019*   
+*Rock Shop Plugin: https://www.rockrms.com/Plugin/100*
 
 ## Summary
 
