@@ -72,6 +72,7 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
             int communicationsSent = 0;
             var smsMediumType = EntityTypeCache.Get( "Rock.Communication.Medium.Sms" );
             var dateAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_SEND_DATE.AsGuid() ).Id;
+            var recurrenceAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_SEND_RECURRENCE.AsGuid() ).Id;
             var fromNumberAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_FROM_NUMBER.AsGuid() ).Id;
             var messageAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_MESSAGE.AsGuid() ).Id;
 
@@ -186,7 +187,7 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
                                             {
                                                 personIdHash.Add( groupMember.PersonId );
                                                 var communicationRecipient = new CommunicationRecipient();
-                                                communicationRecipient.PersonAliasId = person.PrimaryAliasId;
+                                                communicationRecipient.PersonAliasId = person.PrimaryAliasId.Value;
                                                 communicationRecipient.AdditionalMergeValues = new Dictionary<string, object>();
                                                 communicationRecipient.AdditionalMergeValues.Add( "GroupMember", groupMember );
                                                 //communicationRecipient.AdditionalMergeValues.Add( "Group", group );
@@ -215,6 +216,32 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
                                 Rock.Model.Communication.Send( communication );
 
                                 communicationsSent = communicationsSent + personIdHash.Count;
+
+                                var recurrence = new AttributeValueService( rockContext )
+                                    .GetByAttributeIdAndEntityId( recurrenceAttributeId, attributeMatrixItemAndGroupId.Key )
+                                    .Value;
+
+                                if ( !string.IsNullOrWhiteSpace( recurrence ) )
+                                {
+                                    var sendDate = new AttributeValueService( rockContext )
+                                        .GetByAttributeIdAndEntityId( dateAttributeId, attributeMatrixItemAndGroupId.Key );
+
+                                    switch ( recurrence )
+                                    {
+                                        case "Weekly":
+                                            sendDate.Value = sendDate.ValueAsDateTime.Value.AddDays( 7 ).ToString();
+                                            break;
+                                        case "BiWeekly":
+                                            sendDate.Value = sendDate.ValueAsDateTime.Value.AddDays( 14 ).ToString();
+                                            break;
+                                        case "Monthly":
+                                            sendDate.Value = sendDate.ValueAsDateTime.Value.AddMonths( 1 ).ToString();
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    rockContext.SaveChanges();
+                                }
                             }
                         }
                     }
