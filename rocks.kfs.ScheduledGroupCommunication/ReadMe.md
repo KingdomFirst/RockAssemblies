@@ -44,7 +44,7 @@ You will need to add the two attribute matrixes to any group type you want to al
 2. Under Group Attributes, add an attribute
 3. You will need to create a separate attribute for SMS and Email. The only differences will be the names and which Attribute Matrix Template you select.
 
-![](Images/SMS_Group_Attribute.png)
+![Email_Group_Attribute (1)](https://user-images.githubusercontent.com/81330042/122958447-7640db00-d348-11eb-9b21-d0c03f702185.png)
 
 > <span style="padding-left: 30px; margin-right: 10px; width: .8em;background: #d21919; border-radius: 100%; color: white; text-align: center; display: inline-block;">&nbsp;&nbsp;1&nbsp;&nbsp;</span> **Name** Enter a name for your attribute
 >
@@ -63,7 +63,7 @@ You will need to create two system jobs to send the communications.
 1. Go to Admin Tools > System Settings > Jobs Administration
 2. Add a new job
 
-![SMS_Group_Attribute](https://user-images.githubusercontent.com/81330042/118859568-ff737680-b89f-11eb-8740-8414944f7a64.png)
+![Email_Job (1)](https://user-images.githubusercontent.com/81330042/122959364-aa1c0080-d348-11eb-8479-420aa34c5dba.png)
 
 
 > <span style="padding-left: 30px; margin-right: 10px; width: .8em;background: #d21919; border-radius: 100%; color: white; text-align: center; display: inline-block;">&nbsp;&nbsp;1&nbsp;&nbsp;</span> **Name** Give your job a name
