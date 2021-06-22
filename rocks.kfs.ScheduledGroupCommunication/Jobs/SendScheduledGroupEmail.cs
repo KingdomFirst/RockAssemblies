@@ -72,6 +72,7 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
             int communicationsSent = 0;
             var emailMediumType = EntityTypeCache.Get( "Rock.Communication.Medium.Email" );
             var dateAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SEND_DATE.AsGuid() ).Id;
+            var recurrenceAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SEND_RECURRENCE.AsGuid() ).Id;
             var fromEmailAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_FROM_EMAIL.AsGuid() ).Id;
             var fromNameAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_FROM_NAME.AsGuid() ).Id;
             var subjectAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SUBJECT.AsGuid() ).Id;
@@ -216,6 +217,31 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
                             Rock.Model.Communication.Send( communication );
 
                             communicationsSent += personIdHash.Count;
+
+                            var recurrence = new AttributeValueService( rockContext )
+                                .GetByAttributeIdAndEntityId( recurrenceAttributeId, attributeMatrixItemAndGroupId.Key );
+
+                            if ( recurrence != null && !string.IsNullOrWhiteSpace( recurrence.Value ) )
+                            {
+                                var sendDate = new AttributeValueService( rockContext )
+                                    .GetByAttributeIdAndEntityId( dateAttributeId, attributeMatrixItemAndGroupId.Key );
+
+                                switch ( recurrence.Value )
+                                {
+                                    case "1":
+                                        sendDate.Value = sendDate.ValueAsDateTime.Value.AddDays( 7 ).ToString();
+                                        break;
+                                    case "2":
+                                        sendDate.Value = sendDate.ValueAsDateTime.Value.AddDays( 14 ).ToString();
+                                        break;
+                                    case "3":
+                                        sendDate.Value = sendDate.ValueAsDateTime.Value.AddMonths( 1 ).ToString();
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                rockContext.SaveChanges();
+                            }
                         }
                     }
                 }

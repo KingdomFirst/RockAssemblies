@@ -34,6 +34,11 @@ namespace rocks.kfs.ScheduledGroupCommunication.SystemGuid
         public const string MATRIX_ATTRIBUTE_EMAIL_SEND_DATE = "39A38B02-112C-4EDC-A30E-4BDB1B090EE4";
 
         /// <summary>
+        /// The matrix attribute for email send recurrence
+        /// </summary>
+        public const string MATRIX_ATTRIBUTE_EMAIL_SEND_RECURRENCE = "9BC4F790-A9F7-4822-AEEE-91095A3E3D4C";
+
+        /// <summary>
         /// The matrix attribute for email from address
         /// </summary>
         public const string MATRIX_ATTRIBUTE_EMAIL_FROM_EMAIL = "F7C73002-6442-4756-BFDB-BC0BFE58EF15";
@@ -63,17 +68,22 @@ namespace rocks.kfs.ScheduledGroupCommunication.SystemGuid
         public const string ATTRIBUTE_MATRIX_TEMPLATE_SCHEDULED_SMS = "B40C318D-0EB5-49CD-B93C-1CDA0F5CB4BC";
 
         /// <summary>
-        /// The matrix attribute for email send date
+        /// The matrix attribute for SMS send date
         /// </summary>
         public const string MATRIX_ATTRIBUTE_SMS_SEND_DATE = "B2125940-565B-42CE-82BE-CDA58FC65FDE";
 
         /// <summary>
-        /// The matrix attribute for email from address
+        /// The matrix attribute for SMS send recurrence
+        /// </summary>
+        public const string MATRIX_ATTRIBUTE_SMS_SEND_RECURRENCE = "EC6D13F7-A256-4B03-A94B-3B713F26E62D";
+
+        /// <summary>
+        /// The matrix attribute for SMS from address
         /// </summary>
         public const string MATRIX_ATTRIBUTE_SMS_FROM_NUMBER = "1984A561-C4A9-4D4F-B366-23AD54BDCFE8";
 
         /// <summary>
-        /// The matrix attribute for email message
+        /// The matrix attribute for SMS message
         /// </summary>
         public const string MATRIX_ATTRIBUTE_SMS_MESSAGE = "C57166D5-C0D3-4DA6-88DD-92AFA5126D69";
 
