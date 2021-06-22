@@ -189,7 +189,7 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
                                 {
                                     personIdHash.Add( member.PersonId );
                                     var communicationRecipient = new CommunicationRecipient();
-                                    communicationRecipient.PersonAliasId = member.Person.PrimaryAliasId.Value;
+                                    communicationRecipient.PersonAliasId = member.Person.PrimaryAliasId;
                                     communicationRecipient.AdditionalMergeValues = new Dictionary<string, object>();
                                     communicationRecipient.AdditionalMergeValues.Add( "GroupMember", member );
                                     //communicationRecipient.AdditionalMergeValues.Add( "Group", group );
@@ -219,23 +219,22 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
                             communicationsSent += personIdHash.Count;
 
                             var recurrence = new AttributeValueService( rockContext )
-                                .GetByAttributeIdAndEntityId( recurrenceAttributeId, attributeMatrixItemAndGroupId.Key )
-                                .Value;
+                                .GetByAttributeIdAndEntityId( recurrenceAttributeId, attributeMatrixItemAndGroupId.Key );
 
-                            if ( !string.IsNullOrWhiteSpace( recurrence ) )
+                            if ( recurrence != null && !string.IsNullOrWhiteSpace( recurrence.Value ) )
                             {
                                 var sendDate = new AttributeValueService( rockContext )
                                     .GetByAttributeIdAndEntityId( dateAttributeId, attributeMatrixItemAndGroupId.Key );
 
-                                switch ( recurrence )
+                                switch ( recurrence.Value )
                                 {
-                                    case "Weekly":
+                                    case "1":
                                         sendDate.Value = sendDate.ValueAsDateTime.Value.AddDays( 7 ).ToString();
                                         break;
-                                    case "BiWeekly":
+                                    case "2":
                                         sendDate.Value = sendDate.ValueAsDateTime.Value.AddDays( 14 ).ToString();
                                         break;
-                                    case "Monthly":
+                                    case "3":
                                         sendDate.Value = sendDate.ValueAsDateTime.Value.AddMonths( 1 ).ToString();
                                         break;
                                     default:

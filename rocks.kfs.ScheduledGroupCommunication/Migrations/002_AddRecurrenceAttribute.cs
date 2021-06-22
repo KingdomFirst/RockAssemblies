@@ -37,8 +37,8 @@ namespace rocks.kfs.ScheduledGroupCommunication.Migrations
             var attributeMatrixTemplateEmailId = new AttributeMatrixTemplateService( new RockContext() ).Get( KFSConst.Attribute.ATTRIBUTE_MATRIX_TEMPLATE_SCHEDULED_EMAILS.AsGuid() ).Id.ToString();
 
             // recurrence attribute
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.AttributeMatrixItem", Rock.SystemGuid.FieldType.SINGLE_SELECT, "AttributeMatrixTemplateId", attributeMatrixTemplateEmailId, "Recurrence", "", 1, "", KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SEND_RECURRENCE, "rocks.kfs.ScheduledGroupCommunication.EmailSendRecurrence" );
-            RockMigrationHelper.AddAttributeQualifier( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SEND_RECURRENCE, "values", "OneTime,Weekly,BiWeekly,Monthly", "F1F0873E-CA36-4935-90F5-DFEFD79083C8" );
+            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.AttributeMatrixItem", Rock.SystemGuid.FieldType.SINGLE_SELECT, "AttributeMatrixTemplateId", attributeMatrixTemplateEmailId, "Recurrence", "", 1, "0", KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SEND_RECURRENCE, "rocks.kfs.ScheduledGroupCommunication.EmailSendRecurrence" );
+            RockMigrationHelper.AddAttributeQualifier( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SEND_RECURRENCE, "values", "0^OneTime,1^Weekly,2^BiWeekly,3^Monthly", "F1F0873E-CA36-4935-90F5-DFEFD79083C8" );
 
             // reorder existing matrix attributes
 
@@ -63,8 +63,8 @@ namespace rocks.kfs.ScheduledGroupCommunication.Migrations
             var attributeMatrixTemplateSMSId = new AttributeMatrixTemplateService( rockContextSMS ).Get( KFSConst.Attribute.ATTRIBUTE_MATRIX_TEMPLATE_SCHEDULED_SMS.AsGuid() ).Id.ToString();
 
             // recurrence attribute
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.AttributeMatrixItem", Rock.SystemGuid.FieldType.SINGLE_SELECT, "AttributeMatrixTemplateId", attributeMatrixTemplateSMSId, "Recurrence", "", 1, "", KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_SEND_RECURRENCE, "rocks.kfs.ScheduledGroupCommunication.SMSSendRecurrence" );
-            RockMigrationHelper.AddAttributeQualifier( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_SEND_RECURRENCE, "values", "OneTime,Weekly,BiWeekly,Monthly", "4FAE15C5-C1AB-4FDB-B21D-CBF467B1D395" );
+            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.AttributeMatrixItem", Rock.SystemGuid.FieldType.SINGLE_SELECT, "AttributeMatrixTemplateId", attributeMatrixTemplateSMSId, "Recurrence", "", 1, "0", KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_SEND_RECURRENCE, "rocks.kfs.ScheduledGroupCommunication.SMSSendRecurrence" );
+            RockMigrationHelper.AddAttributeQualifier( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_SEND_RECURRENCE, "values", "0^OneTime,1^Weekly,2^BiWeekly,3^Monthly", "4FAE15C5-C1AB-4FDB-B21D-CBF467B1D395" );
 
             // reorder existing matrix attributes
             RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.AttributeMatrixItem", Rock.SystemGuid.FieldType.DEFINED_VALUE, "AttributeMatrixTemplateId", attributeMatrixTemplateSMSId, "From Number", "", 2, "", KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_FROM_NUMBER, "rocks.kfs.ScheduledGroupCommunication.SMSFromNumber" );
