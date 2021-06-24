@@ -425,7 +425,7 @@ namespace rocks.kfs.Intacct
                         DepartmentId = transaction.Department,
                         LocationId = transaction.Location,
                         ProjectId = transaction.Project,
-                        Memo = transaction.Description,
+                        Memo = "Transaction Fees",
                         CustomFields = transaction.CustomDimensions
                     };
 
@@ -439,7 +439,7 @@ namespace rocks.kfs.Intacct
                         DepartmentId = transaction.Department,
                         LocationId = transaction.Location,
                         ProjectId = transaction.Project,
-                        Memo = transaction.Description,
+                        Memo = "Transaction Fees",
                         CustomFields = transaction.CustomDimensions
                     };
 
