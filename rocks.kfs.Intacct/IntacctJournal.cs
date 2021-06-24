@@ -220,7 +220,7 @@ namespace rocks.kfs.Intacct
                     var gatewayFeeProcessing = transaction.FinancialGateway.GetAttributeValue( "rocks.kfs.Intacct.FEEPROCESSING" ).AsIntegerOrNull();
                     splitTransactionFees = gatewayFeeProcessing != null && gatewayFeeProcessing.Value == 1;
                 }
-                
+
                 foreach ( var transactionDetail in transaction.TransactionDetails )
                 {
                     transactionDetail.LoadAttributes();
