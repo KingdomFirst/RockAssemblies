@@ -210,10 +210,17 @@ namespace rocks.kfs.Intacct
             foreach ( var transaction in financialBatch.Transactions )
             {
                 transaction.LoadAttributes();
-                transaction.FinancialGateway.LoadAttributes();
-                var transactionFeeAccount = transaction.FinancialGateway.GetAttributeValue( "rocks.kfs.Intacct.DEFAULTFEEACCOUNTNO" );
-                var gatewayFeeProcessing = transaction.FinancialGateway.GetAttributeValue( "rocks.kfs.Intacct.FEEPROCESSING" ).AsIntegerOrNull();
-                var splitTransactionFees = gatewayFeeProcessing != null && gatewayFeeProcessing.Value == 1;
+                var gateway = transaction.FinancialGateway;
+                var gatewayDefaultFeeAccount = string.Empty;
+                var splitTransactionFees = false;
+                if ( gateway != null )
+                {
+                    gateway.LoadAttributes();
+                    gatewayDefaultFeeAccount = transaction.FinancialGateway.GetAttributeValue( "rocks.kfs.Intacct.DEFAULTFEEACCOUNTNO" );
+                    var gatewayFeeProcessing = transaction.FinancialGateway.GetAttributeValue( "rocks.kfs.Intacct.FEEPROCESSING" ).AsIntegerOrNull();
+                    splitTransactionFees = gatewayFeeProcessing != null && gatewayFeeProcessing.Value == 1;
+                }
+                
                 foreach ( var transactionDetail in transaction.TransactionDetails )
                 {
                     transactionDetail.LoadAttributes();
@@ -221,11 +228,11 @@ namespace rocks.kfs.Intacct
 
                     var detailProject = transactionDetail.GetAttributeValue( "rocks.kfs.Intacct.PROJECTID" ).AsGuidOrNull();
                     var accountProject = transactionDetail.Account.GetAttributeValue( "rocks.kfs.Intacct.PROJECTID" ).AsGuidOrNull();
-                    var accountFeeAccount = transactionDetail.Account.GetAttributeValue( "rocks.kfs.Intacct.FEEACCOUNTNO" );
+                    var transactionFeeAccount = transactionDetail.Account.GetAttributeValue( "rocks.kfs.Intacct.FEEACCOUNTNO" );
 
-                    if ( !string.IsNullOrWhiteSpace( accountFeeAccount ) )
+                    if ( string.IsNullOrWhiteSpace( transactionFeeAccount ) )
                     {
-                        transactionFeeAccount = accountFeeAccount;
+                        transactionFeeAccount = gatewayDefaultFeeAccount;
                     }
 
                     var projectCode = string.Empty;
@@ -332,6 +339,8 @@ namespace rocks.kfs.Intacct
                 var batchSummaryItem = new GLBatchTotals()
                 {
                     Amount = summary.Amount,
+                    CreditAccount = account.GetAttributeValue( "rocks.kfs.Intacct.ACCOUNTNO" ),
+                    DebitAccount = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITACCOUNTNO" ),
                     TransactionFeeAmount = summary.TransactionFeeAmount,
                     TransactionFeeAccount = summary.TransactionFeeAccount,
                     Class = account.GetAttributeValue( "rocks.kfs.Intacct.CLASSID" ),
@@ -425,11 +434,11 @@ namespace rocks.kfs.Intacct
                         DepartmentId = transaction.Department,
                         LocationId = transaction.Location,
                         ProjectId = transaction.Project,
-                        Memo = "Transaction Fees",
+                        Memo = transaction.Description + " Transaction Fees",
                         CustomFields = transaction.CustomDimensions
                     };
 
-                    returnList.Add( creditLine );
+                    returnList.Add( feeCreditLine );
 
                     var feeDebitLine = new JournalEntryLine()
                     {
@@ -439,11 +448,11 @@ namespace rocks.kfs.Intacct
                         DepartmentId = transaction.Department,
                         LocationId = transaction.Location,
                         ProjectId = transaction.Project,
-                        Memo = "Transaction Fees",
+                        Memo = transaction.Description + " Transaction Fees",
                         CustomFields = transaction.CustomDimensions
                     };
 
-                    returnList.Add( creditLine );
+                    returnList.Add( feeDebitLine );
                 }
             }
 
