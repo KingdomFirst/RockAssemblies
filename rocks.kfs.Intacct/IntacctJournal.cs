@@ -212,13 +212,16 @@ namespace rocks.kfs.Intacct
                 transaction.LoadAttributes();
                 var gateway = transaction.FinancialGateway;
                 var gatewayDefaultFeeAccount = string.Empty;
-                var splitTransactionFees = false;
+                var processTransactionFees = 0;
                 if ( gateway != null )
                 {
                     gateway.LoadAttributes();
                     gatewayDefaultFeeAccount = transaction.FinancialGateway.GetAttributeValue( "rocks.kfs.Intacct.DEFAULTFEEACCOUNTNO" );
                     var gatewayFeeProcessing = transaction.FinancialGateway.GetAttributeValue( "rocks.kfs.Intacct.FEEPROCESSING" ).AsIntegerOrNull();
-                    splitTransactionFees = gatewayFeeProcessing != null && gatewayFeeProcessing.Value == 1;
+                    if ( gatewayFeeProcessing != null )
+                    {
+                        processTransactionFees = gatewayFeeProcessing.Value;
+                    }
                 }
 
                 foreach ( var transactionDetail in transaction.TransactionDetails )
@@ -282,7 +285,7 @@ namespace rocks.kfs.Intacct
                         Project = projectCode,
                         TransactionFeeAmount = transactionDetail.FeeAmount != null && transactionDetail.FeeAmount.Value > 0 ? transactionDetail.FeeAmount.Value : 0.0M,
                         TransactionFeeAccount = transactionFeeAccount,
-                        SplitTransactionFees = splitTransactionFees
+                        ProcessTransactionFees = processTransactionFees
                     };
 
                     batchTransactions.Add( transactionItem );
@@ -290,7 +293,7 @@ namespace rocks.kfs.Intacct
             }
 
             var batchTransactionsSummary = batchTransactions
-                .GroupBy( d => new { d.FinancialAccountId, d.Project, d.TransactionFeeAccount, d.SplitTransactionFees } )
+                .GroupBy( d => new { d.FinancialAccountId, d.Project, d.TransactionFeeAccount, d.ProcessTransactionFees } )
                 .Select( s => new GLTransaction
                 {
                     FinancialAccountId = s.Key.FinancialAccountId,
@@ -298,7 +301,7 @@ namespace rocks.kfs.Intacct
                     Amount = s.Sum( f => ( decimal? ) f.Amount ) ?? 0.0M,
                     TransactionFeeAmount = s.Sum( f => ( decimal? ) f.TransactionFeeAmount ) ?? 0.0M,
                     TransactionFeeAccount = s.Key.TransactionFeeAccount,
-                    SplitTransactionFees = s.Key.SplitTransactionFees
+                    ProcessTransactionFees = s.Key.ProcessTransactionFees
                 } )
                 .ToList();
 
@@ -349,7 +352,7 @@ namespace rocks.kfs.Intacct
                     Project = summary.Project,
                     Description = DescriptionLava.ResolveMergeFields( mergeFields ),
                     CustomDimensions = customDimensionValues,
-                    SplitTransactionFees = summary.SplitTransactionFees
+                    ProcessTransactionFees = summary.ProcessTransactionFees
                 };
 
                 batchSummary.Add( batchSummaryItem );
@@ -395,7 +398,11 @@ namespace rocks.kfs.Intacct
             var returnList = new List<JournalEntryLine>();
             foreach ( var transaction in transactionItems )
             {
-                var splitTransactionFee = transaction.SplitTransactionFees && !string.IsNullOrWhiteSpace( transaction.TransactionFeeAccount ) && transaction.TransactionFeeAmount > 0;
+                var processTransactionFees = -1;
+                if ( transaction.ProcessTransactionFees > 0 && !string.IsNullOrWhiteSpace( transaction.TransactionFeeAccount ) && transaction.TransactionFeeAmount > 0 )
+                {
+                    processTransactionFees = transaction.ProcessTransactionFees;
+                }
                 var creditLine = new JournalEntryLine()
                 {
                     GlAccountNumber = transaction.CreditAccount,
@@ -413,7 +420,7 @@ namespace rocks.kfs.Intacct
                 var debitLine = new JournalEntryLine()
                 {
                     GlAccountNumber = transaction.DebitAccount,
-                    TransactionAmount = transaction.Amount,
+                    TransactionAmount = processTransactionFees == 1 ? transaction.Amount - transaction.TransactionFeeAmount : transaction.Amount,
                     ClassId = transaction.Class,
                     DepartmentId = transaction.Department,
                     LocationId = transaction.Location,
@@ -424,7 +431,7 @@ namespace rocks.kfs.Intacct
 
                 returnList.Add( debitLine );
 
-                if ( splitTransactionFee )
+                if ( processTransactionFees == 2 )
                 {
                     var feeCreditLine = new JournalEntryLine()
                     {
@@ -439,7 +446,10 @@ namespace rocks.kfs.Intacct
                     };
 
                     returnList.Add( feeCreditLine );
+                }
 
+                if ( processTransactionFees > 0 )
+                {
                     var feeDebitLine = new JournalEntryLine()
                     {
                         GlAccountNumber = transaction.TransactionFeeAccount,

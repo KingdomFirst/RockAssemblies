@@ -94,7 +94,7 @@ namespace rocks.kfs.Intacct
         public string TransactionFeeAccount;
 
         [LavaInclude]
-        public bool SplitTransactionFees;
+        public int ProcessTransactionFees;
 
         #region ILiquidizable
 
@@ -200,6 +200,6 @@ namespace rocks.kfs.Intacct
         public string Project;
         public string Description;
         public Dictionary<string, dynamic> CustomDimensions;
-        public bool SplitTransactionFees;
+        public int ProcessTransactionFees;
     }
 }
