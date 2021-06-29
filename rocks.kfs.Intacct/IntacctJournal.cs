@@ -378,7 +378,7 @@ namespace rocks.kfs.Intacct
             var accountCategoryId = new CategoryService( rockContext ).Queryable().FirstOrDefault( c => c.Guid.Equals( new System.Guid( KFSConst.Attribute.FINANCIAL_ACCOUNT_ATTRIBUTE_CATEGORY ) ) ).Id;
             var gatewayCategoryId = new CategoryService( rockContext ).Queryable().FirstOrDefault( c => c.Guid.Equals( new System.Guid( KFSConst.Attribute.FINANCIAL_GATEWAY_ATTRIBUTE_CATEGORY ) ) ).Id;
             var attributeService = new AttributeService( rockContext );
-            var accountAttributes = attributeService.Queryable().Where( a => a.Categories.Select( c => c.Id ).Any( c => c == accountCategoryId || c == gatewayCategoryId ) ).ToList();
+            var accountAttributes = attributeService.Queryable().Where( a => a.Categories.Select( c => c.Id ).Contains( accountCategoryId ) ).ToList();
 
             var customDimensions = new List<string>();
 
@@ -398,7 +398,7 @@ namespace rocks.kfs.Intacct
             var returnList = new List<JournalEntryLine>();
             foreach ( var transaction in transactionItems )
             {
-                var processTransactionFees = -1;
+                var processTransactionFees = 0;
                 if ( transaction.ProcessTransactionFees > 0 && !string.IsNullOrWhiteSpace( transaction.TransactionFeeAccount ) && transaction.TransactionFeeAmount > 0 )
                 {
                     processTransactionFees = transaction.ProcessTransactionFees;

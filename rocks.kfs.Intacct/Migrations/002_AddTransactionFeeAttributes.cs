@@ -18,9 +18,9 @@ using System;
 using Rock.Plugin;
 using KFSConst = rocks.kfs.Intacct.SystemGuid;
 
-namespace com.kfs.Intacct.Migrations
+namespace rocks.kfs.Intacct.Migrations
 {
-    [MigrationNumber( 2, "1.7.4" )]
+    [MigrationNumber( 2, "1.11.0" )]
     public class AddTransactionFeeAttributes : Migration
     {
         /// <summary>
@@ -53,7 +53,7 @@ namespace com.kfs.Intacct.Migrations
             ", Rock.SystemGuid.EntityType.FINANCIAL_ACCOUNT, KFSConst.Attribute.FINANCIAL_ACCOUNT_ATTRIBUTE_CATEGORY, KFSConst.Attribute.FINANCIAL_ACCOUNT_FEE_ACCOUNT ) );
 
             // Setup Gateway Account fee processing attributes
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialGateway", Rock.SystemGuid.FieldType.SINGLE_SELECT, "", "", "Gateway Fee Processing", "How should the Intacct Export plugin process transaction fees? DEFAULT: No special handling of transaction fees will be performed. NET DEBIT: Add credit entries for any transaction fees and use net amount (amount - transaction fees) for debit account entries. GROSS DEBIT: Debit account entries are left untouched (gross) and new debit and credit entries will be added for any transaction fees will be added. NOTE: Both Net Debit and Gross Debit require a Fee Account attribute be set on either the financial gateway or financial account.", 0, "0", KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_PROCESSING, "rocks.kfs.Intacct.FEEPROCESSING", true );
+            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialGateway", Rock.SystemGuid.FieldType.SINGLE_SELECT, "", "", "Gateway Fee Processing", "How should the Intacct Export plugin process transaction fees? DEFAULT: No special handling of transaction fees will be performed. NET DEBIT: Add credit entries for any transaction fees and use net amount (amount - transaction fees) for debit account entries. GROSS DEBIT: Debit account entries are left untouched (gross) and new debit and credit entries will be added for any transaction fees. NOTE: Both Net Debit and Gross Debit require a Fee Account attribute be set on either the financial gateway or financial account.", 0, "0", KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_PROCESSING, "rocks.kfs.Intacct.FEEPROCESSING", true );
             RockMigrationHelper.AddAttributeQualifier( KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_PROCESSING, "values", "0^Default,1^Net Debit,2^Gross Debit", "BA5F38C9-78D4-43D9-86ED-5248A8AADFA5" );
             RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialGateway", Rock.SystemGuid.FieldType.TEXT, "", "", "Default Fee Account", "Default account number for transaction fees.", 1, "", KFSConst.Attribute.FINANCIAL_GATEWAY_DEFAULT_FEE_ACCOUNT, "rocks.kfs.Intacct.DEFAULTFEEACCOUNTNO" );
 
