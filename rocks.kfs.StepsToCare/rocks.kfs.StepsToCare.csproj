@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
+    <Compile Include="Migrations\002_CreateDefinedTypes.cs" />
     <Compile Include="Migrations\001_CreateDb.cs" />
     <Compile Include="Model\AssignedPerson.cs" />
     <Compile Include="Model\AssignedPersonService.cs" />
