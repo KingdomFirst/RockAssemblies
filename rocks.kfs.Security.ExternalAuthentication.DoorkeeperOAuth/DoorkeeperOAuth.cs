@@ -335,6 +335,7 @@ namespace com.kfs.Security.ExternalAuthentication
             public string city { get; set; }                // "city": "Dallas",
             public string state { get; set; }               // "state": "TX",
             public string zip { get; set; }                 // "zip": "12345",
+            public string country { get; set; } = "US";     // "country": "US"
             public string latitude { get; set; }            // "latitude": 1.5,
             public string longitude { get; set; }           // "longitude": 1.5
         }
@@ -432,7 +433,7 @@ namespace com.kfs.Security.ExternalAuthentication
                             // save address
                             var personLocation = new LocationService( rockContext )
                                                     .Get( oauthUser.address.street1, oauthUser.address.street2,
-                                                        oauthUser.address.city, oauthUser.address.state, oauthUser.address.zip, "" );
+                                                        oauthUser.address.city, oauthUser.address.state, oauthUser.address.zip, oauthUser.address.country );
                             if ( personLocation != null )
                             {
                                 Guid locationTypeGuid = Rock.SystemGuid.DefinedValue.GROUP_LOCATION_TYPE_HOME.AsGuid();
