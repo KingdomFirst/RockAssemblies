@@ -47,6 +47,7 @@ namespace rocks.kfs.StepsToCare.Model
         public int? SubmitterAliasId { get; set; }
 
         [DataMember]
+        [DefinedValue( SystemGuid.DefinedType.CARE_NEED_CATEGORY )]
         public int? CategoryValueId { get; set; }
 
         [DataMember]
@@ -56,7 +57,19 @@ namespace rocks.kfs.StepsToCare.Model
         public DateTime? FollowUpDate { get; set; }
 
         [DataMember]
+        [DefinedValue( SystemGuid.DefinedType.CARE_NEED_STATUS )]
         public int? StatusValueId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the campus identifier.
+        /// </summary>
+        /// <value>
+        /// The campus identifier.
+        /// </value>
+        [HideFromReporting]
+        [DataMember]
+        [FieldType( Rock.SystemGuid.FieldType.CAMPUS )]
+        public int? CampusId { get; set; }
 
         #endregion Entity Properties
 
@@ -73,6 +86,15 @@ namespace rocks.kfs.StepsToCare.Model
 
         [LavaInclude]
         public virtual DefinedValue Category { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="Campus"/> that this Care Need is associated with.
+        /// </summary>
+        /// <value>
+        /// The <see cref="Campus"/> that this Care Need is associated with.
+        /// </value>
+        [DataMember]
+        public virtual Campus Campus { get; set; }
 
         [LavaInclude]
         public virtual ICollection<AssignedPerson> AssignedPersons { get; set; }
@@ -96,8 +118,10 @@ namespace rocks.kfs.StepsToCare.Model
 
             this.HasRequired( cn => cn.PersonAlias ).WithMany().HasForeignKey( cn => cn.PersonAliasId ).WillCascadeOnDelete( false );
             this.HasRequired( cn => cn.SubmitterPersonAlias ).WithMany().HasForeignKey( cn => cn.SubmitterAliasId ).WillCascadeOnDelete( false );
-            this.HasRequired( cn => cn.Status ).WithMany().HasForeignKey( cn => cn.StatusValueId ).WillCascadeOnDelete( false );
-            this.HasRequired( cn => cn.Category ).WithMany().HasForeignKey( cn => cn.CategoryValueId ).WillCascadeOnDelete( false );
+            this.HasOptional( cn => cn.Status ).WithMany().HasForeignKey( cn => cn.StatusValueId ).WillCascadeOnDelete( false );
+            this.HasOptional( cn => cn.Category ).WithMany().HasForeignKey( cn => cn.CategoryValueId ).WillCascadeOnDelete( false );
+            this.HasOptional( p => p.Campus ).WithMany().HasForeignKey( p => p.CampusId ).WillCascadeOnDelete( false );
+
 
             // IMPORTANT!!
             this.HasEntitySetName( "CareNeed" );

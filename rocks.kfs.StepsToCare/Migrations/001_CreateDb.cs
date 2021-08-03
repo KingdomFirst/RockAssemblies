@@ -33,13 +33,17 @@ namespace rocks.kfs.StepsToCare
 	                [DateEntered] [datetime] NULL,
 	                [FollowUpDate] [datetime] NULL,
 	                [StatusValueId] [int] NULL,
+	                [CampusId] [int] NULL,
 	                [IsActive] [bit] NOT NULL,
 	                [Guid] [uniqueidentifier] NOT NULL,
 	                [CreatedDateTime] [datetime] NULL,
 	                [ModifiedDateTime] [datetime] NULL,
 	                [CreatedByPersonAliasId] [int] NULL,
 	                [ModifiedByPersonAliasId] [int] NULL,
-                 CONSTRAINT [PK__rocks_kfs_StepsToCare_CareNeed] PRIMARY KEY CLUSTERED
+                    [ForeignKey] [nvarchar](50) NULL,
+                    [ForeignGuid] [uniqueidentifier] NULL,
+                    [ForeignId] [int] NULL,
+                CONSTRAINT [PK__rocks_kfs_StepsToCare_CareNeed] PRIMARY KEY CLUSTERED
                 (
 	                [Id] ASC
                 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
@@ -73,7 +77,15 @@ namespace rocks.kfs.StepsToCare
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_StatusDefinedValue] FOREIGN KEY([CategoryValueId])
                 REFERENCES [dbo].[DefinedValue] ([Id])
 
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_StatusDefinedValue]	
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_StatusDefinedValue]
+
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_CampusId] FOREIGN KEY([CampusId])
+                REFERENCES [dbo].[Campus] ([Id])
+
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_CampusId]
+
+                ALTER TABLE dbo._rocks_kfs_StepsToCare_CareNeed ADD CONSTRAINT
+	                DF__rocks_kfs_StepsToCare_CareNeed_IsActive DEFAULT 1 FOR IsActive
             " );
 
             Sql( @"
@@ -81,12 +93,15 @@ namespace rocks.kfs.StepsToCare
 	                [Id] [int] IDENTITY(1,1) NOT NULL,
 	                [NeedId] [int] NULL,
 	                [Note] [nvarchar](max) NULL,
+	                [IsPrivateNote] [bit] NOT NULL,
 	                [Guid] [uniqueidentifier] NULL,
 	                [CreatedDateTime] [datetime] NULL,
 	                [ModifiedDateTime] [datetime] NULL,
 	                [CreatedByPersonAliasId] [int] NULL,
 	                [ModifiedByPersonAliasId] [int] NULL,
-	                [IsPrivateNote] [bit] NOT NULL,
+	                [ForeignKey] [nvarchar](50) NULL,
+                    [ForeignGuid] [uniqueidentifier] NULL,
+                    [ForeignId] [int] NULL,
                  CONSTRAINT [PK__rocks_kfs_StepsToCare_CareNote] PRIMARY KEY CLUSTERED
                 (
 	                [Id] ASC
@@ -120,6 +135,9 @@ namespace rocks.kfs.StepsToCare
 	                [ModifiedDateTime] [datetime] NULL,
 	                [CreatedByPersonAliasId] [int] NULL,
 	                [ModifiedByPersonAliasId] [int] NULL,
+	                [ForeignKey] [nvarchar](50) NULL,
+                    [ForeignGuid] [uniqueidentifier] NULL,
+                    [ForeignId] [int] NULL,
                  CONSTRAINT [PK__rocks_kfs_StepsToCare_CareWorker] PRIMARY KEY CLUSTERED
                 (
 	                [Id] ASC
@@ -159,6 +177,9 @@ namespace rocks.kfs.StepsToCare
 	                [ModifiedDateTime] [datetime] NULL,
 	                [CreatedByPersonAliasId] [int] NULL,
 	                [ModifiedByPersonAliasId] [int] NULL,
+	                [ForeignKey] [nvarchar](50) NULL,
+                    [ForeignGuid] [uniqueidentifier] NULL,
+                    [ForeignId] [int] NULL,
                  CONSTRAINT [PK__rocks_kfs_StepsToCare_NoteTemplate] PRIMARY KEY CLUSTERED
                 (
 	                [Id] ASC
@@ -181,14 +202,17 @@ namespace rocks.kfs.StepsToCare
 	                [Id] [int] IDENTITY(1,1) NOT NULL,
 	                [NeedId] [int] NULL,
 	                [PersonAliasId] [int] NULL,
+	                [WorkerAliasId] [int] NULL,
+	                [FollowUpWorker] [bit] NULL,
 	                [IsActive] [bit] NOT NULL,
 	                [Guid] [uniqueidentifier] NULL,
 	                [CreatedDateTime] [datetime] NULL,
 	                [ModifiedDateTime] [datetime] NULL,
 	                [CreatedByPersonAliasId] [int] NULL,
 	                [ModifiedByPersonAliasId] [int] NULL,
-	                [WorkerAliasId] [int] NULL,
-	                [FollowUpWorker] [bit] NULL,
+	                [ForeignKey] [nvarchar](50) NULL,
+                    [ForeignGuid] [uniqueidentifier] NULL,
+                    [ForeignId] [int] NULL,
                  CONSTRAINT [PK__rocks_kfs_StepsToCare_AssignedPerson] PRIMARY KEY CLUSTERED
                 (
 	                [Id] ASC
@@ -258,6 +282,8 @@ namespace rocks.kfs.StepsToCare
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNote] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNote__rocks_kfs_StepsToCare_CareNeed]
                 DROP TABLE [dbo].[_rocks_kfs_StepsToCare_CareNote]
 
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [DF__rocks_kfs_StepsToCare_CareNeed_IsActive]
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_CampusId]
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_SubmitterPersonAlias]
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_PersonAlias]
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_ModifiedPersonAlias]

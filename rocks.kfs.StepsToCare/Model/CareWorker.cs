@@ -32,6 +32,7 @@ namespace rocks.kfs.StepsToCare.Model
         public int? PersonAliasId { get; set; }
 
         [DataMember]
+        [DefinedValue( SystemGuid.DefinedType.CARE_NEED_CATEGORY )]
         public int? CategoryValueId { get; set; }
 
         [DataMember]
