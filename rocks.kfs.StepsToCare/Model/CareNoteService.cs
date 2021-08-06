@@ -7,7 +7,7 @@ using Rock.Data;
 
 namespace rocks.kfs.StepsToCare.Model
 {
-    public class CareNoteService : Service<CareNeed>
+    public class CareNoteService : Service<CareNote>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CareNoteService"/> class.

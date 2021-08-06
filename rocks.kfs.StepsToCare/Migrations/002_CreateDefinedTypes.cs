@@ -24,10 +24,10 @@ namespace rocks.kfs.StepsToCare
         public override void Up()
         {
             RockMigrationHelper.AddDefinedType( "Steps to Care", "Status", "The status of Care Needs.", SystemGuid.DefinedType.CARE_NEED_STATUS );
-            RockMigrationHelper.UpdateDefinedValue( SystemGuid.DefinedType.CARE_NEED_STATUS, "Closed", "", "3613946D-9788-47E1-BFD3-5FD75B59F986", false );
-            RockMigrationHelper.UpdateDefinedValue( SystemGuid.DefinedType.CARE_NEED_STATUS, "Follow Up", "", "1B48E766-3B9B-4A32-AB1A-80DC0C2DCC63", false );
-            RockMigrationHelper.UpdateDefinedValue( SystemGuid.DefinedType.CARE_NEED_STATUS, "Long Term Care", "", "989A3B33-8230-4167-99F6-E1C21EE6950E", false );
-            RockMigrationHelper.UpdateDefinedValue( SystemGuid.DefinedType.CARE_NEED_STATUS, "Open", "", "811ECA2D-2B74-469A-9CFB-AB47B9643A02", false );
+            RockMigrationHelper.UpdateDefinedValue( SystemGuid.DefinedType.CARE_NEED_STATUS, "Open", "", SystemGuid.DefinedValue.CARE_NEED_STATUS_OPEN, true );
+            RockMigrationHelper.UpdateDefinedValue( SystemGuid.DefinedType.CARE_NEED_STATUS, "Closed", "", SystemGuid.DefinedValue.CARE_NEED_STATUS_CLOSED, true );
+            RockMigrationHelper.UpdateDefinedValue( SystemGuid.DefinedType.CARE_NEED_STATUS, "Follow Up", "", SystemGuid.DefinedValue.CARE_NEED_STATUS_FOLLOWUP, true );
+            RockMigrationHelper.UpdateDefinedValue( SystemGuid.DefinedType.CARE_NEED_STATUS, "Long Term Care", "", SystemGuid.DefinedValue.CARE_NEED_STATUS_LONGTERMCARE, false );
 
             RockMigrationHelper.AddDefinedType( "Steps to Care", "Category", "Categories used for Care Needs and Care workers to color code and assign them.", SystemGuid.DefinedType.CARE_NEED_CATEGORY );
             RockMigrationHelper.AddDefinedTypeAttribute( SystemGuid.DefinedType.CARE_NEED_CATEGORY, "D747E6AE-C383-4E22-8846-71518E3DD06F", "Color", "Color", "", 1056, "", "FF84E9A7-9BD6-4987-A942-AD4703303B12" );

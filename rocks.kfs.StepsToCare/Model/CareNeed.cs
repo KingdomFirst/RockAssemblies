@@ -120,7 +120,7 @@ namespace rocks.kfs.StepsToCare.Model
             this.HasRequired( cn => cn.SubmitterPersonAlias ).WithMany().HasForeignKey( cn => cn.SubmitterAliasId ).WillCascadeOnDelete( false );
             this.HasOptional( cn => cn.Status ).WithMany().HasForeignKey( cn => cn.StatusValueId ).WillCascadeOnDelete( false );
             this.HasOptional( cn => cn.Category ).WithMany().HasForeignKey( cn => cn.CategoryValueId ).WillCascadeOnDelete( false );
-            this.HasOptional( p => p.Campus ).WithMany().HasForeignKey( p => p.CampusId ).WillCascadeOnDelete( false );
+            this.HasOptional( cn => cn.Campus ).WithMany().HasForeignKey( cn => cn.CampusId ).WillCascadeOnDelete( false );
 
 
             // IMPORTANT!!

@@ -74,10 +74,10 @@ namespace rocks.kfs.StepsToCare
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_StatusDefinedValue]
 
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_StatusDefinedValue] FOREIGN KEY([CategoryValueId])
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_CategoryDefinedValue] FOREIGN KEY([CategoryValueId])
                 REFERENCES [dbo].[DefinedValue] ([Id])
 
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_StatusDefinedValue]
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_CategoryDefinedValue]
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_CampusId] FOREIGN KEY([CampusId])
                 REFERENCES [dbo].[Campus] ([Id])
@@ -130,6 +130,7 @@ namespace rocks.kfs.StepsToCare
 	                [PersonAliasId] [int] NULL,
 	                [CategoryValueId] [int] NULL,
 	                [GeoFenceId] [int] NULL,
+	                [CampusId] [int] NULL,
 	                [Guid] [uniqueidentifier] NULL,
 	                [CreatedDateTime] [datetime] NULL,
 	                [ModifiedDateTime] [datetime] NULL,
@@ -163,6 +164,11 @@ namespace rocks.kfs.StepsToCare
                 REFERENCES [dbo].[DefinedValue] ([Id])
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_DefinedValue]
+
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_CampusId] FOREIGN KEY([CampusId])
+                REFERENCES [dbo].[Campus] ([Id])
+
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_CampusId]
             " );
 
             Sql( @"
@@ -272,6 +278,8 @@ namespace rocks.kfs.StepsToCare
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_NoteTemplate] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_NoteTemplate_CreatedPersonAlias]
                 DROP TABLE [dbo].[_rocks_kfs_StepsToCare_NoteTemplate]
 
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_CampusId]
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_DefinedValue]
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_PersonAlias]
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_ModifiedPersonAlias]
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_CreatedPersonAlias]
@@ -284,6 +292,8 @@ namespace rocks.kfs.StepsToCare
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [DF__rocks_kfs_StepsToCare_CareNeed_IsActive]
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_CampusId]
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_StatusDefinedValue]
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_CategoryDefinedValue]
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_SubmitterPersonAlias]
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_PersonAlias]
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_ModifiedPersonAlias]

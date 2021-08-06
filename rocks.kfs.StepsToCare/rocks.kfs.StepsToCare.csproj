@@ -70,6 +70,7 @@
     <Compile Include="Model\NoteTemplate.cs" />
     <Compile Include="Model\NoteTemplateService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SystemGuid\DefinedValue.cs" />
     <Compile Include="SystemGuid\DefinedType.cs" />
   </ItemGroup>
   <ItemGroup />
