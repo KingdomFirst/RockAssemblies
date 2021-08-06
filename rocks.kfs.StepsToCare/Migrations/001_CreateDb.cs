@@ -201,6 +201,9 @@ namespace rocks.kfs.StepsToCare
                 REFERENCES [dbo].[PersonAlias] ([Id])
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_NoteTemplate] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_NoteTemplate_ModifiedPersonAlias]
+
+                ALTER TABLE dbo._rocks_kfs_StepsToCare_NoteTemplate ADD CONSTRAINT
+	                DF__rocks_kfs_StepsToCare_NoteTemplate_IsActive DEFAULT 1 FOR IsActive
             " );
 
             Sql( @"

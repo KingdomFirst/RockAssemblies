@@ -20,7 +20,7 @@ namespace rocks.kfs.StepsToCare.Model
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Runtime.Serialization;
 
-    [Table( "_rocks_kfs_StepsToCare_NoteTemplates" )]
+    [Table( "_rocks_kfs_StepsToCare_NoteTemplate" )]
     [DataContract]
     public partial class NoteTemplate : Rock.Data.Model<NoteTemplate>, Rock.Data.IRockEntity
     {
