@@ -36,7 +36,7 @@ namespace rocks.kfs.StepsToCare.Model
         public string Note { get; set; }
 
         [DataMember]
-        public bool? IsPrivateNote { get; set; }
+        public bool IsPrivateNote { get; set; }
 
         #endregion Entity Properties
 

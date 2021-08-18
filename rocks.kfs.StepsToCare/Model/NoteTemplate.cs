@@ -34,7 +34,10 @@ namespace rocks.kfs.StepsToCare.Model
         public string Note { get; set; }
 
         [DataMember]
-        public bool? IsActive { get; set; }
+        public int Order { get; set; }
+
+        [DataMember]
+        public bool IsActive { get; set; }
 
         #endregion Entity Properties
     }

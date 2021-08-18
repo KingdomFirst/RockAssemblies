@@ -122,6 +122,9 @@ namespace rocks.kfs.StepsToCare
                 REFERENCES [dbo].[PersonAlias] ([Id])
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNote] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNote_ModifiedPersonAlias]
+
+                ALTER TABLE dbo._rocks_kfs_StepsToCare_CareNote ADD CONSTRAINT
+	                DF__rocks_kfs_StepsToCare_CareNote_IsPrivateNote DEFAULT 0 FOR IsPrivateNote
             " );
 
             Sql( @"
@@ -176,6 +179,7 @@ namespace rocks.kfs.StepsToCare
 	                [Id] [int] IDENTITY(1,1) NOT NULL,
 	                [Icon] [nvarchar](250) NULL,
 	                [Note] [nvarchar](max) NULL,
+                	[Order] [int] NOT NULL,
 	                [IsActive] [bit] NOT NULL,
 	                [IsSystem] [bit] NOT NULL,
 	                [Guid] [uniqueidentifier] NULL,
@@ -204,6 +208,9 @@ namespace rocks.kfs.StepsToCare
 
                 ALTER TABLE dbo._rocks_kfs_StepsToCare_NoteTemplate ADD CONSTRAINT
 	                DF__rocks_kfs_StepsToCare_NoteTemplate_IsActive DEFAULT 1 FOR IsActive
+
+                ALTER TABLE dbo._rocks_kfs_StepsToCare_NoteTemplate ADD CONSTRAINT
+	                DF__rocks_kfs_StepsToCare_NoteTemplate_IsSystem DEFAULT 0 FOR IsSystem
             " );
 
             Sql( @"
@@ -252,6 +259,9 @@ namespace rocks.kfs.StepsToCare
                 REFERENCES [dbo].[PersonAlias] ([Id])
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_WorkerPersonAlias]
+
+                ALTER TABLE dbo._rocks_kfs_StepsToCare_AssignedPerson ADD CONSTRAINT
+	                DF__rocks_kfs_StepsToCare_AssignedPerson_IsActive DEFAULT 1 FOR IsActive
             " );
 
             RockMigrationHelper.UpdateEntityType( "rocks.kfs.StepsToCare.Model.CareNeed", "87AC878D-6740-43EB-9389-B8440AC595C3", true, true );
