@@ -134,6 +134,7 @@ namespace rocks.kfs.StepsToCare
 	                [CategoryValueId] [int] NULL,
 	                [GeoFenceId] [int] NULL,
 	                [CampusId] [int] NULL,
+	                [IsActive] [bit] NOT NULL,
 	                [Guid] [uniqueidentifier] NULL,
 	                [CreatedDateTime] [datetime] NULL,
 	                [ModifiedDateTime] [datetime] NULL,
@@ -172,6 +173,9 @@ namespace rocks.kfs.StepsToCare
                 REFERENCES [dbo].[Campus] ([Id])
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_CampusId]
+
+                ALTER TABLE dbo._rocks_kfs_StepsToCare_CareWorker ADD CONSTRAINT
+	                DF__rocks_kfs_StepsToCare_CareWorker_IsActive DEFAULT 1 FOR IsActive
             " );
 
             Sql( @"

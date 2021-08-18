@@ -49,6 +49,9 @@ namespace rocks.kfs.StepsToCare.Model
         [FieldType( Rock.SystemGuid.FieldType.CAMPUS )]
         public int? CampusId { get; set; }
 
+        [DataMember]
+        public bool IsActive { get; set; }
+
         #endregion Entity Properties
 
         #region Virtual Properties
