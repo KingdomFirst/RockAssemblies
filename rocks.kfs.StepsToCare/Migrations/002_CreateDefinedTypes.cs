@@ -42,10 +42,14 @@ namespace rocks.kfs.StepsToCare
             RockMigrationHelper.AddDefinedValueAttributeValue( "6BD7404D-90DD-4C94-9B0C-B516DEACB306", "FF84E9A7-9BD6-4987-A942-AD4703303B12", @"rgb(156,39,176)" );
             RockMigrationHelper.AddDefinedValueAttributeValue( "6E092B06-BD9C-400F-9426-75CED70FF93E", "FF84E9A7-9BD6-4987-A942-AD4703303B12", @"#757272" );
             RockMigrationHelper.AddDefinedValueAttributeValue( "EA93B6A9-F151-475D-89B4-C7C24AE603B8", "FF84E9A7-9BD6-4987-A942-AD4703303B12", @"rgb(255,235,59)" );
+
+            RockMigrationHelper.UpdateNoteType( "Steps to Care - Care Need", "rocks.kfs.StepsToCare.Model.CareNeed", false, "922403D1-FA11-4159-B325-B818237AE9B3", true, "fas fa-notes-medical" );
         }
 
         public override void Down()
         {
+            Sql( "DELETE [NoteType] WHERE [Guid] = '922403D1-FA11-4159-B325-B818237AE9B3'" );
+
             RockMigrationHelper.DeleteAttribute( "FF84E9A7-9BD6-4987-A942-AD4703303B12" ); // Color
             RockMigrationHelper.DeleteDefinedValue( "087FF723-7C2A-46EE-83F6-F1EF7F0F33C7" ); // Milestone
             RockMigrationHelper.DeleteDefinedValue( "167B982F-1C66-4228-B867-3A64AEFE37F1" ); // Hospital/Surgery

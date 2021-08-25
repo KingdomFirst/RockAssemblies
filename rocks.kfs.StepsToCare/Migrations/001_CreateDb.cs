@@ -89,45 +89,6 @@ namespace rocks.kfs.StepsToCare
             " );
 
             Sql( @"
-                CREATE TABLE [dbo].[_rocks_kfs_StepsToCare_CareNote](
-	                [Id] [int] IDENTITY(1,1) NOT NULL,
-	                [NeedId] [int] NULL,
-	                [Note] [nvarchar](max) NULL,
-	                [IsPrivateNote] [bit] NOT NULL,
-	                [Guid] [uniqueidentifier] NULL,
-	                [CreatedDateTime] [datetime] NULL,
-	                [ModifiedDateTime] [datetime] NULL,
-	                [CreatedByPersonAliasId] [int] NULL,
-	                [ModifiedByPersonAliasId] [int] NULL,
-	                [ForeignKey] [nvarchar](50) NULL,
-                    [ForeignGuid] [uniqueidentifier] NULL,
-                    [ForeignId] [int] NULL,
-                 CONSTRAINT [PK__rocks_kfs_StepsToCare_CareNote] PRIMARY KEY CLUSTERED
-                (
-	                [Id] ASC
-                )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-                ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNote]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNote__rocks_kfs_StepsToCare_CareNeed] FOREIGN KEY([NeedId])
-                REFERENCES [dbo].[_rocks_kfs_StepsToCare_CareNeed] ([Id])
-
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNote] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNote__rocks_kfs_StepsToCare_CareNeed]
-
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNote]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNote_CreatedPersonAlias] FOREIGN KEY([CreatedByPersonAliasId])
-                REFERENCES [dbo].[PersonAlias] ([Id])
-
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNote] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNote_CreatedPersonAlias]
-
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNote]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNote_ModifiedPersonAlias] FOREIGN KEY([ModifiedByPersonAliasId])
-                REFERENCES [dbo].[PersonAlias] ([Id])
-
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNote] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNote_ModifiedPersonAlias]
-
-                ALTER TABLE dbo._rocks_kfs_StepsToCare_CareNote ADD CONSTRAINT
-	                DF__rocks_kfs_StepsToCare_CareNote_IsPrivateNote DEFAULT 0 FOR IsPrivateNote
-            " );
-
-            Sql( @"
                 CREATE TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker](
 	                [Id] [int] IDENTITY(1,1) NOT NULL,
 	                [PersonAliasId] [int] NULL,
@@ -269,7 +230,6 @@ namespace rocks.kfs.StepsToCare
             " );
 
             RockMigrationHelper.UpdateEntityType( "rocks.kfs.StepsToCare.Model.CareNeed", "87AC878D-6740-43EB-9389-B8440AC595C3", true, true );
-            RockMigrationHelper.UpdateEntityType( "rocks.kfs.StepsToCare.Model.CareNote", "CF73C1F3-670C-4FBD-B042-A13298B6641E", true, true );
             RockMigrationHelper.UpdateEntityType( "rocks.kfs.StepsToCare.Model.CareWorker", "E6C8DEF1-F51F-48F6-A2E9-749F86F89FFF", true, true );
             RockMigrationHelper.UpdateEntityType( "rocks.kfs.StepsToCare.Model.AssignedPerson", "BC88FC72-8C9A-45F3-B072-CA0EA8E88A2D", true, true );
             RockMigrationHelper.UpdateEntityType( "rocks.kfs.StepsToCare.Model.NoteTemplate", "4926FF37-0E30-401B-9AD7-A028745B5383", true, true );
@@ -301,11 +261,6 @@ namespace rocks.kfs.StepsToCare
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_ModifiedPersonAlias]
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_CreatedPersonAlias]
                 DROP TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker]
-
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNote] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNote_ModifiedPersonAlias]
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNote] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNote_CreatedPersonAlias]
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNote] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNote__rocks_kfs_StepsToCare_CareNeed]
-                DROP TABLE [dbo].[_rocks_kfs_StepsToCare_CareNote]
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [DF__rocks_kfs_StepsToCare_CareNeed_IsActive]
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_CampusId]
