@@ -99,9 +99,6 @@ namespace rocks.kfs.StepsToCare.Model
         [LavaInclude]
         public virtual ICollection<AssignedPerson> AssignedPersons { get; set; }
 
-        [LavaInclude]
-        public virtual ICollection<CareNote> CareNotes { get; set; }
-
         #endregion Virtual Properties
     }
 
@@ -114,8 +111,6 @@ namespace rocks.kfs.StepsToCare.Model
         /// </summary> 
         public CareNeedConfiguration()
         {
-            //this.HasRequired( r => r.Reservation ).WithMany( r => r.ReservationLocations ).HasForeignKey( r => r.ReservationId ).WillCascadeOnDelete( true );
-
             this.HasRequired( cn => cn.PersonAlias ).WithMany().HasForeignKey( cn => cn.PersonAliasId ).WillCascadeOnDelete( false );
             this.HasRequired( cn => cn.SubmitterPersonAlias ).WithMany().HasForeignKey( cn => cn.SubmitterAliasId ).WillCascadeOnDelete( false );
             this.HasOptional( cn => cn.Status ).WithMany().HasForeignKey( cn => cn.StatusValueId ).WillCascadeOnDelete( false );

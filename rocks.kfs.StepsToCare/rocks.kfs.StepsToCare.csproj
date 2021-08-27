@@ -63,8 +63,6 @@
     <Compile Include="Model\AssignedPersonService.cs" />
     <Compile Include="Model\CareNeed.cs" />
     <Compile Include="Model\CareNeedService.cs" />
-    <Compile Include="Model\CareNote.cs" />
-    <Compile Include="Model\CareNoteService.cs" />
     <Compile Include="Model\CareWorker.cs" />
     <Compile Include="Model\CareWorkerService.cs" />
     <Compile Include="Model\NoteTemplate.cs" />

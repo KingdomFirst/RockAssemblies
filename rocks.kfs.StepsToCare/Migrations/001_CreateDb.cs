@@ -92,9 +92,9 @@ namespace rocks.kfs.StepsToCare
                 CREATE TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker](
 	                [Id] [int] IDENTITY(1,1) NOT NULL,
 	                [PersonAliasId] [int] NULL,
-	                [CategoryValueId] [int] NULL,
 	                [GeoFenceId] [int] NULL,
-	                [CampusId] [int] NULL,
+                    [CategoryValues] [nvarchar](2000) NULL,
+                    [Campuses] [nvarchar](1000) NULL,
 	                [IsActive] [bit] NOT NULL,
 	                [Guid] [uniqueidentifier] NULL,
 	                [CreatedDateTime] [datetime] NULL,
@@ -183,7 +183,7 @@ namespace rocks.kfs.StepsToCare
 	                [Id] [int] IDENTITY(1,1) NOT NULL,
 	                [NeedId] [int] NULL,
 	                [PersonAliasId] [int] NULL,
-	                [WorkerAliasId] [int] NULL,
+	                [WorkerId] [int] NULL,
 	                [FollowUpWorker] [bit] NULL,
 	                [IsActive] [bit] NOT NULL,
 	                [Guid] [uniqueidentifier] NULL,
@@ -220,8 +220,8 @@ namespace rocks.kfs.StepsToCare
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_PersonAlias]
 
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_WorkerPersonAlias] FOREIGN KEY([WorkerAliasId])
-                REFERENCES [dbo].[PersonAlias] ([Id])
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_Worker] FOREIGN KEY([WorkerId])
+                REFERENCES [dbo].[_rocks_kfs_StepsToCare_CareWorker] ([Id])
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_WorkerPersonAlias]
 

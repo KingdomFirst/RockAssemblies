@@ -15,5 +15,15 @@ namespace rocks.kfs.StepsToCare.Model
         /// <param name="context">The context.</param>
         public AssignedPersonService( RockContext context ) : base( context ) { }
 
+        public AssignedPerson GetByPersonAliasId( int? PersonAliasId )
+        {
+            return this.Queryable().Where( ap => ap.PersonAliasId == PersonAliasId ).FirstOrDefault();
+        }
+
+        public AssignedPerson GetByPersonAliasAndCareNeed( int? PersonAliasId, int? needId )
+        {
+            return this.Queryable().Where( ap => ap.PersonAliasId == PersonAliasId && ap.NeedId == needId ).FirstOrDefault();
+        }
+
     }
 }

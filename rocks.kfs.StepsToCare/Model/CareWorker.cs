@@ -16,6 +16,7 @@
 //
 namespace rocks.kfs.StepsToCare.Model
 {
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.ModelConfiguration;
     using System.Runtime.Serialization;
@@ -32,22 +33,20 @@ namespace rocks.kfs.StepsToCare.Model
         public int? PersonAliasId { get; set; }
 
         [DataMember]
-        [DefinedValue( SystemGuid.DefinedType.CARE_NEED_CATEGORY )]
-        public int? CategoryValueId { get; set; }
+        public string CategoryValues { get; set; }
 
         [DataMember]
         public int? GeoFenceId { get; set; }
 
         /// <summary>
-        /// Gets or sets the campus identifier.
+        /// Gets or sets the campuses for the worker.
         /// </summary>
         /// <value>
-        /// The campus identifier.
+        /// Comma separated list of campus ID's
         /// </value>
         [HideFromReporting]
         [DataMember]
-        [FieldType( Rock.SystemGuid.FieldType.CAMPUS )]
-        public int? CampusId { get; set; }
+        public string Campuses { get; set; }
 
         [DataMember]
         public bool IsActive { get; set; }
@@ -60,16 +59,7 @@ namespace rocks.kfs.StepsToCare.Model
         public virtual PersonAlias PersonAlias { get; set; }
 
         [LavaInclude]
-        public virtual DefinedValue Category { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="Campus"/> that this Care Need is associated with.
-        /// </summary>
-        /// <value>
-        /// The <see cref="Campus"/> that this Care Need is associated with.
-        /// </value>
-        [DataMember]
-        public virtual Campus Campus { get; set; }
+        public virtual ICollection<AssignedPerson> AssignedPersons { get; set; }
 
         #endregion Virtual Properties
     }
@@ -84,8 +74,6 @@ namespace rocks.kfs.StepsToCare.Model
         public CareWorkerConfiguration()
         {
             this.HasRequired( cw => cw.PersonAlias ).WithMany().HasForeignKey( cw => cw.PersonAliasId ).WillCascadeOnDelete( false );
-            this.HasRequired( cw => cw.Category ).WithMany().HasForeignKey( cw => cw.CategoryValueId ).WillCascadeOnDelete( false );
-            this.HasOptional( cw => cw.Campus ).WithMany().HasForeignKey( cw => cw.CampusId ).WillCascadeOnDelete( false );
 
             // IMPORTANT!!
             this.HasEntitySetName( "CareWorker" );

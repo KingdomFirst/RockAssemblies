@@ -41,7 +41,7 @@ namespace rocks.kfs.StepsToCare.Model
         public int? PersonAliasId { get; set; }
 
         [DataMember]
-        public int? WorkerAliasId { get; set; }
+        public int? WorkerId { get; set; }
 
         [DataMember]
         public bool? FollowUpWorker { get; set; }
@@ -57,7 +57,7 @@ namespace rocks.kfs.StepsToCare.Model
         public virtual PersonAlias PersonAlias { get; set; }
 
         [LavaInclude]
-        public virtual PersonAlias WorkerPersonAlias { get; set; }
+        public virtual CareWorker CareWorker { get; set; }
 
         #endregion Virtual Properties
     }
@@ -72,9 +72,9 @@ namespace rocks.kfs.StepsToCare.Model
         public AssignedPersonConfiguration()
         {
             this.HasRequired( ap => ap.CareNeed ).WithMany( cn => cn.AssignedPersons ).HasForeignKey( ap => ap.NeedId ).WillCascadeOnDelete( true );
+            this.HasRequired( ap => ap.CareWorker ).WithMany( cn => cn.AssignedPersons ).HasForeignKey( ap => ap.WorkerId ).WillCascadeOnDelete( true );
 
             this.HasRequired( ap => ap.PersonAlias ).WithMany().HasForeignKey( ap => ap.PersonAliasId ).WillCascadeOnDelete( false );
-            this.HasRequired( ap => ap.WorkerPersonAlias ).WithMany().HasForeignKey( ap => ap.WorkerAliasId ).WillCascadeOnDelete( false );
 
             // IMPORTANT!!
             this.HasEntitySetName( "AssignedPerson" );
