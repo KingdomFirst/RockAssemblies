@@ -70,7 +70,7 @@ You will need to create two system jobs to send the communications.
 >
 > <span style="padding-left: 30px; margin-right: 10px; width: .8em;background: #d21919; border-radius: 100%; color: white; text-align: center; display: inline-block;">&nbsp;&nbsp;2&nbsp;&nbsp;</span>**Cron Expression** Enter a cron expression for how often you want the job to run. Communications will be sent the next time the job runs after their scheduled send time.
 >
-> <span style="padding-left: 30px; margin-right: 10px; width: .8em;background: #d21919; border-radius: 100%; color: white; text-align: center; display: inline-block;">&nbsp;&nbsp;3&nbsp;&nbsp;</span>**Job Type** For an email job, choose "com.kfs.GroupScheduledEmail.Jobs.SendScheduledGroupEmail" For an SMS job, choose "com.kfs.GroupScheduledSMS.Jobs.SendScheduledGroupSMS"
+> <span style="padding-left: 30px; margin-right: 10px; width: .8em;background: #d21919; border-radius: 100%; color: white; text-align: center; display: inline-block;">&nbsp;&nbsp;3&nbsp;&nbsp;</span>**Job Type** For an email job, choose "rock.kfs.GroupScheduledEmail.Jobs.SendScheduledGroupEmail" For an SMS job, choose "rock.kfs.GroupScheduledSMS.Jobs.SendScheduledGroupSMS"
 >
 > <span style="padding-left: 30px; margin-right: 10px; width: .8em;background: #d21919; border-radius: 100%; color: white; text-align: center; display: inline-block;">&nbsp;&nbsp;4&nbsp;&nbsp;</span>**Enabled Lava Commands** Choose which lava commands should be enabled for this job. If you would like to use any of these commands in your communication, they need to be enabled on the job.
 >
