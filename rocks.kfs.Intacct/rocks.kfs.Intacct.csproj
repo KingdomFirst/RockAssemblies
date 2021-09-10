@@ -74,9 +74,11 @@
   <ItemGroup>
     <Compile Include="IntacctJournal.cs" />
     <Compile Include="IntacctModels.cs" />
+    <Compile Include="Migrations\002_AddTransactionFeeAttributes.cs" />
     <Compile Include="Migrations\001_AddSystemData.cs" />
     <Compile Include="IntacctEndpoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SystemGuid\Attribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

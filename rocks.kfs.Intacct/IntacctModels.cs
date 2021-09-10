@@ -87,6 +87,15 @@ namespace rocks.kfs.Intacct
         [LavaInclude]
         public string Project;
 
+        [LavaInclude]
+        public decimal TransactionFeeAmount;
+
+        [LavaInclude]
+        public string TransactionFeeAccount;
+
+        [LavaInclude]
+        public int ProcessTransactionFees;
+
         #region ILiquidizable
 
         /// <summary>
@@ -183,11 +192,14 @@ namespace rocks.kfs.Intacct
         public decimal Amount;
         public string CreditAccount;
         public string DebitAccount;
+        public string TransactionFeeAccount;
+        public decimal TransactionFeeAmount;
         public string Class;
         public string Department;
         public string Location;
         public string Project;
         public string Description;
         public Dictionary<string, dynamic> CustomDimensions;
+        public int ProcessTransactionFees;
     }
 }
