@@ -5,8 +5,10 @@
 # Send Scheduled Group Communications
 *Tested/Supported in Rock version:  8.0-12.0*   
 *Created:  11/20/2018*  
-*Updated:  8/28/2019*   
+*Updated:  6/22/2021*   
 *Rock Shop Plugin: https://www.rockrms.com/Plugin/100*
+
+# Send Scheduled Group Communications
 
 ## Summary
 
@@ -44,7 +46,7 @@ You will need to add the two attribute matrixes to any group type you want to al
 2. Under Group Attributes, add an attribute
 3. You will need to create a separate attribute for SMS and Email. The only differences will be the names and which Attribute Matrix Template you select.
 
-![](Images/SMS_Group_Attribute.png)
+![SMS_Group_Attribute (1)](https://user-images.githubusercontent.com/81330042/123459868-76d9ab80-d5ac-11eb-89f8-a8045b16d93f.png)
 
 > <span style="padding-left: 30px; margin-right: 10px; width: .8em;background: #d21919; border-radius: 100%; color: white; text-align: center; display: inline-block;">&nbsp;&nbsp;1&nbsp;&nbsp;</span> **Name** Enter a name for your attribute
 >
@@ -63,14 +65,13 @@ You will need to create two system jobs to send the communications.
 1. Go to Admin Tools > System Settings > Jobs Administration
 2. Add a new job
 
-![SMS_Group_Attribute](https://user-images.githubusercontent.com/81330042/118859568-ff737680-b89f-11eb-8740-8414944f7a64.png)
-
+![Email_Job (2)](https://user-images.githubusercontent.com/81330042/123459947-8f49c600-d5ac-11eb-8fb0-3fa27aa8405e.png)
 
 > <span style="padding-left: 30px; margin-right: 10px; width: .8em;background: #d21919; border-radius: 100%; color: white; text-align: center; display: inline-block;">&nbsp;&nbsp;1&nbsp;&nbsp;</span> **Name** Give your job a name
 >
 > <span style="padding-left: 30px; margin-right: 10px; width: .8em;background: #d21919; border-radius: 100%; color: white; text-align: center; display: inline-block;">&nbsp;&nbsp;2&nbsp;&nbsp;</span>**Cron Expression** Enter a cron expression for how often you want the job to run. Communications will be sent the next time the job runs after their scheduled send time.
 >
-> <span style="padding-left: 30px; margin-right: 10px; width: .8em;background: #d21919; border-radius: 100%; color: white; text-align: center; display: inline-block;">&nbsp;&nbsp;3&nbsp;&nbsp;</span>**Job Type** For an email job, choose "rock.kfs.GroupScheduledEmail.Jobs.SendScheduledGroupEmail" For an SMS job, choose "rock.kfs.GroupScheduledSMS.Jobs.SendScheduledGroupSMS"
+> <span style="padding-left: 30px; margin-right: 10px; width: .8em;background: #d21919; border-radius: 100%; color: white; text-align: center; display: inline-block;">&nbsp;&nbsp;3&nbsp;&nbsp;</span>**Job Type** For an email job, choose "rocks.kfs.GroupScheduledEmail.Jobs.SendScheduledGroupEmail" For an SMS job, choose "rocks.kfs.GroupScheduledSMS.Jobs.SendScheduledGroupSMS"
 >
 > <span style="padding-left: 30px; margin-right: 10px; width: .8em;background: #d21919; border-radius: 100%; color: white; text-align: center; display: inline-block;">&nbsp;&nbsp;4&nbsp;&nbsp;</span>**Enabled Lava Commands** Choose which lava commands should be enabled for this job. If you would like to use any of these commands in your communication, they need to be enabled on the job.
 >
@@ -86,15 +87,12 @@ You will need to create two system jobs to send the communications.
 
 3. Under Group Attribute Values, click a plus sign for the communication type you want to create
 
-![Group_Attributes](https://user-images.githubusercontent.com/81330042/118859725-2c278e00-b8a0-11eb-8b08-3550596f6f09.png)
+![Group_Attributes (1)](https://user-images.githubusercontent.com/81330042/123460131-c9b36300-d5ac-11eb-9c1c-cb303788cbb3.png)
 
-4. All the fields for creating a communication are required. You can use Lava in the message field for both SMS and email communications. The Person, Group Member and Organization entities are all available for lava use in both email and SMS.
+4. All the fields for creating a communication are required. You can use Lava in the message field for both SMS and email communications. Recurrence defaults to One Time but you can also choose Weekly, Biweekly, or Monthly (the same day of the month each month). The Person, Group Member and Organization entities are all available for lava use in both email and SMS.
 
-![Create_Email](https://user-images.githubusercontent.com/81330042/118859756-35185f80-b8a0-11eb-8eae-60d9b6dcd371.png)
-
-
+![Create_Email (1)](https://user-images.githubusercontent.com/81330042/123460147-d041da80-d5ac-11eb-8e4b-1081c550560d.png)
 
 
-![Create_SMS](https://user-images.githubusercontent.com/81330042/118859779-3c3f6d80-b8a0-11eb-8321-30f720f24c1c.png)
 
-
+![Create_SMS (1)](https://user-images.githubusercontent.com/81330042/123460161-d6d05200-d5ac-11eb-89b6-012c214f5f23.png)
