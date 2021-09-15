@@ -62,6 +62,17 @@ namespace rocks.kfs.StepsToCare.Model
         public virtual ICollection<AssignedPerson> AssignedPersons { get; set; }
 
         #endregion Virtual Properties
+
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            return PersonAlias?.ToString();
+        }
     }
 
     #region Entity Configuration

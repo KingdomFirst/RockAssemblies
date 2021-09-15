@@ -202,6 +202,7 @@ namespace rocks.kfs.StepsToCare
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson__rocks_kfs_StepsToCare_CareNeed] FOREIGN KEY([NeedId])
                 REFERENCES [dbo].[_rocks_kfs_StepsToCare_CareNeed] ([Id])
+                ON DELETE CASCADE 
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson__rocks_kfs_StepsToCare_CareNeed]
 
@@ -223,7 +224,7 @@ namespace rocks.kfs.StepsToCare
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_Worker] FOREIGN KEY([WorkerId])
                 REFERENCES [dbo].[_rocks_kfs_StepsToCare_CareWorker] ([Id])
 
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_WorkerPersonAlias]
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_Worker]
 
                 ALTER TABLE dbo._rocks_kfs_StepsToCare_AssignedPerson ADD CONSTRAINT
 	                DF__rocks_kfs_StepsToCare_AssignedPerson_IsActive DEFAULT 1 FOR IsActive

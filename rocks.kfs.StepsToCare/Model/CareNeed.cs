@@ -24,6 +24,9 @@ namespace rocks.kfs.StepsToCare.Model
     using System.Data.Entity.ModelConfiguration;
     using Rock.Data;
     using Rock.Model;
+    using Rock.Web.Cache;
+    using System.Linq;
+    using System.Data.Entity;
 
     /// <summary>
     /// A Care Need
@@ -32,6 +35,8 @@ namespace rocks.kfs.StepsToCare.Model
     [DataContract]
     public class CareNeed : Rock.Data.Model<CareNeed>, Rock.Data.IRockEntity
     {
+        private int _touchCount = -1;
+
         #region Entity Properties
 
         [Required]
@@ -100,6 +105,46 @@ namespace rocks.kfs.StepsToCare.Model
         public virtual ICollection<AssignedPerson> AssignedPersons { get; set; }
 
         #endregion Virtual Properties
+
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            return string.Format( "{0} ({1})", Details, PersonAlias?.ToString() );
+        }
+
+        /// <summary>
+        /// Returns a <see cref="System.Int32"/> count of <see cref="Note"/>'s attached to Care Need as Care Touches.
+        /// </summary>
+        [LavaInclude]
+        public int TouchCount
+        {
+            get
+            {
+                if ( _touchCount == -1 )
+                {
+                    using ( var rockContext = new RockContext() )
+                    {
+                        var noteType = NoteTypeCache.GetByEntity( EntityTypeCache.Get( typeof( CareNeed ) ).Id, "", "", true ).FirstOrDefault();
+                        if ( noteType != null )
+                        {
+                            var careNeedNotes = new NoteService( rockContext )
+                                .GetByNoteTypeId( noteType.Id ).AsNoTracking()
+                                .Where( n => n.EntityId == Id );
+
+                            _touchCount = careNeedNotes.Count();
+
+                        }
+                        _touchCount = 0;
+                    }
+                }
+                return _touchCount;
+            }
+        }
     }
 
     #region Entity Configuration
