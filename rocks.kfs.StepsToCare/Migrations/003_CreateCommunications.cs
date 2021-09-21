@@ -31,7 +31,7 @@ namespace rocks.kfs.StepsToCare
     <b>Name:</b> {{ CareNeed.PersonAlias.Person.FullName }}<br>
     <b>Category:</b> {{ CareNeed.Category.Value }}<br>
     <b>Details:</b> {{ CareNeed.Details }}</blockquote>
-    <p><a href='{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}'>View Care Dashboard</a></p>
+    <p><a href='{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}/{{ LinkedPages.CareDashboard }}'>View Care Dashboard</a></p>
 {{ 'Global' | Attribute:'EmailFooter' }}
 ", SystemGuid.SystemCommunication.CARE_NEED_ASSIGNED );
 
@@ -43,26 +43,94 @@ namespace rocks.kfs.StepsToCare
     <b>Name:</b> {{ CareNeed.PersonAlias.Person.FullName }}<br>
     <b>Category:</b> {{ CareNeed.Category.Value }}<br>
     <b>Details:</b> {{ CareNeed.Details }}</blockquote>
-    <p><a href='{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}'>View Care Dashboard</a></p>
+    <p><a href='{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}/{{ LinkedPages.CareDashboard }}'>View Care Dashboard</a></p>
 {{ 'Global' | Attribute:'EmailFooter' }}
 ", SystemGuid.SystemCommunication.CARE_NEED_FOLLOWUP );
 
             RockMigrationHelper.UpdateSystemCommunication( "Plugins", "Outstanding Care Needs", "", "", "", "", "", "Outstanding Care Needs", @"{{ 'Global' | Attribute:'EmailHeader' }}
-    <p>{{ Person.FullName }},</p>
-    <p>You have the following care needs assigned to you:</p>
-    <p><strong>Id | Date | Name | Category | Details</strong></p>
-    <blockquote>
-{%- for careNeed in CareNeeds -%}
-    <b>({{ careNeed.Id }})</b> |
-    {{ careNeed.DateEntered }} |
-    {{ careNeed.PersonAlias.Person.FullName }}| 
-    {{ careNeed.Category.Value }}
-    {{ careNeed.Details }}<br>
-{%- endfor -%}
-    </blockquote>
-    <p><a href='{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}'>View Care Dashboard</a></p>
-{{ 'Global' | Attribute:'EmailFooter' }}
-", SystemGuid.SystemCommunication.CARE_NEED_OUTSTANDING_NEEDS );
+<table class='row' style='border-collapse: collapse; border-spacing: 0; display: table; padding: 0; position: relative; text-align: left; vertical-align: top; width: 100%;'>
+   <tbody>
+      <tr style='padding: 0; text-align: left; vertical-align: top;'>
+         <th class='small-12 large-12 columns first last' style='Margin: 0 auto; color: #0a0a0a; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; line-height: 1.3; margin: 0 auto; padding: 0; padding-bottom: 16px; padding-left: 16px; padding-right: 16px; text-align: left; width: 564px;'>
+            <div class='structure-dropzone'>
+               <div class='dropzone'>
+                  <table class='component component-text' data-state='component' style='border-collapse: collapse; border-spacing: 0px; display: table; padding: 0px; position: relative; text-align: left; vertical-align: top; width: 100%; background-color: rgba(0, 0, 0, 0);'>
+                     <tbody>
+                        <tr>
+                           <td class='js-component-text-wrapper' style='color: #0a0a0a;font-family: Helvetica, Arial, sans-serif;font-size: 16px;font-weight: normal;line-height: 1.3;border-color: rgb(0, 0, 0)'>
+                              <p>{{ Person.FullName }},</p>
+                              <p>You have the following care needs assigned to you:</p>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+                  <div class='component component-section' data-state='component'>
+                     <table class='row' width='100%'>
+                        <tbody>
+                           <tr>
+                              {%- for careNeed in CareNeeds -%}
+                              <td class='dropzone columns large-6 small-12 first' width='50%' valign='top' style='background-color: rgba(0, 0, 0, 0);'>
+                                 <table class='component component-text' data-state='component' style='border-collapse: collapse; border-spacing: 0px; display: table; padding: 0px; position: relative; text-align: left; vertical-align: top; width: 100%; background-color: rgba(0, 0, 0, 0);'>
+                                    <tbody>
+                                       <tr>
+                                          <td class='js-component-text-wrapper' style='color: #0a0a0a;font-family: Helvetica, Arial, sans-serif;font-size: 16px;font-weight: normal;line-height: 1.3;border-color: transparent'>
+                                             <span style='float:right; padding-right: 1em; margin-top: 1.5em;'>#{{ careNeed.Id }}</span>
+                                             <h2 style='line-height: normal; margin-top: .83em;'>{{ careNeed.PersonAlias.Person.FullName }}<br><span style='font-weight: normal; font-size: 14px'>{{ careNeed.DateEntered }} | {{ careNeed.Category.Value }}</span></h2>
+                                             <p>{{ careNeed.Details }}</p>
+                                          </td>
+                                       </tr>
+                                    </tbody>
+                                 </table>
+                                 <div class='component component-button v2' data-state='component'>
+                                    <table class='button-outerwrap' border='0' cellpadding='0' cellspacing='0' width='100%' style='min-width:100%;'>
+                                       <tbody>
+                                          <tr>
+                                             <td valign='top' align='center' class='button-innerwrap'>
+                                                <table border='0' cellpadding='0' cellspacing='0' class='button-shell'>
+                                                   <tbody>
+                                                      <tr>
+                                                         <td align='center' valign='middle' class='button-content' style='border-radius: 3px; background-color: rgb(0, 0, 0);'><a class='button-link' title='View Detail' href='{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}/{{ LinkedPages.CareDetail }}?CareNeedId={{ careNeed.Id }}' target='_blank' style='color: rgb(255, 255, 255);display: inline-block;font-weight: normal;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;background-color: rgb(0, 0, 0);padding: 6px;border: 1px solid rgb(0, 0, 0);border-radius: 3px;font-size: 14px'>View Detail</a></td>
+                                                      </tr>
+                                                   </tbody>
+                                                </table>
+                                             </td>
+                                          </tr>
+                                       </tbody>
+                                    </table>
+                                 </div>
+                              </td>
+                            {% capture breakNow %}{{ forloop.index | Modulo:2 }}{% endcapture %}
+                            {% if breakNow == 0 -%}
+                            </tr>
+                            <tr>
+                            {% endif -%}
+                            {%- endfor -%}
+                           </tr>
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+            </div>
+         </th>
+      </tr>
+   </tbody>
+</table>
+<table class='button-outerwrap' border='0' cellpadding='0' cellspacing='0' width='100%' style='min-width:100%;'>
+   <tbody>
+      <tr>
+         <td valign='top' align='center' class='button-innerwrap'>
+            <table border='0' cellpadding='0' cellspacing='0' class='button-shell'>
+               <tbody>
+                  <tr>
+                     <td align='center' valign='middle' class='button-content' style='border-radius: 3px; background-color: rgb(0, 0, 0);'><a class='button-link' title='View Care Dashboard' href='{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}/{{ LinkedPages.CareDashboard }}' target='_blank' style='color: rgb(255, 255, 255);display: inline-block;font-weight: bold;font-size: 16px;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;background-color: rgb(0, 0, 0);padding: 15px;border: 1px solid rgb(0, 0, 0);border-radius: 3px;'>View Care Dashboard</a></td>
+                  </tr>
+               </tbody>
+            </table>
+         </td>
+      </tr>
+   </tbody>
+</table>
+{{ 'Global' | Attribute:'EmailFooter' }}", SystemGuid.SystemCommunication.CARE_NEED_OUTSTANDING_NEEDS );
 
             RockMigrationHelper.UpdateSystemCommunication( "Plugins", "Care Touch Needed", "", "", "", "", "", "Your assigned Care Need requires attention", @"{{ 'Global' | Attribute:'EmailHeader' }}
     <p>{{ Person.FullName }},</p>
@@ -71,8 +139,8 @@ namespace rocks.kfs.StepsToCare
     <b>Date:</b> {{ CareNeed.DateEntered }}<br>
     <b>Name:</b> {{ CareNeed.PersonAlias.Person.FullName }}<br>
     <b>Details:</b> {{ CareNeed.Details }}<br>
-    <b>Care Touches:</b> {{ CareNeed.TouchCount }}</blockquote>
-    <p><a href='{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}'>View Care Dashboard</a></p>
+    <b>Care Touches:</b> {{ TouchCount }}</blockquote>
+    <p><a href='{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}/{{ LinkedPages.CareDashboard }}'>View Care Dashboard</a></p>
 {{ 'Global' | Attribute:'EmailFooter' }}
 ", SystemGuid.SystemCommunication.CARE_NEED_TOUCH_NEEDED );
         }

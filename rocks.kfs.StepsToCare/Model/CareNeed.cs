@@ -137,9 +137,11 @@ namespace rocks.kfs.StepsToCare.Model
                                 .Where( n => n.EntityId == Id );
 
                             _touchCount = careNeedNotes.Count();
-
                         }
-                        _touchCount = 0;
+                        else
+                        {
+                            _touchCount = 0;
+                        }
                     }
                 }
                 return _touchCount;
