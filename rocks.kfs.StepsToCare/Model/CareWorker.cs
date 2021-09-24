@@ -51,6 +51,15 @@ namespace rocks.kfs.StepsToCare.Model
         [DataMember]
         public bool IsActive { get; set; }
 
+        [DataMember]
+        public bool NotifyEmail { get; set; }
+
+        [DataMember]
+        public bool NotifySMS { get; set; }
+
+        [DataMember]
+        public bool NotifyPush { get; set; }
+
         #endregion Entity Properties
 
         #region Virtual Properties

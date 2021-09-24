@@ -96,6 +96,9 @@ namespace rocks.kfs.StepsToCare
                     [CategoryValues] [nvarchar](2000) NULL,
                     [Campuses] [nvarchar](1000) NULL,
 	                [IsActive] [bit] NOT NULL,
+	                [NotifyEmail] [bit] NOT NULL,
+	                [NotifySMS] [bit] NOT NULL,
+	                [NotifyPush] [bit] NOT NULL,
 	                [Guid] [uniqueidentifier] NULL,
 	                [CreatedDateTime] [datetime] NULL,
 	                [ModifiedDateTime] [datetime] NULL,
@@ -137,6 +140,15 @@ namespace rocks.kfs.StepsToCare
 
                 ALTER TABLE dbo._rocks_kfs_StepsToCare_CareWorker ADD CONSTRAINT
 	                DF__rocks_kfs_StepsToCare_CareWorker_IsActive DEFAULT 1 FOR IsActive
+
+                ALTER TABLE dbo._rocks_kfs_StepsToCare_CareWorker ADD CONSTRAINT
+	                DF__rocks_kfs_StepsToCare_CareWorker_NotifyEmail DEFAULT 1 FOR NotifyEmail
+
+                ALTER TABLE dbo._rocks_kfs_StepsToCare_CareWorker ADD CONSTRAINT
+	                DF__rocks_kfs_StepsToCare_CareWorker_NotifySMS DEFAULT 1 FOR NotifySMS
+
+                ALTER TABLE dbo._rocks_kfs_StepsToCare_CareWorker ADD CONSTRAINT
+	                DF__rocks_kfs_StepsToCare_CareWorker_NotifyPush DEFAULT 1 FOR NotifyPush
             " );
 
             Sql( @"
