@@ -19,7 +19,7 @@ namespace rocks.kfs.StepsToCare.SystemGuid
         /// <summary>
         /// The Care Need Follow Up System Communication.
         /// </summary>
-        public const string CARE_NEED_FOLLOWUP = "70CF2049-A443-4C87-82C3-0A8A22D8DAC8";
+        public const string CARE_NEED_FOLLOWUP = "E193D35E-8223-4193-A5D4-D76D945FBA80";
 
         /// <summary>
         /// The Care Need Touch Needed System Communication.

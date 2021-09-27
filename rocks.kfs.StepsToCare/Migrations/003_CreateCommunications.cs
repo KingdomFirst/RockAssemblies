@@ -147,10 +147,10 @@ namespace rocks.kfs.StepsToCare
 
         public override void Down()
         {
-            RockMigrationHelper.DeleteSystemCommunication( SystemGuid.SystemCommunication.CARE_NEED_ASSIGNED );
-            RockMigrationHelper.DeleteSystemCommunication( SystemGuid.SystemCommunication.CARE_NEED_FOLLOWUP );
-            RockMigrationHelper.DeleteSystemCommunication( SystemGuid.SystemCommunication.CARE_NEED_OUTSTANDING_NEEDS );
             RockMigrationHelper.DeleteSystemCommunication( SystemGuid.SystemCommunication.CARE_NEED_TOUCH_NEEDED );
+            RockMigrationHelper.DeleteSystemCommunication( SystemGuid.SystemCommunication.CARE_NEED_OUTSTANDING_NEEDS );
+            RockMigrationHelper.DeleteSystemCommunication( SystemGuid.SystemCommunication.CARE_NEED_FOLLOWUP );
+            RockMigrationHelper.DeleteSystemCommunication( SystemGuid.SystemCommunication.CARE_NEED_ASSIGNED );
         }
     }
 }

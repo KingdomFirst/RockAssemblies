@@ -36,20 +36,17 @@ namespace rocks.kfs.StepsToCare.Jobs
     /// </summary>
     [SystemCommunicationField( "Follow Up Notification Template",
         Description = "The system communication to use when sending the Care Need Follow Up.",
-        IsRequired = true,
-        DefaultSystemCommunicationGuid = StepsToCare.SystemGuid.SystemCommunication.CARE_NEED_FOLLOWUP,
+        IsRequired = false,
         Key = AttributeKey.FollowUpSystemCommunication )]
 
     [SystemCommunicationField( "Outstanding Needs Notification Template",
         Description = "The system communication to use when sending the Outstanding Care Needs notification.",
-        IsRequired = true,
-        DefaultSystemCommunicationGuid = StepsToCare.SystemGuid.SystemCommunication.CARE_NEED_OUTSTANDING_NEEDS,
+        IsRequired = false,
         Key = AttributeKey.OutstandingNeedsCommunication )]
 
     [SystemCommunicationField( "Care Touch Needed Notification Template",
         Description = "The system communication to use when sending the Care Touch needed notification.",
-        IsRequired = true,
-        DefaultSystemCommunicationGuid = StepsToCare.SystemGuid.SystemCommunication.CARE_NEED_TOUCH_NEEDED,
+        IsRequired = false,
         Key = AttributeKey.CareTouchNeededCommunication )]
 
     [IntegerField(
@@ -190,24 +187,72 @@ namespace rocks.kfs.StepsToCare.Jobs
                 {
                     careNeed.StatusValueId = followUpValue.Id;
 
-                    foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value ) )
+                    if ( !followUpSystemCommunicationGuid.IsEmpty() )
                     {
-                        if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) )
+                        foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value ) )
                         {
-                            continue;
+                            if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) )
+                            {
+                                continue;
+                            }
+                            var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, assignee.PersonAlias.Person );
+                            mergeFields.Add( "CareNeed", careNeed );
+                            mergeFields.Add( "LinkedPages", linkedPages );
+                            mergeFields.Add( "AssignedPerson", assignee );
+                            mergeFields.Add( "Person", assignee.PersonAlias.Person );
+
+                            var recipients = new List<RockMessageRecipient>();
+                            recipients.Add( new RockEmailMessageRecipient( assignee.PersonAlias.Person, mergeFields ) );
+
+                            var emailMessage = new RockEmailMessage( followUpSystemCommunicationGuid );
+                            emailMessage.SetRecipients( recipients );
+                            var errors = new List<string>();
+                            emailMessage.Send( out errors );
+
+                            if ( errors.Any() )
+                            {
+                                errorCount += errors.Count;
+                                errorMessages.AddRange( errors );
+                            }
+                            else
+                            {
+                                assignedPersonEmails++;
+                            }
                         }
-                        var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, assignee.PersonAlias.Person );
-                        mergeFields.Add( "CareNeed", careNeed );
-                        mergeFields.Add( "LinkedPages", linkedPages );
-                        mergeFields.Add( "AssignedPerson", assignee );
-                        mergeFields.Add( "Person", assignee.PersonAlias.Person );
+                    }
+                }
+                rockContext.SaveChanges();
 
+                // Send notification about "Flagged" messages (any messages without a care touch by the follow up worker or minimum care touches within the set minimum Care Touches Hours.
+                if ( careTouchNeededCommunication != null && careTouchNeededCommunication.Id > 0 )
+                {
+                    foreach ( var flagNeed in careNeedFlagged )
+                    {
+                        var careNeed = flagNeed.CareNeed;
+                        var emailMessage = new RockEmailMessage( careTouchNeededCommunication );
+                        //var smsMessage = new RockSMSMessage( careTouchNeededCommunication );
+                        //var pushMessage = new RockPushMessage( careTouchNeededCommunication );
                         var recipients = new List<RockMessageRecipient>();
-                        recipients.Add( new RockEmailMessageRecipient( assignee.PersonAlias.Person, mergeFields ) );
-
-                        var emailMessage = new RockEmailMessage( followUpSystemCommunicationGuid );
-                        emailMessage.SetRecipients( recipients );
                         var errors = new List<string>();
+
+                        foreach ( var assignee in careNeed.AssignedPersons )
+                        {
+                            if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) )
+                            {
+                                continue;
+                            }
+                            var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, assignee.PersonAlias.Person );
+                            mergeFields.Add( "CareNeed", careNeed );
+                            mergeFields.Add( "LinkedPages", linkedPages );
+                            mergeFields.Add( "AssignedPerson", assignee );
+                            mergeFields.Add( "Person", assignee.PersonAlias.Person );
+                            mergeFields.Add( "TouchCount", flagNeed.TouchCount );
+                            mergeFields.Add( "HasLeaderNote", flagNeed.HasLeaderNote );
+
+                            emailMessage.AddRecipient( new RockEmailMessageRecipient( assignee.PersonAlias.Person, mergeFields ) );
+                            //emailMessage.AddRecipient( new RockSMSMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber() mergeFields ) )
+                            //pushMessage.AddRecipient( new RockPushMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.Devices, mergeFields ) );
+                        }
                         emailMessage.Send( out errors );
 
                         if ( errors.Any() )
@@ -219,88 +264,49 @@ namespace rocks.kfs.StepsToCare.Jobs
                         {
                             assignedPersonEmails++;
                         }
+
                     }
-                }
-                rockContext.SaveChanges();
-
-                // Send notification about "Flagged" messages (any messages without a care touch by the follow up worker or minimum care touches within the set minimum Care Touches Hours.
-                foreach ( var flagNeed in careNeedFlagged )
-                {
-                    var careNeed = flagNeed.CareNeed;
-                    var emailMessage = new RockEmailMessage( careTouchNeededCommunication );
-                    //var smsMessage = new RockSMSMessage( careTouchNeededCommunication );
-                    //var pushMessage = new RockPushMessage( careTouchNeededCommunication );
-                    var recipients = new List<RockMessageRecipient>();
-                    var errors = new List<string>();
-
-                    foreach ( var assignee in careNeed.AssignedPersons )
-                    {
-                        if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) )
-                        {
-                            continue;
-                        }
-                        var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, assignee.PersonAlias.Person );
-                        mergeFields.Add( "CareNeed", careNeed );
-                        mergeFields.Add( "LinkedPages", linkedPages );
-                        mergeFields.Add( "AssignedPerson", assignee );
-                        mergeFields.Add( "Person", assignee.PersonAlias.Person );
-                        mergeFields.Add( "TouchCount", flagNeed.TouchCount );
-                        mergeFields.Add( "HasLeaderNote", flagNeed.HasLeaderNote );
-
-                        emailMessage.AddRecipient( new RockEmailMessageRecipient( assignee.PersonAlias.Person, mergeFields ) );
-                        //emailMessage.AddRecipient( new RockSMSMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber() mergeFields ) )
-                        //pushMessage.AddRecipient( new RockPushMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.Devices, mergeFields ) );
-                    }
-                    emailMessage.Send( out errors );
-
-                    if ( errors.Any() )
-                    {
-                        errorCount += errors.Count;
-                        errorMessages.AddRange( errors );
-                    }
-                    else
-                    {
-                        assignedPersonEmails++;
-                    }
-
                 }
 
                 // Send Outstanding needs daily notification
-                foreach ( var assigned in careAssigned )
+                if ( outstandingNeedsCommunication != null && outstandingNeedsCommunication.Id > 0 )
                 {
-                    if ( !assigned.PersonAlias.Person.CanReceiveEmail( false ) )
+                    foreach ( var assigned in careAssigned )
                     {
-                        continue;
+                        if ( !assigned.PersonAlias.Person.CanReceiveEmail( false ) )
+                        {
+                            continue;
+                        }
+                        var emailMessage = new RockEmailMessage( outstandingNeedsCommunication );
+                        //var smsMessage = new RockSMSMessage( outstandingNeedsCommunication );
+                        //var pushMessage = new RockPushMessage( outstandingNeedsCommunication );
+                        var recipients = new List<RockMessageRecipient>();
+                        var errors = new List<string>();
+
+                        var assignedNeeds = careNeeds.Where( cn => cn.AssignedPersons.Any( ap => ap.PersonAliasId == assigned.PersonAliasId ) );
+
+                        var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, assigned.PersonAlias.Person );
+                        mergeFields.Add( "CareNeeds", assignedNeeds );
+                        mergeFields.Add( "LinkedPages", linkedPages );
+                        mergeFields.Add( "AssignedPerson", assigned );
+                        mergeFields.Add( "Person", assigned.PersonAlias.Person );
+
+                        emailMessage.AddRecipient( new RockEmailMessageRecipient( assigned.PersonAlias.Person, mergeFields ) );
+                        //emailMessage.AddRecipient( new RockSMSMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber() mergeFields ) )
+                        //pushMessage.AddRecipient( new RockPushMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.Devices, mergeFields ) );
+                        emailMessage.Send( out errors );
+
+                        if ( errors.Any() )
+                        {
+                            errorCount += errors.Count;
+                            errorMessages.AddRange( errors );
+                        }
+                        else
+                        {
+                            assignedPersonEmails++;
+                        }
+
                     }
-                    var emailMessage = new RockEmailMessage( outstandingNeedsCommunication );
-                    //var smsMessage = new RockSMSMessage( outstandingNeedsCommunication );
-                    //var pushMessage = new RockPushMessage( outstandingNeedsCommunication );
-                    var recipients = new List<RockMessageRecipient>();
-                    var errors = new List<string>();
-
-                    var assignedNeeds = careNeeds.Where( cn => cn.AssignedPersons.Any( ap => ap.PersonAliasId == assigned.PersonAliasId ) );
-
-                    var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, assigned.PersonAlias.Person );
-                    mergeFields.Add( "CareNeeds", assignedNeeds );
-                    mergeFields.Add( "LinkedPages", linkedPages );
-                    mergeFields.Add( "AssignedPerson", assigned );
-                    mergeFields.Add( "Person", assigned.PersonAlias.Person );
-
-                    emailMessage.AddRecipient( new RockEmailMessageRecipient( assigned.PersonAlias.Person, mergeFields ) );
-                    //emailMessage.AddRecipient( new RockSMSMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber() mergeFields ) )
-                    //pushMessage.AddRecipient( new RockPushMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.Devices, mergeFields ) );
-                    emailMessage.Send( out errors );
-
-                    if ( errors.Any() )
-                    {
-                        errorCount += errors.Count;
-                        errorMessages.AddRange( errors );
-                    }
-                    else
-                    {
-                        assignedPersonEmails++;
-                    }
-
                 }
 
             }

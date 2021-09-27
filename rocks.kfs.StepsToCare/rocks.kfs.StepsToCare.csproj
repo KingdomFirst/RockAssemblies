@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Jobs\CareNeedAutomatedNotifications.cs" />
+    <Compile Include="Migrations\005_CreateJob.cs" />
     <Compile Include="Migrations\004_CreatePages.cs" />
     <Compile Include="Migrations\003_CreateCommunications.cs" />
     <Compile Include="Migrations\002_CreateDefinedTypes.cs" />

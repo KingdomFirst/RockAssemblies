@@ -27,8 +27,20 @@ namespace rocks.kfs.StepsToCare
             // Add Page Steps to Care to Site:Rock RMS
             RockMigrationHelper.AddPage( true, "5B6DBC42-8B03-4D15-8D92-AAFA28FD8616", "D65F783D-87A9-4CC9-8110-E83466A0EADB", "Steps to Care", "", "1F93E9AA-ECCA-42A2-8C91-73D991DBCD9F", "fa fa-hand-holding-heart" );
 
+            // Add Page Care Entry to Site:Rock RMS
+            RockMigrationHelper.AddPage( true, "1F93E9AA-ECCA-42A2-8C91-73D991DBCD9F", "D65F783D-87A9-4CC9-8110-E83466A0EADB", "Care Entry", "", "27953B65-21E2-4CA9-8461-3AFAD46D9BC8", "" );
+
+            // Add Page Care Configuration to Site:Rock RMS
+            RockMigrationHelper.AddPage( true, "1F93E9AA-ECCA-42A2-8C91-73D991DBCD9F", "D65F783D-87A9-4CC9-8110-E83466A0EADB", "Care Configuration", "", "39F72E9D-22B7-4F1E-8633-6C3745AC6F34", "" );
+
             // Add Page Route for Steps to Care
             RockMigrationHelper.AddPageRoute( "1F93E9AA-ECCA-42A2-8C91-73D991DBCD9F", "StepsToCare", "9FA7606C-13BC-4049-A1A1-0389C98C3743" );
+
+            // Add Page Route for Care Entry
+            RockMigrationHelper.AddPageRoute( "27953B65-21E2-4CA9-8461-3AFAD46D9BC8", "StepsToCareDetail", "7DA0C653-88E4-4997-89BA-C58B33A2AA32" );
+
+            // Add Page Route for Care Entry
+            RockMigrationHelper.AddPageRoute( "27953B65-21E2-4CA9-8461-3AFAD46D9BC8", "StepsToCareDetail/{CareNeedId}", "32CDFBC1-F3EB-405B-9462-F7E2DD722006" );
 
             // Add/Update BlockType Care Entry
             RockMigrationHelper.UpdateBlockType( "Care Entry", "Care entry page for KFS Steps to Care package. Used for adding and editing care needs ", "~/Plugins/rocks_kfs/StepsToCare/CareEntry.ascx", "KFS > Steps To Care", "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE" );
@@ -308,7 +320,7 @@ namespace rocks.kfs.StepsToCare
             RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE", "1EDAFDED-DFE6-4334-B019-6EECBA89E05A", "Auto Assign Worker (load balanced)", "AutoAssignWorker", "Auto Assign Worker in Round Robin", @"Should workers be auto assigned to care need (by default it will prioritize same category workers with category of need)", 0, @"True", "F7135F9C-8D06-4E6D-A493-2B1B29CE9AB6" );
 
             // Attribute for BlockType: Care Entry:Newly Assigned Need Notification
-            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE", "72ED40C7-4D64-4D60-9411-4FFB2B9E833E", "Newly Assigned Need Notification", "NewAssignmentNotification", "Newly Assigned Need Notification", @"Select the system communication template for the new assignment notification.", 0, @"70CF2049-A443-4C87-82C3-0A8A22D8DAC8", "E3604688-ACC2-4360-976B-44EB5170F685" );
+            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE", "72ED40C7-4D64-4D60-9411-4FFB2B9E833E", "Newly Assigned Need Notification", "NewAssignmentNotification", "Newly Assigned Need Notification", @"Select the system communication template for the new assignment notification.", 0, SystemGuid.SystemCommunication.CARE_NEED_ASSIGNED, "E3604688-ACC2-4360-976B-44EB5170F685" );
 
             // Attribute for BlockType: Care Dashboard:Prayer Detail Page
             RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "AF14CB6C-F915-4449-9CB7-7C44B624B051", "BD53F9C9-EBA9-4D3F-82EA-DE5DD34A8108", "Prayer Detail Page", "PrayerDetailPage", "Prayer Detail Page", @"Page used to convert needs to prayer requests. (if not set the action will not show)", 7, @"", "611CB530-08A9-4D29-8067-7BCB4FE4F300" );
@@ -774,7 +786,7 @@ namespace rocks.kfs.StepsToCare
             //   Block Location: Page=Steps to Care, Site=Rock RMS
             //   Attribute: Enabled Lava Commands
             //   Attribute Value: Sql
-            RockMigrationHelper.AddBlockAttributeValue( "7DB94F3D-9464-4316-8795-46BE43BE0D86", "84ED8FE5-94E5-479E-B1A4-433591B22387", @"Sql" );
+            RockMigrationHelper.AddBlockAttributeValue( "7DB94F3D-9464-4316-8795-46BE43BE0D86", "7146ac24-9250-4fc4-9df2-9803b9a84299", @"Sql" );
 
             // Add Block Attribute Value
             //   Block: Birthdays
@@ -798,7 +810,7 @@ namespace rocks.kfs.StepsToCare
             //   Block Location: Page=Steps to Care, Site=Rock RMS
             //   Attribute: Enabled Lava Commands
             //   Attribute Value: Sql
-            RockMigrationHelper.AddBlockAttributeValue( "0227047D-28E6-4B5F-AF7A-BC2A9F50D693", "84ED8FE5-94E5-479E-B1A4-433591B22387", @"Sql" );
+            RockMigrationHelper.AddBlockAttributeValue( "0227047D-28E6-4B5F-AF7A-BC2A9F50D693", "7146ac24-9250-4fc4-9df2-9803b9a84299", @"Sql" );
 
             // Add Block Attribute Value
             //   Block: Anniversaries
@@ -918,7 +930,7 @@ namespace rocks.kfs.StepsToCare
             //   Block Location: Page=Steps to Care, Site=Rock RMS
             //   Attribute: Enabled Lava Commands
             //   Attribute Value: RockEntity
-            RockMigrationHelper.AddBlockAttributeValue( "32231AB6-A6EF-4544-84BF-A9FA9F035080", "84ED8FE5-94E5-479E-B1A4-433591B22387", @"RockEntity" );
+            RockMigrationHelper.AddBlockAttributeValue( "32231AB6-A6EF-4544-84BF-A9FA9F035080", "7146ac24-9250-4fc4-9df2-9803b9a84299", @"RockEntity" );
 
             // Add Block Attribute Value
             //   Block: Prayer Requests
@@ -942,7 +954,7 @@ namespace rocks.kfs.StepsToCare
             //   Block Location: Page=Steps to Care, Site=Rock RMS
             //   Attribute: Enabled Lava Commands
             //   Attribute Value: RockEntity
-            RockMigrationHelper.AddBlockAttributeValue( "552EE02E-E420-44DF-8847-4610542BFB58", "84ED8FE5-94E5-479E-B1A4-433591B22387", @"RockEntity" );
+            RockMigrationHelper.AddBlockAttributeValue( "552EE02E-E420-44DF-8847-4610542BFB58", "7146ac24-9250-4fc4-9df2-9803b9a84299", @"RockEntity" );
 
             // Add Block Attribute Value
             //   Block: Help Needs
@@ -999,9 +1011,6 @@ namespace rocks.kfs.StepsToCare
             //   Attribute: Require Approval
             //   Attribute Value: False
             RockMigrationHelper.AddBlockAttributeValue( "552EE02E-E420-44DF-8847-4610542BFB58", "EC2B701B-4C1D-4F3F-9C77-A73C75D7FF7A", @"False" );
-
-            // Add/Update PageContext for Page:Groups, Entity: Rock.Model.Campus, Parameter: campusId
-            RockMigrationHelper.UpdatePageContext( "D70715B0-4868-4949-B6E2-8106817EF241", "Rock.Model.Campus", "campusId", "31B6CAD3-FA11-4C44-8A6E-550C3EFD2610" );
 
             // Add/Update PageContext for Page:Care Entry, Entity: rocks.kfs.StepsToCare.Model.CareNeed, Parameter: CareNeedId
             RockMigrationHelper.UpdatePageContext( "27953B65-21E2-4CA9-8461-3AFAD46D9BC8", "rocks.kfs.StepsToCare.Model.CareNeed", "CareNeedId", "6AE31281-2175-4BB9-B5A2-DF29092E85EC" );

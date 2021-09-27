@@ -43,7 +43,7 @@ namespace rocks.kfs.StepsToCare
             RockMigrationHelper.AddDefinedValueAttributeValue( "6E092B06-BD9C-400F-9426-75CED70FF93E", "FF84E9A7-9BD6-4987-A942-AD4703303B12", @"#757272" );
             RockMigrationHelper.AddDefinedValueAttributeValue( "EA93B6A9-F151-475D-89B4-C7C24AE603B8", "FF84E9A7-9BD6-4987-A942-AD4703303B12", @"rgb(255,235,59)" );
 
-            RockMigrationHelper.UpdateNoteType( "Steps to Care - Care Need", "rocks.kfs.StepsToCare.Model.CareNeed", false, "922403D1-FA11-4159-B325-B818237AE9B3", true, "fas fa-notes-medical" );
+            RockMigrationHelper.UpdateNoteType( "Steps to Care - Care Need", "rocks.kfs.StepsToCare.Model.CareNeed", true, "922403D1-FA11-4159-B325-B818237AE9B3", true, "fas fa-notes-medical" );
         }
 
         public override void Down()

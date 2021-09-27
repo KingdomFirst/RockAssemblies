@@ -46,7 +46,7 @@ namespace rocks.kfs.StepsToCare
                 CONSTRAINT [PK__rocks_kfs_StepsToCare_CareNeed] PRIMARY KEY CLUSTERED
                 (
 	                [Id] ASC
-                )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+                )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
                 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_CreatedPersonAlias] FOREIGN KEY([CreatedByPersonAliasId])
@@ -110,7 +110,7 @@ namespace rocks.kfs.StepsToCare
                  CONSTRAINT [PK__rocks_kfs_StepsToCare_CareWorker] PRIMARY KEY CLUSTERED
                 (
 	                [Id] ASC
-                )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+                )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
                 ) ON [PRIMARY]
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_CreatedPersonAlias] FOREIGN KEY([CreatedByPersonAliasId])
@@ -127,16 +127,6 @@ namespace rocks.kfs.StepsToCare
                 REFERENCES [dbo].[PersonAlias] ([Id])
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_PersonAlias]
-
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_DefinedValue] FOREIGN KEY([CategoryValueId])
-                REFERENCES [dbo].[DefinedValue] ([Id])
-
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_DefinedValue]
-
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_CampusId] FOREIGN KEY([CampusId])
-                REFERENCES [dbo].[Campus] ([Id])
-
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_CampusId]
 
                 ALTER TABLE dbo._rocks_kfs_StepsToCare_CareWorker ADD CONSTRAINT
 	                DF__rocks_kfs_StepsToCare_CareWorker_IsActive DEFAULT 1 FOR IsActive
@@ -170,7 +160,7 @@ namespace rocks.kfs.StepsToCare
                  CONSTRAINT [PK__rocks_kfs_StepsToCare_NoteTemplate] PRIMARY KEY CLUSTERED
                 (
 	                [Id] ASC
-                )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+                )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
                 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_NoteTemplate]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_NoteTemplate_CreatedPersonAlias] FOREIGN KEY([CreatedByPersonAliasId])
@@ -209,7 +199,7 @@ namespace rocks.kfs.StepsToCare
                  CONSTRAINT [PK__rocks_kfs_StepsToCare_AssignedPerson] PRIMARY KEY CLUSTERED
                 (
 	                [Id] ASC
-                )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+                )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
                 ) ON [PRIMARY]
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson__rocks_kfs_StepsToCare_CareNeed] FOREIGN KEY([NeedId])
