@@ -19,10 +19,11 @@ namespace rocks.kfs.StepsToCare.Model
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Runtime.Serialization;
+    using Rock.Data;
 
     [Table( "_rocks_kfs_StepsToCare_NoteTemplate" )]
     [DataContract]
-    public partial class NoteTemplate : Rock.Data.Model<NoteTemplate>, Rock.Data.IRockEntity
+    public partial class NoteTemplate : Model<NoteTemplate>, IRockEntity, IOrdered
     {
         #region Entity Properties
 
@@ -33,7 +34,8 @@ namespace rocks.kfs.StepsToCare.Model
         [DataMember]
         public string Note { get; set; }
 
-        [DataMember]
+        [Required]
+        [DataMember( IsRequired = true )]
         public int Order { get; set; }
 
         [DataMember]
