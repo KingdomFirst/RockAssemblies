@@ -93,8 +93,4 @@ You will need to create two system jobs to send the communications.
 
 ![Create_Email (1)](https://user-images.githubusercontent.com/81330042/123460147-d041da80-d5ac-11eb-8e4b-1081c550560d.png)
 
-
-
 ![Create_SMS (1)](https://user-images.githubusercontent.com/81330042/123460161-d6d05200-d5ac-11eb-89b6-012c214f5f23.png)
-
-
