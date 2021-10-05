@@ -73,7 +73,6 @@ namespace rocks.kfs.StepsToCare.Model
         {
             this.HasRequired( ap => ap.CareNeed ).WithMany( cn => cn.AssignedPersons ).HasForeignKey( ap => ap.NeedId ).WillCascadeOnDelete( true );
             this.HasRequired( ap => ap.CareWorker ).WithMany( cn => cn.AssignedPersons ).HasForeignKey( ap => ap.WorkerId ).WillCascadeOnDelete( true );
-
             this.HasRequired( ap => ap.PersonAlias ).WithMany().HasForeignKey( ap => ap.PersonAliasId ).WillCascadeOnDelete( false );
 
             // IMPORTANT!!

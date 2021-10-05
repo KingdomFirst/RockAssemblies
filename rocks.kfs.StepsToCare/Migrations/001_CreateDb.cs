@@ -25,27 +25,27 @@ namespace rocks.kfs.StepsToCare
         {
             Sql( @"
                 CREATE TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed](
-	                [Id] [int] IDENTITY(1,1) NOT NULL,
-	                [PersonAliasId] [int] NULL,
-	                [Details] [nvarchar](max) NULL,
-	                [SubmitterAliasId] [int] NULL,
-	                [CategoryValueId] [int] NULL,
-	                [DateEntered] [datetime] NULL,
-	                [FollowUpDate] [datetime] NULL,
-	                [StatusValueId] [int] NULL,
-	                [CampusId] [int] NULL,
-	                [IsActive] [bit] NOT NULL,
-	                [Guid] [uniqueidentifier] NOT NULL,
-	                [CreatedDateTime] [datetime] NULL,
-	                [ModifiedDateTime] [datetime] NULL,
-	                [CreatedByPersonAliasId] [int] NULL,
-	                [ModifiedByPersonAliasId] [int] NULL,
+                    [Id] [int] IDENTITY(1,1) NOT NULL,
+                    [PersonAliasId] [int] NULL,
+                    [Details] [nvarchar](max) NULL,
+                    [SubmitterAliasId] [int] NULL,
+                    [CategoryValueId] [int] NULL,
+                    [DateEntered] [datetime] NULL,
+                    [FollowUpDate] [datetime] NULL,
+                    [StatusValueId] [int] NULL,
+                    [CampusId] [int] NULL,
+                    [IsActive] [bit] NOT NULL,
+                    [Guid] [uniqueidentifier] NOT NULL,
+                    [CreatedDateTime] [datetime] NULL,
+                    [ModifiedDateTime] [datetime] NULL,
+                    [CreatedByPersonAliasId] [int] NULL,
+                    [ModifiedByPersonAliasId] [int] NULL,
                     [ForeignKey] [nvarchar](50) NULL,
                     [ForeignGuid] [uniqueidentifier] NULL,
                     [ForeignId] [int] NULL,
                 CONSTRAINT [PK__rocks_kfs_StepsToCare_CareNeed] PRIMARY KEY CLUSTERED
                 (
-	                [Id] ASC
+                    [Id] ASC
                 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
                 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
@@ -85,31 +85,31 @@ namespace rocks.kfs.StepsToCare
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_CampusId]
 
                 ALTER TABLE dbo._rocks_kfs_StepsToCare_CareNeed ADD CONSTRAINT
-	                DF__rocks_kfs_StepsToCare_CareNeed_IsActive DEFAULT 1 FOR IsActive
+                    DF__rocks_kfs_StepsToCare_CareNeed_IsActive DEFAULT 1 FOR IsActive
             " );
 
             Sql( @"
                 CREATE TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker](
-	                [Id] [int] IDENTITY(1,1) NOT NULL,
-	                [PersonAliasId] [int] NULL,
-	                [GeoFenceId] [int] NULL,
+                    [Id] [int] IDENTITY(1,1) NOT NULL,
+                    [PersonAliasId] [int] NULL,
+                    [GeoFenceId] [int] NULL,
                     [CategoryValues] [nvarchar](2000) NULL,
                     [Campuses] [nvarchar](1000) NULL,
-	                [IsActive] [bit] NOT NULL,
-	                [NotifyEmail] [bit] NOT NULL,
-	                [NotifySMS] [bit] NOT NULL,
-	                [NotifyPush] [bit] NOT NULL,
-	                [Guid] [uniqueidentifier] NULL,
-	                [CreatedDateTime] [datetime] NULL,
-	                [ModifiedDateTime] [datetime] NULL,
-	                [CreatedByPersonAliasId] [int] NULL,
-	                [ModifiedByPersonAliasId] [int] NULL,
-	                [ForeignKey] [nvarchar](50) NULL,
+                    [IsActive] [bit] NOT NULL,
+                    [NotifyEmail] [bit] NOT NULL,
+                    [NotifySMS] [bit] NOT NULL,
+                    [NotifyPush] [bit] NOT NULL,
+                    [Guid] [uniqueidentifier] NULL,
+                    [CreatedDateTime] [datetime] NULL,
+                    [ModifiedDateTime] [datetime] NULL,
+                    [CreatedByPersonAliasId] [int] NULL,
+                    [ModifiedByPersonAliasId] [int] NULL,
+                    [ForeignKey] [nvarchar](50) NULL,
                     [ForeignGuid] [uniqueidentifier] NULL,
                     [ForeignId] [int] NULL,
                  CONSTRAINT [PK__rocks_kfs_StepsToCare_CareWorker] PRIMARY KEY CLUSTERED
                 (
-	                [Id] ASC
+                    [Id] ASC
                 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
                 ) ON [PRIMARY]
 
@@ -129,37 +129,36 @@ namespace rocks.kfs.StepsToCare
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareWorker] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareWorker_PersonAlias]
 
                 ALTER TABLE dbo._rocks_kfs_StepsToCare_CareWorker ADD CONSTRAINT
-	                DF__rocks_kfs_StepsToCare_CareWorker_IsActive DEFAULT 1 FOR IsActive
+                    DF__rocks_kfs_StepsToCare_CareWorker_IsActive DEFAULT 1 FOR IsActive
 
                 ALTER TABLE dbo._rocks_kfs_StepsToCare_CareWorker ADD CONSTRAINT
-	                DF__rocks_kfs_StepsToCare_CareWorker_NotifyEmail DEFAULT 1 FOR NotifyEmail
+                    DF__rocks_kfs_StepsToCare_CareWorker_NotifyEmail DEFAULT 1 FOR NotifyEmail
 
                 ALTER TABLE dbo._rocks_kfs_StepsToCare_CareWorker ADD CONSTRAINT
-	                DF__rocks_kfs_StepsToCare_CareWorker_NotifySMS DEFAULT 1 FOR NotifySMS
+                    DF__rocks_kfs_StepsToCare_CareWorker_NotifySMS DEFAULT 1 FOR NotifySMS
 
                 ALTER TABLE dbo._rocks_kfs_StepsToCare_CareWorker ADD CONSTRAINT
-	                DF__rocks_kfs_StepsToCare_CareWorker_NotifyPush DEFAULT 1 FOR NotifyPush
+                    DF__rocks_kfs_StepsToCare_CareWorker_NotifyPush DEFAULT 1 FOR NotifyPush
             " );
 
             Sql( @"
                 CREATE TABLE [dbo].[_rocks_kfs_StepsToCare_NoteTemplate](
-	                [Id] [int] IDENTITY(1,1) NOT NULL,
-	                [Icon] [nvarchar](250) NULL,
-	                [Note] [nvarchar](max) NULL,
-                	[Order] [int] NOT NULL,
-	                [IsActive] [bit] NOT NULL,
-	                [IsSystem] [bit] NOT NULL,
-	                [Guid] [uniqueidentifier] NULL,
-	                [CreatedDateTime] [datetime] NULL,
-	                [ModifiedDateTime] [datetime] NULL,
-	                [CreatedByPersonAliasId] [int] NULL,
-	                [ModifiedByPersonAliasId] [int] NULL,
-	                [ForeignKey] [nvarchar](50) NULL,
+                    [Id] [int] IDENTITY(1,1) NOT NULL,
+                    [Icon] [nvarchar](250) NULL,
+                    [Note] [nvarchar](max) NULL,
+                    [Order] [int] NOT NULL,
+                    [IsActive] [bit] NOT NULL,
+                    [Guid] [uniqueidentifier] NULL,
+                    [CreatedDateTime] [datetime] NULL,
+                    [ModifiedDateTime] [datetime] NULL,
+                    [CreatedByPersonAliasId] [int] NULL,
+                    [ModifiedByPersonAliasId] [int] NULL,
+                    [ForeignKey] [nvarchar](50) NULL,
                     [ForeignGuid] [uniqueidentifier] NULL,
                     [ForeignId] [int] NULL,
                  CONSTRAINT [PK__rocks_kfs_StepsToCare_NoteTemplate] PRIMARY KEY CLUSTERED
                 (
-	                [Id] ASC
+                    [Id] ASC
                 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
                 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
@@ -174,31 +173,28 @@ namespace rocks.kfs.StepsToCare
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_NoteTemplate] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_NoteTemplate_ModifiedPersonAlias]
 
                 ALTER TABLE dbo._rocks_kfs_StepsToCare_NoteTemplate ADD CONSTRAINT
-	                DF__rocks_kfs_StepsToCare_NoteTemplate_IsActive DEFAULT 1 FOR IsActive
-
-                ALTER TABLE dbo._rocks_kfs_StepsToCare_NoteTemplate ADD CONSTRAINT
-	                DF__rocks_kfs_StepsToCare_NoteTemplate_IsSystem DEFAULT 0 FOR IsSystem
+                    DF__rocks_kfs_StepsToCare_NoteTemplate_IsActive DEFAULT 1 FOR IsActive
             " );
 
             Sql( @"
                 CREATE TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson](
-	                [Id] [int] IDENTITY(1,1) NOT NULL,
-	                [NeedId] [int] NULL,
-	                [PersonAliasId] [int] NULL,
-	                [WorkerId] [int] NULL,
-	                [FollowUpWorker] [bit] NULL,
-	                [IsActive] [bit] NOT NULL,
-	                [Guid] [uniqueidentifier] NULL,
-	                [CreatedDateTime] [datetime] NULL,
-	                [ModifiedDateTime] [datetime] NULL,
-	                [CreatedByPersonAliasId] [int] NULL,
-	                [ModifiedByPersonAliasId] [int] NULL,
-	                [ForeignKey] [nvarchar](50) NULL,
+                    [Id] [int] IDENTITY(1,1) NOT NULL,
+                    [NeedId] [int] NULL,
+                    [PersonAliasId] [int] NULL,
+                    [WorkerId] [int] NULL,
+                    [FollowUpWorker] [bit] NULL,
+                    [IsActive] [bit] NOT NULL,
+                    [Guid] [uniqueidentifier] NULL,
+                    [CreatedDateTime] [datetime] NULL,
+                    [ModifiedDateTime] [datetime] NULL,
+                    [CreatedByPersonAliasId] [int] NULL,
+                    [ModifiedByPersonAliasId] [int] NULL,
+                    [ForeignKey] [nvarchar](50) NULL,
                     [ForeignGuid] [uniqueidentifier] NULL,
                     [ForeignId] [int] NULL,
                  CONSTRAINT [PK__rocks_kfs_StepsToCare_AssignedPerson] PRIMARY KEY CLUSTERED
                 (
-	                [Id] ASC
+                    [Id] ASC
                 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
                 ) ON [PRIMARY]
 
@@ -229,7 +225,7 @@ namespace rocks.kfs.StepsToCare
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_Worker]
 
                 ALTER TABLE dbo._rocks_kfs_StepsToCare_AssignedPerson ADD CONSTRAINT
-	                DF__rocks_kfs_StepsToCare_AssignedPerson_IsActive DEFAULT 1 FOR IsActive
+                    DF__rocks_kfs_StepsToCare_AssignedPerson_IsActive DEFAULT 1 FOR IsActive
             " );
 
             RockMigrationHelper.UpdateEntityType( "rocks.kfs.StepsToCare.Model.CareNeed", "87AC878D-6740-43EB-9389-B8440AC595C3", true, true );
