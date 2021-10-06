@@ -102,7 +102,7 @@ namespace rocks.kfs.StepsToCare
             RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE", "1EDAFDED-DFE6-4334-B019-6EECBA89E05A", "Auto Assign Worker with Geofence", "AutoAssignWorkerGeofence", "Auto Assign Worker with Geofence", @"Care Need Workers can have Geofence locations assigned to them, if there are workers with geofences and this block setting is enabled it will auto assign workers to this need on new entries based on the requester home being in the geofence.", 0, @"True", "C5DE9EAE-BB28-4D81-AAB0-B7F338D030A3" );
 
             // Attribute for BlockType: Care Entry:Auto Assign Worker (load balanced)
-            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE", "1EDAFDED-DFE6-4334-B019-6EECBA89E05A", "Auto Assign Worker (load balanced)", "AutoAssignWorker", "Auto Assign Worker in Round Robin", @"Should workers be auto assigned to care need (by default it will prioritize same category workers with category of need)", 0, @"True", "F7135F9C-8D06-4E6D-A493-2B1B29CE9AB6" );
+            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE", "1EDAFDED-DFE6-4334-B019-6EECBA89E05A", "Auto Assign Worker (load balanced)", "AutoAssignWorker", "Auto Assign Worker in Round Robin", @"Use intelligent load balancing to auto assign care workers to a care need based on their workload and other parameters?", 0, @"True", "F7135F9C-8D06-4E6D-A493-2B1B29CE9AB6" );
 
             // Attribute for BlockType: Care Entry:Newly Assigned Need Notification
             RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE", "72ED40C7-4D64-4D60-9411-4FFB2B9E833E", "Newly Assigned Need Notification", "NewAssignmentNotification", "Newly Assigned Need Notification", @"Select the system communication template for the new assignment notification.", 0, SystemGuid.SystemCommunication.CARE_NEED_ASSIGNED, "E3604688-ACC2-4360-976B-44EB5170F685" );
@@ -123,7 +123,10 @@ namespace rocks.kfs.StepsToCare
             RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "AF14CB6C-F915-4449-9CB7-7C44B624B051", "1EDAFDED-DFE6-4334-B019-6EECBA89E05A", "Enable Launch Workflow", "WorkflowEnable", "Enable Launch Workflow", @"Enable Launch Workflow Action", 6, @"True", "7FEA3B48-CEA9-4902-B2BC-579D64221355" );
 
             // Attribute for BlockType: Care Dashboard:Minimum Care Touches
-            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "AF14CB6C-F915-4449-9CB7-7C44B624B051", "A75DFC58-7A1B-4799-BF31-451B2BBE38FF", "Minimum Care Touches", "MinimumCareTouches", "Minimum Care Touches", @"Minimum care touches in 24 hours before the need gets 'flagged'.", 3, @"2", "8291F010-FFFE-4806-8E19-E701FAC62E10" );
+            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "AF14CB6C-F915-4449-9CB7-7C44B624B051", "A75DFC58-7A1B-4799-BF31-451B2BBE38FF", "Minimum Care Touches", "MinimumCareTouches", "Minimum Care Touches", @"Minimum care touches in 'Minimum Care Touch Hours' before the need gets 'flagged'.", 3, @"2", "8291F010-FFFE-4806-8E19-E701FAC62E10" );
+
+            // Attribute for BlockType: Care Dashboard:Minimum Care Touch Hours
+            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "AF14CB6C-F915-4449-9CB7-7C44B624B051", "A75DFC58-7A1B-4799-BF31-451B2BBE38FF", "Minimum Care Touch Giyrs", "MinimumCareTouchHours", "Minimum Care Touch Hours", @"Minimum care touches in this time period before the need gets 'flagged'.", 3, @"24", "8945BE62-D065-4A19-89A8-B06CE51FFBFF" );
 
             // Attribute for BlockType: Care Dashboard:Detail Page
             RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "AF14CB6C-F915-4449-9CB7-7C44B624B051", "BD53F9C9-EBA9-4D3F-82EA-DE5DD34A8108", "Detail Page", "DetailPage", "Detail Page", @"Page used to modify and create care needs.", 1, @"", "83441829-9BAA-4C9A-921B-E3DCED54BB20" );
@@ -206,6 +209,14 @@ namespace rocks.kfs.StepsToCare
             //   Attribute: Minimum Care Touches
             //   Attribute Value: 2
             RockMigrationHelper.AddBlockAttributeValue( "EADBE3F0-F64B-4583-B49D-F0031BBC929F", "8291F010-FFFE-4806-8E19-E701FAC62E10", @"2" );
+
+            // Add Block Attribute Value
+            //   Block: Care Dashboard
+            //   BlockType: Care Dashboard
+            //   Block Location: Page=Steps to Care, Site=Rock RMS
+            //   Attribute: Minimum Care Touch Hours
+            //   Attribute Value: 24
+            RockMigrationHelper.AddBlockAttributeValue( "EADBE3F0-F64B-4583-B49D-F0031BBC929F", "8945BE62-D065-4A19-89A8-B06CE51FFBFF", @"24" );
 
             // Add Block Attribute Value
             //   Block: Care Dashboard
@@ -537,6 +548,9 @@ namespace rocks.kfs.StepsToCare
 
             // Minimum Care Touches Attribute for BlockType: Care Dashboard
             RockMigrationHelper.DeleteAttribute( "8291F010-FFFE-4806-8E19-E701FAC62E10" );
+
+            // Minimum Care Touch Hours Attribute for BlockType: Care Dashboard
+            RockMigrationHelper.DeleteAttribute( "8945BE62-D065-4A19-89A8-B06CE51FFBFF" );
 
             // Auto Assign Worker (load balanced) Attribute for BlockType: Care Entry
             RockMigrationHelper.DeleteAttribute( "F7135F9C-8D06-4E6D-A493-2B1B29CE9AB6" );
