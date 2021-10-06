@@ -51,7 +51,7 @@ namespace rocks.kfs.StepsToCare.Jobs
 
     [IntegerField(
         "Minimum Care Touches",
-        Description = "Minimum care touches in 24 hours before the Care Touch needed notification gets sent out.",
+        Description = "Minimum care touches in 'Minimum Care Touch Hours' before the Care Touch needed notification gets sent out.",
         DefaultIntegerValue = 2,
         IsRequired = true,
         Key = AttributeKey.MinimumCareTouches )]
