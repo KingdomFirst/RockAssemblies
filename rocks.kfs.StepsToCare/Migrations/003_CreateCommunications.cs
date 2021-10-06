@@ -77,6 +77,8 @@ namespace rocks.kfs.StepsToCare
                                              <span style='float:right; padding-right: 1em; margin-top: 1.5em;'>#{{ careNeed.Id }}</span>
                                              <h2 style='line-height: normal; margin-top: .83em;'>{{ careNeed.PersonAlias.Person.FullName }}<br><span style='font-weight: normal; font-size: 14px'>{{ careNeed.DateEntered }} | {{ careNeed.Category.Value }}</span></h2>
                                              <p>{{ careNeed.Details }}</p>
+                                             <p style='font-size: 14px'><strong>Status:</strong> {{ careNeed.Status.Value }}<br>
+                                            <strong>Care Touches:</strong> {{ careNeed.TouchCount }}</p>
                                           </td>
                                        </tr>
                                     </tbody>
@@ -143,6 +145,11 @@ namespace rocks.kfs.StepsToCare
     <p><a href='{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}/{{ LinkedPages.CareDashboard }}'>View Care Dashboard</a></p>
 {{ 'Global' | Attribute:'EmailFooter' }}
 ", SystemGuid.SystemCommunication.CARE_NEED_TOUCH_NEEDED );
+
+            Sql( string.Format( "UPDATE [SystemCommunication] SET [IsSystem] = 0 WHERE [Guid] = '{0}'", SystemGuid.SystemCommunication.CARE_NEED_ASSIGNED ) );
+            Sql( string.Format( "UPDATE [SystemCommunication] SET [IsSystem] = 0 WHERE [Guid] = '{0}'", SystemGuid.SystemCommunication.CARE_NEED_FOLLOWUP ) );
+            Sql( string.Format( "UPDATE [SystemCommunication] SET [IsSystem] = 0 WHERE [Guid] = '{0}'", SystemGuid.SystemCommunication.CARE_NEED_OUTSTANDING_NEEDS ) );
+            Sql( string.Format( "UPDATE [SystemCommunication] SET [IsSystem] = 0 WHERE [Guid] = '{0}'", SystemGuid.SystemCommunication.CARE_NEED_TOUCH_NEEDED ) );
         }
 
         public override void Down()

@@ -158,14 +158,14 @@ namespace rocks.kfs.StepsToCare.Jobs
 
                 var careNeed24Hrs = careNeeds.AsNoTracking().Where( n => n.StatusValueId == openValueId && DbFunctions.DiffHours( n.DateEntered.Value, RockDateTime.Now ) >= minimumCareTouchesHours );
                 var careNeedFlagged = careNeed24Hrs
-                    .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && cn.AssignedPersons.Any( ap => ap.PersonAliasId == n.CreatedByPersonAliasId ) ).DefaultIfEmpty(),
+                    .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && cn.AssignedPersons.Any( ap => ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value && ap.PersonAliasId == n.CreatedByPersonAliasId ) ).DefaultIfEmpty(),
                     ( cn, n ) => new
                     {
                         CareNeed = cn,
-                        HasLeaderNote = n != null,
+                        HasFollowUpWorkerNote = n != null,
                         TouchCount = careNeedNotesQry.Where( note => note.EntityId == cn.Id ).Count()
                     } )
-                    .Where( f => !f.HasLeaderNote || f.TouchCount <= minimumCareTouches )
+                    .Where( f => !f.HasFollowUpWorkerNote || f.TouchCount <= minimumCareTouches )
                     .ToList();
 
                 var followUpSystemCommunicationGuid = dataMap.GetString( AttributeKey.FollowUpSystemCommunication ).AsGuid();
@@ -247,7 +247,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                             mergeFields.Add( "AssignedPerson", assignee );
                             mergeFields.Add( "Person", assignee.PersonAlias.Person );
                             mergeFields.Add( "TouchCount", flagNeed.TouchCount );
-                            mergeFields.Add( "HasLeaderNote", flagNeed.HasLeaderNote );
+                            mergeFields.Add( "HasFollowUpWorkerNote", flagNeed.HasFollowUpWorkerNote );
 
                             emailMessage.AddRecipient( new RockEmailMessageRecipient( assignee.PersonAlias.Person, mergeFields ) );
                             //emailMessage.AddRecipient( new RockSMSMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber() mergeFields ) )
