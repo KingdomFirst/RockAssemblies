@@ -60,10 +60,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\RoomOccurrence.cs" />
     <Compile Include="Field\Types\ZoomRoomFieldType.cs" />
     <Compile Include="Field\Types\EventbritePersonFieldType.cs" />
-    <Compile Include="Migrations\001_Init.cs" />
-    <Compile Include="Migrations\002_PageAndBlocks.cs" />
+    <Compile Include="Migrations\001_CreateDb.cs" />
+    <Compile Include="Migrations\002_CreateAttributes.cs" />
     <Compile Include="Utility\ExtensionMethods\StringExtensions.cs" />
     <Compile Include="ZoomGuid\DefinedType.cs" />
     <Compile Include="ZoomGuid\EntityType.cs" />
@@ -76,7 +77,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\rocks.kfs.ZoomRoom\rocks.kfs.ZoomRoom\ZoomDotNetFramework.csproj">
+    <ProjectReference Include="..\ZoomDotNetFramework\ZoomDotNetFramework.csproj">
       <Project>{99da9675-2596-43b9-a623-0ad3c742fd3c}</Project>
       <Name>ZoomDotNetFramework</Name>
     </ProjectReference>
