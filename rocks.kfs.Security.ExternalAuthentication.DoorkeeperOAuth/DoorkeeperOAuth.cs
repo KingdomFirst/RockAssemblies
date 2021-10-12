@@ -44,12 +44,18 @@ namespace com.kfs.Security.ExternalAuthentication
     [UrlLinkField( "Doorkeeper Server Url", "The base Url of the local Doorkeeper server. Example: https://login.mychurch.org/" )]
     [UrlLinkField( "User Info Url", "The Url location of the 'me.json' data. Example: https://login.mychurch.org/api/v1/me.json" )]
     [DefinedValueField( "2E6540EA-63F0-40FE-BE50-F2A84735E600", "Connection Status", "The connection status to use for new individuals (default: 'Web Prospect'.)", true, false, "368DD475-242C-49C4-A42C-7278BE690CC2" )]
+    [BooleanField( "Enable Logging", "Enable logging for Doorkeeper OAuth methods from this provider.", false )]
     public class DoorkeeperOAuth : AuthenticationComponent
     {
         /// <summary>
         /// The _baseUrl
         /// </summary>
         private string _baseUrl = null;
+
+        /// <summary>
+        /// The _enableLogging
+        /// </summary>
+        private bool _enableLogging = false;
 
         /// <summary>
         /// Gets the type of the service.
@@ -93,6 +99,7 @@ namespace com.kfs.Security.ExternalAuthentication
         /// <returns></returns>
         public override Uri GenerateLoginUrl( HttpRequest request )
         {
+            _enableLogging = GetAttributeValue( "EnableLogging" ).AsBoolean();
             _baseUrl = GetAttributeValue( "DoorkeeperServerUrl" );
             if ( !_baseUrl.EndsWith( "/" ) && _baseUrl != "" )
             {
@@ -101,6 +108,24 @@ namespace com.kfs.Security.ExternalAuthentication
 
             string returnUrl = request.QueryString["returnurl"];
             string redirectUri = GetRedirectUrl( request );
+
+            if ( _enableLogging )
+            {
+                using ( var rockContext = new RockContext() )
+                {
+                    LogEvent( rockContext, "GenerateLoginUrl", "_baseUrl", _baseUrl );
+                    LogEvent( rockContext, "GenerateLoginUrl", "returnUrl", returnUrl ?? FormsAuthentication.DefaultUrl );
+                    LogEvent( rockContext, "GenerateLoginUrl", "redirectUri", redirectUri );
+
+                    var serverVariableString = "";
+                    foreach ( string x in request.ServerVariables )
+                    {
+                        serverVariableString += x.ToString() + " : ";
+                        serverVariableString += request.ServerVariables[x].ToString() + "<br/>";
+                    }
+                    LogEvent( rockContext, "GenerateLoginUrl", serverVariableString, "ServerVariables" );
+                }
+            }
 
             return new Uri( string.Format( "{0}oauth/authorize?client_id={1}&response_type=code&redirect_uri={2}&state={3}",
                 _baseUrl,
@@ -481,6 +506,27 @@ namespace com.kfs.Security.ExternalAuthentication
 
                 return username;
             }
+        }
+
+        private static ServiceLog LogEvent( RockContext rockContext, string type, string input, string result )
+        {
+            if ( rockContext == null )
+            {
+                rockContext = new RockContext();
+            }
+            var rockLogger = new ServiceLogService( rockContext );
+            ServiceLog serviceLog = new ServiceLog
+            {
+                Name = "DoorkeeperOAuth",
+                Type = type,
+                LogDateTime = RockDateTime.Now,
+                Input = input,
+                Result = result,
+                Success = true
+            };
+            rockLogger.Add( serviceLog );
+            rockContext.SaveChanges();
+            return serviceLog;
         }
     }
 }
