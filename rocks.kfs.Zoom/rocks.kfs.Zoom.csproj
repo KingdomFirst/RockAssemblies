@@ -62,10 +62,10 @@
   <ItemGroup>
     <Compile Include="Model\RoomOccurrence.cs" />
     <Compile Include="Field\Types\ZoomRoomFieldType.cs" />
-    <Compile Include="Field\Types\EventbritePersonFieldType.cs" />
     <Compile Include="Migrations\001_CreateDb.cs" />
     <Compile Include="Migrations\002_CreateAttributes.cs" />
     <Compile Include="Utility\ExtensionMethods\StringExtensions.cs" />
+    <Compile Include="ZoomGuid\Attribute.cs" />
     <Compile Include="ZoomGuid\DefinedType.cs" />
     <Compile Include="ZoomGuid\EntityType.cs" />
     <Compile Include="Zoom.cs" />
@@ -74,6 +74,7 @@
     <Compile Include="ZoomGuid\FieldType.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
