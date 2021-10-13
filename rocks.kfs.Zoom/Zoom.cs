@@ -53,6 +53,24 @@ namespace rocks.kfs.Zoom
             return new ZoomApi( jwtString );
         }
 
+        public static void SyncZoomRoomDT()
+        {
+            var rockContext = new RockContext();
+            var zoomRoomDT = new DefinedTypeService( rockContext ).Get( ZoomGuid.DefinedType.ZOOM_ROOM.AsGuid() );
+            zoomRoomDT.DefinedValues.Clear();
+            var zoom = Api();
+            var zrList = zoom.GetZoomRooms().OrderBy( r => r.Name );
+            foreach( var room in zrList )
+            {
+                zoomRoomDT.DefinedValues.Add( new DefinedValue
+                {
+                    Value = room.Id,
+                    Description = room.Name
+                } );
+            }
+            rockContext.SaveChanges();
+        }
+
         private static AttributeValueCache GetLocationZoomRoomId( Location location )
         {
             AttributeValueCache retVar = null;
@@ -117,97 +135,6 @@ namespace rocks.kfs.Zoom
             {
                 return new Location();
             }
-        }
-
-        public static void SyncZoomRooms(
-            int groupid,
-            bool updatePrimaryEmail = false,
-            string userid = "Eventbrite",
-            int recordStatusId = 5,
-            int connectionStatusId = 66,
-            bool EnableLogging = false,
-            bool ThrottleSync = false )
-        {
-            //Setup
-            var rockContext = new RockContext();
-
-            if ( EnableLogging )
-            {
-                LogEvent( rockContext, "ZoomSync", "ZoomRooms", "Started" );
-            }
-            var zoom = Api();
-
-            var group = new GroupService( rockContext ).Get( groupid );
-            var eb = new ZoomApi( Settings.GetJwtString());
-            var groupEBEventIDAttr = GetGroupEBEventId( group );
-            var groupEBEventAttrSplit = groupEBEventIDAttr.Value.SplitDelimitedValues( "^" );
-            var evntid = long.Parse( groupEBEventIDAttr != null ? groupEBEventAttrSplit[0] : "0" );
-
-            if ( ThrottleSync && groupEBEventAttrSplit.Length > 1 && groupEBEventAttrSplit[1].AsDateTime() > RockDateTime.Now.Date.AddMinutes( -30 ) )
-            {
-                return;
-            }
-
-            if ( EnableLogging )
-            {
-                LogEvent( rockContext, "SyncEvent", string.Format( "Group: {0}", group ), "Got Group and EBEventId from Group." );
-            }
-
-            var ebOrders = new List<Order>();
-            var ebEvent = eb.GetEventById( evntid );
-            var IsRSVPEvent = ebEvent.IsRSVPEvent( eb );
-            var gmPersonAttributeKey = GetPersonAttributeKey( rockContext, group );
-
-            if ( EnableLogging )
-            {
-                LogEvent( rockContext, "SyncEvent", string.Format( "eb.GetEventById({0})", evntid ), "eb.GetEventById and get Person Attribute Key" );
-            }
-
-            //Get Eventbrite Attendees
-            var ebOrderGet = eb.GetExpandedOrdersById( evntid );
-            ebOrders.AddRange( ebOrderGet.Orders );
-            if ( ebOrderGet.Pagination.PageCount > 1 )
-            {
-                var looper = new EventOrders();
-                for ( int i = 2; i <= ebOrderGet.Pagination.PageCount; i++ )
-                {
-                    looper = eb.GetExpandedOrdersById( evntid, i );
-                    ebOrders.AddRange( looper.Orders );
-                }
-            }
-
-            if ( EnableLogging )
-            {
-                LogEvent( rockContext, "SyncEvent", string.Format( "GetExpandedOrdersById:{0}", evntid ), string.Format( "Result count: {0}", ebOrders.Count ) );
-            }
-
-            var groupMemberService = new GroupMemberService( rockContext );
-            var personAliasService = new PersonAliasService( rockContext );
-
-            AttendanceOccurrence occ = GetOrAddOccurrence( rockContext, group, ebEvent );
-
-            if ( EnableLogging )
-            {
-                LogEvent( rockContext, "SyncEvent", string.Format( "GroupId: {0} Evntid: {1}", groupid, evntid ), "Begin For each order in ebOrders" );
-            }
-            foreach ( var order in ebOrders )
-            {
-                foreach ( var attendee in order.Attendees )
-                {
-                    HttpContext.Current.Server.ScriptTimeout = HttpContext.Current.Server.ScriptTimeout + 2;
-                    SyncAttendee( rockContext, attendee, order, group, groupMemberService, personAliasService, occ, evntid, IsRSVPEvent, gmPersonAttributeKey, updatePrimaryEmail, recordStatusId, connectionStatusId, EnableLogging );
-                }
-            }
-
-            if ( EnableLogging )
-            {
-                LogEvent( rockContext, "SyncEvent", string.Format( "End Sync for Group: {0}", groupid ), "End Sync and Write SyncTime to Group" );
-            }
-            rockContext.SaveChanges();
-
-            // Write the Sync Time
-            group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, string.Format( "{0}^{1}", groupEBEventIDAttr.Value.SplitDelimitedValues( "^" )[0], RockDateTime.Now.ToString( "g", CultureInfo.CreateSpecificCulture( "en-us" ) ) ) );
-            group.SaveAttributeValue( groupEBEventIDAttr.AttributeKey, rockContext );
         }
 
         private static ServiceLog LogEvent( RockContext rockContext, string type, string input, string result )

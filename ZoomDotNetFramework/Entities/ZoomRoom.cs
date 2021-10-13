@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 //
+using rocks.kfs.ZoomRoom.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace ZoomDotNetFramework.Entities
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        public RoomType Type { get; set; }
         public string Activation_Code { get; set; }
         public string Status { get; set; }
         public string Room_Id { get; set; }
