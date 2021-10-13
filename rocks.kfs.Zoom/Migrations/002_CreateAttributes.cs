@@ -28,18 +28,22 @@ namespace rocks.kfs.Zoom.Migrations
         public override void Up()
         {
             // Assign GUID to Zoom and add security
-            RockMigrationHelper.UpdateEntityType( "rocks.kfs.Zoom.Zoom", ZoomGuid.EntityType.ZOOM, false, true );
-            RockMigrationHelper.AddSecurityAuthForEntityType( "rocks.kfs.Zoom.Zoom", 0, Rock.Security.Authorization.VIEW, true, Rock.SystemGuid.Group.GROUP_ADMINISTRATORS, 0, "6BC0A6D7-844F-49DF-BE40-5AD45EAB3CEE" );
-            RockMigrationHelper.AddSecurityAuthForEntityType( "rocks.kfs.Zoom.Zoom", 1, Rock.Security.Authorization.VIEW, true, Rock.SystemGuid.Group.GROUP_EVENT_REGISTRATION_ADMINISTRATORS, 0, "827CD9FB-FA00-4C99-B193-C531EF0F1B0E" );
-            RockMigrationHelper.AddSecurityAuthForEntityType( "rocks.kfs.Zoom.Zoom", 2, Rock.Security.Authorization.VIEW, false, null, Rock.Model.SpecialRole.AllUsers.ConvertToInt(), "3921542F-476D-48B4-97F5-788709A1F4B4" );
+            RockMigrationHelper.UpdateEntityType( "rocks.kfs.Zoom.ZoomApp", ZoomGuid.EntityType.ZOOM, false, true );
+            RockMigrationHelper.AddSecurityAuthForEntityType( "rocks.kfs.Zoom.ZoomApp", 0, Rock.Security.Authorization.VIEW, true, Rock.SystemGuid.Group.GROUP_ADMINISTRATORS, 0, "6BC0A6D7-844F-49DF-BE40-5AD45EAB3CEE" );
+            RockMigrationHelper.AddSecurityAuthForEntityType( "rocks.kfs.Zoom.ZoomApp", 1, Rock.Security.Authorization.VIEW, false, null, Rock.Model.SpecialRole.AllUsers.ConvertToInt(), "3921542F-476D-48B4-97F5-788709A1F4B4" );
 
             RockMigrationHelper.UpdateFieldType( "Zoom Room", "", "rocks.kfs.Zoom", "rocks.kfs.Zoom.Field.Types.ZoomRoomFieldType", ZoomGuid.FieldType.ZOOM_ROOM );
             RockMigrationHelper.UpdateFieldType( "Zoom Room", "", "rocks.kfs.Zoom", "rocks.kfs.Zoom.Field.Types.ZoomMeetingFieldType", ZoomGuid.FieldType.ZOOM_MEETING );
 
-            RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Zoom.Zoom", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "Zoom API Key", "", "The API Key for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "D53A2B48-C8B4-4481-B2AB-139CAF90C78C", "KFSZoomApiKey" );
-            RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Zoom.Zoom", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "Zoom API Secret", "", "The API Secret for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "CB89B071-4866-41BD-ACB1-1810F5224A82", "KFSZoomApiSecret" );
+            RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Key", "", "The API Key for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "D53A2B48-C8B4-4481-B2AB-139CAF90C78C", "KFSZoomApiKey" );
+            RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Secret", "", "The API Secret for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "CB89B071-4866-41BD-ACB1-1810F5224A82", "KFSZoomApiSecret" );
 
             RockMigrationHelper.AddDefinedType( "", "Zoom Rooms", "Zoom Rooms available for linking to Rock Locations.", ZoomGuid.DefinedType.ZOOM_ROOM );
+            RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.TEXT, "User's Name", "ZoomUsersName", "Zoom user's name.", 0, "", ZoomGuid.Attribute.ZOOM_USER_NAME );
+            RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.INTEGER, "User's PMI", "ZoomUsersPMI", "Zoom user's personal meeting ID.", 1, "", ZoomGuid.Attribute.ZOOM_USER_PMI );
+            RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.TEXT, "Meeting Password", "ZoomMeetingPassword", "Zoom meeting password.", 2, "", ZoomGuid.Attribute.ZOOM_MEETING_PASSWORD );
+            RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.BOOLEAN, "Join Before Host", "ZoomJoinBeforeHost", "Zoom meeting's Join Before Host setting.", 3, "false", ZoomGuid.Attribute.ZOOM_MEETING_JOIN_BEFORE_HOST );
+            RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.TEXT, "Time Zone", "ZoomMeetingTimeZone", "Zoom meeting time zone. A list of valid time zone strings can be found <a href='https://marketplace.zoom.us/docs/api-reference/other-references/abbreviation-lists#timezones' target='_blank'>here</a>. Example: America/New_York", 4, "", ZoomGuid.Attribute.ZOOM_MEETING_TIME_ZONE );
         }
 
         /// <summary>
@@ -47,13 +51,17 @@ namespace rocks.kfs.Zoom.Migrations
         /// </summary>
         public override void Down()
         {
+            RockMigrationHelper.DeleteAttribute( ZoomGuid.Attribute.ZOOM_USER_NAME );
+            RockMigrationHelper.DeleteAttribute( ZoomGuid.Attribute.ZOOM_USER_PMI );
+            RockMigrationHelper.DeleteAttribute( ZoomGuid.Attribute.ZOOM_MEETING_PASSWORD );
+            RockMigrationHelper.DeleteAttribute( ZoomGuid.Attribute.ZOOM_MEETING_JOIN_BEFORE_HOST );
+            RockMigrationHelper.DeleteAttribute( ZoomGuid.Attribute.ZOOM_MEETING_TIME_ZONE );
             RockMigrationHelper.DeleteDefinedType( ZoomGuid.DefinedType.ZOOM_ROOM );
             RockMigrationHelper.DeleteAttribute( "CB89B071-4866-41BD-ACB1-1810F5224A82" );
             RockMigrationHelper.DeleteAttribute( "D53A2B48-C8B4-4481-B2AB-139CAF90C78C" );
             RockMigrationHelper.DeleteFieldType( ZoomGuid.FieldType.ZOOM_MEETING );
             RockMigrationHelper.DeleteFieldType( ZoomGuid.FieldType.ZOOM_ROOM );
             RockMigrationHelper.DeleteSecurityAuth( "3921542F-476D-48B4-97F5-788709A1F4B4" );
-            RockMigrationHelper.DeleteSecurityAuth( "827CD9FB-FA00-4C99-B193-C531EF0F1B0E" );
             RockMigrationHelper.DeleteSecurityAuth( "6BC0A6D7-844F-49DF-BE40-5AD45EAB3CEE" );
             RockMigrationHelper.DeleteEntityType( ZoomGuid.EntityType.ZOOM );
         }
