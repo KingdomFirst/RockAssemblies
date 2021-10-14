@@ -87,7 +87,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Migrations
 				<td data-priority=""1"" style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;padding: 12px;line-height: 1.428571429;vertical-align: top;border-top: 1px solid #ddd;color: #333;display: table-cell;background-color: #fff !important;"">{% if contribution.Transaction.ShowAsAnonymous %}Anonymous{% else %}{{ contribution.Transaction.AuthorizedPersonAlias.Person.FullName }}{% endif %}</td>
                 {% if ShowAddress %}<td data-priority=""1"" style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;padding: 12px;line-height: 1.428571429;vertical-align: top;border-top: 1px solid #ddd;color: #333;display: table-cell;background-color: #fff !important;"">{% if contribution.Transaction.ShowAsAnonymous %}&nbsp;{% else %}{{ contribution.Transaction.AuthorizedPersonAlias.Person | Address:'Mailing' }}{% endif %}</td>{% endif %}
                 <td align=""left"" data-priority=""1"" style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;padding: 12px;line-height: 1.428571429;vertical-align: top;border-top: 1px solid #ddd;color: #333;display: table-cell;background-color: #fff !important;"">{{ contribution.Transaction.TransactionDateTime }}</td>
-                {% if ShowAmount %}<td align=""right"" data-priority=""1"" style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;padding: 12px;line-height: 1.428571429;vertical-align: top;border-top: 1px solid #ddd;color: #333;display: table-cell;background-color: #fff !important;"">{{ 'Global' | Attribute:'CurrencySymbol' }}{{ contribution.Amount }}</td>{% endif %}
+                {% if ShowAmount %}<td align=""right"" data-priority=""1"" style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;padding: 12px;line-height: 1.428571429;vertical-align: top;border-top: 1px solid #ddd;color: #333;display: table-cell;background-color: #fff !important;"">{{ contribution.Amount | FormatAsCurrency }}</td>{% endif %}
 			</tr>
 {%- endfor -%}
 {%- if contributionsSize == 0 %}<tr><td colspan=""{{ colspan }}"" style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;padding: 12px;line-height: 1.428571429;vertical-align: top;border-top: 1px solid #ddd;color: #333;display: table-cell;background-color: #fff !important;"">No donations for {{ BeginDateTime | Date:'M/d/yyyy' }} - {{ 'Now' | Date:'M/d/yyyy' }}.</td></tr>{% endif -%}
@@ -102,7 +102,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Migrations
     <div class=""panel-body"" style=""-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;padding: 15px;"">
     {% if ShowAddress and contribution.Transaction.ShowAsAnonymous == false %}<p>{{ contribution.Transaction.AuthorizedPersonAlias.Person | Address:'Mailing' }}</p>{% endif %}
             <p>{{ contribution.Transaction.TransactionDateTime }}</p>
-            {% if ShowAmount %}<p>{{ 'Global' | Attribute:'CurrencySymbol' }}{{ contribution.Amount }}</p>{% endif %}
+            {% if ShowAmount %}<p>{{ contribution.Amount | FormatAsCurrency }}</p>{% endif %}
         </div>
 	</div>
 {%- endfor -%}
