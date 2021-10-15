@@ -20,7 +20,7 @@ using Rock.Plugin;
 namespace rocks.kfs.Zoom.Migrations
 {
     [MigrationNumber( 2, "1.12.4" )]
-    public partial class Init : Migration
+    public partial class CreateAttributes : Migration
     {
         /// <summary>
         /// Operations to be performed during the upgrade process.
@@ -38,9 +38,9 @@ namespace rocks.kfs.Zoom.Migrations
             RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Key", "", "The API Key for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "D53A2B48-C8B4-4481-B2AB-139CAF90C78C", "KFSZoomApiKey" );
             RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Secret", "", "The API Secret for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "CB89B071-4866-41BD-ACB1-1810F5224A82", "KFSZoomApiSecret" );
 
-            RockMigrationHelper.AddDefinedType( "", "Zoom Rooms", "Zoom Rooms available for linking to Rock Locations.", ZoomGuid.DefinedType.ZOOM_ROOM );
-            RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.TEXT, "User's Name", "ZoomUsersName", "Zoom user's name.", 0, "", ZoomGuid.Attribute.ZOOM_USER_NAME );
-            RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.INTEGER, "User's PMI", "ZoomUsersPMI", "Zoom user's personal meeting ID.", 1, "", ZoomGuid.Attribute.ZOOM_USER_PMI );
+            RockMigrationHelper.AddDefinedType( "Zoom", "Zoom Rooms", "Zoom Rooms available for linking to Rock Locations.", ZoomGuid.DefinedType.ZOOM_ROOM );
+            RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.TEXT, "User Name", "ZoomUsersName", "Zoom user's name.", 0, "", ZoomGuid.Attribute.ZOOM_USER_NAME );
+            RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.INTEGER, "User PMI", "ZoomUsersPMI", "Zoom user's personal meeting ID.", 1, "", ZoomGuid.Attribute.ZOOM_USER_PMI );
             RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.TEXT, "Meeting Password", "ZoomMeetingPassword", "Zoom meeting password.", 2, "", ZoomGuid.Attribute.ZOOM_MEETING_PASSWORD );
             RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.BOOLEAN, "Join Before Host", "ZoomJoinBeforeHost", "Zoom meeting's Join Before Host setting.", 3, "false", ZoomGuid.Attribute.ZOOM_MEETING_JOIN_BEFORE_HOST );
             RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.TEXT, "Time Zone", "ZoomMeetingTimeZone", "Zoom meeting time zone. A list of valid time zone strings can be found <a href='https://marketplace.zoom.us/docs/api-reference/other-references/abbreviation-lists#timezones' target='_blank'>here</a>. Example: America/New_York", 4, "", ZoomGuid.Attribute.ZOOM_MEETING_TIME_ZONE );
