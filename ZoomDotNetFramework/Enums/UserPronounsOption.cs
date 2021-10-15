@@ -15,12 +15,17 @@
 // </copyright>
 //
 
+using System.ComponentModel;
+
 namespace rocks.kfs.ZoomRoom.Enums
 {
-    public enum RoomType
+    public enum UserPronounsOption
     {
-        ZoomRoom,
-        SchedulingDisplayOnly,
-        DigitalSignageOnly
+        [Description( "Ask the user every time they join meetings and webinars." )]
+        AskUser = 1,
+        [Description( "Always display pronouns in meetings and webinars." )]
+        AlwaysDisplay = 2,
+        [Description( "Do not display pronouns in meetings and webinars." )]
+        NeverDisplay = 3
     }
 }

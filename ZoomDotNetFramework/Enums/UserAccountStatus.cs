@@ -15,12 +15,17 @@
 // </copyright>
 //
 
+using System.ComponentModel;
+
 namespace rocks.kfs.ZoomRoom.Enums
 {
-    public enum RoomType
+    public enum UserAccountStatus
     {
-        ZoomRoom,
-        SchedulingDisplayOnly,
-        DigitalSignageOnly
+        [Description( "Pending" )]
+        Pending,
+        [Description( "Active" )]
+        Active,
+        [Description( "Inactive" )]
+        Inactive
     }
 }

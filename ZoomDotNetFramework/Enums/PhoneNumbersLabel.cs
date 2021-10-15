@@ -15,12 +15,19 @@
 // </copyright>
 //
 
+using System.ComponentModel;
+
 namespace rocks.kfs.ZoomRoom.Enums
 {
-    public enum RoomType
+    public enum PhoneNumbersLabel
     {
-        ZoomRoom,
-        SchedulingDisplayOnly,
-        DigitalSignageOnly
+        [Description( "Mobile" )]
+        Mobile,
+        [Description( "Office" )]
+        Office,
+        [Description( "Home" )]
+        Home,
+        [Description( "Fax" )]
+        Fax
     }
 }

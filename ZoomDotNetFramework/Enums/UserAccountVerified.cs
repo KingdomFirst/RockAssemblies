@@ -15,12 +15,15 @@
 // </copyright>
 //
 
+using System.ComponentModel;
+
 namespace rocks.kfs.ZoomRoom.Enums
 {
-    public enum RoomType
+    public enum UserAccountVerified
     {
-        ZoomRoom,
-        SchedulingDisplayOnly,
-        DigitalSignageOnly
+        [Description( "Account Not Verified" )]
+        AccountNotVerified = 0,
+        [Description( "Account Verified" )]
+        AccountVerified = 1
     }
 }

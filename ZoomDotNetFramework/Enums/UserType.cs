@@ -15,12 +15,19 @@
 // </copyright>
 //
 
+using System.ComponentModel;
+
 namespace rocks.kfs.ZoomRoom.Enums
 {
-    public enum RoomType
+    public enum UserType
     {
-        ZoomRoom,
-        SchedulingDisplayOnly,
-        DigitalSignageOnly
+        [Description( "Basic" )]
+        Basic = 1,
+        [Description( "Licensed" )]
+        Licensed = 2,
+        [Description( "OnPrem" )]
+        OnPrem = 3,
+        [Description( "None (this can only be set with ssoCreate)." )]
+        None = 99
     }
 }
