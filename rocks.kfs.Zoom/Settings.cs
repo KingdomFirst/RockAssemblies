@@ -15,7 +15,7 @@ namespace rocks.kfs.Zoom
     public class Settings
     {
         /// <summary>
-        /// Gets the token value.
+        /// Builds a JSON Web Token value.
         /// </summary>
         /// <returns></returns>
         public static string GetJwtString()
@@ -35,13 +35,67 @@ namespace rocks.kfs.Zoom
                             .WithSecret( zoomApiSecret )
                             .AddClaim( "aud", null )
                             .AddClaim( "iss", zoomApiKey )
-                            .AddClaim( "exp", DateTimeOffset.UtcNow.AddHours( 1 ).ToUnixTimeSeconds() )
-                            .AddClaim( "iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds() )
+                            .AddClaim( "exp", DateTimeOffset.UtcNow.AddHours( 1 ).Subtract( new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc ) ).TotalSeconds )  // Replace .Subtract() with  .ToUnixTimeSeconds() once assembly is moved to .NET 4.6+
+                            .AddClaim( "iat", DateTimeOffset.UtcNow.Subtract( new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc ) ).TotalSeconds )  // Replace .Subtract() with  .ToUnixTimeSeconds() once assembly is moved to .NET 4.6+
                             .Encode();
                     }
                 }
             }
             return tokenString;
+        }
+
+        /// <summary>
+        /// Gets the API Key value.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetApiKey()
+        {
+            string zoomApiKey = null;
+            using ( RockContext rockContext = new RockContext() )
+            {
+                var settings = GetSettings( rockContext );
+                if ( settings != null )
+                {
+                    zoomApiKey = GetSettingValue( settings, "KFSZoomApiKey", true );
+                }
+            }
+            return zoomApiKey;
+        }
+
+        /// <summary>
+        /// Gets the API Secret value.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetApiSecret()
+        {
+            string zoomApiSecret = null;
+            using ( RockContext rockContext = new RockContext() )
+            {
+                var settings = GetSettings( rockContext );
+                if ( settings != null )
+                {
+                    zoomApiSecret = GetSettingValue( settings, "KFSZoomApiSecret", true );
+                }
+            }
+            return zoomApiSecret;
+        }
+
+        /// <summary>
+        /// Saves the API Key and API Secret.
+        /// </summary>
+        /// <param name="apiKey">The api key.</param>
+        /// <param name="apiSecret">The api secret.</param>
+
+        public static void SaveApiSettings( string apiKey, string apiSecret )
+        {
+            using ( var rockContext = new RockContext() )
+            {
+                var settings = GetSettings( rockContext );
+                SetSettingValue( rockContext, settings, "KFSZoomApiKey", apiKey, true );
+                SetSettingValue( rockContext, settings, "KFSZoomApiSecret", apiSecret, true );
+
+                rockContext.SaveChanges();
+            }
         }
 
         /// <summary>
@@ -51,7 +105,7 @@ namespace rocks.kfs.Zoom
         /// <returns></returns>
         private static List<AttributeValue> GetSettings( RockContext rockContext )
         {
-            var zoomEntityType = EntityTypeCache.Get( typeof( Zoom ) );
+            var zoomEntityType = EntityTypeCache.Get( ZoomGuid.EntityType.ZOOM );
             if ( zoomEntityType != null )
             {
                 var service = new AttributeValueService( rockContext );
@@ -82,6 +136,53 @@ namespace rocks.kfs.Zoom
             }
 
             return value;
+        }
+
+        /// <summary>
+        /// Sets the setting value.
+        /// </summary>
+        /// <param name="rockContext">The rock context.</param>
+        /// <param name="values">The values.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
+        private static void SetSettingValue( RockContext rockContext, List<AttributeValue> values, string key, string value, bool encryptValue = false )
+        {
+            if ( encryptValue && !string.IsNullOrWhiteSpace( value ) )
+            {
+                try { value = Encryption.EncryptString( value ); }
+                catch { }
+            }
+
+            var attributeValue = values
+                .Where( v => v.AttributeKey == key )
+                .FirstOrDefault();
+            if ( attributeValue != null )
+            {
+                attributeValue.Value = value;
+            }
+            else
+            {
+                var zoomEntityType = EntityTypeCache.Get( ZoomGuid.EntityType.ZOOM );
+                if ( zoomEntityType != null )
+                {
+                    var attribute = new AttributeService( rockContext )
+                        .Queryable()
+                        .Where( a =>
+                            a.EntityTypeId == zoomEntityType.Id &&
+                            a.Key == key
+                        )
+                        .FirstOrDefault();
+
+                    if ( attribute != null )
+                    {
+                        attributeValue = new AttributeValue();
+                        new AttributeValueService( rockContext ).Add( attributeValue );
+                        attributeValue.AttributeId = attribute.Id;
+                        attributeValue.Value = value;
+                        attributeValue.EntityId = 0;
+                    }
+                }
+            }
         }
     }
 }

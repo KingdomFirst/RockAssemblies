@@ -53,22 +53,66 @@ namespace rocks.kfs.Zoom
             return new ZoomApi( jwtString );
         }
 
-        public static void SyncZoomRoomDT()
+        public static bool ZoomAuthCheck()
         {
-            var rockContext = new RockContext();
-            var zoomRoomDT = new DefinedTypeService( rockContext ).Get( ZoomGuid.DefinedType.ZOOM_ROOM.AsGuid() );
-            zoomRoomDT.DefinedValues.Clear();
-            var zoom = Api();
-            var zrList = zoom.GetZoomRooms().OrderBy( r => r.Name );
-            foreach( var room in zrList )
+            var retVar = false;
+            var zmUser = new ZoomApi( Settings.GetJwtString() ).GetUser();
+            if ( zmUser != null && zmUser.Id.IsNotNullOrWhiteSpace() )
             {
-                zoomRoomDT.DefinedValues.Add( new DefinedValue
-                {
-                    Value = room.Id,
-                    Description = room.Name
-                } );
+                retVar = true;
+            }
+            return retVar;
+        }
+
+        public static void SyncZoomRoomDT( RockContext rockContext, bool enableLogging = false )
+        {
+            if ( enableLogging )
+            {
+                LogEvent( rockContext, "SyncZoom", "Sync Zoom Rooms Defined Type", "Started" );
+            }
+            var zoom = Api();
+            var zrList = zoom.GetZoomRoomList().OrderBy( r => r.Zr_Name );
+            if ( enableLogging )
+            {
+                LogEvent( rockContext, "SyncZoom", "Get Zoom Rooms using Zoom API", string.Format( "zoom.GetZoomRoomList() found {0} rooms.", zrList.Count() ) );
+            }
+
+            var zoomRoomDT = new DefinedTypeService( rockContext ).Get( ZoomGuid.DefinedType.ZOOM_ROOM.AsGuid() );
+
+            // Delete DefinedValue for any rooms that no longer exist
+            var zoomRoomsToDelete = zoomRoomDT.DefinedValues.Where( v => !zrList.Select( zr => zr.Zr_Id ).Contains( v.Value ) );
+            foreach ( var zrDV in zoomRoomsToDelete )
+            {
+                zoomRoomDT.DefinedValues.Remove( zrDV );
+            }
+
+            if ( enableLogging )
+            {
+                LogEvent( rockContext, "SyncZoom", "Remove Defined Values for Zoom Rooms that no longer exist.", string.Format( "Deleted {0} Zoom Room Defined Value(s).", zoomRoomsToDelete.Count() ) );
+            }
+
+            // Add DefinedValue for any new Zoom Rooms
+            var newZoomRooms = zrList.Where( r => !zoomRoomDT.DefinedValues.Select( v => v.Value )
+                                        .Contains( r.Zr_Id ) )
+                                        .Select( r => new DefinedValue
+                                        {
+                                            Value = r.Zr_Id,
+                                            Description = r.Zr_Name
+                                        } );
+            foreach ( var roomDV in newZoomRooms )
+            {
+                zoomRoomDT.DefinedValues.Add( roomDV );
             }
             rockContext.SaveChanges();
+
+            if ( enableLogging )
+            {
+                LogEvent( rockContext, "SyncZoom", "Add Defined Values for new Zoom Rooms.", string.Format( "Added {0} Zoom Room Defined Value(s).", newZoomRooms.Count() ) );
+            }
+            if ( enableLogging )
+            {
+                LogEvent( rockContext, "SyncZoom", "Sync Zoom Rooms Defined Type", "Finished" );
+            }
         }
 
         private static AttributeValueCache GetLocationZoomRoomId( Location location )
@@ -106,17 +150,6 @@ namespace rocks.kfs.Zoom
 
             return retVar;
         }
-
-        //public static bool EBoAuthCheck()
-        //{
-        //    var retVar = false;
-        //    var getUser = new EBApi( Settings.GetAccessToken() ).GetUser();
-        //    if ( getUser != null && getUser.Id != 0 )
-        //    {
-        //        retVar = true;
-        //    }
-        //    return retVar;
-        //}
 
         private static Location GetLocation( int id )
         {
