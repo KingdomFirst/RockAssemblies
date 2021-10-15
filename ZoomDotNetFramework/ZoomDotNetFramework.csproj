@@ -7,9 +7,9 @@
     <ProjectGuid>{99DA9675-2596-43B9-A623-0AD3C742FD3C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>rocks.kfs.ZoomRoom</RootNamespace>
-    <AssemblyName>rocks.kfs.ZoomRoom</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <RootNamespace>ZoomDotNetFramework</RootNamespace>
+    <AssemblyName>ZoomDotNetFramework</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
@@ -33,10 +33,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="JWT, Version=8.0.0.0, Culture=neutral, PublicKeyToken=6f98bca0f40f2ecf, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\JWT.8.4.2\lib\net46\JWT.dll</HintPath>
+      <HintPath>..\..\packages\JWT.8.4.2\lib\net40\JWT.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Logging, Version=1.1.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.IdentityModel.Logging.1.1.5\lib\net451\Microsoft.IdentityModel.Logging.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.1.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.IdentityModel.Tokens.5.1.5\lib\net451\Microsoft.IdentityModel.Tokens.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="RestSharp">
       <HintPath>..\..\RockWeb\Bin\RestSharp.dll</HintPath>
@@ -44,6 +50,9 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IdentityModel" />
+    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=5.1.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.IdentityModel.Tokens.Jwt.5.1.5\lib\net451\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,9 +62,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\User.cs" />
+    <Compile Include="Enums\UserPronounsOption.cs" />
+    <Compile Include="Enums\UserLoginType.cs" />
+    <Compile Include="Enums\UserAccountStatus.cs" />
+    <Compile Include="Enums\UserAccountVerified.cs" />
+    <Compile Include="Enums\PhoneNumbersLabel.cs" />
+    <Compile Include="Enums\UserType.cs" />
     <Compile Include="Enums\RoomType.cs" />
     <Compile Include="Responses\RoomsResponse.cs" />
     <Compile Include="Responses\ZoomBaseResponse.cs" />
+    <Compile Include="Responses\ZRRequestBodyBase.cs" />
     <Compile Include="Responses\ZRListResult.cs" />
     <Compile Include="Responses\ZRBaseResponseResult.cs" />
     <Compile Include="Responses\ZRBaseResponse.cs" />
