@@ -33,12 +33,13 @@ namespace ZoomDotNetFramework
     {
         private const string BaseUrl = "https://api.zoom.us/v2/";
         private string _jwtToken;
-        private long _me;
+        private string _jsonRpc = string.Empty;
 
         //Initializer
-        public ZoomApi( string jwtToken )
+        public ZoomApi( string jwtToken, string jsonRpcVersion = "" )
         {
             _jwtToken = jwtToken;
+            _jsonRpc = jsonRpcVersion;
         }
 
         //Base Execute
@@ -55,22 +56,38 @@ namespace ZoomDotNetFramework
             if ( response.ErrorException != null )
             {
                 const string message = "Error retrieving response.  Check inner details for more info.";
-                var EventBriteException = new ApplicationException( message, response.ErrorException );
-                throw EventBriteException;
+                var ZoomException = new ApplicationException( message, response.ErrorException );
+                throw ZoomException;
             }
             return response.Data;
         }
 
         #region Pure Rest Calls
 
+        public User GetUser()
+        {
+            var request = new RestRequest
+            {
+                Resource = "users/me/"
+            };
+
+            return Execute<User>( request );
+        }
+
         public List<ZRRoom> GetZoomRoomList()
         {
             var request = new RestRequest
             {
-                Resource = "rooms/zrlist"
+                Resource = "rooms/zrlist",
+                Method = Method.POST
             };
+            var reqBody = new ZRRequestBodyBase
+            {
+                Method = "list",
+                JsonRPC = _jsonRpc
+            };
+            request.AddJsonBody( reqBody );
             var result = Execute<ZRListResponse>( request );
-
             return result.Result.Data;
         }
 
