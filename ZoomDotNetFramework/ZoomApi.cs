@@ -100,7 +100,7 @@ namespace ZoomDotNetFramework
                 Method = "list",
                 JsonRPC = _jsonRpc
             };
-            request.AddJsonBody( reqBody );
+            AddRequestJsonBody( request, reqBody );
             var result = Execute<ZRListResponse>( request );
             return result.Result.Data;
         }
@@ -133,9 +133,22 @@ namespace ZoomDotNetFramework
 
         #endregion
 
-        #region Mixed Methods
+        public RestRequest AddRequestJsonBody( RestRequest request, object bodyObject )
+        {
+            var settings = new JsonSerializerSettings();
+            settings.ContractResolver = new LowercaseContractResolver();
+            var jsonBody = JsonConvert.SerializeObject( bodyObject, Formatting.Indented, settings );
+            request.AddParameter( "application/json", jsonBody, ParameterType.RequestBody );
+            return request;
+        }
 
-        #endregion
-
+        public class LowercaseContractResolver : DefaultContractResolver
+        {
+            protected override string ResolvePropertyName( string propertyName )
+            {
+                return propertyName.ToLower();
+            }
+        }
     }
+
 }
