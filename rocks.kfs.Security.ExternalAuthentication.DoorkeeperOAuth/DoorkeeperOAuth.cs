@@ -27,6 +27,7 @@ using RestSharp;
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
+using Rock.Field.Types;
 using Rock.Model;
 using Rock.Security;
 using Rock.Web.Cache;
@@ -45,6 +46,7 @@ namespace com.kfs.Security.ExternalAuthentication
     [UrlLinkField( "User Info Url", "The Url location of the 'me.json' data. Example: https://login.mychurch.org/api/v1/me.json" )]
     [DefinedValueField( "2E6540EA-63F0-40FE-BE50-F2A84735E600", "Connection Status", "The connection status to use for new individuals (default: 'Web Prospect'.)", true, false, "368DD475-242C-49C4-A42C-7278BE690CC2" )]
     [BooleanField( "Enable Logging", "Enable logging for Doorkeeper OAuth methods from this provider.", false )]
+    [KeyValueListField( "Weglot Language Hosts", "Add support for Weglot specific language headers to host mapping. Key = language code, i.e. 'es', Value = Host, i.e. 'es.example.com'", false, "", "Language Code", "Host" )]
     public class DoorkeeperOAuth : AuthenticationComponent
     {
         /// <summary>
@@ -232,7 +234,28 @@ namespace com.kfs.Security.ExternalAuthentication
 
         private string GetRedirectUrl( HttpRequest request )
         {
+            // ProxySafe method pulls host from x-forwarded-host and x-forwarded-proto
             Uri uri = new Uri( request.UrlProxySafe().ToString() );
+
+            // Support for forwarding hosts such as ngrok adds x-original-host
+            var originalRequest = request.ServerVariables["HTTP_X_ORIGINAL_HOST"];
+            if ( originalRequest.IsNotNullOrWhiteSpace() && !uri.ToString().Contains( originalRequest ) )
+            {
+                if ( !originalRequest.Contains( "http" ) )
+                {
+                    originalRequest = uri.Scheme + "://" + originalRequest;
+                }
+                uri = new Uri( originalRequest );
+            }
+
+            // Currently Weglot only adds a single header to the request that we can identify. Find the language and map it to a setting to get the proper host.
+            var weglotLanguage = request.ServerVariables["HTTP_WEGLOT_LANGUAGE"];
+            var weglotLanguageHosts = new KeyValueListFieldType().GetValuesFromString( null, GetAttributeValue( "WeglotLanguageHosts" ), null, false );
+            if ( weglotLanguageHosts.Any( l => l.Key == weglotLanguage ) )
+            {
+                uri = new Uri( weglotLanguageHosts.Where( l => l.Key == weglotLanguage ).Select( l => l.Value ).FirstOrDefault().ToString() );
+            }
+
             return uri.Scheme + "://" + uri.GetComponents( UriComponents.HostAndPort, UriFormat.UriEscaped ) + uri.LocalPath;
         }
 
