@@ -28,6 +28,9 @@ namespace ZoomDotNetFramework
     using JWT.Builder;
     using JWT.Algorithms;
     using ZoomDotNetFramework.Responses;
+    using Newtonsoft.Json;
+    using System.Text;
+    using Newtonsoft.Json.Serialization;
 
     public class ZoomApi
     {
@@ -57,6 +60,17 @@ namespace ZoomDotNetFramework
             {
                 const string message = "Error retrieving response.  Check inner details for more info.";
                 var ZoomException = new ApplicationException( message, response.ErrorException );
+                throw ZoomException;
+            }
+            else if ( response.Content.Contains( "error" ) )
+            {
+                var message = "Error retrieving response.";
+                var errorResponse = JsonConvert.DeserializeObject<ZRErrorResponse>( response.Content );
+                foreach ( var error in errorResponse.Error.Data )
+                {
+                    message += string.Format( " {0}: {1};", error.Field, error.Message );
+                }
+                var ZoomException = new ApplicationException( message );
                 throw ZoomException;
             }
             return response.Data;
