@@ -116,19 +116,37 @@ namespace ZoomDotNetFramework
             return result.Rooms;
         }
 
-        public List<ZoomRoom> ScheduleZoomRoomMeeting( ZoomRoom room, string topic, string password )
+        public List<ZRRoom> ScheduleZoomRoomMeeting( string roomId, string password, string callbackUrl, string topic, DateTime startTime, string timezone, int duration, bool joinBeforeHost = false )
         {
             var request = new RestRequest
             {
-                Resource = string.Format( "rooms/{0}/meetings", room.Id )
+                Resource = string.Format( "rooms/{0}/meetings", roomId ),
+                Method = Method.POST
             };
-            if ( !string.IsNullOrWhiteSpace( password ) )
+            var reqBody = new ZRScheduleRequest
             {
-                request.AddParameter( "password", password );
-            }
-            var result = Execute<RoomsResponse>( request );
-
-            return result.Rooms;
+                Method = "schedule",
+                JsonRPC = _jsonRpc,
+                Params = new ZRScheduleRequestBody
+                {
+                    Password = password,
+                    Callback_Url = callbackUrl,
+                    Meeting_Info = new ZRScheduleMeetingInfo
+                    {
+                        Topic = topic,
+                        Start_Time = startTime,
+                        Timezone = timezone,
+                        Duration = duration,
+                        Settings = new ZRScheduleMeetingInfoSetting
+                        {
+                            Join_Before_Host = joinBeforeHost
+                        }
+                    }
+                }
+            };
+            AddRequestJsonBody( request, reqBody );
+            var result = Execute<ZRListResponse>( request );
+            return result.Result.Data;
         }
 
         #endregion

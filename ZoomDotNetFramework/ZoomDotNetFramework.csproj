@@ -73,6 +73,9 @@
     <Compile Include="Responses\ZoomBaseResponse.cs" />
     <Compile Include="Responses\ZRError.cs" />
     <Compile Include="Responses\ZRErrorResponse.cs" />
+    <Compile Include="Responses\ZRScheduleResult.cs" />
+    <Compile Include="Responses\ZRScheduleResponse.cs" />
+    <Compile Include="Responses\ZRScheduleRequest.cs" />
     <Compile Include="Responses\ZRRequestBodyBase.cs" />
     <Compile Include="Responses\ZRListResult.cs" />
     <Compile Include="Responses\ZRBaseResponseResult.cs" />
