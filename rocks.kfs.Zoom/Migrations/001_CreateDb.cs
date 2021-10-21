@@ -26,7 +26,8 @@ namespace rocks.kfs.Zoom.Migrations
         /// </summary>
         public override void Up()
         {
-            Sql( @"
+            Sql( @"IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[_rocks_kfs_ZoomRoomOccurrence]') AND type in (N'U'))
+            BEGIN
                 CREATE TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence](
 	                [Id] [int] NOT NULL,
 	                [ScheduleId] [int] NOT NULL,
@@ -77,6 +78,7 @@ namespace rocks.kfs.Zoom.Migrations
                 REFERENCES [dbo].[Schedule] ([Id])
 
                 ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] CHECK CONSTRAINT [FK__rocks_kfs_ZoomRoomOccurrence_Schedule]
+            END
                 " );
 
             RockMigrationHelper.UpdateEntityType( "rocks.kfs.Zoom.Model.RoomOccurrence", "2A138B5B-3CD8-4F03-ACAD-4D544D257916", true, true );
@@ -88,14 +90,10 @@ namespace rocks.kfs.Zoom.Migrations
         public override void Down()
         {
             RockMigrationHelper.DeleteEntityType( "2A138B5B-3CD8-4F03-ACAD-4D544D257916" );
-            Sql( @"
-                ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] DROP CONSTRAINT [DF__rocks_kfs_ZoomRoomOccurrence_IsOccurring]
-                ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] DROP CONSTRAINT [DF__rocks_kfs_ZoomRoomOccurrence_IsCompleted]
-                ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] DROP CONSTRAINT [DF__rocks_kfs_ZoomRoomOccurrence_IsActive]
-                ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] DROP CONSTRAINT [FK__rocks_kfs_ZoomRoomOccurrence_EntityType]
-                ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] DROP CONSTRAINT [FK__rocks_kfs_ZoomRoomOccurrence_Location]
-                ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] DROP CONSTRAINT [FK__rocks_kfs_ZoomRoomOccurrence_Schedule]
+            Sql( @"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[_rocks_kfs_ZoomRoomOccurrence]') AND type in (N'U'))
+            BEGIN
                 DROP TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence]
+            END
             " );
         }
     }

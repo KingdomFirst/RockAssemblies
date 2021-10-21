@@ -44,6 +44,8 @@ namespace rocks.kfs.Zoom.Migrations
             RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.TEXT, "Meeting Password", "ZoomMeetingPassword", "Zoom meeting password.", 2, "", ZoomGuid.Attribute.ZOOM_MEETING_PASSWORD );
             RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.BOOLEAN, "Join Before Host", "ZoomJoinBeforeHost", "Zoom meeting's Join Before Host setting.", 3, "false", ZoomGuid.Attribute.ZOOM_MEETING_JOIN_BEFORE_HOST );
             RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.TEXT, "Time Zone", "ZoomMeetingTimeZone", "Zoom meeting time zone. A list of valid time zone strings can be found <a href='https://marketplace.zoom.us/docs/api-reference/other-references/abbreviation-lists#timezones' target='_blank'>here</a>. Example: America/New_York", 4, "", ZoomGuid.Attribute.ZOOM_MEETING_TIME_ZONE );
+
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.Location", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Zoom Room", "", "The Zoom Room associated with this location.", 0, "", ZoomGuid.Attribute.ZOOR_ROOM_LOCATION_ENTITY_ATTRIBUTE, "KFSZoomRoom" );
         }
 
         /// <summary>
@@ -51,6 +53,7 @@ namespace rocks.kfs.Zoom.Migrations
         /// </summary>
         public override void Down()
         {
+            RockMigrationHelper.DeleteAttribute( ZoomGuid.Attribute.ZOOR_ROOM_LOCATION_ENTITY_ATTRIBUTE );
             RockMigrationHelper.DeleteAttribute( ZoomGuid.Attribute.ZOOM_USER_NAME );
             RockMigrationHelper.DeleteAttribute( ZoomGuid.Attribute.ZOOM_USER_PMI );
             RockMigrationHelper.DeleteAttribute( ZoomGuid.Attribute.ZOOM_MEETING_PASSWORD );
