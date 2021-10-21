@@ -46,7 +46,7 @@ namespace com.kfs.Security.ExternalAuthentication
     [UrlLinkField( "User Info Url", "The Url location of the 'me.json' data. Example: https://login.mychurch.org/api/v1/me.json" )]
     [DefinedValueField( "2E6540EA-63F0-40FE-BE50-F2A84735E600", "Connection Status", "The connection status to use for new individuals (default: 'Web Prospect'.)", true, false, "368DD475-242C-49C4-A42C-7278BE690CC2" )]
     [BooleanField( "Enable Logging", "Enable logging for Doorkeeper OAuth methods from this provider.", false )]
-    [KeyValueListField( "Weglot Language Hosts", "Add support for Weglot specific language headers to host mapping. Key = language code, i.e. 'es', Value = Host, i.e. 'es.example.com'", false, "", "Language Code", "Host" )]
+    [KeyValueListField( "Weglot Language Hosts", "Add support for Weglot specific language headers to host mapping. This should no longer be needed due to new headers, but just in case you want manual mapping or they do not provide them. Key = language code, i.e. 'es', Value = Host, i.e. 'es.example.com'", false, "", "Language Code", "Host" )]
     public class DoorkeeperOAuth : AuthenticationComponent
     {
         /// <summary>
@@ -175,9 +175,19 @@ namespace com.kfs.Security.ExternalAuthentication
         /// <returns></returns>
         public override Boolean Authenticate( HttpRequest request, out string username, out string returnUrl )
         {
+            _enableLogging = GetAttributeValue( "EnableLogging" ).AsBoolean();
             username = string.Empty;
             returnUrl = request.QueryString["State"];
             string redirectUri = GetRedirectUrl( request );
+
+            if ( _enableLogging )
+            {
+                using ( var rockContext = new RockContext() )
+                {
+                    LogEvent( rockContext, "Authenticate", "returnUrl", returnUrl );
+                    LogEvent( rockContext, "Authenticate", "redirectUri", redirectUri );
+                }
+            }
 
             try
             {
@@ -235,10 +245,10 @@ namespace com.kfs.Security.ExternalAuthentication
         private string GetRedirectUrl( HttpRequest request )
         {
             // ProxySafe method pulls host from x-forwarded-host and x-forwarded-proto
-            Uri uri = new Uri( request.UrlProxySafe().ToString() );
+            Uri uri = new Uri( WeglotUrlProxySafe( request ).ToString() );
 
             // Support for forwarding hosts such as ngrok adds x-original-host
-            var originalRequest = request.ServerVariables["HTTP_X_ORIGINAL_HOST"];
+            var originalRequest = request.Headers["X-Original-Host"];
             if ( originalRequest.IsNotNullOrWhiteSpace() && !uri.ToString().Contains( originalRequest ) )
             {
                 if ( !originalRequest.Contains( "http" ) )
@@ -248,16 +258,38 @@ namespace com.kfs.Security.ExternalAuthentication
                 uri = new Uri( originalRequest );
             }
 
-            // Currently Weglot only adds a single header to the request that we can identify. Find the language and map it to a setting to get the proper host.
-            var weglotLanguage = request.ServerVariables["HTTP_WEGLOT_LANGUAGE"];
+            // If the weglot proxy headers do not work, fall back on kvp setting for language to host match
+            var weglotLanguage = request.Headers["Weglot-Language"];
             var weglotLanguageHosts = new KeyValueListFieldType().GetValuesFromString( null, GetAttributeValue( "WeglotLanguageHosts" ), null, false );
             if ( weglotLanguageHosts.Any( l => l.Key == weglotLanguage ) )
             {
-                uri = new Uri( weglotLanguageHosts.Where( l => l.Key == weglotLanguage ).Select( l => l.Value ).FirstOrDefault().ToString() );
+                var weGlotUri = new Uri( weglotLanguageHosts.Where( l => l.Key == weglotLanguage ).Select( l => l.Value ).FirstOrDefault().ToString() );
+                uri = new UriBuilder( request.Url )
+                {
+                    Scheme = uri.Scheme,
+                    Host = weGlotUri.Host
+                }.Uri;
             }
 
             return uri.Scheme + "://" + uri.GetComponents( UriComponents.HostAndPort, UriFormat.UriEscaped ) + uri.LocalPath;
         }
+
+        private Uri WeglotUrlProxySafe( HttpRequest request )
+        {
+            var isRequestForwardedFromWeglot = request.Headers["Weglot-Forwarded-Host"].IsNotNull() && request.Headers["Weglot-Forwarded-Proto"].IsNotNull();
+
+            if ( !isRequestForwardedFromWeglot )
+            {
+                return request.UrlProxySafe();
+            }
+
+            return new UriBuilder( request.Url )
+            {
+                Scheme = request.Headers["Weglot-Forwarded-Proto"].ToString(),
+                Host = request.Headers["Weglot-Forwarded-Host"].ToString()
+            }.Uri;
+        }
+
 
         /// <summary>
         /// Authenticates the user based on user name and password
