@@ -81,6 +81,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Jobs\ZoomRoomSchedulingAndMaintenance.cs" />
     <Compile Include="Migrations\004_CreateJob.cs" />
     <Compile Include="Migrations\003_CreateAttributeQualifiers.cs" />
     <Compile Include="Model\RoomOccurrenceService.cs" />
