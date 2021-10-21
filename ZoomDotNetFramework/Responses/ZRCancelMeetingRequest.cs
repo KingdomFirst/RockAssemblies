@@ -14,19 +14,16 @@
 // limitations under the License.
 // </copyright>
 //
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZoomDotNetFramework.Entities;
-using ZoomDotNetFramework.Responses;
-
 
 namespace ZoomDotNetFramework.Responses
 {
-    public class ZRListResponseResult : ZRBaseResponseResult
+    public class ZRCancelMeetingRequest : ZRRequestBodyBase
     {
-        public List<ZRRoom> Data { get; set; }
+        public ZRCancelMeetingRequestBody Params { get; set; }
+    }
+
+    public class ZRCancelMeetingRequestBody
+    {
+        public ZRBaseMeetingInfo Meeting_Info { get; set; }
     }
 }

@@ -16,21 +16,13 @@
 //
 namespace ZoomDotNetFramework
 {
+    using Entities;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Serialization;
+    using RestSharp;
     using System;
     using System.Collections.Generic;
-    using System.Collections.Specialized;
-    using System.Globalization;
-    using System.Linq;
-    using System.IdentityModel.Tokens;
-    using System.Security.Claims;
-    using Entities;
-    using RestSharp;
-    using JWT.Builder;
-    using JWT.Algorithms;
     using ZoomDotNetFramework.Responses;
-    using Newtonsoft.Json;
-    using System.Text;
-    using Newtonsoft.Json.Serialization;
 
     public class ZoomApi
     {
@@ -116,7 +108,7 @@ namespace ZoomDotNetFramework
             return result.Rooms;
         }
 
-        public List<ZRRoom> ScheduleZoomRoomMeeting( string roomId, string password, string callbackUrl, string topic, DateTime startTime, string timezone, int duration, bool joinBeforeHost = false )
+        public bool ScheduleZoomRoomMeeting( string roomId, string password, string callbackUrl, string topic, DateTime startTime, string timezone, int duration, bool joinBeforeHost = false )
         {
             var request = new RestRequest
             {
@@ -145,8 +137,35 @@ namespace ZoomDotNetFramework
                 }
             };
             AddRequestJsonBody( request, reqBody );
-            var result = Execute<ZRListResponse>( request );
-            return result.Result.Data;
+            var result = Execute<ZRScheduleResponse>( request );
+            return result != null;
+        }
+
+        public bool CancelZoomRoomMeeting( string roomId, string topic, DateTime startTime, string timezone, int duration )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "rooms/{0}/meetings", roomId ),
+                Method = Method.POST
+            };
+            var reqBody = new ZRCancelMeetingRequest
+            {
+                Method = "cancel",
+                JsonRPC = _jsonRpc,
+                Params = new ZRCancelMeetingRequestBody
+                {
+                    Meeting_Info = new ZRScheduleMeetingInfo
+                    {
+                        Topic = topic,
+                        Start_Time = startTime,
+                        Timezone = timezone,
+                        Duration = duration
+                    }
+                }
+            };
+            AddRequestJsonBody( request, reqBody );
+            var result = Execute<ZRScheduleResponse>( request );
+            return result != null;
         }
 
         #endregion

@@ -16,11 +16,7 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ZoomDotNetFramework.Entities;
-using ZoomDotNetFramework.Responses;
 
 
 namespace ZoomDotNetFramework.Responses
@@ -28,5 +24,10 @@ namespace ZoomDotNetFramework.Responses
     public class ZRListResponse : ZRBaseResponse
     {
         public ZRListResponseResult Result { get; set; }
+    }
+    public class ZRListResponseResult
+    {
+        public DateTime Send_At { get; set; }
+        public List<ZRRoom> Data { get; set; }
     }
 }

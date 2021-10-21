@@ -30,12 +30,8 @@ namespace ZoomDotNetFramework.Responses
         public ZRScheduleMeetingInfo Meeting_Info { get; set; }
     }
 
-    public class ZRScheduleMeetingInfo
+    public class ZRScheduleMeetingInfo : ZRBaseMeetingInfo
     {
-        public string Topic { get; set; }
-        public DateTime Start_Time { get; set; }
-        public string Timezone { get; set; }
-        public int Duration { get; set; }
         public ZRScheduleMeetingInfoSetting Settings { get; set; }
     }
 

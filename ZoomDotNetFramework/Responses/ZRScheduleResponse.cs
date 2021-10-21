@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2020 by Kingdom First Solutions
+// Copyright 2021 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,18 +15,16 @@
 // </copyright>
 //
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZoomDotNetFramework.Entities;
-using ZoomDotNetFramework.Responses;
-
 
 namespace ZoomDotNetFramework.Responses
 {
     public class ZRScheduleResponse : ZRBaseResponse
     {
-        public ZRListResponseResult Result { get; set; }
+        public ZRScheduleResponseResult Result { get; set; }
+    }
+    public class ZRScheduleResponseResult
+    {
+        public string Room_Id { get; set; }
+        public DateTime Send_At { get; set; }
     }
 }

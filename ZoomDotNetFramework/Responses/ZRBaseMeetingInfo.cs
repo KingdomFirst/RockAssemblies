@@ -14,19 +14,16 @@
 // limitations under the License.
 // </copyright>
 //
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZoomDotNetFramework.Entities;
-using ZoomDotNetFramework.Responses;
 
+using System;
 
 namespace ZoomDotNetFramework.Responses
 {
-    public class ZRScheduleResult
+    public class ZRBaseMeetingInfo
     {
-        public List<ZRRoom> Data { get; set; }
+        public string Topic { get; set; }
+        public DateTime Start_Time { get; set; }
+        public string Timezone { get; set; }
+        public int Duration { get; set; }
     }
 }
