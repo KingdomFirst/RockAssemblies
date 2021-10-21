@@ -25,9 +25,21 @@ using ZoomDotNetFramework.Responses;
 
 namespace ZoomDotNetFramework.Responses
 {
-    public class ZRErrorResponse : ZRBaseResponseResult
+    public class ZRErrorResponse
     {
+        public DateTime Send_At { get; set; }
         public string JsonRpc { get; set; }
         public ZRError Error { get; set; }
+    }
+    public class ZRError
+    {
+        public int Code { get; set; }
+        public string Message { get; set; }
+        public List<ZRErrorDataObject> Data { get; set; }
+    }
+    public class ZRErrorDataObject
+    {
+        public string Field { get; set; }
+        public string Message { get; set; }
     }
 }

@@ -14,20 +14,12 @@
 // limitations under the License.
 // </copyright>
 //
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZoomDotNetFramework.Entities;
-using ZoomDotNetFramework.Responses;
-
 
 namespace ZoomDotNetFramework.Responses
 {
     public class ZRBaseResponse
     {
-        public string JsonRpc { get; set; } = "2.0";
+        public string JsonRpc { get; set; }
         public string Id { get; set; }
     }
 }
