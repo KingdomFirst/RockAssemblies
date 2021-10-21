@@ -81,6 +81,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\004_CreateJob.cs" />
+    <Compile Include="Migrations\003_CreateAttributeQualifiers.cs" />
+    <Compile Include="Model\RoomOccurrenceService.cs" />
     <Compile Include="Model\RoomOccurrence.cs" />
     <Compile Include="Field\Types\ZoomRoomFieldType.cs" />
     <Compile Include="Migrations\001_CreateDb.cs" />

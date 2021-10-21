@@ -14,35 +14,20 @@
 // limitations under the License.
 // </copyright>
 //
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using ZoomDotNetFramework;
-using ZoomDotNetFramework.Entities;
-using ZoomDotNetFramework.Responses;
 using Rock;
 using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
-using rocks.kfs.Zoom.Utility.ExtensionMethods;
+using System;
+using System.Collections.Specialized;
+using System.Linq;
+using ZoomDotNetFramework;
 //using rocks.kfs.Eventbrite.Utility.ExtensionMethods;
 
 namespace rocks.kfs.Zoom
 {
     public class Zoom
     {
-        private static int recordTypePersonId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() ).Id;
-        private static int recordStatusPendingId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_PENDING.AsGuid() ).Id;
-        private static int homePhoneValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_PHONE_TYPE_HOME ).Id;
-        private static int homeLocationValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.GROUP_LOCATION_TYPE_HOME ).Id;
-        private static int mobilePhoneValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_PHONE_TYPE_MOBILE ).Id;
-        private static int workPhoneValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_PHONE_TYPE_WORK ).Id;
-
         public static ZoomApi Api()
         {
             return new ZoomApi( Settings.GetJwtString() );
@@ -113,6 +98,36 @@ namespace rocks.kfs.Zoom
             {
                 LogEvent( rockContext, "SyncZoom", "Sync Zoom Rooms Defined Type", "Finished" );
             }
+        }
+
+        public bool ScheduleZoomRoomMeeting( RockContext rockContext, string roomId, string password, string topic, DateTime startTime, string timezone, int duration, bool joinBeforeHost, bool enableLogging = false )
+        {
+            if ( enableLogging )
+            {
+                LogEvent( rockContext, "SyncZoom", "Schedule Zoom Room Meeting", "Started" );
+            }
+            var zoom = Api();
+            var success = zoom.ScheduleZoomRoomMeeting( roomId, password, string.Empty, topic, startTime, timezone, duration, joinBeforeHost );
+            if ( enableLogging )
+            {
+                LogEvent( rockContext, "SyncZoom", "Schedule Zoom Room Meeting", string.Format( "Meeting schedule {0}.", success ? "succeeded" : "failed" ) );
+            }
+            return success;
+        }
+
+        public bool CancelZoomRoomMeeting( RockContext rockContext, string roomId, string topic, DateTime startTime, string timezone, int duration, bool enableLogging = false )
+        {
+            if ( enableLogging )
+            {
+                LogEvent( rockContext, "SyncZoom", "Cancel Zoom Room Meeting", "Started" );
+            }
+            var zoom = Api();
+            var success = zoom.CancelZoomRoomMeeting( roomId, topic, startTime, timezone, duration );
+            if ( enableLogging )
+            {
+                LogEvent( rockContext, "SyncZoom", "Cancel Zoom Room Meeting", string.Format( "Cancel of meeting {0}.", success ? "succeeded" : "failed" ) );
+            }
+            return success;
         }
 
         private static AttributeValueCache GetLocationZoomRoomId( Location location )
