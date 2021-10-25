@@ -157,33 +157,5 @@ namespace rocks.kfs.Eventbrite.Field.Types
 
         #endregion
 
-
-        #region Filter Control
-
-        /// <summary>
-        /// Creates the control needed to filter (query) values using this field type.
-        /// </summary>
-        /// <param name="configurationValues">The configuration values.</param>
-        /// <param name="id">The identifier.</param>
-        /// <param name="required">if set to <c>true</c> [required].</param>
-        /// <param name="filterMode">The filter mode.</param>
-        /// <returns></returns>
-        public override System.Web.UI.Control FilterControl( System.Collections.Generic.Dictionary<string, ConfigurationValue> configurationValues, string id, bool required, Rock.Reporting.FilterMode filterMode )
-        {
-            // This field type does not support filtering
-            return null;
-        }
-
-        /// <summary>
-        /// Determines whether this filter has a filter control
-        /// </summary>
-        /// <returns></returns>
-        public override bool HasFilterControl()
-        {
-            return false;
-        }
-
-        #endregion
-
     }
 }
