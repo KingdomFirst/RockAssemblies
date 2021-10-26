@@ -107,23 +107,6 @@ function() {
         public override string FormatSelection( Type entityType, string selection )
         {
             string result = "EB Ticket Class";
-            //string[] selectionValues = selection.Split( '|' );
-            //if ( selectionValues.Length >= 1 )
-            //{
-            //    int? campusId = GetCampusIdFromSelection( selectionValues );
-            //    if ( campusId.HasValue )
-            //    {
-            //        var campus = CampusCache.Get( campusId.Value );
-            //        if ( campus != null )
-            //        {
-            //            result = string.Format( "Campus: {0}", campus.Name );
-            //        }
-            //    }
-            //    else
-            //    {
-            //        result = "No Campus";
-            //    }
-            //}
             if ( selection.IsNotNullOrWhiteSpace() )
             {
                 result = string.Format( "Ticket Class: {0}", selection );

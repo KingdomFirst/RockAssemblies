@@ -354,6 +354,7 @@ namespace rocks.kfs.Eventbrite
                     var attributeVal = matchedGroupMember.GetAttributeValue( gmPersonAttributeKey );
                     if ( attributeVal.IsNotNullOrWhiteSpace() )
                     {
+                        // Attribute Values in our special eventBritePerson field type are stored as a delimited string Eventbrite Id^Ticket Class(es)^Eventbrite Order Id^RSVP/Ticket Count(s)
                         var splitVal = attributeVal.SplitDelimitedValues( "^" );
                         var ticketClasses = splitVal[1].SplitDelimitedValues( "||" );
                         var ticketQtys = splitVal[3].SplitDelimitedValues( "||" );
