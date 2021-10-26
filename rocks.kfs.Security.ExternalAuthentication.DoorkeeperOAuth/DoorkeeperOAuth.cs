@@ -251,11 +251,12 @@ namespace com.kfs.Security.ExternalAuthentication
             var originalRequest = request.Headers["X-Original-Host"];
             if ( originalRequest.IsNotNullOrWhiteSpace() && !uri.ToString().Contains( originalRequest ) )
             {
-                if ( !originalRequest.Contains( "http" ) )
+                var originalHostUri = new Uri( originalRequest );
+                uri = new UriBuilder( request.Url )
                 {
-                    originalRequest = uri.Scheme + "://" + originalRequest;
-                }
-                uri = new Uri( originalRequest );
+                    Scheme = uri.Scheme,
+                    Host = originalHostUri.Host
+                }.Uri;
             }
 
             // If the weglot proxy headers do not work, fall back on kvp setting for language to host match
