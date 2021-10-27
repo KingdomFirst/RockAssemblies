@@ -60,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CheckForEmptyCheckin.cs" />
     <Compile Include="LoadBalanceLocations.cs" />
     <Compile Include="Migrations\002_AddOccurrenceClosedAttribute.cs" />
     <Compile Include="Migrations\001_AddLoadBalanceAttribute.cs" />
