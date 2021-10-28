@@ -100,14 +100,14 @@ namespace rocks.kfs.Zoom
             }
         }
 
-        public bool ScheduleZoomRoomMeeting( RockContext rockContext, string roomId, string password, string topic, DateTime startTime, string timezone, int duration, bool joinBeforeHost, bool enableLogging = false )
+        public bool ScheduleZoomRoomMeeting( RockContext rockContext, string roomId, string password, string topic, DateTimeOffset startTime, int duration, bool joinBeforeHost, string timezone = "", bool enableLogging = false )
         {
             if ( enableLogging )
             {
                 LogEvent( rockContext, "SyncZoom", "Schedule Zoom Room Meeting", "Started" );
             }
             var zoom = Api();
-            var success = zoom.ScheduleZoomRoomMeeting( roomId, password, string.Empty, topic, startTime, timezone, duration, joinBeforeHost );
+            var success = zoom.ScheduleZoomRoomMeeting( roomId, password, string.Empty, topic, startTime, timezone, duration, joinBeforeHost: joinBeforeHost );
             if ( enableLogging )
             {
                 LogEvent( rockContext, "SyncZoom", "Schedule Zoom Room Meeting", string.Format( "Meeting schedule {0}.", success ? "succeeded" : "failed" ) );
@@ -115,7 +115,7 @@ namespace rocks.kfs.Zoom
             return success;
         }
 
-        public bool CancelZoomRoomMeeting( RockContext rockContext, string roomId, string topic, DateTime startTime, string timezone, int duration, bool enableLogging = false )
+        public bool CancelZoomRoomMeeting( RockContext rockContext, string roomId, string topic, DateTimeOffset startTime, string timezone, int duration, bool enableLogging = false )
         {
             if ( enableLogging )
             {

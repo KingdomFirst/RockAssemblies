@@ -56,11 +56,14 @@ namespace ZoomDotNetFramework
             }
             else if ( response.Content.Contains( "error" ) )
             {
-                var message = "Error retrieving response.";
                 var errorResponse = JsonConvert.DeserializeObject<ZRErrorResponse>( response.Content );
-                foreach ( var error in errorResponse.Error.Data )
+                var message = string.Format( "Error Code {0}. {1}", errorResponse.Error.Code, errorResponse.Error.Message );
+                if ( errorResponse.Error.Data != null )
                 {
-                    message += string.Format( " {0}: {1};", error.Field, error.Message );
+                    foreach ( var error in errorResponse.Error.Data )
+                    {
+                        message += string.Format( " {0}: {1};", error.Field, error.Message );
+                    }
                 }
                 var ZoomException = new ApplicationException( message );
                 throw ZoomException;
@@ -108,7 +111,7 @@ namespace ZoomDotNetFramework
             return result.Rooms;
         }
 
-        public bool ScheduleZoomRoomMeeting( string roomId, string password, string callbackUrl, string topic, DateTime startTime, string timezone, int duration, bool joinBeforeHost = false )
+        public bool ScheduleZoomRoomMeeting( string roomId, string password, string callbackUrl, string topic, DateTimeOffset startTime, string timezone, int duration, bool joinBeforeHost = false )
         {
             var request = new RestRequest
             {
@@ -127,8 +130,8 @@ namespace ZoomDotNetFramework
                     {
                         Topic = topic,
                         Start_Time = startTime,
-                        Timezone = timezone,
                         Duration = duration,
+                        Timezone = timezone,
                         Settings = new ZRScheduleMeetingInfoSetting
                         {
                             Join_Before_Host = joinBeforeHost
@@ -141,7 +144,7 @@ namespace ZoomDotNetFramework
             return result != null;
         }
 
-        public bool CancelZoomRoomMeeting( string roomId, string topic, DateTime startTime, string timezone, int duration )
+        public bool CancelZoomRoomMeeting( string roomId, string topic, DateTimeOffset startTime, string timezone, int duration )
         {
             var request = new RestRequest
             {

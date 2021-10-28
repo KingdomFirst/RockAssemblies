@@ -49,7 +49,6 @@ namespace rocks.kfs.Zoom.Model
         [DataMember]
         public DateTime StartTime { get; set; }
 
-        [Required]
         [DataMember]
         public string TimeZone { get; set; }
 
@@ -114,7 +113,6 @@ namespace rocks.kfs.Zoom.Model
         {
             this.HasRequired( ro => ro.Schedule ).WithMany().HasForeignKey( ro => ro.ScheduleId ).WillCascadeOnDelete( false );
             this.HasRequired( ro => ro.Location ).WithMany().HasForeignKey( cn => cn.LocationId ).WillCascadeOnDelete( false );
-            this.HasRequired( ro => ro.EntityType ).WithMany().HasForeignKey( cn => cn.EntityTypeId ).WillCascadeOnDelete( false );
 
 
             // IMPORTANT!!

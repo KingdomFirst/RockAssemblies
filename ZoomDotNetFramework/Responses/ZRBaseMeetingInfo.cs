@@ -22,7 +22,7 @@ namespace ZoomDotNetFramework.Responses
     public class ZRBaseMeetingInfo
     {
         public string Topic { get; set; }
-        public DateTime Start_Time { get; set; }
+        public DateTimeOffset Start_Time { get; set; }
         public string Timezone { get; set; }
         public int Duration { get; set; }
     }

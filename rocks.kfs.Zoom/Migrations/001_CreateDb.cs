@@ -29,12 +29,12 @@ namespace rocks.kfs.Zoom.Migrations
             Sql( @"IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[_rocks_kfs_ZoomRoomOccurrence]') AND type in (N'U'))
             BEGIN
                 CREATE TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence](
-	                [Id] [int] NOT NULL,
+	                [Id] [int] IDENTITY(1,1) NOT NULL,
 	                [ScheduleId] [int] NOT NULL,
 	                [LocationId] [int] NOT NULL,
 	                [Topic] [varchar](200) NOT NULL,
 	                [StartTime] [datetime] NOT NULL,
-	                [TimeZone] [varchar](50) NOT NULL,
+	                [TimeZone] [varchar](50) NULL,
 	                [Password] [varchar](10) NULL,
 	                [Duration] [int] NOT NULL,
 	                [SendAt] [datetime] NULL,
@@ -62,11 +62,6 @@ namespace rocks.kfs.Zoom.Migrations
                 ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] ADD  CONSTRAINT [DF__rocks_kfs_ZoomRoomOccurrence_IsCompleted]  DEFAULT ((0)) FOR [IsCompleted]
 
                 ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] ADD  CONSTRAINT [DF__rocks_kfs_ZoomRoomOccurrence_IsActive]  DEFAULT ((1)) FOR [IsActive]
-
-                ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_ZoomRoomOccurrence_EntityType] FOREIGN KEY([EntityTypeId])
-                REFERENCES [dbo].[EntityType] ([Id])
-
-                ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] CHECK CONSTRAINT [FK__rocks_kfs_ZoomRoomOccurrence_EntityType]
                 
                 ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_ZoomRoomOccurrence_Location] FOREIGN KEY([LocationId])
                 REFERENCES [dbo].[Location] ([Id])
