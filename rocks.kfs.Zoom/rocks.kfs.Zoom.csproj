@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="com.bemaservices.RoomManagement">
+      <HintPath>..\..\RockWeb\Bin\com.bemaservices.RoomManagement.dll</HintPath>
+    </Reference>
     <Reference Include="DotLiquid">
       <HintPath>..\..\RockWeb\Bin\DotLiquid.dll</HintPath>
     </Reference>
