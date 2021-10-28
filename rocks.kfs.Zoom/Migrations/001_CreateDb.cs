@@ -30,6 +30,7 @@ namespace rocks.kfs.Zoom.Migrations
             BEGIN
                 CREATE TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence](
 	                [Id] [int] IDENTITY(1,1) NOT NULL,
+	                [ZoomMeetingId] [bigint] NULL,
 	                [ScheduleId] [int] NOT NULL,
 	                [LocationId] [int] NOT NULL,
 	                [Topic] [varchar](200) NOT NULL,
