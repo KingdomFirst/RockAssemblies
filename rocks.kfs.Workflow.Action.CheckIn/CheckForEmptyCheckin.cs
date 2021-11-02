@@ -73,35 +73,50 @@ namespace rocks.kfs.Workflow.Action.CheckIn
                 string errorMessageTemplate = GetAttributeValue( action, "ErrorMessageTemplate" );
 
                 var peopleRemoved = new List<int>();
-                var groupTypesRemoved = new List<int>();
-                var groupsRemoved = new List<int>();
-                var locationsRemoved = new List<int>();
+                // personId, list of Group Types removed
+                var totalGroupTypesRemoved = new List<Dictionary<int, List<int>>>();
+                // groupTypeId, list of Groups removed
+                var totalGroupsRemoved = new List<Dictionary<int, List<int>>>();
+                // groupId, list of Locations removed
+                var totallocationsRemoved = new List<Dictionary<int, List<int>>>();
 
                 foreach ( var family in checkInState.CheckIn.Families.ToList() )
                 {
                     foreach ( var person in family.People.ToList() )
                     {
+                        var groupTypesRemoved = new List<int>();
                         foreach ( var groupType in person.GroupTypes.ToList() )
                         {
+                            var groupsRemoved = new List<int>();
                             foreach ( var group in groupType.Groups.ToList() )
                             {
-                                foreach ( var location in group.Locations.ToList() )
-                                {
-                                    if ( location.Schedules.Count == 0 || !location.Schedules.Any( s => !s.ExcludedByFilter ) )
-                                    {
-                                        locationsRemoved.Add( location.Location.Id );
-                                    }
-                                }
-                                if ( group.Locations.Count == 0 || !group.Locations.Any( gl => !locationsRemoved.Contains( gl.Location.Id ) ) || !group.Locations.Any( l => !l.ExcludedByFilter ) )
+                                //var locationsRemoved = new List<int>();
+                                //foreach ( var location in group.Locations.ToList() )
+                                //{
+                                //    if ( location.Schedules.Count == 0 || !location.Schedules.Any( s => !s.ExcludedByFilter ) )
+                                //    {
+                                //        locationsRemoved.Add( location.Location.Id );
+                                //    }
+                                //}
+                                //var dLocations = new Dictionary<int, List<int>>();
+                                //dLocations.Add( group.Group.Id, locationsRemoved );
+                                //totalGroupsRemoved.Add( dLocations );
+                                if ( group.Locations.Count == 0 || !group.Locations.Any( l => !l.ExcludedByFilter ) )
                                 {
                                     groupsRemoved.Add( group.Group.Id );
                                 }
                             }
+                            var dGroups = new Dictionary<int, List<int>>();
+                            dGroups.Add( groupType.GroupType.Id, groupsRemoved );
+                            totalGroupsRemoved.Add( dGroups );
                             if ( groupType.Groups.Count == 0 || !groupType.Groups.Any( g => !groupsRemoved.Contains( g.Group.Id ) ) || !groupType.Groups.Any( g => !g.ExcludedByFilter ) )
                             {
                                 groupTypesRemoved.Add( groupType.GroupType.Id );
                             }
                         }
+                        var dGroupTypes = new Dictionary<int, List<int>>();
+                        dGroupTypes.Add( person.Person.Id, groupTypesRemoved );
+                        totalGroupTypesRemoved.Add( dGroupTypes );
                         if ( person.GroupTypes.Count == 0 || person.GroupTypes.All( gt => groupTypesRemoved.Contains( gt.GroupType.Id ) ) || person.GroupTypes.All( t => t.ExcludedByFilter ) )
                         {
                             peopleRemoved.Add( person.Person.Id );
@@ -131,9 +146,9 @@ namespace rocks.kfs.Workflow.Action.CheckIn
                     mergeFields.Add( "SearchValue", checkInState.CheckIn.SearchValue );
                     mergeFields.Add( "Messages", checkInState.Messages );
                     mergeFields.Add( "RemovedPeople", peopleRemoved );
-                    mergeFields.Add( "RemovedGroupTypes", groupTypesRemoved );
-                    mergeFields.Add( "RemovedGroups", groupsRemoved );
-                    mergeFields.Add( "RemovedLocations", locationsRemoved );
+                    mergeFields.Add( "RemovedGroupTypes", totalGroupTypesRemoved );
+                    mergeFields.Add( "RemovedGroups", totalGroupsRemoved );
+                    mergeFields.Add( "RemovedLocations", totallocationsRemoved );
 
                     checkInState.Messages.Add( new CheckInMessage { MessageText = errorMessageTemplate.ResolveMergeFields( mergeFields, checkInState.CheckIn.CurrentPerson?.Person ), MessageType = MessageType.Warning } );
                 }
