@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using Rock;
 using Rock.Data;
+using rocks.kfs.Intacct.Enums;
 
 namespace rocks.kfs.Intacct
 {
@@ -74,6 +75,49 @@ namespace rocks.kfs.Intacct
         public string ClassId;
         public string ContractId;
         public string WarehouseId;
+    }
+
+    public class OtherReceipt
+    {
+        public DateTime PaymentDate;
+        public string Payer; // Incorrectly named "payee" in API.
+        public DateTime ReceivedDate;
+        public PaymentMethod PaymentMethod;
+        public string UnDepGLAccountNo;
+        public string BankAccountId;
+        public DateTime? DepositDate;
+        public string RefId;
+        public string Description;
+        public string SupDocId;
+        public string Currency;
+        public DateTime? ExchRateDate;
+        public string ExchRateType;
+        public decimal? ExchRate;
+        public Dictionary<string, dynamic> CustomFields = new Dictionary<string, object>();
+        public bool? InclusiveTax;
+        public string TaxSolutionId;
+        public List<ReceiptLineItem> ReceiptItems;
+
+    }
+
+    public class ReceiptLineItem
+    {
+        public string GlAccountNo;
+        public string AccountLabel;
+        public decimal Amount;
+        public string Memo;
+        public string LocationId;
+        public string DepartmentId;
+        public Dictionary<string, dynamic> CustomFields = new Dictionary<string, object>();
+        public string ProjectId;
+        public string TaskId;
+        public string CostTypeId;
+        public string CustomerId;
+        public string VendorId;
+        public string EmployeeId;
+        public string ItemId;
+        public string ClassId;
+        public decimal TotalTrxAmount;
     }
 
     public class GLTransaction : Rock.Lava.ILiquidizable
@@ -201,5 +245,147 @@ namespace rocks.kfs.Intacct
         public string Description;
         public Dictionary<string, dynamic> CustomDimensions;
         public int ProcessTransactionFees;
+    }
+
+    public class OtherReceiptTransaction : Rock.Lava.ILiquidizable
+    {
+        [LavaInclude]
+        public int? TransactionId;
+
+        [LavaInclude]
+        public string Payer;
+
+        [LavaInclude]
+        public decimal Amount;
+
+        [LavaInclude]
+        public int FinancialAccountId;
+
+        [LavaInclude]
+        public string Project;
+
+        [LavaInclude]
+        public DateTime PaymentDate;
+
+        [LavaInclude]
+        public decimal TransactionFeeAmount;
+
+        [LavaInclude]
+        public string TransactionFeeAccount;
+
+        [LavaInclude]
+        public int ProcessTransactionFees;
+
+        #region ILiquidizable
+
+        /// <summary>
+        /// Creates a DotLiquid compatible dictionary that represents the current entity object. 
+        /// </summary>
+        /// <returns>DotLiquid compatible dictionary.</returns>
+        public object ToLiquid()
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// Gets the available keys (for debugging info).
+        /// </summary>
+        /// <value>
+        /// The available keys.
+        /// </value>
+        [LavaIgnore]
+        public virtual List<string> AvailableKeys
+        {
+            get
+            {
+                var availableKeys = new List<string>();
+
+                foreach ( var propInfo in GetType().GetProperties() )
+                {
+                    availableKeys.Add( propInfo.Name );
+                }
+
+                return availableKeys;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="System.Object"/> with the specified key.
+        /// </summary>
+        /// <value>
+        /// The <see cref="System.Object"/>.
+        /// </value>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
+        [LavaIgnore]
+        public virtual object this[object key]
+        {
+            get
+            {
+                string propertyKey = key.ToStringSafe();
+                var propInfo = GetType().GetProperty( propertyKey );
+
+                try
+                {
+                    object propValue = null;
+                    if ( propInfo != null )
+                    {
+                        propValue = propInfo.GetValue( this, null );
+                    }
+
+                    if ( propValue is Guid )
+                    {
+                        return ( ( Guid ) propValue ).ToString();
+                    }
+                    else
+                    {
+                        return propValue;
+                    }
+                }
+                catch
+                {
+                    // intentionally ignore
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the specified key contains key.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
+        public virtual bool ContainsKey( object key )
+        {
+            string propertyKey = key.ToStringSafe();
+            var propInfo = GetType().GetProperty( propertyKey );
+
+            return propInfo != null;
+        }
+
+        #endregion
+    }
+
+    public class OtherReceiptSummaryTotals
+    {
+        public decimal Amount;
+        public string CreditAccount;
+        public string BankAccount;
+        public string Class;
+        public string Department;
+        public string Location;
+        public string Project;
+        public string Description;
+        public Dictionary<string, dynamic> CustomDimensions;
+        public int ProcessTransactionFees;
+    }
+
+    public class CheckingAccount
+    {
+        public string BankAccountId { get; set; }
+        public string BankAcountNo { get; set; }
+        public string GLAccountNo { get; set; }
+        public string BankName { get; set; }
     }
 }
