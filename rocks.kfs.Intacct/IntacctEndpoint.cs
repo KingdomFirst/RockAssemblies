@@ -15,6 +15,7 @@
 // </copyright>
 //
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -156,6 +157,74 @@ namespace rocks.kfs.Intacct
             }
 
             return false;
+        }
+
+        public List<CheckingAccount> ParseListCheckingAccountsResponse( XmlDocument xmlDocument, int BatchId, bool Log = false )
+        {
+            var bankAccountList = new List<CheckingAccount>();
+            var resultX = XDocument.Load( new XmlNodeReader( xmlDocument ) );
+
+            if ( Log )
+            {
+                var financialBatch = new FinancialBatchService( new RockContext() ).Get( BatchId );
+                var changes = new History.HistoryChangeList();
+                var oldValue = string.Empty;
+                var newValue = resultX.ToString();
+
+                History.EvaluateChange( changes, "Intacct Response", oldValue, newValue );
+
+                var rockContext = new RockContext();
+                rockContext.WrapTransaction( () =>
+                {
+                    if ( changes.Any() )
+                    {
+                        HistoryService.SaveChanges(
+                            rockContext,
+                            typeof( FinancialBatch ),
+                            Rock.SystemGuid.Category.HISTORY_FINANCIAL_BATCH.AsGuid(),
+                            BatchId,
+                            changes );
+                    }
+                } );
+            }
+
+            var xResponseXml = resultX.Elements( "response" ).FirstOrDefault();
+            if ( xResponseXml != null )
+            {
+                var xOperationXml = xResponseXml.Elements( "operation" ).FirstOrDefault();
+                if ( xOperationXml != null )
+                {
+                    var xResultXml = xOperationXml.Elements( "result" ).FirstOrDefault();
+                    if ( xResultXml != null )
+                    {
+                        var xStatusXml = xResultXml.Elements( "status" ).FirstOrDefault();
+                        if ( xStatusXml != null && xStatusXml.Value == "success" )
+                        {
+                            var xDataXml = xResultXml.Elements( "data" ).FirstOrDefault();
+                            if ( xDataXml != null )
+                            {
+                                var xCheckingAccountsXml = xDataXml.Elements( "checkingaccount" );
+                                if ( xCheckingAccountsXml != null )
+                                {
+                                    foreach ( var xAcctXml in xCheckingAccountsXml )
+                                    {
+                                        var bankAccount = new CheckingAccount
+                                        {
+                                            BankAccountId = xAcctXml.Elements( "BANKACCOUNTID" ).FirstOrDefault().Value ?? null,
+                                            BankAcountNo = xAcctXml.Elements( "BANKACCOUNTNO" ).FirstOrDefault().Value ?? null,
+                                            GLAccountNo = xAcctXml.Elements( "GLACCOUNTNO" ).FirstOrDefault().Value ?? null,
+                                            BankName = xAcctXml.Elements( "BANKNAME" ).FirstOrDefault().Value ?? null,
+                                        };
+                                        bankAccountList.Add( bankAccount );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return bankAccountList;
         }
     }
 }

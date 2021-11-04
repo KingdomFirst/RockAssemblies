@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IntacctCheckingAccountList.cs" />
     <Compile Include="IntacctJournal.cs" />
     <Compile Include="IntacctModels.cs" />
     <Compile Include="Migrations\002_AddTransactionFeeAttributes.cs" />
