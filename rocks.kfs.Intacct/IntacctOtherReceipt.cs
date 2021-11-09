@@ -100,6 +100,10 @@ namespace rocks.kfs.Intacct
                         {
                             writer.WriteElementString( "undepglaccountno", otherReceipt.UnDepGLAccountNo );
                         }
+                        if ( !string.IsNullOrWhiteSpace( otherReceipt.RefId ) )
+                        {
+                            writer.WriteElementString( "refid", otherReceipt.RefId );
+                        }
                         writer.WriteElementString( "description", otherReceipt.Description );
                         if ( !string.IsNullOrWhiteSpace( otherReceipt.Currency ) )
                         {
@@ -382,7 +386,7 @@ namespace rocks.kfs.Intacct
                     {
                         GlAccountNo = bTran.TransactionFeeAccount,
                         Amount = bTran.TransactionFeeAmount * -1,
-                        Memo = "Transaction Fee",
+                        Memo = "Transaction Fees",
                         LocationId = locationId,
                         DepartmentId = departmentId,
                         ProjectId = bTran.Project,
