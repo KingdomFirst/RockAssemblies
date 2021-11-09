@@ -300,21 +300,50 @@ namespace rocks.kfs.Intacct
             } )
             .ToList();
 
+            //
+            // Get the Dimensions from the Account since the Transaction Details have been Grouped already
+            //
+            var customDimensions = GetCustomDimensions();
+
             // Create Receipt Item for each entry within a grouping
             foreach ( var bTran in receiptTransactions )
             {
                 var account = new FinancialAccountService( rockContext ).Get( bTran.FinancialAccountId );
+                var customDimensionValues = new Dictionary<string, dynamic>();
+                var mergeFields = new Dictionary<string, object>();
                 account.LoadAttributes();
+
+                if ( customDimensions.Count > 0 )
+                {
+                    foreach ( var rockKey in customDimensions )
+                    {
+                        var dimension = rockKey.Split( '.' ).Last();
+                        customDimensionValues.Add( dimension, account.GetAttributeValue( rockKey ) );
+                    }
+                }
+
+                mergeFields.Add( "Account", account );
+                mergeFields.Add( "Batch", financialBatch );
+                mergeFields.Add( "Registrations", registrationLinks );
+                mergeFields.Add( "GroupMembers", groupMemberLinks );
+                mergeFields.Add( "CustomDimensions", customDimensionValues );
+
+                if ( debugLava.Length < 6 && debugLava.AsBoolean() )
+                {
+                    debugLava = mergeFields.lavaDebugInfo();
+                }
+
                 var bankAccount = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITACCOUNTNO" );
                 var glAccount = account.GetAttributeValue( "rocks.kfs.Intacct.ACCOUNTNO" );
                 var classId = account.GetAttributeValue( "rocks.kfs.Intacct.CLASSID" );
                 var departmentId = account.GetAttributeValue( "rocks.kfs.Intacct.DEPARTMENT" );
                 var locationId = account.GetAttributeValue( "rocks.kfs.Intacct.LOCATION" );
+
                 var receiptItem = new ReceiptLineItem
                 {
                     GlAccountNo = glAccount,
                     Amount = bTran.ProcessTransactionFees == 1 ? bTran.Amount - bTran.TransactionFeeAmount : bTran.Amount,
-                    Memo = "Imported from Rock",
+                    Memo = DescriptionLava.ResolveMergeFields( mergeFields ),
                     LocationId = locationId,
                     DepartmentId = departmentId,
                     ProjectId = bTran.Project,
@@ -339,6 +368,37 @@ namespace rocks.kfs.Intacct
             }
 
             return otherReceipt;
+        }
+
+        private List<string> GetCustomDimensions()
+        {
+            var knownDimensions = new List<string>();
+            knownDimensions.Add( "rocks.kfs.Intacct.ACCOUNTNO" );
+            knownDimensions.Add( "rocks.kfs.Intacct.DEBITACCOUNTNO" );
+            knownDimensions.Add( "rocks.kfs.Intacct.FEEACCOUNTNO" );
+            knownDimensions.Add( "rocks.kfs.Intacct.DEFAULTFEEACCOUNTNO" );
+            knownDimensions.Add( "rocks.kfs.Intacct.FEEPROCESSING" );
+            knownDimensions.Add( "rocks.kfs.Intacct.CLASSID" );
+            knownDimensions.Add( "rocks.kfs.Intacct.DEPARTMENT" );
+            knownDimensions.Add( "rocks.kfs.Intacct.LOCATION" );
+            knownDimensions.Add( "rocks.kfs.Intacct.PROJECTID" );
+
+            var rockContext = new RockContext();
+            var accountCategoryId = new CategoryService( rockContext ).Queryable().FirstOrDefault( c => c.Guid.Equals( new System.Guid( KFSConst.Attribute.FINANCIAL_ACCOUNT_ATTRIBUTE_CATEGORY ) ) ).Id;
+            var gatewayCategoryId = new CategoryService( rockContext ).Queryable().FirstOrDefault( c => c.Guid.Equals( new System.Guid( KFSConst.Attribute.FINANCIAL_GATEWAY_ATTRIBUTE_CATEGORY ) ) ).Id;
+            var attributeService = new AttributeService( rockContext );
+            var accountAttributes = attributeService.Queryable().Where( a => a.Categories.Select( c => c.Id ).Contains( accountCategoryId ) ).ToList();
+
+            var customDimensions = new List<string>();
+
+            foreach ( var attribute in accountAttributes )
+            {
+                if ( !knownDimensions.Contains( attribute.Key ) )
+                {
+                    customDimensions.Add( attribute.Key );
+                }
+            }
+            return customDimensions;
         }
     }
 }
