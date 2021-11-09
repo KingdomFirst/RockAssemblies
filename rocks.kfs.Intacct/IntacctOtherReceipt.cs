@@ -44,7 +44,7 @@ namespace rocks.kfs.Intacct
 
             if ( financialBatch.Id > 0 )
             {
-                var otherReceipt = BuildOtherReceipt( financialBatch, ref debugLava, paymentMethod, bankAccountId, DescriptionLava );
+                var otherReceipt = BuildOtherReceipt( financialBatch, ref debugLava, paymentMethod, bankAccountId, unDepGLAccountId, DescriptionLava );
                 if ( otherReceipt.ReceiptItems.Any() )
                 {
                     using ( var writer = doc.CreateNavigator().AppendChild() )
@@ -90,18 +90,21 @@ namespace rocks.kfs.Intacct
                         if ( !string.IsNullOrWhiteSpace( otherReceipt.BankAccountId ) )
                         {
                             writer.WriteElementString( "bankaccountid", otherReceipt.BankAccountId );
+                            writer.WriteStartElement( "depositdate" );
+                            writer.WriteElementString( "year", otherReceipt.DepositDate.Value.Year.ToString() );
+                            writer.WriteElementString( "month", otherReceipt.DepositDate.Value.Month.ToString() );
+                            writer.WriteElementString( "day", otherReceipt.DepositDate.Value.Day.ToString() );
+                            writer.WriteEndElement();  // close depositdate
                         }
                         else if ( !string.IsNullOrWhiteSpace( otherReceipt.UnDepGLAccountNo ) )
                         {
-                            writer.WriteElementString( "undepglaccountn", otherReceipt.UnDepGLAccountNo );
+                            writer.WriteElementString( "undepglaccountno", otherReceipt.UnDepGLAccountNo );
                         }
-                        writer.WriteStartElement( "depositdate" );
-                        writer.WriteElementString( "year", otherReceipt.DepositDate.Value.Year.ToString() );
-                        writer.WriteElementString( "month", otherReceipt.DepositDate.Value.Month.ToString() );
-                        writer.WriteElementString( "day", otherReceipt.DepositDate.Value.Day.ToString() );
-                        writer.WriteEndElement();  // close depositdate
-                        writer.WriteElementString( "refid", otherReceipt.RefId );
-                        writer.WriteElementString( "currency", otherReceipt.Currency ?? string.Empty );
+                        writer.WriteElementString( "description", otherReceipt.Description );
+                        if ( !string.IsNullOrWhiteSpace( otherReceipt.Currency ) )
+                        {
+                            writer.WriteElementString( "currency", otherReceipt.Currency );
+                        }
                         if ( otherReceipt.ExchRateDate.HasValue )
                         {
                             writer.WriteElementString( "exchratedate", ( ( DateTime ) otherReceipt.ExchRateDate ).ToShortDateString() );
@@ -129,13 +132,34 @@ namespace rocks.kfs.Intacct
                             writer.WriteElementString( "memo", item.Memo ?? string.Empty );
                             writer.WriteElementString( "locationid", item.LocationId ?? string.Empty );
                             writer.WriteElementString( "departmentid", item.DepartmentId ?? string.Empty );
-                            writer.WriteElementString( "projectid", item.ProjectId ?? string.Empty );
-                            writer.WriteElementString( "taskid", item.TaskId ?? string.Empty );
-                            writer.WriteElementString( "customerid", item.CustomerId ?? string.Empty );
-                            writer.WriteElementString( "vendorid", item.VendorId ?? string.Empty );
-                            writer.WriteElementString( "employeeid", item.EmployeeId ?? string.Empty );
-                            writer.WriteElementString( "itemid", item.ItemId ?? string.Empty );
-                            writer.WriteElementString( "classid", item.ClassId ?? string.Empty );
+                            if ( !string.IsNullOrWhiteSpace( item.ProjectId ) )
+                            {
+                                writer.WriteElementString( "projectid", item.ProjectId );
+                            }
+                            if ( !string.IsNullOrWhiteSpace( item.TaskId ) )
+                            {
+                                writer.WriteElementString( "taskid", item.TaskId );
+                            }
+                            if ( !string.IsNullOrWhiteSpace( item.CustomerId ) )
+                            {
+                                writer.WriteElementString( "customerid", item.CustomerId );
+                            }
+                            if ( !string.IsNullOrWhiteSpace( item.VendorId ) )
+                            {
+                                writer.WriteElementString( "vendorid", item.VendorId );
+                            }
+                            if ( !string.IsNullOrWhiteSpace( item.EmployeeId ) )
+                            {
+                                writer.WriteElementString( "employeeid", item.EmployeeId );
+                            }
+                            if ( !string.IsNullOrWhiteSpace( item.ItemId ) )
+                            {
+                                writer.WriteElementString( "itemid", item.ItemId );
+                            }
+                            if ( !string.IsNullOrWhiteSpace( item.ClassId ) )
+                            {
+                                writer.WriteElementString( "classid", item.ClassId );
+                            }
                             if ( item.CustomFields.Count > 0 )
                             {
                                 foreach ( KeyValuePair<string, dynamic> customField in item.CustomFields )
@@ -180,15 +204,16 @@ namespace rocks.kfs.Intacct
             var batchDate = financialBatch.BatchStartDateTime == null ? RockDateTime.Now : ( ( System.DateTime ) financialBatch.BatchStartDateTime );
             var otherReceipt = new OtherReceipt
             {
-                Payer = string.Format( "Rock Batch - {0} ({1})", financialBatch.Name, financialBatch.Id ),
+                Payer = "Rock Batch Import",
                 PaymentDate = batchDate,
                 ReceivedDate = batchDate,
                 PaymentMethod = paymentMethod,
                 BankAccountId = bankAccountId,
                 UnDepGLAccountNo = unDepGLAccountId,
                 DepositDate = batchDate,
-                Description = string.Format( "Imported From Rock Batch {0} ({1})", financialBatch.Name, financialBatch.Id ),
-                RefId = financialBatch.Id.ToString()
+                Description = string.Format( "Imported From Rock batch {0}: {1}", financialBatch.Id, financialBatch.Name ),
+                RefId = financialBatch.Id.ToString(),
+                ReceiptItems = new List<ReceiptLineItem>()
             };
 
             //
