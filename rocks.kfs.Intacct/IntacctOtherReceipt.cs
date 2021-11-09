@@ -37,7 +37,7 @@ namespace rocks.kfs.Intacct
         /// <param name="AuthCreds">The IntacctAuth object with authentication. <see cref="IntacctAuth"/></param>
         /// <param name="Batch">The Rock FinancialBatch that a Journal Entry will be created from. <see cref="FinancialBatch"/></param>
         /// <returns>Returns the XML needed to create an Intacct Other Receipt.</returns>
-        public XmlDocument CreateOtherReceiptXML( IntacctAuth AuthCreds, int BatchId, ref string debugLava, PaymentMethod paymentMethod, string bankAccountId = null, string unDepGLAccountId = null , string DescriptionLava = "" )
+        public XmlDocument CreateOtherReceiptXML( IntacctAuth AuthCreds, int BatchId, ref string debugLava, PaymentMethod paymentMethod, string bankAccountId = null, string unDepGLAccountId = null, string DescriptionLava = "" )
         {
             var doc = new XmlDocument();
             var financialBatch = new FinancialBatchService( new RockContext() ).Get( BatchId );
@@ -313,7 +313,7 @@ namespace rocks.kfs.Intacct
                     batchTransactions.Add( transactionItem );
                 }
             }
-            
+
             var receiptTransactions = batchTransactions
             .GroupBy( d => new { d.FinancialAccountId, d.Project, d.TransactionFeeAccount, d.ProcessTransactionFees } )
             .Select( s => new OtherReceiptTransaction
