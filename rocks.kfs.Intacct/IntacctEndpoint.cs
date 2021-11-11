@@ -159,34 +159,10 @@ namespace rocks.kfs.Intacct
             return false;
         }
 
-        public List<CheckingAccount> ParseListCheckingAccountsResponse( XmlDocument xmlDocument, int BatchId, bool Log = false )
+        public List<CheckingAccount> ParseListCheckingAccountsResponse( XmlDocument xmlDocument, int BatchId )
         {
             var bankAccountList = new List<CheckingAccount>();
             var resultX = XDocument.Load( new XmlNodeReader( xmlDocument ) );
-
-            if ( Log )
-            {
-                var financialBatch = new FinancialBatchService( new RockContext() ).Get( BatchId );
-                var changes = new History.HistoryChangeList();
-                var oldValue = string.Empty;
-                var newValue = resultX.ToString();
-
-                History.EvaluateChange( changes, "Intacct Response", oldValue, newValue );
-
-                var rockContext = new RockContext();
-                rockContext.WrapTransaction( () =>
-                {
-                    if ( changes.Any() )
-                    {
-                        HistoryService.SaveChanges(
-                            rockContext,
-                            typeof( FinancialBatch ),
-                            Rock.SystemGuid.Category.HISTORY_FINANCIAL_BATCH.AsGuid(),
-                            BatchId,
-                            changes );
-                    }
-                } );
-            }
 
             var xResponseXml = resultX.Elements( "response" ).FirstOrDefault();
             if ( xResponseXml != null )

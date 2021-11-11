@@ -356,6 +356,7 @@ namespace rocks.kfs.Intacct
                 mergeFields.Add( "Registrations", registrationLinks );
                 mergeFields.Add( "GroupMembers", groupMemberLinks );
                 mergeFields.Add( "CustomDimensions", customDimensionValues );
+                mergeFields.Add( "Summary", bTran );
 
                 if ( debugLava.Length < 6 && debugLava.AsBoolean() )
                 {
@@ -376,7 +377,8 @@ namespace rocks.kfs.Intacct
                     LocationId = locationId,
                     DepartmentId = departmentId,
                     ProjectId = bTran.Project,
-                    ClassId = classId
+                    ClassId = classId,
+                    CustomFields = customDimensionValues
                 };
                 otherReceipt.ReceiptItems.Add( receiptItem );
 

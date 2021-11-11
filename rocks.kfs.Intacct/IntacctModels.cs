@@ -367,20 +367,6 @@ namespace rocks.kfs.Intacct
         #endregion
     }
 
-    public class OtherReceiptSummaryTotals
-    {
-        public decimal Amount;
-        public string CreditAccount;
-        public string BankAccount;
-        public string Class;
-        public string Department;
-        public string Location;
-        public string Project;
-        public string Description;
-        public Dictionary<string, dynamic> CustomDimensions;
-        public int ProcessTransactionFees;
-    }
-
     public class CheckingAccount
     {
         public string BankAccountId { get; set; }
