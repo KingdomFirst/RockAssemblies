@@ -213,7 +213,7 @@ namespace rocks.kfs.Intacct
                                             BankAccountId = xAcctXml.Elements( "BANKACCOUNTID" ).FirstOrDefault().Value ?? null,
                                             BankAcountNo = xAcctXml.Elements( "BANKACCOUNTNO" ).FirstOrDefault().Value ?? null,
                                             GLAccountNo = xAcctXml.Elements( "GLACCOUNTNO" ).FirstOrDefault().Value ?? null,
-                                            BankName = xAcctXml.Elements( "BANKNAME" ).FirstOrDefault().Value ?? null,
+                                            BankName = xAcctXml.Elements( "BANKNAME" ).FirstOrDefault().Value ?? null
                                         };
                                         bankAccountList.Add( bankAccount );
                                     }
