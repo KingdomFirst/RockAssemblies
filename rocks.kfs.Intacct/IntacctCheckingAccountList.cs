@@ -35,7 +35,7 @@ namespace rocks.kfs.Intacct
         /// </summary>
         /// <param name="AuthCreds">The IntacctAuth object with authentication. <see cref="IntacctAuth"/></param>
         /// <returns>Returns the XML needed to request a list of Bank Accounts.</returns>
-        public XmlDocument GetBankAccountsXML( IntacctAuth AuthCreds, int batchId, ref string debugLava, string DescriptionLava = "", List<string> fields = null )
+        public XmlDocument GetBankAccountsXML( IntacctAuth AuthCreds, int batchId, List<string> fields = null )
         {
             var doc = new XmlDocument();
             using ( var writer = doc.CreateNavigator().AppendChild() )

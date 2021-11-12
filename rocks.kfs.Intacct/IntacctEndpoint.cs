@@ -184,13 +184,23 @@ namespace rocks.kfs.Intacct
                                 {
                                     foreach ( var xAcctXml in xCheckingAccountsXml )
                                     {
-                                        var bankAccount = new CheckingAccount
+                                        var bankAccount = new CheckingAccount();
+                                        if ( xAcctXml.Elements( "BANKACCOUNTID" ).FirstOrDefault() != null )
                                         {
-                                            BankAccountId = xAcctXml.Elements( "BANKACCOUNTID" ).FirstOrDefault().Value ?? null,
-                                            BankAcountNo = xAcctXml.Elements( "BANKACCOUNTNO" ).FirstOrDefault().Value ?? null,
-                                            GLAccountNo = xAcctXml.Elements( "GLACCOUNTNO" ).FirstOrDefault().Value ?? null,
-                                            BankName = xAcctXml.Elements( "BANKNAME" ).FirstOrDefault().Value ?? null
-                                        };
+                                            bankAccount.BankAccountId = xAcctXml.Elements( "BANKACCOUNTID" ).FirstOrDefault().Value;
+                                        }
+                                        if ( xAcctXml.Elements( "BANKACCOUNTNO" ).FirstOrDefault() != null )
+                                        {
+                                            bankAccount.BankAcountNo = xAcctXml.Elements( "BANKACCOUNTNO" ).FirstOrDefault().Value;
+                                        }
+                                        if ( xAcctXml.Elements( "GLACCOUNTNO" ).FirstOrDefault() != null )
+                                        {
+                                            bankAccount.GLAccountNo = xAcctXml.Elements( "GLACCOUNTNO" ).FirstOrDefault().Value;
+                                        }
+                                        if ( xAcctXml.Elements( "BANKNAME" ).FirstOrDefault() != null )
+                                        {
+                                            bankAccount.BankName = xAcctXml.Elements( "BANKNAME" ).FirstOrDefault().Value;
+                                        }
                                         bankAccountList.Add( bankAccount );
                                     }
                                 }
