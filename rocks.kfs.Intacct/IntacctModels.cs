@@ -140,6 +140,9 @@ namespace rocks.kfs.Intacct
         [LavaInclude]
         public int ProcessTransactionFees;
 
+        [LavaInclude]
+        public string Payer;
+
         #region ILiquidizable
 
         /// <summary>
@@ -245,126 +248,6 @@ namespace rocks.kfs.Intacct
         public string Description;
         public Dictionary<string, dynamic> CustomDimensions;
         public int ProcessTransactionFees;
-    }
-
-    public class OtherReceiptTransaction : Rock.Lava.ILiquidizable
-    {
-        [LavaInclude]
-        public int? TransactionId;
-
-        [LavaInclude]
-        public string Payer;
-
-        [LavaInclude]
-        public decimal Amount;
-
-        [LavaInclude]
-        public int FinancialAccountId;
-
-        [LavaInclude]
-        public string Project;
-
-        [LavaInclude]
-        public DateTime PaymentDate;
-
-        [LavaInclude]
-        public decimal TransactionFeeAmount;
-
-        [LavaInclude]
-        public string TransactionFeeAccount;
-
-        [LavaInclude]
-        public int ProcessTransactionFees;
-
-        #region ILiquidizable
-
-        /// <summary>
-        /// Creates a DotLiquid compatible dictionary that represents the current entity object. 
-        /// </summary>
-        /// <returns>DotLiquid compatible dictionary.</returns>
-        public object ToLiquid()
-        {
-            return this;
-        }
-
-        /// <summary>
-        /// Gets the available keys (for debugging info).
-        /// </summary>
-        /// <value>
-        /// The available keys.
-        /// </value>
-        [LavaIgnore]
-        public virtual List<string> AvailableKeys
-        {
-            get
-            {
-                var availableKeys = new List<string>();
-
-                foreach ( var propInfo in GetType().GetProperties() )
-                {
-                    availableKeys.Add( propInfo.Name );
-                }
-
-                return availableKeys;
-            }
-        }
-
-        /// <summary>
-        /// Gets the <see cref="System.Object"/> with the specified key.
-        /// </summary>
-        /// <value>
-        /// The <see cref="System.Object"/>.
-        /// </value>
-        /// <param name="key">The key.</param>
-        /// <returns></returns>
-        [LavaIgnore]
-        public virtual object this[object key]
-        {
-            get
-            {
-                string propertyKey = key.ToStringSafe();
-                var propInfo = GetType().GetProperty( propertyKey );
-
-                try
-                {
-                    object propValue = null;
-                    if ( propInfo != null )
-                    {
-                        propValue = propInfo.GetValue( this, null );
-                    }
-
-                    if ( propValue is Guid )
-                    {
-                        return ( ( Guid ) propValue ).ToString();
-                    }
-                    else
-                    {
-                        return propValue;
-                    }
-                }
-                catch
-                {
-                    // intentionally ignore
-                }
-
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Determines whether the specified key contains key.
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <returns></returns>
-        public virtual bool ContainsKey( object key )
-        {
-            string propertyKey = key.ToStringSafe();
-            var propInfo = GetType().GetProperty( propertyKey );
-
-            return propInfo != null;
-        }
-
-        #endregion
     }
 
     public class CheckingAccount
