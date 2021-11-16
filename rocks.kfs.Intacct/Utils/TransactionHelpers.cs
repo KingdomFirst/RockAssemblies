@@ -175,7 +175,6 @@ namespace rocks.kfs.Intacct.Utils
         {
             var mergeFields = new Dictionary<string, object>();
             var account = mergeFieldObjects.Account;
-            account.LoadAttributes();
 
             if ( mergeFieldObjects.CustomDimensions.Count > 0 )
             {

@@ -234,6 +234,7 @@ namespace rocks.kfs.Intacct
             {
                 var account = new FinancialAccountService( rockContext ).Get( bTran.FinancialAccountId );
                 var customDimensionValues = new Dictionary<string, dynamic>();
+                account.LoadAttributes();
                 var mergeFieldObjects = new MergeFieldObjects
                 {
                     Account = account,
