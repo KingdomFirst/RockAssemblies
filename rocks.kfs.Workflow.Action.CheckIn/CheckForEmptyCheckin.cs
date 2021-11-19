@@ -136,6 +136,7 @@ namespace rocks.kfs.Workflow.Action.CheckIn
                     mergeFields.Add( "RemovedGroupTypes", totalGroupTypesRemoved );
                     mergeFields.Add( "RemovedGroups", totalGroupsRemoved );
                     mergeFields.Add( "NoMatchingFamilies", noMatchingFamilies );
+                    mergeFields.Add( "ManagerLoggedIn", checkInState.ManagerLoggedIn );
 
                     checkInState.Messages.Add( new CheckInMessage { MessageText = errorMessageTemplate.ResolveMergeFields( mergeFields, checkInState.CheckIn.CurrentPerson?.Person ), MessageType = MessageType.Warning } );
                 }
