@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="Jobs\CareNeedAutomatedNotifications.cs" />
     <Compile Include="Migrations\006_AddWorkersOnlyColumn.cs" />
+    <Compile Include="Migrations\008_LavaShortcode.cs" />
     <Compile Include="Migrations\007_CreateAttribute.cs" />
     <Compile Include="Migrations\005_CreateJob.cs" />
     <Compile Include="Migrations\004_CreatePages.cs" />
