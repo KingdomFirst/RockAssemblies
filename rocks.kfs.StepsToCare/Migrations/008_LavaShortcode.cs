@@ -35,7 +35,7 @@ VALUES (N'KFS Note Popover', N'Use this shortcode to add person note popover/qui
 <p>&nbsp; &nbsp; prefix: &lt;string&gt; (optional)</p>
 <p>&nbsp; &nbsp; icon: &lt;font awesome icon string&gt; (default: ""fa fa-comment"")<br></p>
 <p><b>Example Appearance:</b></p><p>&nbsp;&nbsp;&nbsp;&nbsp;<a href=""#""><i class=""fa fa-comment""></i></a></p>
-', '0', '1', N'kfsnotepopover', N'<a tabindex=""0"" role=""button"" data-toggle=""popoverCustom"" data-id=""{{ id }}"" class=""kfs-popover""><i class=""{{ icon }}""></i></a>
+', '0', '1', N'kfsnotepopover', N'<a tabindex=""0"" role=""button"" data-toggle=""popoverCustom"" data-id=""{{ id }}"" data-prefix=""{{ prefix }}"" class=""kfs-popover""><i class=""{{ icon }}""></i></a>
 {% javascript id:''kfsNotePopover'' disableanonymousfunction:''true'' %}
     $(function () {
         $(''[data-toggle=""popoverCustom""]'').each (function () {
@@ -44,12 +44,13 @@ VALUES (N'KFS Note Popover', N'Use this shortcode to add person note popover/qui
               placement: ''top'',
               html:''true'',
               sanitize: false,
-              content:''{% notetemplate where:''IsActive == true'' %}{% for template in notetemplateItems %}<a href=""#"" onclick=""addNoteAjax(\''{{ prefix }}\'',this.title,'' + $(this).data(''id'')+'');return false;"" title=""{{ template.Note }}"" class=""mx-2""><i class=""{{ template.Icon }}""></i></a>{%- endfor %}{% endnotetemplate %}''
+              content:''{% notetemplate where:''IsActive == true'' %}{% for template in notetemplateItems %}<a href=""#"" onclick=""addNoteAjax(\'''' + $(this).data(''prefix'') +''\'',this.title,'' + $(this).data(''id'')+'');return false;"" title=""{{ template.Note }}"" class=""mx-2""><i class=""{{ template.Icon }}""></i></a>{%- endfor %}{% endnotetemplate %}''
           });
         });
     });
     
-    function addNoteAjax(prefix = """", message, id) { 
+    function addNoteAjax(prefix = """", message, id) {
+        $(''#updateProgress'').show();
         var prefixPlus = """";
         if (prefix != """") {
             prefixPlus = "": "";
@@ -69,10 +70,12 @@ VALUES (N'KFS Note Popover', N'Use this shortcode to add person note popover/qui
                 Caption: """"
             }),
             success: function( data ) {
+                $(''#updateProgress'').hide();
                 alert( prefix+"" Added: ""+message);
             },
             error: function (e) {
                 console.error(e);
+                $(''#updateProgress'').hide();
             }
         });
     }
