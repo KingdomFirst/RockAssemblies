@@ -40,7 +40,7 @@ VALUES (N'KFS Note Popover', N'Use this shortcode to add person note popover/qui
     $(function () {
         $(''[data-toggle=""popoverCustom""]'').each (function () {
           $(this).popover({
-              //trigger: ''focus'',
+              trigger: ''focus'',
               placement: ''top'',
               html:''true'',
               sanitize: false,
