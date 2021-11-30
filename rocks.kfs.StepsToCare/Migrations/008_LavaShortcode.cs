@@ -44,7 +44,7 @@ VALUES (N'KFS Note Popover', N'Use this shortcode to add person note popover/qui
               placement: ''top'',
               html:''true'',
               sanitize: false,
-              content:''{% notetemplate where:''IsActive == true && Id != 6'' %}{% for template in notetemplateItems %}<a href=""#"" onclick=""addNoteAjax(\''{{ prefix }}\'',this.title,'' + $(this).data(''id'')+'');return false;"" title=""{{ template.Note }}"" class=""mx-2""><i class=""{{ template.Icon }}""></i></a>{%- endfor %}{% endnotetemplate %}''
+              content:''{% notetemplate where:''IsActive == true'' %}{% for template in notetemplateItems %}<a href=""#"" onclick=""addNoteAjax(\''{{ prefix }}\'',this.title,'' + $(this).data(''id'')+'');return false;"" title=""{{ template.Note }}"" class=""mx-2""><i class=""{{ template.Icon }}""></i></a>{%- endfor %}{% endnotetemplate %}''
           });
         });
     });
