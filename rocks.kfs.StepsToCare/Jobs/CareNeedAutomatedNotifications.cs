@@ -98,6 +98,7 @@ namespace rocks.kfs.StepsToCare.Jobs
         }
 
         private int assignedPersonEmails = 0;
+        private int assignedPersonSms = 0;
         private int errorCount = 0;
 
         private List<string> errorMessages = new List<string>();
@@ -152,11 +153,11 @@ namespace rocks.kfs.StepsToCare.Jobs
                 var openValueId = DefinedValueCache.Get( SystemGuid.DefinedValue.CARE_NEED_STATUS_OPEN.AsGuid() ).Id;
 
                 var careNeeds = careNeedService.Queryable( "PersonAlias,SubmitterPersonAlias" ).Where( n => n.StatusValueId != closedValueId );
-                var careAssigned = assignedPersonService.Queryable().AsNoTracking().Where( ap => ap.PersonAliasId != null && ap.NeedId != null && ap.CareNeed.StatusValueId != closedValueId ).DistinctBy( ap => ap.PersonAliasId );
+                var careAssigned = assignedPersonService.Queryable().Where( ap => ap.PersonAliasId != null && ap.NeedId != null && ap.CareNeed.StatusValueId != closedValueId ).DistinctBy( ap => ap.PersonAliasId );
 
                 var careNeedFollowUp = careNeeds.Where( n => n.StatusValueId == openValueId && n.DateEntered <= DbFunctions.AddDays( RockDateTime.Now, -followUpDays ) );
 
-                var careNeed24Hrs = careNeeds.AsNoTracking().Where( n => n.StatusValueId == openValueId && DbFunctions.DiffHours( n.DateEntered.Value, RockDateTime.Now ) >= minimumCareTouchesHours );
+                var careNeed24Hrs = careNeeds.Where( n => n.StatusValueId == openValueId && DbFunctions.DiffHours( n.DateEntered.Value, RockDateTime.Now ) >= minimumCareTouchesHours );
                 var careNeedFlagged = careNeed24Hrs
                     .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && cn.AssignedPersons.Any( ap => ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value && ap.PersonAliasId == n.CreatedByPersonAliasId ) ).DefaultIfEmpty(),
                     ( cn, n ) => new
@@ -171,6 +172,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                 var followUpSystemCommunicationGuid = dataMap.GetString( AttributeKey.FollowUpSystemCommunication ).AsGuid();
                 var careTouchNeededCommunicationGuid = dataMap.GetString( AttributeKey.CareTouchNeededCommunication ).AsGuid();
                 var outstandingNeedsCommunicationGuid = dataMap.GetString( AttributeKey.OutstandingNeedsCommunication ).AsGuid();
+                var followUpSystemCommunication = new SystemCommunicationService( rockContext ).Get( followUpSystemCommunicationGuid );
                 var careTouchNeededCommunication = new SystemCommunicationService( rockContext ).Get( careTouchNeededCommunicationGuid );
                 var outstandingNeedsCommunication = new SystemCommunicationService( rockContext ).Get( outstandingNeedsCommunicationGuid );
 
@@ -179,19 +181,29 @@ namespace rocks.kfs.StepsToCare.Jobs
                 var dashboardPage = PageCache.Get( dataMap.GetString( AttributeKey.CareDashboardPage ) );
                 var dashboardPageRoute = dashboardPage.PageRoutes.FirstOrDefault();
                 Dictionary<string, object> linkedPages = new Dictionary<string, object>();
-                linkedPages.Add( "CareDetail", detailPageRoute != null ? detailPageRoute.Route : "page/" + detailPage.Id );
-                linkedPages.Add( "CareDashboard", dashboardPageRoute != null ? dashboardPageRoute.Route : "page/" + dashboardPage.Id );
+                linkedPages.Add( "CareDetail", detailPageRoute != null ? "/" + detailPageRoute.Route : "/page/" + detailPage.Id );
+                linkedPages.Add( "CareDashboard", dashboardPageRoute != null ? "/" + dashboardPageRoute.Route : "/page/" + dashboardPage.Id );
+
+                var errors = new List<string>();
+                var errorsSms = new List<string>();
 
                 // Update status to follow up and email follow up messages
                 foreach ( var careNeed in careNeedFollowUp )
                 {
                     careNeed.StatusValueId = followUpValue.Id;
+                    careNeed.LoadAttributes();
 
                     if ( !followUpSystemCommunicationGuid.IsEmpty() )
                     {
+                        var emailMessage = new RockEmailMessage( followUpSystemCommunication );
+                        var smsMessage = new RockSMSMessage( followUpSystemCommunication );
+
                         foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value ) )
                         {
-                            if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) )
+                            assignee.PersonAlias.Person.LoadAttributes();
+
+                            var smsNumber = assignee.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber();
+                            if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) && smsNumber.IsNullOrWhiteSpace() )
                             {
                                 continue;
                             }
@@ -204,20 +216,58 @@ namespace rocks.kfs.StepsToCare.Jobs
                             var recipients = new List<RockMessageRecipient>();
                             recipients.Add( new RockEmailMessageRecipient( assignee.PersonAlias.Person, mergeFields ) );
 
-                            var emailMessage = new RockEmailMessage( followUpSystemCommunicationGuid );
-                            emailMessage.SetRecipients( recipients );
-                            var errors = new List<string>();
-                            emailMessage.Send( out errors );
+                            var notificationType = assignee.PersonAlias.Person.GetAttributeValue( SystemGuid.PersonAttribute.NOTIFICATION.AsGuid() );
 
-                            if ( errors.Any() )
+                            if ( notificationType == null || notificationType == "Email" || notificationType == "Both" )
                             {
-                                errorCount += errors.Count;
-                                errorMessages.AddRange( errors );
+                                if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) )
+                                {
+                                    errorCount += 1;
+                                    errorMessages.Add( string.Format( "{0} does not have a valid email address.", assignee.PersonAlias.Person.FullName ) );
+                                }
+                                else
+                                {
+                                    emailMessage.AddRecipient( new RockEmailMessageRecipient( assignee.PersonAlias.Person, mergeFields ) );
+                                }
                             }
-                            else
+                            if ( notificationType == "SMS" || notificationType == "Both" )
                             {
-                                assignedPersonEmails++;
+                                if ( string.IsNullOrWhiteSpace( smsNumber ) )
+                                {
+                                    errorCount += 1;
+                                    errorMessages.Add( string.Format( "No SMS number could be found for {0}.", assignee.PersonAlias.Person.FullName ) );
+                                }
+                                smsMessage.AddRecipient( new RockSMSMessageRecipient( assignee.PersonAlias.Person, smsNumber, mergeFields ) );
                             }
+                            //pushMessage.AddRecipient( new RockPushMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.Devices, mergeFields ) );
+                        }
+
+                        if ( emailMessage.GetRecipients().Count > 0 )
+                        {
+                            emailMessage.Send( out errors );
+                        }
+                        if ( smsMessage.GetRecipients().Count > 0 )
+                        {
+                            smsMessage.Send( out errorsSms );
+                        }
+
+                        if ( errors.Any() )
+                        {
+                            errorCount += errors.Count;
+                            errorMessages.AddRange( errors );
+                        }
+                        else
+                        {
+                            assignedPersonEmails++;
+                        }
+                        if ( errorsSms.Any() )
+                        {
+                            errorCount += errorsSms.Count;
+                            errorMessages.AddRange( errorsSms );
+                        }
+                        else
+                        {
+                            assignedPersonSms++;
                         }
                     }
                 }
@@ -229,18 +279,22 @@ namespace rocks.kfs.StepsToCare.Jobs
                     foreach ( var flagNeed in careNeedFlagged )
                     {
                         var careNeed = flagNeed.CareNeed;
+                        careNeed.LoadAttributes();
                         var emailMessage = new RockEmailMessage( careTouchNeededCommunication );
-                        //var smsMessage = new RockSMSMessage( careTouchNeededCommunication );
+                        var smsMessage = new RockSMSMessage( careTouchNeededCommunication );
                         //var pushMessage = new RockPushMessage( careTouchNeededCommunication );
                         var recipients = new List<RockMessageRecipient>();
-                        var errors = new List<string>();
 
                         foreach ( var assignee in careNeed.AssignedPersons )
                         {
-                            if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) )
+                            assignee.PersonAlias.Person.LoadAttributes();
+
+                            var smsNumber = assignee.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber();
+                            if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) && smsNumber.IsNullOrWhiteSpace() )
                             {
                                 continue;
                             }
+
                             var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, assignee.PersonAlias.Person );
                             mergeFields.Add( "CareNeed", careNeed );
                             mergeFields.Add( "LinkedPages", linkedPages );
@@ -249,11 +303,40 @@ namespace rocks.kfs.StepsToCare.Jobs
                             mergeFields.Add( "TouchCount", flagNeed.TouchCount );
                             mergeFields.Add( "HasFollowUpWorkerNote", flagNeed.HasFollowUpWorkerNote );
 
-                            emailMessage.AddRecipient( new RockEmailMessageRecipient( assignee.PersonAlias.Person, mergeFields ) );
-                            //emailMessage.AddRecipient( new RockSMSMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber() mergeFields ) )
+                            var notificationType = assignee.PersonAlias.Person.GetAttributeValue( SystemGuid.PersonAttribute.NOTIFICATION.AsGuid() );
+
+                            if ( notificationType == null || notificationType == "Email" || notificationType == "Both" )
+                            {
+                                if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) )
+                                {
+                                    errorCount += 1;
+                                    errorMessages.Add( string.Format( "{0} does not have a valid email address.", assignee.PersonAlias.Person.FullName ) );
+                                }
+                                else
+                                {
+                                    emailMessage.AddRecipient( new RockEmailMessageRecipient( assignee.PersonAlias.Person, mergeFields ) );
+                                }
+                            }
+                            if ( notificationType == "SMS" || notificationType == "Both" )
+                            {
+                                if ( string.IsNullOrWhiteSpace( smsNumber ) )
+                                {
+                                    errorCount += 1;
+                                    errorMessages.Add( string.Format( "No SMS number could be found for {0}.", assignee.PersonAlias.Person.FullName ) );
+                                }
+                                smsMessage.AddRecipient( new RockSMSMessageRecipient( assignee.PersonAlias.Person, smsNumber, mergeFields ) );
+                            }
                             //pushMessage.AddRecipient( new RockPushMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.Devices, mergeFields ) );
+
                         }
-                        emailMessage.Send( out errors );
+                        if ( emailMessage.GetRecipients().Count > 0 )
+                        {
+                            emailMessage.Send( out errors );
+                        }
+                        if ( smsMessage.GetRecipients().Count > 0 )
+                        {
+                            smsMessage.Send( out errorsSms );
+                        }
 
                         if ( errors.Any() )
                         {
@@ -264,7 +347,15 @@ namespace rocks.kfs.StepsToCare.Jobs
                         {
                             assignedPersonEmails++;
                         }
-
+                        if ( errorsSms.Any() )
+                        {
+                            errorCount += errorsSms.Count;
+                            errorMessages.AddRange( errorsSms );
+                        }
+                        else
+                        {
+                            assignedPersonSms++;
+                        }
                     }
                 }
 
@@ -273,17 +364,20 @@ namespace rocks.kfs.StepsToCare.Jobs
                 {
                     foreach ( var assigned in careAssigned )
                     {
-                        if ( !assigned.PersonAlias.Person.CanReceiveEmail( false ) )
+                        var smsNumber = assigned.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber();
+
+                        if ( !assigned.PersonAlias.Person.CanReceiveEmail( false ) && smsNumber.IsNullOrWhiteSpace() )
                         {
                             continue;
                         }
                         var emailMessage = new RockEmailMessage( outstandingNeedsCommunication );
-                        //var smsMessage = new RockSMSMessage( outstandingNeedsCommunication );
+                        var smsMessage = new RockSMSMessage( outstandingNeedsCommunication );
                         //var pushMessage = new RockPushMessage( outstandingNeedsCommunication );
                         var recipients = new List<RockMessageRecipient>();
-                        var errors = new List<string>();
 
                         var assignedNeeds = careNeeds.Where( cn => cn.AssignedPersons.Any( ap => ap.PersonAliasId == assigned.PersonAliasId ) );
+
+                        assigned.PersonAlias.Person.LoadAttributes();
 
                         var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, assigned.PersonAlias.Person );
                         mergeFields.Add( "CareNeeds", assignedNeeds );
@@ -291,10 +385,39 @@ namespace rocks.kfs.StepsToCare.Jobs
                         mergeFields.Add( "AssignedPerson", assigned );
                         mergeFields.Add( "Person", assigned.PersonAlias.Person );
 
-                        emailMessage.AddRecipient( new RockEmailMessageRecipient( assigned.PersonAlias.Person, mergeFields ) );
-                        //emailMessage.AddRecipient( new RockSMSMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber() mergeFields ) )
+                        var notificationType = assigned.PersonAlias.Person.GetAttributeValue( SystemGuid.PersonAttribute.NOTIFICATION.AsGuid() );
+
+                        if ( notificationType == null || notificationType == "Email" || notificationType == "Both" )
+                        {
+                            if ( !assigned.PersonAlias.Person.CanReceiveEmail( false ) )
+                            {
+                                errorCount += 1;
+                                errorMessages.Add( string.Format( "{0} does not have a valid email address.", assigned.PersonAlias.Person.FullName ) );
+                            }
+                            else
+                            {
+                                emailMessage.AddRecipient( new RockEmailMessageRecipient( assigned.PersonAlias.Person, mergeFields ) );
+                            }
+                        }
+                        if ( notificationType == "SMS" || notificationType == "Both" )
+                        {
+                            if ( string.IsNullOrWhiteSpace( smsNumber ) )
+                            {
+                                errorCount += 1;
+                                errorMessages.Add( string.Format( "No SMS number could be found for {0}.", assigned.PersonAlias.Person.FullName ) );
+                            }
+                            smsMessage.AddRecipient( new RockSMSMessageRecipient( assigned.PersonAlias.Person, smsNumber, mergeFields ) );
+                        }
                         //pushMessage.AddRecipient( new RockPushMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.Devices, mergeFields ) );
-                        emailMessage.Send( out errors );
+
+                        if ( emailMessage.GetRecipients().Count > 0 )
+                        {
+                            emailMessage.Send( out errors );
+                        }
+                        if ( smsMessage.GetRecipients().Count > 0 )
+                        {
+                            smsMessage.Send( out errorsSms );
+                        }
 
                         if ( errors.Any() )
                         {
@@ -305,12 +428,20 @@ namespace rocks.kfs.StepsToCare.Jobs
                         {
                             assignedPersonEmails++;
                         }
-
+                        if ( errorsSms.Any() )
+                        {
+                            errorCount += errorsSms.Count;
+                            errorMessages.AddRange( errorsSms );
+                        }
+                        else
+                        {
+                            assignedPersonSms++;
+                        }
                     }
                 }
 
             }
-            context.Result = string.Format( "{0} emails sent", assignedPersonEmails );
+            context.Result = string.Format( "{0} emails sent \n{1} SMS messages sent", assignedPersonEmails, assignedPersonSms );
             if ( errorMessages.Any() )
             {
                 StringBuilder sb = new StringBuilder();
