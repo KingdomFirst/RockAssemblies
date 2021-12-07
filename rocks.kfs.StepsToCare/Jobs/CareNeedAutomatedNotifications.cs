@@ -181,8 +181,8 @@ namespace rocks.kfs.StepsToCare.Jobs
                 var dashboardPage = PageCache.Get( dataMap.GetString( AttributeKey.CareDashboardPage ) );
                 var dashboardPageRoute = dashboardPage.PageRoutes.FirstOrDefault();
                 Dictionary<string, object> linkedPages = new Dictionary<string, object>();
-                linkedPages.Add( "CareDetail", detailPageRoute != null ? detailPageRoute.Route : "page/" + detailPage.Id );
-                linkedPages.Add( "CareDashboard", dashboardPageRoute != null ? dashboardPageRoute.Route : "page/" + dashboardPage.Id );
+                linkedPages.Add( "CareDetail", detailPageRoute != null ? "/" + detailPageRoute.Route : "/page/" + detailPage.Id );
+                linkedPages.Add( "CareDashboard", dashboardPageRoute != null ? "/" + dashboardPageRoute.Route : "/page/" + dashboardPage.Id );
 
                 var errors = new List<string>();
                 var errorsSms = new List<string>();
@@ -220,7 +220,15 @@ namespace rocks.kfs.StepsToCare.Jobs
 
                             if ( notificationType == null || notificationType == "Email" || notificationType == "Both" )
                             {
-                                emailMessage.AddRecipient( new RockEmailMessageRecipient( assignee.PersonAlias.Person, mergeFields ) );
+                                if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) )
+                                {
+                                    errorCount += 1;
+                                    errorMessages.Add( string.Format( "{0} does not have a valid email address.", assignee.PersonAlias.Person.FullName ) );
+                                }
+                                else
+                                {
+                                    emailMessage.AddRecipient( new RockEmailMessageRecipient( assignee.PersonAlias.Person, mergeFields ) );
+                                }
                             }
                             if ( notificationType == "SMS" || notificationType == "Both" )
                             {
@@ -299,7 +307,15 @@ namespace rocks.kfs.StepsToCare.Jobs
 
                             if ( notificationType == null || notificationType == "Email" || notificationType == "Both" )
                             {
-                                emailMessage.AddRecipient( new RockEmailMessageRecipient( assignee.PersonAlias.Person, mergeFields ) );
+                                if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) )
+                                {
+                                    errorCount += 1;
+                                    errorMessages.Add( string.Format( "{0} does not have a valid email address.", assignee.PersonAlias.Person.FullName ) );
+                                }
+                                else
+                                {
+                                    emailMessage.AddRecipient( new RockEmailMessageRecipient( assignee.PersonAlias.Person, mergeFields ) );
+                                }
                             }
                             if ( notificationType == "SMS" || notificationType == "Both" )
                             {
@@ -348,7 +364,9 @@ namespace rocks.kfs.StepsToCare.Jobs
                 {
                     foreach ( var assigned in careAssigned )
                     {
-                        if ( !assigned.PersonAlias.Person.CanReceiveEmail( false ) )
+                        var smsNumber = assigned.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber();
+
+                        if ( !assigned.PersonAlias.Person.CanReceiveEmail( false ) && smsNumber.IsNullOrWhiteSpace() )
                         {
                             continue;
                         }
@@ -356,7 +374,6 @@ namespace rocks.kfs.StepsToCare.Jobs
                         var smsMessage = new RockSMSMessage( outstandingNeedsCommunication );
                         //var pushMessage = new RockPushMessage( outstandingNeedsCommunication );
                         var recipients = new List<RockMessageRecipient>();
-                        var smsNumber = assigned.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber();
 
                         var assignedNeeds = careNeeds.Where( cn => cn.AssignedPersons.Any( ap => ap.PersonAliasId == assigned.PersonAliasId ) );
 
@@ -372,7 +389,15 @@ namespace rocks.kfs.StepsToCare.Jobs
 
                         if ( notificationType == null || notificationType == "Email" || notificationType == "Both" )
                         {
-                            emailMessage.AddRecipient( new RockEmailMessageRecipient( assigned.PersonAlias.Person, mergeFields ) );
+                            if ( !assigned.PersonAlias.Person.CanReceiveEmail( false ) )
+                            {
+                                errorCount += 1;
+                                errorMessages.Add( string.Format( "{0} does not have a valid email address.", assigned.PersonAlias.Person.FullName ) );
+                            }
+                            else
+                            {
+                                emailMessage.AddRecipient( new RockEmailMessageRecipient( assigned.PersonAlias.Person, mergeFields ) );
+                            }
                         }
                         if ( notificationType == "SMS" || notificationType == "Both" )
                         {
@@ -416,8 +441,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                 }
 
             }
-            context.Result = string.Format( "{0} emails sent", assignedPersonEmails );
-            context.Result += string.Format( "{0} SMS messages sent", assignedPersonSms );
+            context.Result = string.Format( "{0} emails sent \n{1} SMS messages sent", assignedPersonEmails, assignedPersonSms );
             if ( errorMessages.Any() )
             {
                 StringBuilder sb = new StringBuilder();
