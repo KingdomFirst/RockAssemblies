@@ -16,7 +16,7 @@
 //
 using Rock.Plugin;
 
-namespace rocks.kfs.StepsToCare
+namespace rocks.kfs.StepsToCare.Migrations
 {
     [MigrationNumber( 2, "1.12.3" )]
     public class CreateDefinedTypes : Migration
