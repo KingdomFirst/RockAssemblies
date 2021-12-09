@@ -16,7 +16,7 @@
 //
 using Rock.Plugin;
 
-namespace rocks.kfs.StepsToCare
+namespace rocks.kfs.StepsToCare.Migrations
 {
     [MigrationNumber( 3, "1.12.3" )]
     public class CreateCommunications : Migration

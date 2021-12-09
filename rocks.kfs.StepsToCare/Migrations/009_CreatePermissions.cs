@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using Rock;
 using Rock.Plugin;
 
-namespace rocks.kfs.StepsToCare
+namespace rocks.kfs.StepsToCare.Migrations
 {
     [MigrationNumber( 9, "1.12.3" )]
     public class CreatePermissions : Migration
