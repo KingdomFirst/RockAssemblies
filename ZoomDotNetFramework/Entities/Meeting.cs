@@ -16,16 +16,13 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ZoomDotNetFramework.Entities
 {
     public class Meeting
     {
         public string Uuid { get; set; }
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Host_Id { get; set; }
         public string Assistant_Id { get; set; }
         public string Host_Email { get; set; }

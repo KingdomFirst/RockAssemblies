@@ -20,6 +20,7 @@ namespace ZoomDotNetFramework
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
     using RestSharp;
+    using rocks.kfs.ZoomRoom.Enums;
     using System;
     using System.Collections.Generic;
     using ZoomDotNetFramework.Responses;
@@ -111,6 +112,21 @@ namespace ZoomDotNetFramework
             return result.Rooms;
         }
 
+        public List<Meeting> GetZoomMeetings( string userId, MeetingListType? type = null, int? pageSize = null )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "users/{0}/meetings", userId ),
+            };
+            if ( type.HasValue )
+            {
+                request.AddParameter( "type", type.ToString() );
+            }
+            var result = Execute<ListMeetingsResponse>( request );
+
+            return result.Meetings;
+        }
+
         public bool ScheduleZoomRoomMeeting( string roomId, string password, string callbackUrl, string topic, DateTimeOffset startTime, string timezone, int duration, bool joinBeforeHost = false )
         {
             var request = new RestRequest
@@ -141,6 +157,23 @@ namespace ZoomDotNetFramework
             };
             AddRequestJsonBody( request, reqBody );
             var result = Execute<ZRScheduleResponse>( request );
+            return result != null;
+        }
+
+        public bool DeleteMeeting( long meetingId, string occurrenceId = null, bool notifyHosts = false, bool notifyRegistrants = false )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "meetings/{0}", meetingId ),
+                Method = Method.DELETE
+            };
+            if ( !string.IsNullOrWhiteSpace( occurrenceId ) )
+            {
+                request.AddParameter( "occurrence_id", occurrenceId );
+            }
+            request.AddParameter( "schedule_for_reminder", notifyHosts );
+            request.AddParameter( "cancel_meeting_reminder", notifyRegistrants.ToString().ToLower() );
+            var result = Execute<ZoomBaseResponse>( request );
             return result != null;
         }
 

@@ -20,8 +20,8 @@ using ZoomDotNetFramework.Entities;
 
 namespace ZoomDotNetFramework.Responses
 {
-    public class RoomsResponse : ZoomBaseResponse
+    public class ListMeetingsResponse : ZoomBaseResponse
     {
-        public List<ZoomRoom> Rooms { get; set; }
+        public List<Meeting> Meetings { get; set; }
     }
 }

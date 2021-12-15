@@ -14,14 +14,14 @@
 // limitations under the License.
 // </copyright>
 //
-using System.Collections.Generic;
-using ZoomDotNetFramework.Entities;
 
 
-namespace ZoomDotNetFramework.Responses
+namespace rocks.kfs.ZoomRoom.Enums
 {
-    public class RoomsResponse : ZoomBaseResponse
+    public enum MeetingListType
     {
-        public List<ZoomRoom> Rooms { get; set; }
+        Scheduled,
+        Live,
+        Upcoming
     }
 }

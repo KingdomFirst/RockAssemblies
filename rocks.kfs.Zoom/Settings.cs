@@ -81,6 +81,21 @@ namespace rocks.kfs.Zoom
         }
 
         /// <summary>
+        /// Gets the Zoom webhook url.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetWebhookUrl()
+        {
+            string webhookUrl = null;
+            var appUrl = GlobalAttributesCache.Get().GetValue( "InternalApplicationRoot" );
+            if ( !string.IsNullOrWhiteSpace( appUrl ) )
+            {
+                webhookUrl = string.Format( "{0}Plugins/rocks_kfs/Zoom/Webhook.ashx", appUrl );
+            }
+            return webhookUrl;
+        }
+
+        /// <summary>
         /// Saves the API Key and API Secret.
         /// </summary>
         /// <param name="apiKey">The api key.</param>

@@ -14,14 +14,13 @@
 // limitations under the License.
 // </copyright>
 //
-using System.Collections.Generic;
-using ZoomDotNetFramework.Entities;
-
-
-namespace ZoomDotNetFramework.Responses
+namespace rocks.kfs.Zoom.ZoomGuid
 {
-    public class RoomsResponse : ZoomBaseResponse
+    public static class RoomReservationType
     {
-        public List<ZoomRoom> Rooms { get; set; }
+        /// <summary>
+        /// Zoom Entity
+        /// </summary>
+        public const string ZOOMROOMIMPORT = "3EF84F37-9E31-414C-9246-C970FE1C199E";
     }
 }

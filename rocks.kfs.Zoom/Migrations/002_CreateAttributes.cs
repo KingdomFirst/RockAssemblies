@@ -37,6 +37,7 @@ namespace rocks.kfs.Zoom.Migrations
 
             RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Key", "", "The API Key for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "D53A2B48-C8B4-4481-B2AB-139CAF90C78C", "KFSZoomApiKey" );
             RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Secret", "", "The API Secret for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "CB89B071-4866-41BD-ACB1-1810F5224A82", "KFSZoomApiSecret" );
+            RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.TEXT, "", "", "Webhook URL", "", "The URL for the webhook to handle callbacks from Zoom api.", 0, "", "4B6E0AF2-9D9D-4801-B8CE-F2B424F970FE", "KFSZoomWebhookURL" );
 
             RockMigrationHelper.AddDefinedType( "Zoom", "Zoom Rooms", "Zoom Rooms available for linking to Rock Locations.", ZoomGuid.DefinedType.ZOOM_ROOM );
             RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.TEXT, "User Name", "ZoomUsersName", "Zoom user's name.", 0, "", ZoomGuid.Attribute.ZOOM_USER_NAME );
@@ -62,6 +63,7 @@ namespace rocks.kfs.Zoom.Migrations
             RockMigrationHelper.DeleteDefinedType( ZoomGuid.DefinedType.ZOOM_ROOM );
             RockMigrationHelper.DeleteAttribute( "CB89B071-4866-41BD-ACB1-1810F5224A82" );
             RockMigrationHelper.DeleteAttribute( "D53A2B48-C8B4-4481-B2AB-139CAF90C78C" );
+            RockMigrationHelper.DeleteAttribute( "4B6E0AF2-9D9D-4801-B8CE-F2B424F970FE" );
             RockMigrationHelper.DeleteFieldType( ZoomGuid.FieldType.ZOOM_MEETING );
             RockMigrationHelper.DeleteFieldType( ZoomGuid.FieldType.ZOOM_ROOM );
             RockMigrationHelper.DeleteSecurityAuth( "3921542F-476D-48B4-97F5-788709A1F4B4" );
