@@ -38,28 +38,28 @@ namespace rocks.kfs.Zoom.Jobs
     /// Job to process communications
     /// </summary>
     [DisplayName( "Send Zoom Meeting Reminders" )]
-    [Description( "Sends a reminder to members of a group connected with a reservation that has a Zoom meeting attached to it." )]
+    [Description( "Sends a reminder to members of a group connected with a room reservation that has a Zoom meeting attached to it." )]
 
     #region Job Attributes
     [SystemCommunicationField(
         "System Communication",
         Description = "The system communication to use when sending Zoom meeting reminders.",
-        DefaultValue = Rock.SystemGuid.SystemCommunication.GROUP_ATTENDANCE_REMINDER,
+        DefaultValue = ZoomGuid.SystemComunication.ZOOM_MEETING_REMINDER,
         IsRequired = true,
         Order = 1,
-        Key = AttributeKey.SystemEmail )]
+        Key = AttributeKey.SystemCommunication )]
 
     [TextField(
         "Days Prior",
         Description = "Comma delimited list of days prior to a scheduled Zoom meeting to send a reminder. For example, a value of '2,4' would result in reminders getting sent two and four days prior to the Zoom meeting's scheduled meeting date.",
-        DefaultValue = "",
+        DefaultValue = "1",
         IsRequired = false,
         Order = 2,
         Key = AttributeKey.DaysPrior )]
 
     [AttributeField(
-        "Reservation Group Attribute",
-        Description = "The \"Group Type Group\" type attribute on the Room Reservation entity. This attribute is what connects a Room Reservation to a Group for Zoom meeting purposes.",
+        "Reminder Group Attribute",
+        Description = "The \"Group Type Group\" type attribute on the Room Reservation entity to be used for sending reminders. This attribute is what connects a Room Reservation to a Group for Zoom meeting purposes.",
         DefaultValue = ZoomGuid.Attribute.ROOM_RESERVATION_GROUP_ATTRIBUTE,
         IsRequired = true,
         Order = 3,
@@ -77,14 +77,14 @@ namespace rocks.kfs.Zoom.Jobs
     #endregion Job Attributes
 
     [DisallowConcurrentExecution]
-    public class ZoomRoomGroupNotification : IJob
+    public class ZoomMeetingGroupReminder : IJob
     {
         /// <summary>
         /// Attribute Keys
         /// </summary>
         private static class AttributeKey
         {
-            public const string SystemEmail = "SystemEmail";
+            public const string SystemCommunication = "SystemCommunication";
             public const string DaysPrior = "DaysPrior";
             public const string GroupAttributeSetting = "GroupAttributeSetting";
             public const string SendUsing = "SendUsing";
@@ -95,7 +95,6 @@ namespace rocks.kfs.Zoom.Jobs
         private int notificationSms = 0;
         private int notificationPush = 0;
         private int? reservationLocationEntityTypeId;
-        private string webhookBaseUrl;
         private AttributeCache resGroupAttribute;
 
         private List<string> errorMessages = new List<string>();
@@ -103,7 +102,7 @@ namespace rocks.kfs.Zoom.Jobs
         /// <summary>
         /// Initializes a new instance of the <see cref="ZoomRoomSchedulingAndMaintenance"/> class.
         /// </summary>
-        public ZoomRoomGroupNotification()
+        public ZoomMeetingGroupReminder()
         {
         }
 
@@ -129,7 +128,7 @@ namespace rocks.kfs.Zoom.Jobs
                 HandleErrorMessages( context, errorMessages );
             }
 
-            var systemEmailGuid = dataMap.GetString( AttributeKey.SystemEmail ).AsGuid();
+            var systemEmailGuid = dataMap.GetString( AttributeKey.SystemCommunication ).AsGuid();
             var systemCommunication = new SystemCommunicationService( rockContext ).Get( systemEmailGuid );
 
             var jobPreferredCommunicationType = ( CommunicationType ) dataMap.GetString( AttributeKey.SendUsing ).AsInteger();
@@ -441,64 +440,6 @@ namespace rocks.kfs.Zoom.Jobs
                 messages.ForEach( w => { sb.AppendLine( w ); } );
             }
             return sb;
-        }
-
-        private int CreateZoomRoomOccurrences( RockContext rockContext, RoomOccurrenceService occService, string roomId, string occurrenceTopic, string password, Schedule schedule, bool joinBeforeHost, ReservationLocation reservationLocation, List<ReservationDateTime> reservationDateTimes, IQueryable<RoomOccurrence> existingRoomOccurrences, ServiceLogService logService, bool verboseLogging = false )
-        {
-            var occurrencesAdded = 0;
-            foreach ( var dateTime in reservationDateTimes )
-            {
-                var existingRoomOccurrence = existingRoomOccurrences.Where( o => o.StartTime == dateTime.StartDateTime );
-                if ( existingRoomOccurrence.Count() == 0 )
-                {
-                    var occurrence = new RoomOccurrence
-                    {
-                        EntityTypeId = reservationLocationEntityTypeId,
-                        EntityId = reservationLocation.Id,
-                        ScheduleId = schedule.Id,
-                        LocationId = reservationLocation.LocationId,
-                        Topic = occurrenceTopic,
-                        StartTime = dateTime.StartDateTime,
-                        Password = password,
-                        Duration = schedule.DurationInMinutes
-                    };
-                    occService.Add( occurrence );
-                    //rockContext.SaveChanges();
-                    occurrencesAdded++;
-                    if ( verboseLogging )
-                    {
-                        AddLogEntry( logService, "Zoom Room Reservation Sync", string.Format( "Begin create new Zoom Meeting: ZoomRoom {0} - {1}", roomId, occurrence.StartTime.ToShortDateTimeString() ), true );
-                    }
-                    var callbackUrl = string.Format( "{0}?token={1}", webhookBaseUrl, occurrence.Id );
-                    var success = new Zoom().ScheduleZoomRoomMeeting( rockContext, roomId, occurrence.Password, occurrence.Topic, occurrence.StartTime.ToRockDateTimeOffset(), occurrence.Duration, joinBeforeHost, enableLogging: verboseLogging, callbackUrl: callbackUrl );
-                    if ( verboseLogging )
-                    {
-                        AddLogEntry( logService, "Zoom Room Reservation Sync", string.Format( "Create new Zoom Meeting {0}: ZoomRoom {1} - {2}", success ? "succeeded" : "failed", roomId, occurrence.StartTime.ToShortDateTimeString() ), success );
-                    }
-                }
-            }
-            return occurrencesAdded;
-        }
-
-        private void AddLogEntry( ServiceLogService logService, string logType, string logName, bool logSuccess, List<string> logInputs = null )
-        {
-            if ( logInputs == null )
-            {
-                logInputs = new List<string>();
-            }
-
-            ServiceLog log = new ServiceLog
-            {
-                LogDateTime = RockDateTime.Now,
-                Type = logType,
-                Name = logName,
-                Success = logSuccess
-            };
-            foreach ( var input in logInputs )
-            {
-                log.Input = input;
-            }
-            logService.Add( log );
         }
     }
 }

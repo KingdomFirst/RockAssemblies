@@ -45,6 +45,7 @@ namespace rocks.kfs.Zoom.Jobs
         Description = "Number of days into the future to sync Locations to Zoom Rooms if the Schedule does not have an effective date.",
         DefaultIntegerValue = 30,
         IsRequired = true,
+        Order = 1,
         Key = AttributeKey.SyncDaysOut )]
 
     [BooleanField(
@@ -52,6 +53,7 @@ namespace rocks.kfs.Zoom.Jobs
         Description = "Turn on extra logging points in addition to the standard job logging points. This is only recommended for testing/troubleshooting purposes.",
         DefaultBooleanValue = false,
         IsRequired = false,
+        Order = 2,
         Key = AttributeKey.VerboseLogging )]
 
     //[TextField(
@@ -66,6 +68,7 @@ namespace rocks.kfs.Zoom.Jobs
         Description = "Create Room Reservations for any Zoom Room meetings scheduled outside of Rock. This will help reduce the chances of the Room Reservation plugin scheduling a conflict with other Zoom Room meetings.",
         DefaultBooleanValue = false,
         IsRequired = false,
+        Order = 3,
         Key = AttributeKey.ImportMeetings )]
 
     //[IntegerField(

@@ -88,10 +88,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Jobs\ZoomRoomGroupNotification.cs" />
+    <Compile Include="Jobs\ZoomMeetingGroupReminder.cs" />
     <Compile Include="Jobs\ZoomRoomSchedulingAndMaintenance.cs" />
     <Compile Include="Migrations\003_CreateAttributeQualifiers.cs" />
-    <Compile Include="Migrations\004_CreateZoomRoomSyncJob.cs" />
+    <Compile Include="Migrations\004_CreateCommunications.cs" />
+    <Compile Include="Migrations\005_CreateJobs.cs" />
     <Compile Include="Model\RoomOccurrenceService.cs" />
     <Compile Include="Model\RoomOccurrence.cs" />
     <Compile Include="Field\Types\ZoomRoomFieldType.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Utility\ExtensionMethods\StringExtensions.cs" />
     <Compile Include="ZoomGuid\Attribute.cs" />
     <Compile Include="ZoomGuid\DefinedType.cs" />
+    <Compile Include="ZoomGuid\SystemCommunication.cs" />
     <Compile Include="ZoomGuid\RoomReservationType.cs" />
     <Compile Include="ZoomGuid\EntityType.cs" />
     <Compile Include="Zoom.cs" />
