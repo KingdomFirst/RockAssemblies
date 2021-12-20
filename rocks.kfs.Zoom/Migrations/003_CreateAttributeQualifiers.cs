@@ -29,8 +29,8 @@ namespace rocks.kfs.Zoom.Migrations
         public override void Up()
         {
             var zrDefinedTypeId = new DefinedTypeService( new Rock.Data.RockContext() ).Get( ZoomGuid.DefinedType.ZOOM_ROOM.AsGuid() ).Id;
-            RockMigrationHelper.AddAttributeQualifier( ZoomGuid.Attribute.ZOOR_ROOM_LOCATION_ENTITY_ATTRIBUTE, "definedtype", zrDefinedTypeId.ToString(), "D210E7BF-7C3D-4B8E-A8AB-423C97DA6FACf" );
-            RockMigrationHelper.AddAttributeQualifier( ZoomGuid.Attribute.ZOOR_ROOM_LOCATION_ENTITY_ATTRIBUTE, "displaydescription", "True", "85D4A488-3F71-49EF-9EBC-28927D4C15A4" );
+            RockMigrationHelper.AddAttributeQualifier( ZoomGuid.Attribute.ZOOM_ROOM_LOCATION_ENTITY_ATTRIBUTE, "definedtype", zrDefinedTypeId.ToString(), "D210E7BF-7C3D-4B8E-A8AB-423C97DA6FACf" );
+            RockMigrationHelper.AddAttributeQualifier( ZoomGuid.Attribute.ZOOM_ROOM_LOCATION_ENTITY_ATTRIBUTE, "displaydescription", "True", "85D4A488-3F71-49EF-9EBC-28927D4C15A4" );
         }
 
         /// <summary>
