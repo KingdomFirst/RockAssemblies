@@ -22,6 +22,7 @@ using System;
 using System.Collections.Specialized;
 using System.Linq;
 using ZoomDotNetFramework;
+using ZoomDotNetFramework.Entities;
 //using rocks.kfs.Eventbrite.Utility.ExtensionMethods;
 
 namespace rocks.kfs.Zoom
@@ -47,6 +48,13 @@ namespace rocks.kfs.Zoom
                 retVar = true;
             }
             return retVar;
+        }
+
+        public Meeting GetZoomMeeting( long meetingId )
+        {
+            var zoom = Api();
+            var meeting = zoom.GetZoomMeeting( meetingId );
+            return meeting;
         }
 
         public static void SyncZoomRoomDT( RockContext rockContext, bool enableLogging = false )

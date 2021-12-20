@@ -74,6 +74,8 @@ namespace ZoomDotNetFramework
 
         #region Pure Rest Calls
 
+        #region Zoom API
+
         public User GetUser()
         {
             var request = new RestRequest
@@ -83,6 +85,64 @@ namespace ZoomDotNetFramework
 
             return Execute<User>( request );
         }
+
+        public List<ZoomRoom> GetZoomRooms()
+        {
+            var request = new RestRequest
+            {
+                Resource = "rooms"
+            };
+            var result = Execute<RoomsResponse>( request );
+
+            return result.Rooms;
+        }
+
+        public Meeting GetZoomMeeting( long meetingId )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "meetings/{0}", meetingId ),
+            };
+            var result = Execute<Meeting>( request );
+
+            return result;
+        }
+
+        public List<Meeting> GetZoomMeetings( string userId, MeetingListType? type = null, int? pageSize = null )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "users/{0}/meetings", userId ),
+            };
+            if ( type.HasValue )
+            {
+                request.AddParameter( "type", type.ToString() );
+            }
+            var result = Execute<ListMeetingsResponse>( request );
+
+            return result.Meetings;
+        }
+
+        public bool DeleteMeeting( long meetingId, string occurrenceId = null, bool notifyHosts = false, bool notifyRegistrants = false )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "meetings/{0}", meetingId ),
+                Method = Method.DELETE
+            };
+            if ( !string.IsNullOrWhiteSpace( occurrenceId ) )
+            {
+                request.AddParameter( "occurrence_id", occurrenceId );
+            }
+            request.AddParameter( "schedule_for_reminder", notifyHosts );
+            request.AddParameter( "cancel_meeting_reminder", notifyRegistrants.ToString().ToLower() );
+            var result = Execute<ZoomBaseResponse>( request );
+            return result != null;
+        }
+
+        #endregion Zoom API
+
+        #region Zoom Room API
 
         public List<ZRRoom> GetZoomRoomList()
         {
@@ -99,32 +159,6 @@ namespace ZoomDotNetFramework
             AddRequestJsonBody( request, reqBody );
             var result = Execute<ZRListResponse>( request );
             return result.Result.Data;
-        }
-
-        public List<ZoomRoom> GetZoomRooms()
-        {
-            var request = new RestRequest
-            {
-                Resource = "rooms"
-            };
-            var result = Execute<RoomsResponse>( request );
-
-            return result.Rooms;
-        }
-
-        public List<Meeting> GetZoomMeetings( string userId, MeetingListType? type = null, int? pageSize = null )
-        {
-            var request = new RestRequest
-            {
-                Resource = string.Format( "users/{0}/meetings", userId ),
-            };
-            if ( type.HasValue )
-            {
-                request.AddParameter( "type", type.ToString() );
-            }
-            var result = Execute<ListMeetingsResponse>( request );
-
-            return result.Meetings;
         }
 
         public bool ScheduleZoomRoomMeeting( string roomId, string password, string callbackUrl, string topic, DateTimeOffset startTime, string timezone, int duration, bool joinBeforeHost = false )
@@ -160,23 +194,6 @@ namespace ZoomDotNetFramework
             return result != null;
         }
 
-        public bool DeleteMeeting( long meetingId, string occurrenceId = null, bool notifyHosts = false, bool notifyRegistrants = false )
-        {
-            var request = new RestRequest
-            {
-                Resource = string.Format( "meetings/{0}", meetingId ),
-                Method = Method.DELETE
-            };
-            if ( !string.IsNullOrWhiteSpace( occurrenceId ) )
-            {
-                request.AddParameter( "occurrence_id", occurrenceId );
-            }
-            request.AddParameter( "schedule_for_reminder", notifyHosts );
-            request.AddParameter( "cancel_meeting_reminder", notifyRegistrants.ToString().ToLower() );
-            var result = Execute<ZoomBaseResponse>( request );
-            return result != null;
-        }
-
         public bool CancelZoomRoomMeeting( string roomId, string topic, DateTimeOffset startTime, string timezone, int duration )
         {
             var request = new RestRequest
@@ -204,7 +221,9 @@ namespace ZoomDotNetFramework
             return result != null;
         }
 
-        #endregion
+        #endregion Zoom Room API
+
+        #endregion Pure Rest Calls
 
         public RestRequest AddRequestJsonBody( RestRequest request, object bodyObject )
         {

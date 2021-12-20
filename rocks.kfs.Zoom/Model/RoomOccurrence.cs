@@ -34,7 +34,10 @@ namespace rocks.kfs.Zoom.Model
         #region Entity Properties
 
         [DataMember]
-        public Int64 ZoomMeetingId { get; set; }
+        public long ZoomMeetingId { get; set; }
+
+        [DataMember]
+        public string ZoomMeetingJoinUrl { get; set; }
 
         [Required]
         [DataMember]
