@@ -34,7 +34,7 @@ namespace rocks.kfs.Zoom.Model
         #region Entity Properties
 
         [DataMember]
-        public long ZoomMeetingId { get; set; }
+        public long? ZoomMeetingId { get; set; }
 
         [DataMember]
         public string ZoomMeetingJoinUrl { get; set; }
@@ -77,10 +77,10 @@ namespace rocks.kfs.Zoom.Model
         public bool IsCompleted { get; set; } = false;
 
         [DataMember]
-        public int? EntityTypeId { get; set; }
+        public int EntityTypeId { get; set; }
 
         [DataMember]
-        public int? EntityId { get; set; }
+        public int EntityId { get; set; }
 
         #endregion Entity Properties
 
