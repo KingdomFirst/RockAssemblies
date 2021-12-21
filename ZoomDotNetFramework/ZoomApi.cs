@@ -140,6 +140,23 @@ namespace ZoomDotNetFramework
             return result != null;
         }
 
+        public bool UpdateMeeting( Meeting meeting, string occurrenceId = null )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "meetings/{0}", meeting.Id ),
+                Method = Method.PATCH
+            };
+            if ( !string.IsNullOrWhiteSpace( occurrenceId ) )
+            {
+                request.AddParameter( "occurrence_id", occurrenceId );
+            }
+            var meetingJson = 
+            AddRequestJsonBody( request, meeting );
+            var result = Execute<ZoomBaseResponse>( request );
+            return result != null;
+        }
+
         #endregion Zoom API
 
         #region Zoom Room API
