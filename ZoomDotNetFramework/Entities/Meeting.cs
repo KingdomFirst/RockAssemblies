@@ -30,7 +30,7 @@ namespace ZoomDotNetFramework.Entities
         public int Type { get; set; }
         public bool Pre_Schedule { get; set; }
         public string Status { get; set; }
-        public DateTime Start_Time { get; set; }
+        public DateTimeOffset Start_Time { get; set; }
         public int Duration { get; set; }
         public string Timezone { get; set; }
         public DateTime Created_At { get; set; }
