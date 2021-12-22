@@ -14,35 +14,33 @@
 // limitations under the License.
 // </copyright>
 //
+using rocks.kfs.ZoomRoom.Enums;
 using System;
 using System.Collections.Generic;
+using ZoomDotNetFramework.Entities;
 
-namespace ZoomDotNetFramework.Entities
+namespace ZoomDotNetFramework.Responses
 {
-    public class Meeting
+    public class CreateMeetingRequest
     {
-        public string Uuid { get; set; }
-        public long Id { get; set; }
-        public string Host_Id { get; set; }
-        public string Assistant_Id { get; set; }
-        public string Host_Email { get; set; }
+        public CreateMeetingRequestBody Request { get; set; }
+    }
+
+    public class CreateMeetingRequestBody
+    {
         public string Topic { get; set; }
-        public int Type { get; set; }
+        public MeetingType Type { get; set; }
         public bool Pre_Schedule { get; set; }
-        public string Status { get; set; }
         public DateTimeOffset Start_Time { get; set; }
         public int Duration { get; set; }
+        public string Schedule_For { get; set; }
         public string Timezone { get; set; }
-        public DateTime Created_At { get; set; }
-        public string Agenda { get; set; }
-        public string Start_Url { get; set; }
-        public string Join_Url { get; set; }
         public string Password { get; set; }
-        public string H323_Password { get; set; }
-        public string Encrypted_Password { get; set; }
-        public int Pmi { get; set; }
+        public bool Default_Password { get; set; }
+        public string Agenda { get; set; }
         public List<TrackingField> Tracking_Fields { get; set; }
-        public List<Occurrence> Occurrences { get; set; }
+        public Recurrence Recurrence { get; set; }
         public MeetingSetting Settings { get; set; }
+        public string Template_Id { get; set; }
     }
 }

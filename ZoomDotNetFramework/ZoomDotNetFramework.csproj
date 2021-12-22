@@ -61,7 +61,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\Recurrence.cs" />
     <Compile Include="Entities\User.cs" />
+    <Compile Include="Enums\MeetingType.cs" />
     <Compile Include="Enums\UserPronounsOption.cs" />
     <Compile Include="Enums\UserLoginType.cs" />
     <Compile Include="Enums\UserAccountStatus.cs" />
@@ -77,6 +79,7 @@
     <Compile Include="Responses\ZRBaseMeetingInfo.cs" />
     <Compile Include="Responses\ZRErrorResponse.cs" />
     <Compile Include="Responses\ZRCancelMeetingRequest.cs" />
+    <Compile Include="Responses\CreateMeetingRequest.cs" />
     <Compile Include="Responses\ZRScheduleResponse.cs" />
     <Compile Include="Responses\ZRScheduleRequest.cs" />
     <Compile Include="Responses\ZRRequestBodyBase.cs" />

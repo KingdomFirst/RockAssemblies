@@ -18,11 +18,14 @@ using Rock;
 using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
+using rocks.kfs.ZoomRoom.Enums;
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using ZoomDotNetFramework;
 using ZoomDotNetFramework.Entities;
+using ZoomDotNetFramework.Responses;
 //using rocks.kfs.Eventbrite.Utility.ExtensionMethods;
 
 namespace rocks.kfs.Zoom
@@ -54,6 +57,31 @@ namespace rocks.kfs.Zoom
         {
             var zoom = Api();
             var meeting = zoom.GetZoomMeeting( meetingId );
+            return meeting;
+        }
+
+        public Meeting CreateZoomMeeting( string userId, Meeting meetingInfo, string templateId = null, Recurrence recurrence = null )
+        {
+            var zoom = Api();
+            var meetingRequestBody = new CreateMeetingRequestBody
+            {
+                Topic = meetingInfo.Topic,
+                Type = ( MeetingType ) meetingInfo.Type,
+                Start_Time = meetingInfo.Start_Time,
+                Duration = meetingInfo.Duration,
+                Timezone = meetingInfo.Timezone,
+                Password = meetingInfo.Password,
+                Agenda = meetingInfo.Agenda,
+                Recurrence = recurrence,
+                Settings = meetingInfo.Settings,
+                Tracking_Fields = meetingInfo.Tracking_Fields,
+                Template_Id = templateId
+            };
+            var meetingRequest = new CreateMeetingRequest
+            {
+                Request = meetingRequestBody
+            };
+            var meeting = zoom.CreateMeeting( userId, meetingRequest );
             return meeting;
         }
 

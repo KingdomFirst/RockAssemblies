@@ -123,21 +123,16 @@ namespace ZoomDotNetFramework
             return result.Meetings;
         }
 
-        public bool DeleteMeeting( long meetingId, string occurrenceId = null, bool notifyHosts = false, bool notifyRegistrants = false )
+        public Meeting CreateMeeting( string userId, CreateMeetingRequest meetingData )
         {
             var request = new RestRequest
             {
-                Resource = string.Format( "meetings/{0}", meetingId ),
-                Method = Method.DELETE
+                Resource = string.Format( "users/{0}/meetings", userId ),
+                Method = Method.POST
             };
-            if ( !string.IsNullOrWhiteSpace( occurrenceId ) )
-            {
-                request.AddParameter( "occurrence_id", occurrenceId );
-            }
-            request.AddParameter( "schedule_for_reminder", notifyHosts );
-            request.AddParameter( "cancel_meeting_reminder", notifyRegistrants.ToString().ToLower() );
-            var result = Execute<ZoomBaseResponse>( request );
-            return result != null;
+            AddRequestJsonBody( request, meetingData );
+            var result = Execute<Meeting>( request );
+            return result;
         }
 
         public bool UpdateMeeting( Meeting meeting, string occurrenceId = null )
@@ -151,8 +146,24 @@ namespace ZoomDotNetFramework
             {
                 request.AddParameter( "occurrence_id", occurrenceId );
             }
-            var meetingJson = 
             AddRequestJsonBody( request, meeting );
+            var result = Execute<ZoomBaseResponse>( request );
+            return result != null;
+        }
+
+        public bool DeleteMeeting( long meetingId, string occurrenceId = null, bool notifyHosts = false, bool notifyRegistrants = false )
+        {
+            var request = new RestRequest
+            {
+                Resource = string.Format( "meetings/{0}", meetingId ),
+                Method = Method.DELETE
+            };
+            if ( !string.IsNullOrWhiteSpace( occurrenceId ) )
+            {
+                request.AddParameter( "occurrence_id", occurrenceId );
+            }
+            request.AddParameter( "schedule_for_reminder", notifyHosts );
+            request.AddParameter( "cancel_meeting_reminder", notifyRegistrants.ToString().ToLower() );
             var result = Execute<ZoomBaseResponse>( request );
             return result != null;
         }
