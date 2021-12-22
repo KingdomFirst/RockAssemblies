@@ -18,12 +18,12 @@ using Rock;
 namespace rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect
 {
     /// <summary>
-    /// A tabular report field that displays the id of the Zoom Room associated with the RoomOccurrence.
+    /// A tabular report field that displays the name of the Zoom Room associated with the RoomOccurrence.
     /// </summary>
     [Description( "Show Zoom Room Id" )]
     [Export( typeof( DataSelectComponent ) )]
     [ExportMetadata( "ComponentName", "Select Zoom Room Id" )]
-    public class ZoomRoomIdSelect : DataSelectComponent
+    public class ZoomRoomNameSelect : DataSelectComponent
     {
         /// <summary>
         /// Gets the name of the entity type. Filter should be an empty string
@@ -50,7 +50,7 @@ namespace rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect
         {
             get
             {
-                return "Zoom Room Id";
+                return "Zoom Room Name";
             }
         }
 
@@ -93,7 +93,7 @@ namespace rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect
             var zoomRoomDTGuid = ZoomGuid.DefinedType.ZOOM_ROOM.AsGuid();
             var definedValueQuery = new DefinedValueService( context ).Queryable( "DefinedType" )
                 .Where( dv => dv.DefinedType.Guid == zoomRoomDTGuid )
-                .Select( dv => new { GuidString = dv.Guid.ToString(), Value = dv.Value } );
+                .Select( dv => new { GuidString = dv.Guid.ToString(), Description = dv.Description } );
 
             var serviceInstance = new AttributeValueService( context );
 
@@ -105,7 +105,7 @@ namespace rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect
             var occurrenceService = new RoomOccurrenceService( context );
 
             var resultQuery = occurrenceService.Queryable( "Location" )
-                .Select( ro => definedValueQuery.FirstOrDefault( dv => valuesQuery.FirstOrDefault( v => v.EntityId == ro.Location.Id && v.Value == dv.GuidString ).Value == dv.GuidString ).Value );
+                .Select( ro => definedValueQuery.FirstOrDefault( dv => valuesQuery.FirstOrDefault( v => v.EntityId == ro.Location.Id && v.Value == dv.GuidString ).Value == dv.GuidString ).Description );
 
             return SelectExpressionExtractor.Extract( resultQuery, entityIdProperty, "ro" );
         }
