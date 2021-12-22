@@ -128,7 +128,7 @@ namespace rocks.kfs.Zoom.Jobs
                 var zrOccurrencesCancel = new List<RoomOccurrence>();
                 reservationLocationEntityTypeId = new EntityTypeService( rockContext ).GetNoTracking( com.bemaservices.RoomManagement.SystemGuid.EntityType.RESERVATION_LOCATION.AsGuid() ).Id;
                 
-                var zoom = Zoom.Api();
+                var zoom = new Zoom();
                 var logService = new ServiceLogService( rockContext );
                 var locationService = new LocationService( rockContext );
                 var zrLocations = locationService.Queryable()
@@ -199,7 +199,7 @@ namespace rocks.kfs.Zoom.Jobs
                 var zoomMeetings = new List<ZoomDotNetFramework.Entities.Meeting>();
                 foreach ( var zrl in linkedZoomRoomLocations )
                 {
-                    zoomMeetings.AddRange( zoom.GetZoomMeetings( zrl.Value, MeetingListType.Upcoming ) );
+                    zoomMeetings.AddRange( zoom.GetZoomRoomMeetings( zrl.Value, MeetingListType.Upcoming ) );
                 }
                 var zoomMeetingIds = zoomMeetings.Select( m => m.Id ).ToList();
                 var orphanedOccurrences = linkedOccurrences.Where( ro => !zoomMeetingIds.Any( mid => mid == ro.ZoomMeetingId ) );
@@ -371,8 +371,29 @@ namespace rocks.kfs.Zoom.Jobs
                                 {
                                     AddLogEntry( logService, "Zoom Room Reservation Sync", string.Format( "Begin create new Zoom Meeting: ZoomRoom {0} - {1}", zoomRoomDT.Value, occurrence.StartTime.ToShortDateTimeString() ), true );
                                 }
-                                var callbackUrl = string.Format( "{0}?token={1}", webhookBaseUrl, occurrence.Id );
-                                var success = new Zoom().ScheduleZoomRoomMeeting( rockContext, zoomRoomDT.Value, occurrence.Password, occurrence.Topic, occurrence.StartTime.ToRockDateTimeOffset(), occurrence.Duration, joinBeforeHost, enableLogging: verboseLogging, callbackUrl: callbackUrl );
+                                var meetingSettings = new MeetingSetting
+                                {
+                                    Join_Before_Host = joinBeforeHost
+                                };
+                                var meetingToCreate = new Meeting
+                                {
+                                    Topic = occurrence.Topic,
+                                    Type = 2, // Scheduled Meeting
+                                    Start_Time = occurrence.StartTime.ToRockDateTimeOffset(),
+                                    Duration = occurrence.Duration,
+                                    Password = occurrence.Password,
+                                    Settings = meetingSettings
+                                };
+                                var newMeeting = zoom.CreateZoomMeeting( zoomRoomDT.Value, meetingToCreate );
+                                var success = false;
+                                if ( newMeeting != null )
+                                {
+                                    success = true;
+                                    occurrence.ZoomMeetingId = newMeeting.Id;
+                                    occurrence.ZoomMeetingJoinUrl = newMeeting.Join_Url;
+                                }
+                                //var callbackUrl = string.Format( "{0}?token={1}", webhookBaseUrl, occurrence.Id );
+                                //var success = new Zoom().ScheduleZoomRoomMeeting( rockContext, zoomRoomDT.Value, occurrence.Password, occurrence.Topic, occurrence.StartTime.ToRockDateTimeOffset(), occurrence.Duration, joinBeforeHost, enableLogging: verboseLogging, callbackUrl: callbackUrl );
                                 if ( verboseLogging )
                                 {
                                     AddLogEntry( logService, "Zoom Room Reservation Sync", string.Format( "Create new Zoom Meeting {0}: ZoomRoom {1} - {2}", success ? "succeeded" : "failed", zoomRoomDT.Value, occurrence.StartTime.ToShortDateTimeString() ), success );
@@ -428,7 +449,7 @@ namespace rocks.kfs.Zoom.Jobs
                                 }
                                 if ( updateMeeting != null )
                                 {
-                                    zoom.UpdateMeeting( updateMeeting );
+                                    zoom.UpdateZoomMeeting( updateMeeting );
                                 }
                             }
                         }
@@ -456,7 +477,7 @@ namespace rocks.kfs.Zoom.Jobs
                                 zrOccurrenceService.Delete( roomOcc );
                                 if ( roomOcc.ZoomMeetingId.HasValue && roomOcc.ZoomMeetingId.Value > 0 )
                                 {
-                                    zoom.DeleteMeeting( roomOcc.ZoomMeetingId.Value );
+                                    zoom.DeleteZoomMeeting( roomOcc.ZoomMeetingId.Value );
                                 }
                             }
                         }
@@ -469,7 +490,7 @@ namespace rocks.kfs.Zoom.Jobs
             }
         }
 
-        private void DeleteOccurrenceZoomMeetings( bool verboseLogging, IQueryable<RoomOccurrence> occurrencesToCancel, ZoomApi zoom, ServiceLogService logService )
+        private void DeleteOccurrenceZoomMeetings( bool verboseLogging, IQueryable<RoomOccurrence> occurrencesToCancel, Zoom zoom, ServiceLogService logService )
         {
             var errors = new List<string>();
             if ( verboseLogging )
@@ -478,7 +499,7 @@ namespace rocks.kfs.Zoom.Jobs
             }
             foreach ( var roomOcc in occurrencesToCancel )
             {
-                if ( !zoom.DeleteMeeting( roomOcc.ZoomMeetingId.Value ) )
+                if ( !zoom.DeleteZoomMeeting( roomOcc.ZoomMeetingId.Value ) )
                 {
                     errors.Add( string.Format( "Unable to delete Zoom meeting ({0}).", roomOcc.ZoomMeetingId ) );
                 }

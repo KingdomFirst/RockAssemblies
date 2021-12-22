@@ -85,6 +85,27 @@ namespace rocks.kfs.Zoom
             return meeting;
         }
 
+        public bool UpdateZoomMeeting( Meeting meetingInfo )
+        {
+            var zoom = Api();
+            var success = zoom.UpdateMeeting( meetingInfo );
+            return success;
+        }
+
+        public bool DeleteZoomMeeting( long meetingId )
+        {
+            var zoom = Api();
+            var success = zoom.DeleteMeeting( meetingId );
+            return success;
+        }
+
+        public List<Meeting> GetZoomRoomMeetings( string userId, MeetingListType meetingType = MeetingListType.Upcoming  )
+        {
+            var zoom = Api();
+            var meeting = zoom.GetZoomMeetings( userId, meetingType );
+            return meeting;
+        }
+
         public static void SyncZoomRoomDT( RockContext rockContext, bool enableLogging = false )
         {
             if ( enableLogging )
