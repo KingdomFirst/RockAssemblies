@@ -43,7 +43,7 @@ namespace rocks.kfs.Zoom.Migrations
                   ,[Guid] )
                VALUES ( 
                   0
-                  ,1
+                  ,0
                   ,'Zoom Room Reservation Scheduling and Maintenance'
                   ,'Generates Zoom Room occurrences and synchronizes meeting schedules for Room Reservations tied to Locations linked to a Zoom Room.'
                   ,'rocks.kfs.Zoom.Jobs.ZoomRoomSchedulingAndMaintenance'
@@ -85,7 +85,7 @@ namespace rocks.kfs.Zoom.Migrations
                   ,[Guid] )
                VALUES ( 
                   0
-                  ,1
+                  ,0
                   ,'Zoom Meeting Group Reminder'
                   ,'Sends a reminder to members of a group connected with a room reservation that has a Zoom meeting attached to it.'
                   ,'rocks.kfs.Zoom.Jobs.ZoomMeetingGroupReminder'
@@ -97,7 +97,7 @@ namespace rocks.kfs.Zoom.Migrations
 
             // Attribute: rocks.kfs.Zoom.Jobs.ZoomMeetingGroupReminder: System Communication
             RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.ServiceJob", Rock.SystemGuid.FieldType.SYSTEM_COMMUNICATION, "Class", "rocks.kfs.Zoom.Jobs.ZoomMeetingGroupReminder", "System Communication", "System Communication", @"The system communication to use when sending Zoom meeting reminders.", 1, ZoomGuid.SystemComunication.ZOOM_MEETING_REMINDER, "00D58FC1-E85B-4D6F-8788-3F9466A8A364", "SystemCommunication" );
-            RockMigrationHelper.AddAttributeValue( "00D58FC1-E85B-4D6F-8788-3F9466A8A364", -1, Rock.SystemGuid.FieldType.SYSTEM_COMMUNICATION, "5AD2F8A7-B809-4479-A118-1B36623DBFC0" );
+            RockMigrationHelper.AddAttributeValue( "00D58FC1-E85B-4D6F-8788-3F9466A8A364", -1, ZoomGuid.SystemComunication.ZOOM_MEETING_REMINDER, "5AD2F8A7-B809-4479-A118-1B36623DBFC0" );
 
             // Attribute: rocks.kfs.Zoom.Jobs.ZoomMeetingGroupReminder: Days Prior 
             RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.ServiceJob", Rock.SystemGuid.FieldType.TEXT, "Class", "rocks.kfs.Zoom.Jobs.ZoomMeetingGroupReminder", "Days Prior", "Days Prior", @"Comma delimited list of days prior to a scheduled Zoom meeting to send a reminder. For example, a value of '2,4' would result in reminders getting sent two and four days prior to the Zoom meeting's scheduled meeting date.", 2, "1", "BFE626AD-7141-4EA3-B5CE-73F03FE18622", "DaysPrior" );

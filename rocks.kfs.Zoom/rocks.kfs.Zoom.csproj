@@ -73,6 +73,7 @@
       <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=5.1.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -90,6 +91,8 @@
   <ItemGroup>
     <Compile Include="Jobs\ZoomMeetingGroupReminder.cs" />
     <Compile Include="Jobs\ZoomRoomSchedulingAndMaintenance.cs" />
+    <Compile Include="Migrations\007_DataViewsAndReports.cs" />
+    <Compile Include="Migrations\006_PageAndBlocks.cs" />
     <Compile Include="Migrations\003_CreateAttributeQualifiers.cs" />
     <Compile Include="Migrations\004_CreateCommunications.cs" />
     <Compile Include="Migrations\005_CreateJobs.cs" />
@@ -99,6 +102,8 @@
     <Compile Include="Migrations\001_CreateDb.cs" />
     <Compile Include="Migrations\002_CreateAttributes.cs" />
     <Compile Include="Model\ScheduleMeetingWebhookResponse.cs" />
+    <Compile Include="Reporting\RoomOccurrence\DataSelect\ZoomRoomId.cs" />
+    <Compile Include="Reporting\RoomOccurrence\DataSelect\LocationName.cs" />
     <Compile Include="Utility\ExtensionMethods\StringExtensions.cs" />
     <Compile Include="ZoomGuid\Attribute.cs" />
     <Compile Include="ZoomGuid\DefinedType.cs" />
