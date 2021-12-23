@@ -1,10 +1,10 @@
-﻿using System;
+﻿
+using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Web.UI.WebControls;
-using Rock.Attribute;
-using Rock.Model;
+
 using Rock.Reporting;
 
 using rocks.kfs.Zoom.Model;
@@ -73,19 +73,6 @@ namespace rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect
             var result = new BoundField();
 
             return result;
-        }
-
-        /// <summary>
-        /// Comma-delimited list of the Entity properties that should be used for Sorting. Normally, you should leave this as null which will make it sort on the returned field
-        /// </summary>
-        /// <param name="selection"></param>
-        /// <returns></returns>
-        /// <value>
-        /// The sort expression.
-        /// </value>
-        public override string SortProperties( string selection )
-        {
-            return "Location.Name";
         }
 
         /// <summary>
