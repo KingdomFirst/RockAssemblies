@@ -22,5 +22,15 @@ namespace rocks.kfs.Zoom.ZoomGuid
         /// Zoom Entity
         /// </summary>
         public const string ZOOM = "1C7482DC-BAEF-4660-BAA7-E2892E3318DF";
+
+        /// <summary>
+        /// Location Name DataSelect Entity
+        /// </summary>
+        public const string REPORT_LOCATION_NAME = "2B2A1BE5-3C11-49BA-9E69-62E4E3935141";
+
+        /// <summary>
+        /// Zoom Room Name DataSelect Entity
+        /// </summary>
+        public const string REPORT_ZOOM_ROOM_NAME = "E2A4CCFF-7E5E-4A1B-8FF0-DB53917AF940";
     }
 }

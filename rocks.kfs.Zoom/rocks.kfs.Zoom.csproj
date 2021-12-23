@@ -105,6 +105,7 @@
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ScheduleEndDate.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ScheduleStartDate.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ScheduleName.cs" />
+    <Compile Include="Reporting\RoomOccurrence\DataSelect\ReservationNotifyGroup.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ZoomRoomUserPMI.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ZoomRoomUserName.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ZoomRoomName.cs" />
