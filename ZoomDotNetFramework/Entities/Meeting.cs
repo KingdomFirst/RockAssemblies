@@ -44,5 +44,7 @@ namespace ZoomDotNetFramework.Entities
         public List<TrackingField> Tracking_Fields { get; set; }
         public List<Occurrence> Occurrences { get; set; }
         public MeetingSetting Settings { get; set; }
+        public Recurrence Recurrence { get; set; }
+        public string Template_Id { get; set; }
     }
 }

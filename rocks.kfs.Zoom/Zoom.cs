@@ -60,28 +60,10 @@ namespace rocks.kfs.Zoom
             return meeting;
         }
 
-        public Meeting CreateZoomMeeting( string userId, Meeting meetingInfo, string templateId = null, Recurrence recurrence = null )
+        public Meeting CreateZoomMeeting( string userId, Meeting meetingInfo )
         {
             var zoom = Api();
-            var meetingRequestBody = new CreateMeetingRequestBody
-            {
-                Topic = meetingInfo.Topic,
-                Type = ( MeetingType ) meetingInfo.Type,
-                Start_Time = meetingInfo.Start_Time,
-                Duration = meetingInfo.Duration,
-                Timezone = meetingInfo.Timezone,
-                Password = meetingInfo.Password,
-                Agenda = meetingInfo.Agenda,
-                Recurrence = recurrence,
-                Settings = meetingInfo.Settings,
-                Tracking_Fields = meetingInfo.Tracking_Fields,
-                Template_Id = templateId
-            };
-            var meetingRequest = new CreateMeetingRequest
-            {
-                Request = meetingRequestBody
-            };
-            var meeting = zoom.CreateMeeting( userId, meetingRequest );
+            var meeting = zoom.CreateMeeting( userId, meetingInfo );
             return meeting;
         }
 

@@ -123,7 +123,7 @@ namespace ZoomDotNetFramework
             return result.Meetings;
         }
 
-        public Meeting CreateMeeting( string userId, CreateMeetingRequest meetingData )
+        public Meeting CreateMeeting( string userId, Meeting meetingData )
         {
             var request = new RestRequest
             {
