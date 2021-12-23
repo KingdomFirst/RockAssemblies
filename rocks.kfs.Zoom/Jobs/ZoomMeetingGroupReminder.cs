@@ -159,9 +159,9 @@ namespace rocks.kfs.Zoom.Jobs
             // Process reminders
             var meetingRemindersResults = SendMeetingReminders( context, rockContext, roomOccurrenceInfo, systemCommunication, jobPreferredCommunicationType );
 
-            results.AppendLine( $"{meetingRemindersResults.MessagesSent} meeting reminders sent." );
+            results.AppendLine( $"{notificationEmails + notificationSms + notificationPush } meeting reminders sent." );
 
-            results.AppendLine( string.Format( "\t{0} email(s) sent \n\t{1} SMS message(s) sent \n\t{2} push notification(s) sent", notificationEmails, notificationSms, notificationPush ) );
+            results.AppendLine( string.Format( "- {0} email(s)\n- {1} SMS message(s)\n- {2} push notification(s)", notificationEmails, notificationSms, notificationPush ) );
 
             results.Append( FormatWarningMessages( meetingRemindersResults.Warnings ) );
 
