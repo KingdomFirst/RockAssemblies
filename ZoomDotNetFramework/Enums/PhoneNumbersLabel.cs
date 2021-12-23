@@ -21,13 +21,9 @@ namespace rocks.kfs.ZoomRoom.Enums
 {
     public enum PhoneNumbersLabel
     {
-        [Description( "Mobile" )]
         Mobile,
-        [Description( "Office" )]
         Office,
-        [Description( "Home" )]
         Home,
-        [Description( "Fax" )]
         Fax
     }
 }

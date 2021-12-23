@@ -377,7 +377,7 @@ namespace rocks.kfs.Zoom.Jobs
                                 var meetingToCreate = new Meeting
                                 {
                                     Topic = occurrence.Topic,
-                                    Type = 2, // Scheduled Meeting
+                                    Type = MeetingType.Scheduled,
                                     Start_Time = occurrence.StartTime.ToRockDateTimeOffset(),
                                     Duration = occurrence.Duration,
                                     Password = occurrence.Password,
@@ -547,7 +547,7 @@ namespace rocks.kfs.Zoom.Jobs
                     var meetingToCreate = new Meeting
                     {
                         Topic = occurrence.Topic,
-                        Type = 2, // Scheduled Meeting
+                        Type = MeetingType.Scheduled,
                         Start_Time = occurrence.StartTime.ToRockDateTimeOffset(),
                         Duration = occurrence.Duration,
                         Password = occurrence.Password,

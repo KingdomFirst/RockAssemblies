@@ -161,6 +161,8 @@ namespace rocks.kfs.Zoom.Jobs
 
             results.AppendLine( $"{meetingRemindersResults.MessagesSent} meeting reminders sent." );
 
+            results.AppendLine( string.Format( "\t{0} email(s) sent \n\t{1} SMS message(s) sent \n\t{2} push notification(s) sent", notificationEmails, notificationSms, notificationPush ) );
+
             results.Append( FormatWarningMessages( meetingRemindersResults.Warnings ) );
 
             context.Result = results.ToString();
@@ -189,7 +191,7 @@ namespace rocks.kfs.Zoom.Jobs
                 .Queryable().AsNoTracking()
                 .Where( ro => ro.EntityTypeId == reservationLocationEntityTypeId
                     && ro.ZoomMeetingId > 0
-                    && dates.Contains( ro.StartTime.Date ) )
+                    && dates.Contains( DbFunctions.TruncateTime( ro.StartTime ).Value ) )
                 .ToList();
 
             // Find all Reservation Locations tied to the occurrences that need reminder sent.
@@ -208,7 +210,8 @@ namespace rocks.kfs.Zoom.Jobs
                 var groupAttributeValue = resLoc.Reservation.AttributeValues.FirstOrDefault( v => v.Key == resGroupAttribute.Key ).Value;
                 if ( groupAttributeValue != null )
                 {
-                    var group = groupService.Get( groupAttributeValue.Value.AsGuid() );
+                    var groupGuid = groupAttributeValue.Value.Split( '|' )[1].AsGuid();
+                    var group = groupService.Get( groupGuid );
                     if ( group != null )
                     {
                         result.Add( roomOcc, group );
@@ -345,8 +348,7 @@ namespace rocks.kfs.Zoom.Jobs
                     emailMessage.Send( out errorsEmail );
                     if ( errorsEmail.Any() )
                     {
-                        errorCount += errorsEmail.Count;
-                        errorMessages.AddRange( errorsEmail );
+                        result.Errors.AddRange( errorsEmail );
                     }
                     else
                     {
@@ -358,8 +360,7 @@ namespace rocks.kfs.Zoom.Jobs
                     smsMessage.Send( out errorsSms );
                     if ( errorsSms.Any() )
                     {
-                        errorCount += errorsSms.Count;
-                        errorMessages.AddRange( errorsSms );
+                        result.Errors.AddRange( errorsSms );
                     }
                     else
                     {
@@ -371,8 +372,7 @@ namespace rocks.kfs.Zoom.Jobs
                     pushMessage.Send( out errorsSms );
                     if ( errorsPush.Any() )
                     {
-                        errorCount += errorsPush.Count;
-                        errorMessages.AddRange( errorsPush );
+                        result.Errors.AddRange( errorsPush );
                     }
                     else
                     {
@@ -380,7 +380,6 @@ namespace rocks.kfs.Zoom.Jobs
                     }
                 }
             }
-            context.Result = string.Format( "{0} emails sent \n{1} SMS messages sent \n{2} push notifications sent", notificationEmails, notificationSms, notificationPush );
             if ( errorMessages.Any() )
             {
                 StringBuilder sb = new StringBuilder();

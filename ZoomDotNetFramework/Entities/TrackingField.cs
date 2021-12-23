@@ -24,7 +24,6 @@ namespace ZoomDotNetFramework.Entities
 {
     public class TrackingField
     {
-
         public string Field { get; set; }
         public string Value { get; set; }
         public bool Visible { get; set; }

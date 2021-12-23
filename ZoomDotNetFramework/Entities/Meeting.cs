@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 //
+using rocks.kfs.ZoomRoom.Enums;
 using System;
 using System.Collections.Generic;
 
@@ -27,7 +28,7 @@ namespace ZoomDotNetFramework.Entities
         public string Assistant_Id { get; set; }
         public string Host_Email { get; set; }
         public string Topic { get; set; }
-        public int Type { get; set; }
+        public MeetingType Type { get; set; }
         public bool Pre_Schedule { get; set; }
         public string Status { get; set; }
         public DateTimeOffset Start_Time { get; set; }

@@ -21,11 +21,8 @@ namespace rocks.kfs.ZoomRoom.Enums
 {
     public enum UserAccountStatus
     {
-        [Description( "Pending" )]
         Pending,
-        [Description( "Active" )]
         Active,
-        [Description( "Inactive" )]
         Inactive
     }
 }

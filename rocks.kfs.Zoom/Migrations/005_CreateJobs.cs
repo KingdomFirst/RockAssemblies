@@ -89,7 +89,7 @@ namespace rocks.kfs.Zoom.Migrations
                   ,'Zoom Meeting Group Reminder'
                   ,'Sends a reminder to members of a group connected with a room reservation that has a Zoom meeting attached to it.'
                   ,'rocks.kfs.Zoom.Jobs.ZoomMeetingGroupReminder'
-                  ,'0 0/1 * 1/1 * ? *'
+                  ,'0 0 6 1/1 * ? *'
                   ,1
                   ,'07BCC7E6-0E02-4ECE-8948-422C4E4EF20D'
                   );

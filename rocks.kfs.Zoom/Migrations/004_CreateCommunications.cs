@@ -38,8 +38,9 @@ namespace rocks.kfs.Zoom.Migrations
                     {{ 'Global' | Attribute:'EmailFooter' }}"
                 , ZoomGuid.SystemComunication.ZOOM_MEETING_REMINDER
                 , isActive: true
-                , smsMessage: @"Upcoming Zoom meeting for {{ Group.Name }} ( {{ Occurrence.StartTime }} ). <a href='{{ Occurrence.ZoomMeetingJoinUrl }}'>Join Meeting</a>"
-                , pushTitle: "Upcoming Zoom Meeting", pushMessage: @"Upcoming Zoom meeting for {{ Group.Name }} ( {{ Occurrence.StartTime }} ). <a href='{{ Occurrence.ZoomMeetingJoinUrl }}'>Join Meeting</a>" );
+                , smsMessage: @"Upcoming Zoom meeting for {{ Group.Name }} ( {{ Occurrence.StartTime }} ). {{ Occurrence.ZoomMeetingJoinUrl }}"
+                , pushTitle: "Upcoming Zoom Meeting"
+                , pushMessage: @"Upcoming Zoom meeting for {{ Group.Name }} ( {{ Occurrence.StartTime }} ). {{ Occurrence.ZoomMeetingJoinUrl }}" );
         }
 
         /// <summary>
