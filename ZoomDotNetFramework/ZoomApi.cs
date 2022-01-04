@@ -118,6 +118,10 @@ namespace ZoomDotNetFramework
             {
                 request.AddParameter( "type", type.ToString() );
             }
+            if ( pageSize.HasValue )
+            {
+                request.AddParameter( "page_size", pageSize.Value );
+            }
             var result = Execute<ListMeetingsResponse>( request );
 
             return result.Meetings;
@@ -222,7 +226,7 @@ namespace ZoomDotNetFramework
             return result != null;
         }
 
-        public bool CancelZoomRoomMeeting( string roomId, string topic, DateTimeOffset startTime, string timezone, int duration )
+        public bool CancelZoomRoomMeeting( string roomId, string topic, DateTimeOffset startTime, string timezone, int duration, long? meetingNumber = null )
         {
             var request = new RestRequest
             {
@@ -244,6 +248,10 @@ namespace ZoomDotNetFramework
                     }
                 }
             };
+            if ( meetingNumber.HasValue )
+            {
+                reqBody.Params.Meeting_Number = meetingNumber.Value;
+            }
             AddRequestJsonBody( request, reqBody );
             var result = Execute<ZRScheduleResponse>( request );
             return result != null;

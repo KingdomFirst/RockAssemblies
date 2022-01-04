@@ -24,6 +24,7 @@ namespace ZoomDotNetFramework.Responses
 
     public class ZRCancelMeetingRequestBody
     {
+        public long Meeting_Number { get; set; }
         public ZRBaseMeetingInfo Meeting_Info { get; set; }
     }
 }

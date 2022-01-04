@@ -14,21 +14,14 @@
 // limitations under the License.
 // </copyright>
 //
-using System;
-using System.Collections.Generic;
-using ZoomDotNetFramework.Enums;
 
-namespace ZoomDotNetFramework.Entities
+
+namespace ZoomDotNetFramework.Enums
 {
-    public class Recurrence
+    public enum RecurrenceType
     {
-        public RecurrenceType Type { get; set; }
-        public int Repeat_Interval { get; set; }
-        public string Weekly_Days { get; set; }
-        public int Monthly_Day { get; set; }
-        public int Monthly_Week { get; set; }
-        public int Monthly_Week_Day { get; set; }
-        public int End_Times { get; set; }
-        public DateTime End_Date_Time { get; set; }  // Must be UTC
+        Daily = 1,
+        Weekly = 2,
+        Monthly = 3
     }
 }
