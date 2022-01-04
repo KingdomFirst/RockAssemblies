@@ -20,9 +20,9 @@ namespace ZoomDotNetFramework
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
     using RestSharp;
-    using rocks.kfs.ZoomRoom.Enums;
     using System;
     using System.Collections.Generic;
+    using ZoomDotNetFramework.Enums;
     using ZoomDotNetFramework.Responses;
 
     public class ZoomApi

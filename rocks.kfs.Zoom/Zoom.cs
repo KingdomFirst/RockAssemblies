@@ -18,15 +18,13 @@ using Rock;
 using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
-using rocks.kfs.ZoomRoom.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using ZoomDotNetFramework;
 using ZoomDotNetFramework.Entities;
-using ZoomDotNetFramework.Responses;
-//using rocks.kfs.Eventbrite.Utility.ExtensionMethods;
+using ZoomDotNetFramework.Enums;
 
 namespace rocks.kfs.Zoom
 {

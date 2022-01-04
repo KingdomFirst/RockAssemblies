@@ -14,9 +14,9 @@
 // limitations under the License.
 // </copyright>
 //
-using rocks.kfs.ZoomRoom.Enums;
 using System;
 using System.Collections.Generic;
+using ZoomDotNetFramework.Enums;
 
 namespace ZoomDotNetFramework.Entities
 {

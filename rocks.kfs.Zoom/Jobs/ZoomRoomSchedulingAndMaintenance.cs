@@ -31,9 +31,8 @@ using System.Linq;
 using com.bemaservices.RoomManagement.Model;
 using rocks.kfs.Zoom.Model;
 using rocks.kfs.Zoom.ZoomGuid;
-using rocks.kfs.ZoomRoom.Enums;
-using ZoomDotNetFramework;
 using ZoomDotNetFramework.Entities;
+using ZoomDotNetFramework.Enums;
 
 namespace rocks.kfs.Zoom.Jobs
 {

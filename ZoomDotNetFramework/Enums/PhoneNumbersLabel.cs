@@ -17,7 +17,7 @@
 
 using System.ComponentModel;
 
-namespace rocks.kfs.ZoomRoom.Enums
+namespace ZoomDotNetFramework.Enums
 {
     public enum PhoneNumbersLabel
     {

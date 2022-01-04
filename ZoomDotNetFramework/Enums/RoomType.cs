@@ -15,7 +15,7 @@
 // </copyright>
 //
 
-namespace rocks.kfs.ZoomRoom.Enums
+namespace ZoomDotNetFramework.Enums
 {
     public enum RoomType
     {

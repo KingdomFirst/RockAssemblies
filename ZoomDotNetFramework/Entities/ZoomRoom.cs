@@ -14,12 +14,12 @@
 // limitations under the License.
 // </copyright>
 //
-using rocks.kfs.ZoomRoom.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ZoomDotNetFramework.Enums;
 
 namespace ZoomDotNetFramework.Entities
 {
