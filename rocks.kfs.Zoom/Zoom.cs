@@ -88,8 +88,12 @@ namespace rocks.kfs.Zoom
             return meeting;
         }
 
-        public static void SyncZoomRoomDT( RockContext rockContext, bool enableLogging = false )
+        public static void SyncZoomRoomDT( RockContext rockContext = null, bool enableLogging = false )
         {
+            if ( rockContext == null )
+            {
+                rockContext = new RockContext();
+            }
             if ( enableLogging )
             {
                 LogEvent( rockContext, "SyncZoom", "Sync Zoom Rooms Defined Type", "Started" );
