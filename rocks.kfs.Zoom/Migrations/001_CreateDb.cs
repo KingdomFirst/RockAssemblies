@@ -59,6 +59,19 @@ namespace rocks.kfs.Zoom.Migrations
                 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
                 ) ON [PRIMARY]
 
+                IF NOT EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[_rocks_kfs_ZoomRoomOccurrence]') AND name = N'IX_EntityTypeId')
+                CREATE NONCLUSTERED INDEX [IX_EntityTypeId] ON [dbo].[_rocks_kfs_ZoomRoomOccurrence]
+                (
+	                [EntityTypeId] ASC
+                )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+
+                IF NOT EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[_rocks_kfs_ZoomRoomOccurrence]') AND name = N'IX_EntityTypeId_EntityId')
+                CREATE NONCLUSTERED INDEX [IX_EntityTypeId_EntityId] ON [dbo].[_rocks_kfs_ZoomRoomOccurrence]
+                (
+	                [EntityTypeId] ASC,
+	                [EntityId] ASC
+                )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+
                 ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] ADD  CONSTRAINT [DF__rocks_kfs_ZoomRoomOccurrence_IsOccurring]  DEFAULT ((1)) FOR [IsOccurring]
 
                 ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] ADD  CONSTRAINT [DF__rocks_kfs_ZoomRoomOccurrence_IsCompleted]  DEFAULT ((0)) FOR [IsCompleted]
