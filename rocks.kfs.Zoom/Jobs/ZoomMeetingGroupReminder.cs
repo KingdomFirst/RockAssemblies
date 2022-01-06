@@ -53,7 +53,7 @@ namespace rocks.kfs.Zoom.Jobs
         "Days Prior",
         Description = "Comma delimited list of days prior to a scheduled Zoom meeting to send a reminder. For example, a value of '2,4' would result in reminders getting sent two and four days prior to the Zoom meeting's scheduled meeting date.",
         DefaultValue = "1",
-        IsRequired = false,
+        IsRequired = true,
         Order = 2,
         Key = AttributeKey.DaysPrior )]
 
@@ -128,11 +128,12 @@ namespace rocks.kfs.Zoom.Jobs
                 HandleErrorMessages( context, errorMessages );
             }
 
-            var systemEmailGuid = dataMap.GetString( AttributeKey.SystemCommunication ).AsGuid();
-            var systemCommunication = new SystemCommunicationService( rockContext ).Get( systemEmailGuid );
+            var systemCommunicationGuid = dataMap.GetString( AttributeKey.SystemCommunication ).AsGuid();
+            var systemCommunication = new SystemCommunicationService( rockContext ).Get( systemCommunicationGuid );
 
             var jobPreferredCommunicationType = ( CommunicationType ) dataMap.GetString( AttributeKey.SendUsing ).AsInteger();
             var isSmsEnabled = MediumContainer.HasActiveSmsTransport() && !string.IsNullOrWhiteSpace( systemCommunication.SMSMessage );
+            var isPushEnabled = MediumContainer.HasActivePushTransport() && !string.IsNullOrWhiteSpace( systemCommunication.PushMessage );
 
             if ( jobPreferredCommunicationType == CommunicationType.SMS && !isSmsEnabled )
             {
@@ -144,10 +145,28 @@ namespace rocks.kfs.Zoom.Jobs
                 HandleErrorMessages( context, errorMessages );
             }
 
-            var results = new StringBuilder();
-            if ( jobPreferredCommunicationType != CommunicationType.Email && string.IsNullOrWhiteSpace( systemCommunication.SMSMessage ) )
+            if ( jobPreferredCommunicationType == CommunicationType.PushNotification && !isPushEnabled )
             {
-                var warning = $"No SMS message found in system communication {systemCommunication.Title}. All Zoom meeting reminders were sent via email.";
+                // If push notification selected but not usable default to email.
+                var errorMessages = new List<string>
+                {
+                    $"The job is setup to send via Push Notification but either Push Notifications are not enabled or no Push message was found in system communication {systemCommunication.Title}."
+                };
+                HandleErrorMessages( context, errorMessages );
+            }
+
+            var results = new StringBuilder();
+            if ( jobPreferredCommunicationType == CommunicationType.SMS && string.IsNullOrWhiteSpace( systemCommunication.SMSMessage ) )
+            {
+                var warning = $"No SMS message found in system communication {systemCommunication.Title}. All Zoom meeting reminders will be attempted via email.";
+                results.AppendLine( warning );
+                RockLogger.Log.Warning( RockLogDomains.Jobs, warning );
+                jobPreferredCommunicationType = CommunicationType.Email;
+            }
+
+            if ( jobPreferredCommunicationType == CommunicationType.PushNotification && string.IsNullOrWhiteSpace( systemCommunication.PushMessage ) )
+            {
+                var warning = $"No Push message found in system communication {systemCommunication.Title}. All Zoom meeting reminders will be attempted via email.";
                 results.AppendLine( warning );
                 RockLogger.Log.Warning( RockLogDomains.Jobs, warning );
                 jobPreferredCommunicationType = CommunicationType.Email;
