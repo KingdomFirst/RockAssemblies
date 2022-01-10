@@ -120,7 +120,7 @@ namespace rocks.kfs.Zoom.Migrations
         public override void Down()
         {
             #region Zoom Room Scheduling And Maintenance Job
-            
+
             RockMigrationHelper.DeleteAttribute( "4504E3F4-E2E1-44DB-B6D7-E2CC1F498695" ); // rocks.kfs.Zoom.Jobs.ZoomRoomSchedulingAndMaintenance: Sync Days Out
             RockMigrationHelper.DeleteAttribute( "6EE5573F-D3CE-4E04-A9D7-EF6F19343961" ); // rocks.kfs.Zoom.Jobs.ZoomRoomSchedulingAndMaintenance: Enable Verbose Logging
             RockMigrationHelper.DeleteAttribute( "E512BF8F-EBD0-40D9-B310-3C3B3B895629" ); // rocks.kfs.Zoom.Jobs.ZoomRoomSchedulingAndMaintenance: Import Zoom Room Meetings

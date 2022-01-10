@@ -79,7 +79,7 @@ namespace rocks.kfs.Zoom
             return success;
         }
 
-        public List<Meeting> GetZoomRoomMeetings( string userId, MeetingListType meetingType = MeetingListType.Upcoming  )
+        public List<Meeting> GetZoomRoomMeetings( string userId, MeetingListType meetingType = MeetingListType.Upcoming )
         {
             var zoom = Api();
             var meeting = zoom.GetZoomMeetings( userId, meetingType );

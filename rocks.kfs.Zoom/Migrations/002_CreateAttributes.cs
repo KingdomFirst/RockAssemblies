@@ -44,7 +44,7 @@ namespace rocks.kfs.Zoom.Migrations
                 Sql( @"SELECT TOP 1 Id FROM _com_bemaservices_RoomManagement_Reservation" );
                 RockMigrationHelper.AddNewEntityAttribute( "com.bemaservices.RoomManagement.Model.Reservation", Rock.SystemGuid.FieldType.GROUP_TYPE_GROUP, "", "", "Zoom Notify Group", "", "The Group to notify when a Zoom Room meeting is connected with this reservation.", 0, "", ZoomGuid.Attribute.ROOM_RESERVATION_GROUP_ATTRIBUTE, "ZoomNotifyGroup" );
             }
-            catch {}
+            catch { }
 
             RockMigrationHelper.AddDefinedType( "Zoom", "Zoom Rooms", "Zoom Rooms available for linking to Rock Locations.", ZoomGuid.DefinedType.ZOOM_ROOM );
             RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.TEXT, "User Name", "ZoomUsersName", "Zoom user's name.", 0, "", ZoomGuid.Attribute.ZOOM_USER_NAME );

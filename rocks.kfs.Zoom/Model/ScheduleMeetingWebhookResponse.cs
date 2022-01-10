@@ -17,6 +17,6 @@
 namespace rocks.kfs.Zoom.Model
 {
     public class ScheduleMeetingWebhookResponse : ZoomDotNetFramework.Responses.ZRScheduleMeetingWebhookResponse
-    { 
+    {
     }
 }

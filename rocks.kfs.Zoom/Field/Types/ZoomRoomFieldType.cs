@@ -14,19 +14,8 @@
 // limitations under the License.
 // </copyright>
 //
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using ZoomDotNetFramework;
-using ZoomDotNetFramework.Responses;
-using Rock;
-using Rock.Data;
 using Rock.Field;
-using Rock.Web.UI.Controls;
-using rocks.kfs.Zoom.Utility.ExtensionMethods;
+using System;
 
 namespace rocks.kfs.Zoom.Field.Types
 {

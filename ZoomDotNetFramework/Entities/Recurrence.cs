@@ -15,7 +15,6 @@
 // </copyright>
 //
 using System;
-using System.Collections.Generic;
 using ZoomDotNetFramework.Enums;
 
 namespace ZoomDotNetFramework.Entities

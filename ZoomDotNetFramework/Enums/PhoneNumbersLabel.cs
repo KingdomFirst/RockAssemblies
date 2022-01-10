@@ -15,8 +15,6 @@
 // </copyright>
 //
 
-using System.ComponentModel;
-
 namespace ZoomDotNetFramework.Enums
 {
     public enum PhoneNumbersLabel

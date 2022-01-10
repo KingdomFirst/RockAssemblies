@@ -126,7 +126,7 @@ namespace rocks.kfs.Zoom.Jobs
                 var verboseLogging = dataMap.GetBooleanFromString( AttributeKey.VerboseLogging );
                 var zrOccurrencesCancel = new List<RoomOccurrence>();
                 reservationLocationEntityTypeId = new EntityTypeService( rockContext ).GetNoTracking( com.bemaservices.RoomManagement.SystemGuid.EntityType.RESERVATION_LOCATION.AsGuid() ).Id;
-                
+
                 var zoom = new Zoom();
                 var logService = new ServiceLogService( rockContext );
                 var locationService = new LocationService( rockContext );
