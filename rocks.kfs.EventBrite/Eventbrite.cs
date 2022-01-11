@@ -331,7 +331,7 @@ namespace rocks.kfs.Eventbrite
 
                     groupMemberService.Add( member );
 
-                    SetPersonData( rockContext, person, attendee, group, IsRSVPEvent && order.Attendees != null ? order.Attendees.Count : 1, EnableLogging );
+                    SetPersonData( rockContext, person, attendee, group, IsRSVPEvent && order.Attendees != null ? order.Attendees.Count : attendee.Quantity, EnableLogging );
                 }
                 else if ( matchedGroupMember != null && order.Status == "deleted" )
                 {
@@ -344,6 +344,33 @@ namespace rocks.kfs.Eventbrite
                 {
                     matchedGroupMember.GroupMemberStatus = GroupMemberStatus.Inactive;
                     matchedGroupMember.Note = "Eventbrite order canceled/refunded!";
+                }
+                else if ( matchedGroupMember != null )
+                {
+                    if ( matchedGroupMember.Attributes == null )
+                    {
+                        matchedGroupMember.LoadAttributes( rockContext );
+                    }
+                    var attributeVal = matchedGroupMember.GetAttributeValue( gmPersonAttributeKey );
+                    if ( attributeVal.IsNotNullOrWhiteSpace() )
+                    {
+                        // Attribute Values in our special eventBritePerson field type are stored as a delimited string Eventbrite Id^Ticket Class(es)^Eventbrite Order Id^RSVP/Ticket Count(s)
+                        var splitVal = attributeVal.SplitDelimitedValues( "^" );
+                        var ticketClasses = splitVal[1].SplitDelimitedValues( "||" );
+                        var ticketQtys = splitVal[3].SplitDelimitedValues( "||" );
+                        if ( !ticketClasses.Contains( attendee.Ticket_Class_Name ) )
+                        {
+                            splitVal[1] += "||" + attendee.Ticket_Class_Name;
+                            splitVal[3] += "||" + order.Attendees?.Count( a => a.Profile.First_Name == attendee.Profile.First_Name && a.Profile.Last_Name == attendee.Profile.Last_Name && a.Profile.Email == attendee.Profile.Email && a.Ticket_Class_Id == attendee.Ticket_Class_Id ).ToString();
+                        }
+                        else
+                        {
+                            ticketQtys[Array.IndexOf( ticketClasses, attendee.Ticket_Class_Name )] = order.Attendees?.Count( a => a.Profile.First_Name == attendee.Profile.First_Name && a.Profile.Last_Name == attendee.Profile.Last_Name && a.Profile.Email == attendee.Profile.Email && a.Ticket_Class_Id == attendee.Ticket_Class_Id ).ToString();
+                            splitVal[3] = ticketQtys.JoinStrings( "||" );
+                        }
+                        matchedGroupMember.SetAttributeValue( gmPersonAttributeKey, splitVal.JoinStrings( "^" ) );
+                        matchedGroupMember.SaveAttributeValue( gmPersonAttributeKey );
+                    }
                 }
 
                 //Record Attendance
@@ -511,7 +538,7 @@ namespace rocks.kfs.Eventbrite
             var familyGroup = person.GetFamily( rockContext );
 
             //Address
-            if ( attendee.Profile.Addresses.Home != null && attendee.Profile.Addresses.Home.Address_1 != null &&  familyGroup != null && familyGroup.GroupLocations != null && !familyGroup.GroupLocations.Any( gl => gl.GroupLocationTypeValueId == homeLocationValueId )  )
+            if ( attendee.Profile.Addresses.Home != null && attendee.Profile.Addresses.Home.Address_1 != null && familyGroup != null && familyGroup.GroupLocations != null && !familyGroup.GroupLocations.Any( gl => gl.GroupLocationTypeValueId == homeLocationValueId ) )
             {
                 var location = new LocationService( rockContext ).Get( attendee.Profile.Addresses.Home.Address_1, attendee.Profile.Addresses.Home.Address_2, attendee.Profile.Addresses.Home.City, attendee.Profile.Addresses.Home.Region, attendee.Profile.Addresses.Home.Postal_Code, attendee.Profile.Addresses.Home.Country );
                 if ( familyGroup != null && location != null )
@@ -590,7 +617,7 @@ namespace rocks.kfs.Eventbrite
             }
             rockContext.SaveChanges();
 
-            // Attribute Values in our special eventBritePerson field type are stored as a delimitted string Eventbrite Id^Ticket Class^Eventbrite Order Id^RSVP/Ticket Count
+            // Attribute Values in our special eventBritePerson field type are stored as a delimited string Eventbrite Id^Ticket Class(es)^Eventbrite Order Id^RSVP/Ticket Count(s)
             var ebPersonVal = string.Format( "{0}^{1}^{2}^{3}", attendee.Id, attendee.Ticket_Class_Name, attendee.Order_Id.ToString(), attendeeCount );
 
             var groupMember = group.Members.FirstOrDefault( gm => gm.PersonId == person.Id );
@@ -636,7 +663,7 @@ namespace rocks.kfs.Eventbrite
             }
             GroupMember retVar = null;
 
-            // Attribute Values in our special eventBritePerson field type are stored as a delimitted string Eventbrite Id^Ticket Class^Eventbrite Order Id^RSVP/Ticket Count
+            // Attribute Values in our special eventBritePerson field type are stored as a delimited string Eventbrite Id^Ticket Class(es)^Eventbrite Order Id^RSVP/Ticket Count(s)
             foreach ( var gm in groupMembers )
             {
                 if ( gm.Attributes == null )

@@ -15,6 +15,7 @@
 // </copyright>
 //
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -156,6 +157,60 @@ namespace rocks.kfs.Intacct
             }
 
             return false;
+        }
+
+        public List<CheckingAccount> ParseListCheckingAccountsResponse( XmlDocument xmlDocument, int BatchId )
+        {
+            var bankAccountList = new List<CheckingAccount>();
+            var resultX = XDocument.Load( new XmlNodeReader( xmlDocument ) );
+
+            var xResponseXml = resultX.Elements( "response" ).FirstOrDefault();
+            if ( xResponseXml != null )
+            {
+                var xOperationXml = xResponseXml.Elements( "operation" ).FirstOrDefault();
+                if ( xOperationXml != null )
+                {
+                    var xResultXml = xOperationXml.Elements( "result" ).FirstOrDefault();
+                    if ( xResultXml != null )
+                    {
+                        var xStatusXml = xResultXml.Elements( "status" ).FirstOrDefault();
+                        if ( xStatusXml != null && xStatusXml.Value == "success" )
+                        {
+                            var xDataXml = xResultXml.Elements( "data" ).FirstOrDefault();
+                            if ( xDataXml != null )
+                            {
+                                var xCheckingAccountsXml = xDataXml.Elements( "checkingaccount" );
+                                if ( xCheckingAccountsXml != null )
+                                {
+                                    foreach ( var xAcctXml in xCheckingAccountsXml )
+                                    {
+                                        var bankAccount = new CheckingAccount();
+                                        if ( xAcctXml.Elements( "BANKACCOUNTID" ).FirstOrDefault() != null )
+                                        {
+                                            bankAccount.BankAccountId = xAcctXml.Elements( "BANKACCOUNTID" ).FirstOrDefault().Value;
+                                        }
+                                        if ( xAcctXml.Elements( "BANKACCOUNTNO" ).FirstOrDefault() != null )
+                                        {
+                                            bankAccount.BankAcountNo = xAcctXml.Elements( "BANKACCOUNTNO" ).FirstOrDefault().Value;
+                                        }
+                                        if ( xAcctXml.Elements( "GLACCOUNTNO" ).FirstOrDefault() != null )
+                                        {
+                                            bankAccount.GLAccountNo = xAcctXml.Elements( "GLACCOUNTNO" ).FirstOrDefault().Value;
+                                        }
+                                        if ( xAcctXml.Elements( "BANKNAME" ).FirstOrDefault() != null )
+                                        {
+                                            bankAccount.BankName = xAcctXml.Elements( "BANKNAME" ).FirstOrDefault().Value;
+                                        }
+                                        bankAccountList.Add( bankAccount );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return bankAccountList;
         }
     }
 }

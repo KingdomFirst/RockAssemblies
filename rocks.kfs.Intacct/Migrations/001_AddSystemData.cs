@@ -16,7 +16,7 @@
 //
 using Rock.Plugin;
 
-namespace com.kfs.Intacct.Migrations
+namespace rocks.kfs.Intacct.Migrations
 {
     [MigrationNumber( 1, "1.7.4" )]
     public class AddSystemData : Migration

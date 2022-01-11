@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2019 by Kingdom First Solutions
+// Copyright 2021 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ using Rock;
 using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
+using rocks.kfs.Intacct.Utils;
+using KFSConst = rocks.kfs.Intacct.SystemGuid;
 
 namespace rocks.kfs.Intacct
 {
@@ -203,126 +205,45 @@ namespace rocks.kfs.Intacct
             //
             // Group/Sum Transactions by Account and Project since Project can come from Account or Transaction Details
             //
-            var batchTransactions = new List<GLTransaction>();
-            var registrationLinks = new List<RegistrationInstance>();
-            var groupMemberLinks = new List<GroupMember>();
-            foreach ( var transaction in financialBatch.Transactions )
-            {
-                transaction.LoadAttributes();
-                foreach ( var transactionDetail in transaction.TransactionDetails )
-                {
-                    transactionDetail.LoadAttributes();
-                    transactionDetail.Account.LoadAttributes();
-
-                    var detailProject = transactionDetail.GetAttributeValue( "rocks.kfs.Intacct.PROJECTID" ).AsGuidOrNull();
-                    var accountProject = transactionDetail.Account.GetAttributeValue( "rocks.kfs.Intacct.PROJECTID" ).AsGuidOrNull();
-
-                    var projectCode = string.Empty;
-                    if ( detailProject != null )
-                    {
-                        projectCode = DefinedValueCache.Get( ( Guid ) detailProject ).Value;
-                    }
-                    else if ( accountProject != null )
-                    {
-                        projectCode = DefinedValueCache.Get( ( Guid ) accountProject ).Value;
-                    }
-
-                    if ( transactionDetail.EntityTypeId.HasValue )
-                    {
-                        var registrationEntityType = EntityTypeCache.Get( typeof( Rock.Model.Registration ) );
-                        var groupMemberEntityType = EntityTypeCache.Get( typeof( Rock.Model.GroupMember ) );
-
-                        if ( transactionDetail.EntityId.HasValue && transactionDetail.EntityTypeId == registrationEntityType.Id )
-                        {
-                            foreach ( var registration in new RegistrationService( rockContext )
-                                .Queryable().AsNoTracking()
-                                .Where( r =>
-                                    r.RegistrationInstance != null &&
-                                    r.RegistrationInstance.RegistrationTemplate != null &&
-                                    r.Id == transactionDetail.EntityId ) )
-                            {
-                                registrationLinks.Add( registration.RegistrationInstance );
-                            }
-                        }
-                        if ( transactionDetail.EntityId.HasValue && transactionDetail.EntityTypeId == groupMemberEntityType.Id )
-                        {
-                            foreach ( var groupMember in new GroupMemberService( rockContext )
-                                .Queryable().AsNoTracking()
-                                .Where( gm =>
-                                    gm.Group != null &&
-                                    gm.Id == transactionDetail.EntityId ) )
-                            {
-                                groupMemberLinks.Add( groupMember );
-                            }
-                        }
-                    }
-
-                    var transactionItem = new GLTransaction()
-                    {
-                        Amount = transactionDetail.Amount,
-                        FinancialAccountId = transactionDetail.AccountId,
-                        Project = projectCode
-                    };
-
-                    batchTransactions.Add( transactionItem );
-                }
-            }
-
-            var batchTransactionsSummary = batchTransactions
-                .GroupBy( d => new { d.FinancialAccountId, d.Project } )
-                .Select( s => new GLTransaction
-                {
-                    FinancialAccountId = s.Key.FinancialAccountId,
-                    Project = s.Key.Project,
-                    Amount = s.Sum( f => ( decimal? ) f.Amount ) ?? 0.0M
-                } )
-                .ToList();
+            List<RegistrationInstance> registrationLinks;
+            List<GroupMember> groupMemberLinks;
+            var batchTransactionsSummary = TransactionHelpers.GetTransactionSummary( financialBatch, rockContext, out registrationLinks, out groupMemberLinks );
 
             //
-            // Get the Dimensions from the Account since the Transaction Detials have been Grouped already
+            // Get the Dimensions from the Account since the Transaction Details have been Grouped already
             //
-            var customDimensions = GetCustomDimensions();
+            var customDimensions = TransactionHelpers.GetCustomDimensions();
             var batchSummary = new List<GLBatchTotals>();
             foreach ( var summary in batchTransactionsSummary )
             {
                 var account = new FinancialAccountService( rockContext ).Get( summary.FinancialAccountId );
-                account.LoadAttributes();
-
                 var customDimensionValues = new Dictionary<string, dynamic>();
-
-                if ( customDimensions.Count > 0 )
+                account.LoadAttributes();
+                var mergeFieldObjects = new MergeFieldObjects
                 {
-                    foreach ( var rockKey in customDimensions )
-                    {
-                        var dimension = rockKey.Split( '.' ).Last();
-                        customDimensionValues.Add( dimension, account.GetAttributeValue( rockKey ) );
-                    }
-                }
-
-                var mergeFields = new Dictionary<string, object>();
-                mergeFields.Add( "Account", account );
-                mergeFields.Add( "Summary", summary );
-                mergeFields.Add( "Batch", financialBatch );
-                mergeFields.Add( "Registrations", registrationLinks );
-                mergeFields.Add( "GroupMembers", groupMemberLinks );
-                mergeFields.Add( "CustomDimensions", customDimensionValues );
-
-                if ( debugLava.Length < 6 && debugLava.AsBoolean() )
-                {
-                    debugLava = mergeFields.lavaDebugInfo();
-                }
+                    Account = account,
+                    Batch = financialBatch,
+                    Registrations = registrationLinks,
+                    GroupMembers = groupMemberLinks,
+                    Summary = summary,
+                    CustomDimensions = customDimensions
+                };
+                Dictionary<string, object> mergeFields = TransactionHelpers.GetMergeFieldsAndDimensions(  ref debugLava, customDimensionValues, mergeFieldObjects );
 
                 var batchSummaryItem = new GLBatchTotals()
                 {
                     Amount = summary.Amount,
                     CreditAccount = account.GetAttributeValue( "rocks.kfs.Intacct.ACCOUNTNO" ),
                     DebitAccount = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITACCOUNTNO" ),
+                    TransactionFeeAmount = summary.TransactionFeeAmount,
+                    TransactionFeeAccount = summary.TransactionFeeAccount,
                     Class = account.GetAttributeValue( "rocks.kfs.Intacct.CLASSID" ),
                     Department = account.GetAttributeValue( "rocks.kfs.Intacct.DEPARTMENT" ),
                     Location = account.GetAttributeValue( "rocks.kfs.Intacct.LOCATION" ),
                     Project = summary.Project,
                     Description = DescriptionLava.ResolveMergeFields( mergeFields ),
-                    CustomDimensions = customDimensionValues
+                    CustomDimensions = customDimensionValues,
+                    ProcessTransactionFees = summary.ProcessTransactionFees
                 };
 
                 batchSummary.Add( batchSummaryItem );
@@ -331,39 +252,16 @@ namespace rocks.kfs.Intacct
             return GenerateLineItems( batchSummary );
         }
 
-        private List<string> GetCustomDimensions()
-        {
-            var knownDimensions = new List<string>();
-            knownDimensions.Add( "rocks.kfs.Intacct.ACCOUNTNO" );
-            knownDimensions.Add( "rocks.kfs.Intacct.DEBITACCOUNTNO" );
-            knownDimensions.Add( "rocks.kfs.Intacct.CLASSID" );
-            knownDimensions.Add( "rocks.kfs.Intacct.DEPARTMENT" );
-            knownDimensions.Add( "rocks.kfs.Intacct.LOCATION" );
-            knownDimensions.Add( "rocks.kfs.Intacct.PROJECTID" );
-
-            var rockContext = new RockContext();
-            var accountCategoryId = new CategoryService( rockContext ).Queryable().FirstOrDefault( c => c.Guid.Equals( new System.Guid( "7361A954-350A-41F1-9D94-AD2CF4030CA5" ) ) ).Id;
-            var attributeService = new AttributeService( rockContext );
-            var accountAttributes = attributeService.Queryable().Where( a => a.Categories.Select( c => c.Id ).Contains( accountCategoryId ) ).ToList();
-
-            var customDimensions = new List<string>();
-
-            foreach ( var attribute in accountAttributes )
-            {
-                if ( !knownDimensions.Contains( attribute.Key ) )
-                {
-                    customDimensions.Add( attribute.Key );
-                }
-            }
-
-            return customDimensions;
-        }
-
         private List<JournalEntryLine> GenerateLineItems( List<GLBatchTotals> transactionItems )
         {
             var returnList = new List<JournalEntryLine>();
             foreach ( var transaction in transactionItems )
             {
+                var processTransactionFees = 0;
+                if ( transaction.ProcessTransactionFees > 0 && !string.IsNullOrWhiteSpace( transaction.TransactionFeeAccount ) && transaction.TransactionFeeAmount > 0 )
+                {
+                    processTransactionFees = transaction.ProcessTransactionFees;
+                }
                 var creditLine = new JournalEntryLine()
                 {
                     GlAccountNumber = transaction.CreditAccount,
@@ -381,7 +279,7 @@ namespace rocks.kfs.Intacct
                 var debitLine = new JournalEntryLine()
                 {
                     GlAccountNumber = transaction.DebitAccount,
-                    TransactionAmount = transaction.Amount,
+                    TransactionAmount = processTransactionFees == 1 ? transaction.Amount - transaction.TransactionFeeAmount : transaction.Amount,
                     ClassId = transaction.Class,
                     DepartmentId = transaction.Department,
                     LocationId = transaction.Location,
@@ -391,6 +289,40 @@ namespace rocks.kfs.Intacct
                 };
 
                 returnList.Add( debitLine );
+
+                if ( processTransactionFees == 2 )
+                {
+                    var feeCreditLine = new JournalEntryLine()
+                    {
+                        GlAccountNumber = transaction.DebitAccount,  // Credit the Bank Account (DebitAccount)
+                        TransactionAmount = transaction.TransactionFeeAmount * -1,
+                        ClassId = transaction.Class,
+                        DepartmentId = transaction.Department,
+                        LocationId = transaction.Location,
+                        ProjectId = transaction.Project,
+                        Memo = transaction.Description + " Transaction Fees",
+                        CustomFields = transaction.CustomDimensions
+                    };
+
+                    returnList.Add( feeCreditLine );
+                }
+
+                if ( processTransactionFees > 0 )
+                {
+                    var feeDebitLine = new JournalEntryLine()
+                    {
+                        GlAccountNumber = transaction.TransactionFeeAccount,
+                        TransactionAmount = transaction.TransactionFeeAmount,
+                        ClassId = transaction.Class,
+                        DepartmentId = transaction.Department,
+                        LocationId = transaction.Location,
+                        ProjectId = transaction.Project,
+                        Memo = transaction.Description + " Transaction Fees",
+                        CustomFields = transaction.CustomDimensions
+                    };
+
+                    returnList.Add( feeDebitLine );
+                }
             }
 
             return returnList;

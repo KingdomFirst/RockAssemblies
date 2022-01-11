@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2019 by Kingdom First Solutions
+// Copyright 2021 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "rocks.kfs.ScheduledGroupCommunication" )]
-[assembly: AssemblyProduct( "rocks.kfs.ScheduledGroupCommunication" )]
+[assembly: AssemblyTitle( "rocks.kfs.StepsToCare" )]
+[assembly: AssemblyProduct( "rocks.kfs.StepsToCare" )]
 [assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2021" )]
 
 // Auto increment assembly versions
-[assembly: AssemblyVersion( "1.6.*" )]
+[assembly: AssemblyVersion( "1.1.*" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
@@ -33,4 +33,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible( false )]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid( "cd71a013-e46e-4a34-af7c-b13544ef2b23" )]
+[assembly: Guid("44b89d21-5af4-4e89-a49d-31b60ec4ab4d")]
