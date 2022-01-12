@@ -199,7 +199,6 @@ namespace rocks.kfs.Zoom.Jobs
             var result = new Dictionary<RoomOccurrence, Group>();
             var dates = GetSearchDates( dataMap );
             var startDate = dates.Min();
-            var endDate = dates.Max().AddDays( 1 );
 
             var zRoomOccurrenceService = new RoomOccurrenceService( rockContext );
             var reservationLocationEntityTypeId = new EntityTypeService( rockContext ).GetNoTracking( com.bemaservices.RoomManagement.SystemGuid.EntityType.RESERVATION_LOCATION.AsGuid() ).Id;
@@ -215,7 +214,6 @@ namespace rocks.kfs.Zoom.Jobs
 
             // Find all Reservation Locations tied to the occurrences that need reminder sent.
             var occurrenceEntityIds = occurrencesToRemind.Select( o => o.EntityId ).ToList();
-            var occReminderInfo = new List<Tuple<Group, RoomOccurrence>>();
             var groupService = new GroupService( rockContext );
             var reservationLocationService = new ReservationLocationService( rockContext );
             var resLocationsToRemind = reservationLocationService.Queryable( "Reservation" )
@@ -388,7 +386,7 @@ namespace rocks.kfs.Zoom.Jobs
                 }
                 if ( pushMessage.GetRecipients().Count > 0 )
                 {
-                    pushMessage.Send( out errorsSms );
+                    pushMessage.Send( out errorsPush );
                     if ( errorsPush.Any() )
                     {
                         result.Errors.AddRange( errorsPush );
