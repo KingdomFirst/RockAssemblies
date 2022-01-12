@@ -65,6 +65,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
     </Reference>
+    <Reference Include="Rock.Common">
+      <HintPath>..\..\RockWeb\Bin\Rock.Common.dll</HintPath>
+    </Reference>
     <Reference Include="Rock.Rest">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Rock.Rest.dll</HintPath>
