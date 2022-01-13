@@ -224,10 +224,10 @@ namespace rocks.kfs.Zoom.Jobs
             {
                 var resLoc = resLocationsToRemind.FirstOrDefault( rl => rl.Id == roomOcc.EntityId );
                 resLoc.Reservation.LoadAttributes();
-                var groupAttributeValue = resLoc.Reservation.AttributeValues.FirstOrDefault( v => v.Key == resGroupAttribute.Key ).Value;
-                if ( groupAttributeValue != null )
+                var groupAttributeValue = resLoc.Reservation.GetAttributeValue( resGroupAttribute.Key );
+                if ( !string.IsNullOrEmpty( groupAttributeValue ) )
                 {
-                    var groupGuid = groupAttributeValue.Value.Split( '|' )[1].AsGuid();
+                    var groupGuid = groupAttributeValue.Split( '|' )[1].AsGuid();
                     var group = groupService.Get( groupGuid );
                     if ( group != null )
                     {
@@ -267,6 +267,7 @@ namespace rocks.kfs.Zoom.Jobs
             catch
             {
                 // if an exception occurs just use today's date.
+                dates.Add( RockDateTime.Today );
             }
 
             return dates;
@@ -303,7 +304,12 @@ namespace rocks.kfs.Zoom.Jobs
                 {
                     groupMember.Person.LoadAttributes();
                     var smsNumber = groupMember.Person.PhoneNumbers.GetFirstSmsNumber();
-                    if ( !groupMember.Person.CanReceiveEmail( false ) && smsNumber.IsNullOrWhiteSpace() )
+                    var personAlias = new PersonAliasService( rockContext ).Get( groupMember.Person.PrimaryAliasId.Value );
+                    List<string> pushDevices = new PersonalDeviceService( rockContext ).Queryable()
+                        .Where( a => a.PersonAliasId.HasValue && a.PersonAliasId == personAlias.Id && a.NotificationsEnabled )
+                        .Select( a => a.DeviceRegistrationId )
+                        .ToList();
+                    if ( !groupMember.Person.CanReceiveEmail( false ) && smsNumber.IsNullOrWhiteSpace() && pushDevices.Count == 0 )
                     {
                         continue;
                     }
@@ -338,22 +344,25 @@ namespace rocks.kfs.Zoom.Jobs
                             {
                                 errorCount += 1;
                                 errorMessages.Add( string.Format( "No SMS number could be found for {0}.", groupMember.Person.FullName ) );
+                                goto case CommunicationType.Email;
                             }
-                            smsMessage.AddRecipient( new RockSMSMessageRecipient( groupMember.Person, smsNumber, mergeFields ) );
+                            else
+                            {
+                                smsMessage.AddRecipient( new RockSMSMessageRecipient( groupMember.Person, smsNumber, mergeFields ) );
+                            }
                             break;
                         case CommunicationType.PushNotification:
-                            var personAlias = new PersonAliasService( rockContext ).Get( groupMember.Person.PrimaryAliasId.Value );
-                            List<string> devices = new PersonalDeviceService( rockContext ).Queryable()
-                                .Where( a => a.PersonAliasId.HasValue && a.PersonAliasId == personAlias.Id && a.NotificationsEnabled )
-                                .Select( a => a.DeviceRegistrationId )
-                                .ToList();
-                            string deviceIds = String.Join( ",", devices );
-                            if ( devices.Count == 0 )
+                            if ( pushDevices.Count == 0 )
                             {
                                 errorCount += 1;
                                 errorMessages.Add( string.Format( "No devices that support notifications could be found for {0}.", groupMember.Person.FullName ) );
+                                goto case CommunicationType.Email;
+                    }
+                            else
+                            {
+                                string deviceIds = String.Join( ",", pushDevices );
+                                pushMessage.AddRecipient( new RockPushMessageRecipient( groupMember.Person, deviceIds, mergeFields ) );
                             }
-                            pushMessage.AddRecipient( new RockPushMessageRecipient( groupMember.Person, deviceIds, mergeFields ) );
                             break;
                         default:
                             break;
