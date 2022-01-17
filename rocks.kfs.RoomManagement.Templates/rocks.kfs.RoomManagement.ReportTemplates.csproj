@@ -11,7 +11,7 @@
     <AssemblyName>rocks.kfs.RoomManagement.Templates</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
+    <Deterministic>false</Deterministic>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -32,12 +32,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="com.bemaservices.RoomManagement">
+      <HintPath>..\..\RockWeb\Bin\com.bemaservices.RoomManagement.dll</HintPath>
+    </Reference>
     <Reference Include="itextsharp">
       <HintPath>..\..\CentralAZ\com.CentralAZ.RoomManagement\libs\itextsharp.dll</HintPath>
     </Reference>
     <Reference Include="Rock">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
+    </Reference>
+    <Reference Include="Rock.Common">
+      <HintPath>..\..\RockWeb\Bin\Rock.Common.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -57,12 +63,6 @@
     <Compile Include="ResourceQuestionReportTemplate.cs" />
     <Compile Include="SPACReportTemplate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\CentralAZ\com.CentralAZ.RoomManagement\com.centralaz.RoomManagement.csproj">
-      <Project>{e3c37e39-0dae-4826-b38f-eb6a4d23842f}</Project>
-      <Name>com.centralaz.RoomManagement</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

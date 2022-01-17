@@ -163,6 +163,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Workflow.Action.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.StepsToCare", "KFSRockAssemblies\rocks.kfs.StepsToCare\rocks.kfs.StepsToCare.csproj", "{44B89D21-5AF4-4E89-A49D-31B60EC4AB4D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.RoomManagement.ReportTemplates", "KFSRockAssemblies\rocks.kfs.RoomManagement.Templates\rocks.kfs.RoomManagement.ReportTemplates.csproj", "{B710207F-009F-4DDE-B74A-D08925F3BF42}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -437,6 +439,10 @@ Global
 		{44B89D21-5AF4-4E89-A49D-31B60EC4AB4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44B89D21-5AF4-4E89-A49D-31B60EC4AB4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44B89D21-5AF4-4E89-A49D-31B60EC4AB4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B710207F-009F-4DDE-B74A-D08925F3BF42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B710207F-009F-4DDE-B74A-D08925F3BF42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B710207F-009F-4DDE-B74A-D08925F3BF42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B710207F-009F-4DDE-B74A-D08925F3BF42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
