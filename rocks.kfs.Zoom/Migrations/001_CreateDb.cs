@@ -15,6 +15,7 @@
 // </copyright>
 //
 using Rock.Plugin;
+using rocks.kfs.Zoom.ZoomGuid;
 
 namespace rocks.kfs.Zoom.Migrations
 {
@@ -26,7 +27,7 @@ namespace rocks.kfs.Zoom.Migrations
         /// </summary>
         public override void Up()
         {
-            Sql( @"IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[_rocks_kfs_ZoomRoomOccurrence]') AND type in (N'U'))
+            Sql( string.Format( @"IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[_rocks_kfs_ZoomRoomOccurrence]') AND type in (N'U'))
             BEGIN
                 CREATE TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence](
 	                [Id] [int] IDENTITY(1,1) NOT NULL,
@@ -89,7 +90,95 @@ namespace rocks.kfs.Zoom.Migrations
 
                 ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] CHECK CONSTRAINT [FK__rocks_kfs_ZoomRoomOccurrence_Schedule]
             END
-                " );
+
+            /* Add Zoom Room reservation type  */
+
+            IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[_com_bemaservices_RoomManagement_ReservationType]') AND type in (N'U'))
+            BEGIN
+                IF NOT EXISTS ( SELECT * FROM [dbo].[_com_bemaservices_RoomManagement_ReservationType] WHERE [Guid] = '{0}' )
+                BEGIN
+                    INSERT INTO [dbo].[_com_bemaservices_RoomManagement_ReservationType] (
+                        [IsSystem]
+                        ,[Name]
+                        ,[Description]
+                        ,[IsActive]
+                        ,[IconCssClass]
+                        ,[IsNumberAttendingRequired]
+                        ,[IsContactDetailsRequired]
+                        ,[IsSetupTimeRequired]
+                        ,[Guid]
+                        ,[CreatedDateTime]
+                        ,[ModifiedDateTime]
+                        ,[IsReservationBookedOnApproval])
+                        VALUES (
+                        1
+                        ,'Zoom Room Import'
+                        ,'For use with Reservations created from Zoom Room meetings imported from Zoom api. WARNING: Making any changes to the configuration of this type could result in undesired behavior of synchronization with external Zoom Room resources.'
+                        ,1
+                        ,'fa fa-video'
+                        ,0
+                        ,0
+                        ,0
+                        ,'{0}'
+                        ,GETDATE()
+                        ,GETDATE()
+                        ,0
+                        )
+                END
+
+                /*   Add security for Zoom Room reservation type  */
+
+                DECLARE @RockAdminsGroupId INT
+                SET @RockAdminsGroupId = (SELECT [Id] FROM [Group] WHERE [Guid] = '{1}')
+                DECLARE @AllUsersGroupId INT
+                SET @AllUsersGroupId = (SELECT [Id] FROM [Group] WHERE [Guid] = '{4}')
+                DECLARE @entityTypeId int
+                SET @entityTypeId = (SELECT [Id] FROM [EntityType] WHERE [Guid] = 'AC498297-D28C-47C0-B53B-4BF54D895DEB')    -- ReservationType entity type
+                DECLARE @entityId int
+                SET @entityId = (SELECT [Id] FROM [_com_bemaservices_RoomManagement_ReservationType] WHERE [Guid] = '{0}')
+
+                IF NOT EXISTS ( SELECT [Id] FROM [dbo].[Auth] WHERE [EntityTypeId] = @entityTypeId AND [EntityId] = @entityId AND [Action] = '{2}' AND [SpecialRole] = 0 AND [GroupId] = @RockAdminsGroupId)
+                BEGIN
+                    INSERT INTO [dbo].[Auth] (
+                        [EntityTypeId]
+                        ,[EntityId]
+                        ,[Order]
+                        ,[Action]
+                        ,[AllowOrDeny]
+                        ,[SpecialRole]
+                        ,[GroupId]
+                        ,[Guid])
+                        VALUES (
+                        @entityTypeId
+                        ,@entityId
+                        ,0
+                        ,'{2}'
+                        ,'A'
+                        ,0
+                        ,@RockAdminsGroupId
+                        ,'D32F44D8-22A0-4FEF-91C2-CF05833523DF')
+                END
+
+                IF NOT EXISTS ( SELECT [Id] FROM [dbo].[Auth] WHERE [EntityTypeId] = @entityTypeId AND [EntityId] = @entityId AND [Action] = '{2}' AND [SpecialRole] = 1 AND [GroupId] = NULL )
+                BEGIN
+                    INSERT INTO [dbo].[Auth] (
+                        [EntityTypeId]
+                        ,[EntityId]
+                        ,[Order]
+                        ,[Action]
+                        ,[AllowOrDeny]
+                        ,[SpecialRole]
+                        ,[Guid])
+                        VALUES (
+                        @entityTypeId
+                        ,@entityId
+                        ,1
+                        ,'{2}'
+                        ,'D'
+                        ,1
+                        ,'46ACAA04-F415-4CB8-9D2F-88B7596F6409')
+                END
+            END", RoomReservationType.ZOOMROOMIMPORT, Rock.SystemGuid.Group.GROUP_ADMINISTRATORS, Rock.Security.Authorization.VIEW ) );
 
             RockMigrationHelper.UpdateEntityType( "rocks.kfs.Zoom.Model.RoomOccurrence", "2A138B5B-3CD8-4F03-ACAD-4D544D257916", true, true );
         }
@@ -100,11 +189,17 @@ namespace rocks.kfs.Zoom.Migrations
         public override void Down()
         {
             RockMigrationHelper.DeleteEntityType( "2A138B5B-3CD8-4F03-ACAD-4D544D257916" );
-            Sql( @"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[_rocks_kfs_ZoomRoomOccurrence]') AND type in (N'U'))
+            Sql( string.Format( @"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[_rocks_kfs_ZoomRoomOccurrence]') AND type in (N'U'))
             BEGIN
                 DROP TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence]
             END
-            " );
+            IF EXISTS ( SELECT * FROM [dbo].[_com_bemaservices_RoomManagement_ReservationType] WHERE [Guid] = '{0}' )
+            BEGIN
+                DELETE FROM [dbo].[_com_bemaservices_RoomManagement_ReservationType] WHERE [Guid] = '{0}'
+            END
+            ", RoomReservationType.ZOOMROOMIMPORT ) );
+            RockMigrationHelper.DeleteSecurityAuth( "D32F44D8-22A0-4FEF-91C2-CF05833523DF" );
+            RockMigrationHelper.DeleteSecurityAuth( "46ACAA04-F415-4CB8-9D2F-88B7596F6409" );
         }
     }
 }

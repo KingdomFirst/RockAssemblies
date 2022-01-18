@@ -17,7 +17,7 @@
 using Rock;
 using Rock.Plugin;
 
-namespace rocks.kfs.Eventbrite.Migrations
+namespace rocks.kfs.Zoom.Migrations
 {
     [MigrationNumber( 6, "1.12.4" )]
     public partial class PageAndBlocks : Migration
@@ -38,7 +38,7 @@ namespace rocks.kfs.Eventbrite.Migrations
 
             // Add Defined Type block
             RockMigrationHelper.AddBlock( true, "6653BC97-06D0-4AF4-803B-21724AF78E93".AsGuid(), null, "C2D29296-6A87-47A9-A753-EE4E9159C4C4".AsGuid(), "0AB2D5E9-9272-47D5-90E4-4AA838D2D3EE".AsGuid(), "Zoom Rooms", "Main", @"", @"", 2, "5278E423-758A-475E-9A62-B58C346949A5" ); // Core Defined Type List block
-            RockMigrationHelper.AddBlockAttributeValue( "5278E423-758A-475E-9A62-B58C346949A5", "9280D61F-C4F3-4A3E-A9BB-BCD67FF78637", Zoom.ZoomGuid.DefinedType.ZOOM_ROOM ); // Set Defined Type setting of block
+            RockMigrationHelper.AddBlockAttributeValue( "5278E423-758A-475E-9A62-B58C346949A5", "9280D61F-C4F3-4A3E-A9BB-BCD67FF78637", ZoomGuid.DefinedType.ZOOM_ROOM ); // Set Defined Type setting of block
         }
 
         /// <summary>

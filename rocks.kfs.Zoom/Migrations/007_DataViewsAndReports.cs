@@ -17,7 +17,7 @@
 using Rock;
 using Rock.Plugin;
 
-namespace rocks.kfs.Eventbrite.Migrations
+namespace rocks.kfs.Zoom.Migrations
 {
     [MigrationNumber( 7, "1.12.4" )]
     public partial class DataViewsAndReports : Migration
@@ -132,10 +132,10 @@ namespace rocks.kfs.Eventbrite.Migrations
             #region Report
 
             // Add GUID to Reporting DataSelect entity type for reporting: Location Name
-            RockMigrationHelper.UpdateEntityType( "rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect.LocationNameSelect", "Location Name Select", "rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect.LocationNameSelect, rocks.kfs.Zoom, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", true, true, Zoom.ZoomGuid.EntityType.REPORT_LOCATION_NAME );
+            RockMigrationHelper.UpdateEntityType( "rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect.LocationNameSelect", "Location Name Select", "rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect.LocationNameSelect, rocks.kfs.Zoom, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", true, true, ZoomGuid.EntityType.REPORT_LOCATION_NAME );
 
             // Add GUID to Reporting DataSelect entity type for reporting: Zoom Room Name
-            RockMigrationHelper.UpdateEntityType( "rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect.ZoomRoomNameSelect", "Zoom Room Name Select", "rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect.ZoomRoomNameSelect, rocks.kfs.Zoom, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", true, true, Zoom.ZoomGuid.EntityType.REPORT_ZOOM_ROOM_NAME );
+            RockMigrationHelper.UpdateEntityType( "rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect.ZoomRoomNameSelect", "Zoom Room Name Select", "rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect.ZoomRoomNameSelect, rocks.kfs.Zoom, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", true, true, ZoomGuid.EntityType.REPORT_ZOOM_ROOM_NAME );
 
             // Create Zoom Room Occurrence Report Category
             Sql( @"IF NOT EXISTS (SELECT * FROM Category where [Guid] = '5C73C293-031A-4D91-8947-23A506120D22')
@@ -305,7 +305,7 @@ namespace rocks.kfs.Eventbrite.Migrations
                     BEGIN
                     DECLARE
                         @reportId int = (select Id from [Report] where [Guid] = 'E89ED73D-3D1D-40EB-BC6A-5631C6BC9834'),
-                        @dataSelectEntityTypeId int = (select Id from [EntityType] where [Guid] = '" + Zoom.ZoomGuid.EntityType.REPORT_LOCATION_NAME + @"')
+                        @dataSelectEntityTypeId int = (select Id from [EntityType] where [Guid] = '" + ZoomGuid.EntityType.REPORT_LOCATION_NAME + @"')
                     INSERT INTO [ReportField] (
                         ReportId,
                         ReportFieldType,
@@ -335,7 +335,7 @@ namespace rocks.kfs.Eventbrite.Migrations
                     BEGIN
                     DECLARE
                         @reportId int = (select Id from [Report] where [Guid] = 'E89ED73D-3D1D-40EB-BC6A-5631C6BC9834'),
-                        @dataSelectEntityTypeId int = (select Id from [EntityType] where [Guid] = '" + Zoom.ZoomGuid.EntityType.REPORT_ZOOM_ROOM_NAME + @"')
+                        @dataSelectEntityTypeId int = (select Id from [EntityType] where [Guid] = '" + ZoomGuid.EntityType.REPORT_ZOOM_ROOM_NAME + @"')
                     INSERT INTO [ReportField] (
                         ReportId,
                         ReportFieldType,
@@ -369,7 +369,6 @@ namespace rocks.kfs.Eventbrite.Migrations
         public override void Down()
         {
             #region Report
-
             RockMigrationHelper.DeleteReportField( "F79941D9-8BC2-4812-A6A4-68143E5DBCBC" );
             RockMigrationHelper.DeleteReportField( "E855930E-5B2E-4311-B494-EA7FD56E6B57" );
             RockMigrationHelper.DeleteReportField( "F04559AA-E192-4799-9434-B660BC097992" );
