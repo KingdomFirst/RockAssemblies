@@ -369,29 +369,29 @@ namespace rocks.kfs.Zoom.Jobs
                                 {
                                     LogEvent( rockContext, "Zoom Room Reservation Sync", string.Format( "Begin create new Zoom Meeting: ZoomRoom {0} - {1}", zoomRoomDT.Value, occurrence.StartTime.ToShortDateTimeString() ) );
                                 }
-                                var meetingSettings = new MeetingSetting
-                                {
-                                    Join_Before_Host = joinBeforeHost
-                                };
-                                var meetingToCreate = new Meeting
-                                {
-                                    Topic = occurrence.Topic,
-                                    Type = MeetingType.Scheduled,
-                                    Start_Time = occurrence.StartTime.ToRockDateTimeOffset(),
-                                    Duration = occurrence.Duration,
-                                    Password = occurrence.Password,
-                                    Settings = meetingSettings
-                                };
-                                var newMeeting = zoom.CreateZoomMeeting( zoomRoomDT.Value, meetingToCreate );
-                                var success = false;
-                                if ( newMeeting != null )
-                                {
-                                    success = true;
-                                    occurrence.ZoomMeetingId = newMeeting.Id;
-                                    occurrence.ZoomMeetingJoinUrl = newMeeting.Join_Url;
-                                }
-                                //var callbackUrl = string.Format( "{0}?token={1}", webhookBaseUrl, occurrence.Id );
-                                //var success = new Zoom().ScheduleZoomRoomMeeting( rockContext, zoomRoomDT.Value, occurrence.Password, occurrence.Topic, occurrence.StartTime.ToRockDateTimeOffset(), occurrence.Duration, joinBeforeHost, enableLogging: verboseLogging, callbackUrl: callbackUrl );
+                                //var meetingSettings = new MeetingSetting
+                                //{
+                                //    Join_Before_Host = joinBeforeHost
+                                //};
+                                //var meetingToCreate = new Meeting
+                                //{
+                                //    Topic = occurrence.Topic,
+                                //    Type = MeetingType.Scheduled,
+                                //    Start_Time = occurrence.StartTime.ToRockDateTimeOffset(),
+                                //    Duration = occurrence.Duration,
+                                //    Password = occurrence.Password,
+                                //    Settings = meetingSettings
+                                //};
+                                //var newMeeting = zoom.CreateZoomMeeting( zoomRoomDT.Value, meetingToCreate );
+                                //var success = false;
+                                //if ( newMeeting != null )
+                                //{
+                                //    success = true;
+                                //    occurrence.ZoomMeetingId = newMeeting.Id;
+                                //    occurrence.ZoomMeetingJoinUrl = newMeeting.Join_Url;
+                                //}
+                                var callbackUrl = string.Format( "{0}?token={1}", webhookBaseUrl, occurrence.Id );
+                                var success = new Zoom().ScheduleZoomRoomMeeting( rockContext, zoomRoomDT.Value, occurrence.Password, occurrence.Topic, occurrence.StartTime.ToRockDateTimeOffset(), occurrence.Duration, joinBeforeHost, enableLogging: verboseLogging, callbackUrl: callbackUrl );
                                 if ( verboseLogging )
                                 {
                                     LogEvent( rockContext, "Zoom Room Reservation Sync", string.Format( "Create new Zoom Meeting {0}: ZoomRoom {1} - {2}", success ? "succeeded" : "failed", zoomRoomDT.Value, occurrence.StartTime.ToShortDateTimeString() ) );
