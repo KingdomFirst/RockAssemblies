@@ -32,6 +32,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="com.bemaservices.RoomManagement, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>libs\com.bemaservices.RoomManagement.dll</HintPath>
+    </Reference>
+    <Reference Include="DotLiquid, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\DotLiquid.dll</HintPath>
+    </Reference>
     <Reference Include="itextsharp">
       <HintPath>..\..\CentralAZ\com.CentralAZ.RoomManagement\libs\itextsharp.dll</HintPath>
     </Reference>
@@ -59,17 +67,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\CentralAZ\com.CentralAZ.RoomManagement\com.centralaz.RoomManagement.csproj">
-      <Project>{e3c37e39-0dae-4826-b38f-eb6a4d23842f}</Project>
-      <Name>com.centralaz.RoomManagement</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y /R "$(TargetPath)" "$(SolutionDir)RockWeb\bin"
-xcopy /Y /R "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)RockWeb\bin"</PostBuildEvent>
+xcopy /Y /R "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(ProjectDir)bin\Debug\com.bemaservices.RoomManagement.dll" "$(SolutionDir)RockWeb\bin"
+</PostBuildEvent>
   </PropertyGroup>
 </Project>
