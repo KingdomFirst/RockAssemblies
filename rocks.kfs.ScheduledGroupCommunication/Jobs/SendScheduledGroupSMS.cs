@@ -236,6 +236,9 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
                                         case "3":
                                             sendDate.Value = sendDate.ValueAsDateTime.Value.AddMonths( 1 ).ToString();
                                             break;
+                                        case "4":
+                                            sendDate.Value = sendDate.ValueAsDateTime.Value.AddDays( 1 ).ToString();
+                                            break;
                                         default:
                                             break;
                                     }
