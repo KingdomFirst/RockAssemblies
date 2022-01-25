@@ -177,12 +177,12 @@ namespace rocks.kfs.Zoom.Jobs
                     }
                     zrOccurrenceService.DeleteRange( orphanedOccs );
                     var errors = new List<string>();
-                    LogEvent( rockContext, "Zoom Room Reservation Sync", string.Format( "{0} orphaned RoomOccurrence(s) deleted.", orphanedOccs.Count() ) );
+                    LogEvent( null, "Zoom Room Reservation Sync", string.Format( "{0} orphaned RoomOccurrence(s) deleted.", orphanedOccs.Count() ) );
                     if ( verboseLogging )
                     {
-                        LogEvent( rockContext, "Zoom Room Reservation Sync", "Deleting related Zoom Meetings." );
+                        LogEvent( null, "Zoom Room Reservation Sync", "Deleting related Zoom Meetings." );
                     }
-                    DeleteOccurrenceZoomMeetings( rockContext, verboseLogging, orphanedOccs, zoom, logService );
+                    DeleteOccurrenceZoomMeetings( rockContext, verboseLogging, orphanedOccs, zoom );
                     rockContext.SaveChanges();
                 }
 
@@ -372,7 +372,7 @@ namespace rocks.kfs.Zoom.Jobs
                                 //    occurrence.ZoomMeetingJoinUrl = newMeeting.Join_Url;
                                 //}
                                 var callbackUrl = string.Format( "{0}?token={1}", webhookBaseUrl, occurrence.Id );
-                                var success = new Zoom().ScheduleZoomRoomMeeting( rockContext, zoomRoomDV.Value, occurrence.Password, occurrence.Topic, occurrence.StartTime.ToRockDateTimeOffset(), occurrence.Duration, joinBeforeHost, enableLogging: verboseLogging, callbackUrl: callbackUrl );
+                                var success = new Zoom().ScheduleZoomRoomMeeting( zoomRoomDV.Value, occurrence.Password, occurrence.Topic, occurrence.StartTime.ToRockDateTimeOffset(), occurrence.Duration, joinBeforeHost, enableLogging: verboseLogging, callbackUrl: callbackUrl );
                                 if ( verboseLogging )
                                 {
                                     LogEvent( rockContext, "Zoom Room Reservation Sync", string.Format( "Create new Zoom Meeting {0}: ZoomRoom {1} - {2}", success ? "succeeded" : "failed", zoomRoomDV.Value, occurrence.StartTime.ToShortDateTimeString() ) );
@@ -452,7 +452,7 @@ namespace rocks.kfs.Zoom.Jobs
                                 endDate = RockDateTime.Today.AddDays( daysOut + 1 ).AddMilliseconds( -1 ); // Set to last millisecond of days out date since we are working with DateTimes
                             }
                             var reservationDateTimes = res.GetReservationTimes( beginDateTime, endDate );
-                            zrOccurrencesAdded += CreateZoomRoomOccurrences( rockContext, zrOccurrenceService, zoomRoomDV.Value, res.Name, zrPassword, res.Schedule, joinBeforeHost, rl, reservationDateTimes, resLocOccurrences, logService, verboseLogging );
+                            zrOccurrencesAdded += CreateZoomRoomOccurrences( zrOccurrenceService, zoomRoomDV.Value, res.Name, zrPassword, res.Schedule, joinBeforeHost, rl, reservationDateTimes, resLocOccurrences, verboseLogging );
 
                             // Capture existing Zoom Room Occurrences where the target Reservation "occurrence" no longer exists. This would happen if the Room Reservation schedule has been changed.
                             var resStartDateTimes = reservationDateTimes.Select( rdt => rdt.StartDateTime ).ToList();
@@ -474,7 +474,7 @@ namespace rocks.kfs.Zoom.Jobs
             }
         }
 
-        private void DeleteOccurrenceZoomMeetings( RockContext rockContext, bool verboseLogging, IQueryable<RoomOccurrence> occurrencesToCancel, Zoom zoom, ServiceLogService logService )
+        private void DeleteOccurrenceZoomMeetings( RockContext rockContext, bool verboseLogging, IQueryable<RoomOccurrence> occurrencesToCancel, Zoom zoom )
         {
             var errors = new List<string>();
             if ( verboseLogging )
@@ -492,13 +492,13 @@ namespace rocks.kfs.Zoom.Jobs
             {
                 foreach ( var error in errors )
                 {
-                    LogEvent( rockContext, "Zoom Room Reservation Sync", "An error was encountered while trying to delete Zoom Meeting(s).", error );
+                    LogEvent( null, "Zoom Room Reservation Sync", "An error was encountered while trying to delete Zoom Meeting(s).", error );
                 }
             }
-            LogEvent( rockContext, "Zoom Room Reservation Sync", string.Format( "{0} Zoom Meetings successfully deleted.", occurrencesToCancel.Count() - errors.Count ) );
+            LogEvent( null, "Zoom Room Reservation Sync", string.Format( "{0} Zoom Meetings successfully deleted.", occurrencesToCancel.Count() - errors.Count ) );
         }
 
-        private int CreateZoomRoomOccurrences( RockContext rockContext, RoomOccurrenceService occService, string roomId, string occurrenceTopic, string password, Schedule schedule, bool joinBeforeHost, ReservationLocation reservationLocation, List<ReservationDateTime> reservationDateTimes, IQueryable<RoomOccurrence> existingRoomOccurrences, ServiceLogService logService, bool verboseLogging = false )
+        private int CreateZoomRoomOccurrences( RoomOccurrenceService occService, string roomId, string occurrenceTopic, string password, Schedule schedule, bool joinBeforeHost, ReservationLocation reservationLocation, List<ReservationDateTime> reservationDateTimes, IQueryable<RoomOccurrence> existingRoomOccurrences, bool verboseLogging = false )
         {
             var occurrencesAdded = 0;
             foreach ( var dateTime in reservationDateTimes )
@@ -546,7 +546,7 @@ namespace rocks.kfs.Zoom.Jobs
                     //    occurrence.ZoomMeetingJoinUrl = newMeeting.Join_Url;
                     //}
                     var callbackUrl = string.Format( "{0}?token={1}", webhookBaseUrl, occurrence.Id );
-                    var success = new Zoom().ScheduleZoomRoomMeeting( rockContext, roomId, occurrence.Password, occurrence.Topic, occurrence.StartTime.ToRockDateTimeOffset(), occurrence.Duration, joinBeforeHost, enableLogging: verboseLogging, callbackUrl: callbackUrl );
+                    var success = new Zoom().ScheduleZoomRoomMeeting( roomId, occurrence.Password, occurrence.Topic, occurrence.StartTime.ToRockDateTimeOffset(), occurrence.Duration, joinBeforeHost, enableLogging: verboseLogging, callbackUrl: callbackUrl );
                     if ( verboseLogging )
                     {
                         LogEvent( null, "Zoom Room Reservation Sync", string.Format( "Create new Zoom Meeting {0}: ZoomRoom {1} - {2}", success ? "succeeded" : "failed", roomId, occurrence.StartTime.ToShortDateTimeString() ) );
