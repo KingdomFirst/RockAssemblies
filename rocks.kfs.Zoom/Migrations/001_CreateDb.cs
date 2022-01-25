@@ -87,6 +87,7 @@ namespace rocks.kfs.Zoom.Migrations
                 
                 ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_ZoomRoomOccurrence_Schedule] FOREIGN KEY([ScheduleId])
                 REFERENCES [dbo].[Schedule] ([Id])
+                ON DELETE CASCADE
 
                 ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] CHECK CONSTRAINT [FK__rocks_kfs_ZoomRoomOccurrence_Schedule]
             END
@@ -130,8 +131,6 @@ namespace rocks.kfs.Zoom.Migrations
 
                 DECLARE @RockAdminsGroupId INT
                 SET @RockAdminsGroupId = (SELECT [Id] FROM [Group] WHERE [Guid] = '{1}')
-                DECLARE @AllUsersGroupId INT
-                SET @AllUsersGroupId = (SELECT [Id] FROM [Group] WHERE [Guid] = '{4}')
                 DECLARE @entityTypeId int
                 SET @entityTypeId = (SELECT [Id] FROM [EntityType] WHERE [Guid] = 'AC498297-D28C-47C0-B53B-4BF54D895DEB')    -- ReservationType entity type
                 DECLARE @entityId int

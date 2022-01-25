@@ -172,61 +172,6 @@ namespace rocks.kfs.Zoom
             return success;
         }
 
-        private static AttributeValueCache GetLocationZoomRoomId( Location location )
-        {
-            AttributeValueCache retVar = null;
-            var zoomFieldType = FieldTypeCache.Get( ZoomGuid.FieldType.ZOOM_ROOM.AsGuid() );
-            if ( zoomFieldType != null )
-            {
-                location.LoadAttributes();
-                var attribute = location.Attributes.Select( a => a.Value ).FirstOrDefault( a => a.FieldTypeId == zoomFieldType.Id );
-                if ( attribute != null )
-                {
-                    retVar = location.AttributeValues.Select( av => av.Value ).FirstOrDefault( av => av.AttributeId == attribute.Id && av.Value != "" );
-                }
-            }
-
-            return retVar;
-        }
-
-        public static Location GetLocationByZoomRoomId( string zoomRoomId, RockContext rockContext = null )
-        {
-            Location retVar = null;
-            var zoomFieldType = FieldTypeCache.Get( ZoomGuid.FieldType.ZOOM_ROOM.AsGuid() );
-            if ( zoomFieldType != null )
-            {
-                using ( var context = rockContext ?? new RockContext() )
-                {
-                    var attributeVal = new AttributeValueService( context ).Queryable().FirstOrDefault( av => av.Attribute.FieldTypeId == zoomFieldType.Id && av.Value.Contains( zoomRoomId ) );
-                    if ( attributeVal != null )
-                    {
-                        retVar = new LocationService( context ).Get( attributeVal.EntityId ?? 0 );
-                    }
-                }
-            }
-
-            return retVar;
-        }
-
-        private static Location GetLocation( int id )
-        {
-            var mockQuerystring = new NameValueCollection();
-            mockQuerystring.Add( "LocationId", id.ToString() );
-            return GetLocationpFromQS( mockQuerystring );
-        }
-
-        private static Location GetLocationpFromQS( NameValueCollection qs )
-        {
-            if ( qs["LocationId"] != null && int.Parse( qs["LocationId"] ) > 0 )
-            {
-                return new LocationService( new RockContext() ).Get( int.Parse( qs["LocationId"] ) );
-            }
-            else
-            {
-                return new Location();
-            }
-        }
-
         private static ServiceLog LogEvent( RockContext rockContext, string type, string input, string result )
         {
             var rockLogger = new ServiceLogService( rockContext );
@@ -242,50 +187,6 @@ namespace rocks.kfs.Zoom
             rockLogger.Add( serviceLog );
             rockContext.SaveChanges();
             return serviceLog;
-        }
-
-        public static bool LinkZoomRoomLocation( Location location, string zoomRoomId )
-        {
-            var retVar = false;
-            var zoomFieldType = FieldTypeCache.Get( ZoomGuid.FieldType.ZOOM_ROOM.AsGuid() );
-            if ( zoomFieldType != null )
-            {
-                location.LoadAttributes();
-                var attribute = location.Attributes.Select( a => a.Value ).FirstOrDefault( a => a.FieldTypeId == zoomFieldType.Id );
-                if ( attribute != null )
-                {
-                    using ( var rockContext = new RockContext() )
-                    {
-                        location.SetAttributeValue( attribute.Key, zoomRoomId );
-                        location.SaveAttributeValue( attribute.Key, rockContext );
-                        retVar = true;
-                    }
-                }
-            }
-            return retVar;
-        }
-
-        public static bool LinkZoomRoomLocation( int locationId, string zoomRoomId )
-        {
-            var location = GetLocation( locationId );
-            return LinkZoomRoomLocation( location, zoomRoomId );
-        }
-
-        public static void UnlinkZoomRoomLocation( int locationId )
-        {
-            var location = GetLocation( locationId );
-            UnlinkZoomRoomLocation( location );
-        }
-
-        public static void UnlinkZoomRoomLocation( Location location )
-        {
-            var locationZoomRoomIDAttr = GetLocationZoomRoomId( location );
-
-            using ( var rockContext = new RockContext() )
-            {
-                location.SetAttributeValue( locationZoomRoomIDAttr.AttributeKey, string.Empty );
-                location.SaveAttributeValue( locationZoomRoomIDAttr.AttributeKey, rockContext );
-            }
         }
     }
 }

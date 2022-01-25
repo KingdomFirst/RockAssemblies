@@ -110,8 +110,6 @@
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ScheduleStartDate.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ScheduleName.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ReservationNotifyGroup.cs" />
-    <Compile Include="Reporting\RoomOccurrence\DataSelect\ZoomRoomUserPMI.cs" />
-    <Compile Include="Reporting\RoomOccurrence\DataSelect\ZoomRoomUserName.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ZoomRoomName.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ZoomRoomId.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\LocationName.cs" />
@@ -124,7 +122,6 @@
     <Compile Include="Zoom.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ZoomGuid\FieldType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -18,11 +18,8 @@ namespace rocks.kfs.Zoom.ZoomGuid
 {
     public static class Attribute
     {
-        public const string ZOOM_USER_NAME = "0BCD134F-9A64-4241-BDBD-F5AF29B37ECC";
-        public const string ZOOM_USER_PMI = "AAE46F7D-DD8E-42ED-B2CA-6430D7ACB375";
         public const string ZOOM_MEETING_PASSWORD = "4CB9F792-83BA-40C1-9C8C-27A383CD24DD";
         public const string ZOOM_MEETING_JOIN_BEFORE_HOST = "28A34919-EDF7-45DB-B90D-8C68ADA1802C";
-        public const string ZOOM_MEETING_TIME_ZONE = "885591ED-E4B6-45FB-8BA1-4E9E3AA99CE3";
         public const string ZOOM_ROOM_LOCATION_ENTITY_ATTRIBUTE = "AE530F4C-7335-4D07-BD20-7CB90A62D391";
         public const string ROOM_RESERVATION_GROUP_ATTRIBUTE = "ADA5C607-F1C7-473B-88C9-E5CC706DB2EE";
     }
