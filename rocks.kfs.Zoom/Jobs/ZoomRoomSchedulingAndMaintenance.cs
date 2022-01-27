@@ -347,10 +347,6 @@ namespace rocks.kfs.Zoom.Jobs
                                 zrOccurrenceService.Add( occurrence );
                                 rockContext.SaveChanges();
                                 zrOccurrencesAdded++;
-                                if ( verboseLogging )
-                                {
-                                    LogEvent( rockContext, "Zoom Room Reservation Sync", string.Format( "Begin create new Zoom Meeting: ZoomRoom {0} - {1}", zoomRoomDV.Value, occurrence.StartTime.ToShortDateTimeString() ) );
-                                }
                                 //var meetingSettings = new MeetingSetting
                                 //{
                                 //    Join_Before_Host = joinBeforeHost
@@ -372,12 +368,8 @@ namespace rocks.kfs.Zoom.Jobs
                                 //    occurrence.ZoomMeetingId = newMeeting.Id;
                                 //    occurrence.ZoomMeetingJoinUrl = newMeeting.Join_Url;
                                 //}
-                                var callbackUrl = string.Format( "{0}?token={1}", webhookBaseUrl, occurrence.Id );
-                                var success = new Zoom().ScheduleZoomRoomMeeting( zoomRoomDV.Value, occurrence.Password, occurrence.Topic, occurrence.StartTime.ToRockDateTimeOffset(), occurrence.Duration, joinBeforeHost, enableLogging: verboseLogging, callbackUrl: callbackUrl );
-                                if ( verboseLogging )
-                                {
-                                    LogEvent( rockContext, "Zoom Room Reservation Sync", string.Format( "Create new Zoom Meeting {0}: ZoomRoom {1} - {2}", success ? "succeeded" : "failed", zoomRoomDV.Value, occurrence.StartTime.ToShortDateTimeString() ) );
-                                }
+
+                                CreateOccurrenceZoomMeeting( occurrence, zoomRoomDV.Value, joinBeforeHost );
                             }
                             else
                             {
@@ -475,6 +467,24 @@ namespace rocks.kfs.Zoom.Jobs
             }
         }
 
+        private void CreateOccurrenceZoomMeeting( RoomOccurrence occurrence, string zoomRoomId, bool joinBeforeHost )
+        {
+            if ( verboseLogging )
+            {
+                LogEvent( null, "Zoom Room Reservation Sync", string.Format( "Begin create new Zoom Meeting Request: ZoomRoom {0} - {1}", zoomRoomId, occurrence.StartTime.ToShortDateTimeString() ) );
+            }
+            var callbackUrl = string.Format( "{0}?token={1}", webhookBaseUrl, occurrence.Id );
+            var success = new Zoom().ScheduleZoomRoomMeeting( zoomRoomId, occurrence.Password, occurrence.Topic, occurrence.StartTime.ToRockDateTimeOffset(), occurrence.Duration, joinBeforeHost, enableLogging: verboseLogging, callbackUrl: callbackUrl );
+            if ( "test for offline logic" == "true" )
+            {
+                occurrence.ZoomMeetingRequestStatus = ZoomMeetingRequestStatus.ZoomRoomOffline;
+            }
+            if ( verboseLogging )
+            {
+                LogEvent( null, "Zoom Room Reservation Sync", string.Format( "Create new Zoom Meeting {0}: ZoomRoom {1} - {2}", success ? "succeeded" : "failed", zoomRoomId, occurrence.StartTime.ToShortDateTimeString() ) );
+            }
+        }
+
         private void DeleteOccurrenceZoomMeetings( RockContext rockContext, IQueryable<RoomOccurrence> occurrencesToCancel, Zoom zoom )
         {
             var errors = new List<string>();
@@ -520,23 +530,19 @@ namespace rocks.kfs.Zoom.Jobs
                     };
                     occService.Add( occurrence );
                     occurrencesAdded++;
-                    if ( verboseLogging )
-                    {
-                        LogEvent( null, "Zoom Room Reservation Sync", string.Format( "Begin create new Zoom Meeting: ZoomRoom {0} - {1}", roomId, occurrence.StartTime.ToShortDateTimeString() ) );
-                    }
                     var meetingSettings = new MeetingSetting
                     {
                         Join_Before_Host = joinBeforeHost
                     };
-                    var meetingToCreate = new Meeting
-                    {
-                        Topic = occurrence.Topic,
-                        Type = MeetingType.Scheduled,
-                        Start_Time = occurrence.StartTime.ToRockDateTimeOffset(),
-                        Duration = occurrence.Duration,
-                        Password = occurrence.Password,
-                        Settings = meetingSettings
-                    };
+                    //var meetingToCreate = new Meeting
+                    //{
+                    //    Topic = occurrence.Topic,
+                    //    Type = MeetingType.Scheduled,
+                    //    Start_Time = occurrence.StartTime.ToRockDateTimeOffset(),
+                    //    Duration = occurrence.Duration,
+                    //    Password = occurrence.Password,
+                    //    Settings = meetingSettings
+                    //};
                     //var zoom = new Zoom();
                     //var newMeeting = zoom.CreateZoomMeeting( roomId, meetingToCreate );
                     //var success = false;
@@ -546,12 +552,7 @@ namespace rocks.kfs.Zoom.Jobs
                     //    occurrence.ZoomMeetingId = newMeeting.Id;
                     //    occurrence.ZoomMeetingJoinUrl = newMeeting.Join_Url;
                     //}
-                    var callbackUrl = string.Format( "{0}?token={1}", webhookBaseUrl, occurrence.Id );
-                    var success = new Zoom().ScheduleZoomRoomMeeting( roomId, occurrence.Password, occurrence.Topic, occurrence.StartTime.ToRockDateTimeOffset(), occurrence.Duration, joinBeforeHost, enableLogging: verboseLogging, callbackUrl: callbackUrl );
-                    if ( verboseLogging )
-                    {
-                        LogEvent( null, "Zoom Room Reservation Sync", string.Format( "Create new Zoom Meeting {0}: ZoomRoom {1} - {2}", success ? "succeeded" : "failed", roomId, occurrence.StartTime.ToShortDateTimeString() ) );
-                    }
+                    CreateOccurrenceZoomMeeting( occurrence, roomId, joinBeforeHost );
                 }
             }
             return occurrencesAdded;
