@@ -74,6 +74,7 @@
     <PostBuildEvent>xcopy /Y /R "$(TargetPath)" "$(SolutionDir)RockWeb\bin"
 xcopy /Y /R "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)RockWeb\bin"
 xcopy /Y /R "$(ProjectDir)bin\Debug\com.bemaservices.RoomManagement.dll" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(ProjectDir)bin\Debug\itextsharp.dll" "$(SolutionDir)RockWeb\bin"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
