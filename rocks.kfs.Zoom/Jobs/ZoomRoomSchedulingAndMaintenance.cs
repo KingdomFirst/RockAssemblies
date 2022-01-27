@@ -369,7 +369,13 @@ namespace rocks.kfs.Zoom.Jobs
                                 //    occurrence.ZoomMeetingJoinUrl = newMeeting.Join_Url;
                                 //}
 
-                                CreateOccurrenceZoomMeeting( occurrence, zoomRoomDV.Value, joinBeforeHost );
+                                saveChanges = false;
+                                CreateOccurrenceZoomMeeting( occurrence, zoomRoomDV.Value, joinBeforeHost, out saveChanges );
+
+                                if ( saveChanges )
+                                {
+                                    rockContext.SaveChanges();
+                                }
                             }
                             else
                             {
@@ -467,8 +473,9 @@ namespace rocks.kfs.Zoom.Jobs
             }
         }
 
-        private void CreateOccurrenceZoomMeeting( RoomOccurrence occurrence, string zoomRoomId, bool joinBeforeHost )
+        private void CreateOccurrenceZoomMeeting( RoomOccurrence occurrence, string zoomRoomId, bool joinBeforeHost, out bool changesMade )
         {
+            changesMade = false;
             if ( verboseLogging )
             {
                 LogEvent( null, "Zoom Room Reservation Sync", string.Format( "Begin create new Zoom Meeting Request: ZoomRoom {0} - {1}", zoomRoomId, occurrence.StartTime.ToShortDateTimeString() ) );
@@ -478,6 +485,7 @@ namespace rocks.kfs.Zoom.Jobs
             if ( "test for offline logic" == "true" )
             {
                 occurrence.ZoomMeetingRequestStatus = ZoomMeetingRequestStatus.ZoomRoomOffline;
+                changesMade = true;
             }
             if ( verboseLogging )
             {
@@ -552,7 +560,8 @@ namespace rocks.kfs.Zoom.Jobs
                     //    occurrence.ZoomMeetingId = newMeeting.Id;
                     //    occurrence.ZoomMeetingJoinUrl = newMeeting.Join_Url;
                     //}
-                    CreateOccurrenceZoomMeeting( occurrence, roomId, joinBeforeHost );
+                    var changesMade = false;
+                    CreateOccurrenceZoomMeeting( occurrence, roomId, joinBeforeHost, out changesMade );
                 }
             }
             return occurrencesAdded;
