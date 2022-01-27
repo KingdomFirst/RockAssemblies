@@ -80,6 +80,7 @@ namespace rocks.kfs.Zoom.Jobs
         private int errorCount = 0;
         private string webhookBaseUrl;
         private int reservationLocationEntityTypeId;
+        private bool verboseLogging;
 
         private List<string> errorMessages = new List<string>();
 
@@ -123,7 +124,7 @@ namespace rocks.kfs.Zoom.Jobs
                 var daysOut = dataMap.GetIntegerFromString( AttributeKey.SyncDaysOut );
                 webhookBaseUrl = Settings.GetWebhookUrl();
                 var importMeetings = dataMap.GetBooleanFromString( AttributeKey.ImportMeetings );
-                var verboseLogging = dataMap.GetBooleanFromString( AttributeKey.VerboseLogging );
+                verboseLogging = dataMap.GetBooleanFromString( AttributeKey.VerboseLogging );
                 var zrOccurrencesCancel = new List<RoomOccurrence>();
                 reservationLocationEntityTypeId = new EntityTypeService( rockContext ).GetNoTracking( com.bemaservices.RoomManagement.SystemGuid.EntityType.RESERVATION_LOCATION.AsGuid() ).Id;
 
@@ -182,7 +183,7 @@ namespace rocks.kfs.Zoom.Jobs
                     {
                         LogEvent( null, "Zoom Room Reservation Sync", "Deleting related Zoom Meetings." );
                     }
-                    DeleteOccurrenceZoomMeetings( rockContext, verboseLogging, orphanedOccs, zoom );
+                    DeleteOccurrenceZoomMeetings( rockContext, orphanedOccs, zoom );
                     rockContext.SaveChanges();
                 }
 
@@ -452,7 +453,7 @@ namespace rocks.kfs.Zoom.Jobs
                                 endDate = RockDateTime.Today.AddDays( daysOut + 1 ).AddMilliseconds( -1 ); // Set to last millisecond of days out date since we are working with DateTimes
                             }
                             var reservationDateTimes = res.GetReservationTimes( beginDateTime, endDate );
-                            zrOccurrencesAdded += CreateZoomRoomOccurrences( zrOccurrenceService, zoomRoomDV.Value, res.Name, zrPassword, res.Schedule, joinBeforeHost, rl, reservationDateTimes, resLocOccurrences, verboseLogging );
+                            zrOccurrencesAdded += CreateZoomRoomOccurrences( zrOccurrenceService, zoomRoomDV.Value, res.Name, zrPassword, res.Schedule, joinBeforeHost, rl, reservationDateTimes, resLocOccurrences );
 
                             // Capture existing Zoom Room Occurrences where the target Reservation "occurrence" no longer exists. This would happen if the Room Reservation schedule has been changed.
                             var resStartDateTimes = reservationDateTimes.Select( rdt => rdt.StartDateTime ).ToList();
@@ -474,7 +475,7 @@ namespace rocks.kfs.Zoom.Jobs
             }
         }
 
-        private void DeleteOccurrenceZoomMeetings( RockContext rockContext, bool verboseLogging, IQueryable<RoomOccurrence> occurrencesToCancel, Zoom zoom )
+        private void DeleteOccurrenceZoomMeetings( RockContext rockContext, IQueryable<RoomOccurrence> occurrencesToCancel, Zoom zoom )
         {
             var errors = new List<string>();
             if ( verboseLogging )
@@ -498,7 +499,7 @@ namespace rocks.kfs.Zoom.Jobs
             LogEvent( null, "Zoom Room Reservation Sync", string.Format( "{0} Zoom Meetings successfully deleted.", occurrencesToCancel.Count() - errors.Count ) );
         }
 
-        private int CreateZoomRoomOccurrences( RoomOccurrenceService occService, string roomId, string occurrenceTopic, string password, Schedule schedule, bool joinBeforeHost, ReservationLocation reservationLocation, List<ReservationDateTime> reservationDateTimes, IQueryable<RoomOccurrence> existingRoomOccurrences, bool verboseLogging = false )
+        private int CreateZoomRoomOccurrences( RoomOccurrenceService occService, string roomId, string occurrenceTopic, string password, Schedule schedule, bool joinBeforeHost, ReservationLocation reservationLocation, List<ReservationDateTime> reservationDateTimes, IQueryable<RoomOccurrence> existingRoomOccurrences )
         {
             var occurrencesAdded = 0;
             foreach ( var dateTime in reservationDateTimes )
