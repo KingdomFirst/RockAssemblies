@@ -36,7 +36,7 @@
       <HintPath>..\..\RockWeb\Bin\com.bemaservices.RoomManagement.dll</HintPath>
     </Reference>
     <Reference Include="itextsharp">
-      <HintPath>..\..\CentralAZ\com.CentralAZ.RoomManagement\libs\itextsharp.dll</HintPath>
+      <HintPath>libs\itextsharp.dll</HintPath>
     </Reference>
     <Reference Include="Rock">
       <SpecificVersion>False</SpecificVersion>
