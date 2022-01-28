@@ -47,7 +47,7 @@ namespace rocks.kfs.Zoom.Migrations
                   ,'Zoom Room Reservation Scheduling and Maintenance'
                   ,'Generates Zoom Room occurrences and synchronizes meeting schedules for Room Reservations tied to Locations linked to a Zoom Room.'
                   ,'rocks.kfs.Zoom.Jobs.ZoomRoomSchedulingAndMaintenance'
-                  ,'0 0 4 1/1 * ? *'  -- Daily at 4:00 AM
+                  ,'0 0 0/1 1/1 * ? *'  -- Every Hour
                   ,1
                   ,'B23BD7D6-046D-411D-8F06-64EE237FA770'
                   );

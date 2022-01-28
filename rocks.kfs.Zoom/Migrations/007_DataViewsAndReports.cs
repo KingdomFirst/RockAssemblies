@@ -30,25 +30,7 @@ namespace rocks.kfs.Zoom.Migrations
             #region DataView
 
             // Create Zoom Room Occurrence DataView Category
-            Sql( @"IF NOT EXISTS (SELECT * FROM Category where [Guid] = '409D543C-9D39-49D5-BF1C-0F9BE442555F')
-                        BEGIN
-                        DECLARE 
-                            @dataViewEntityTypeId int = (select top 1 [Id] from [EntityType] where [Guid] = '57F8FA29-DCF1-4F74-8553-87E90F234139')
-                        INSERT INTO [Category] (
-                            IsSystem,
-                            EntityTypeId,
-                            Name,
-                            [Order],
-                            IconCssClass,
-                            [Guid])
-                        values (
-                            0,
-                            @dataViewEntityTypeId,
-                            'Zoom Room Occurrences',
-                            0,
-                            'fa fa-video',
-                            '409D543C-9D39-49D5-BF1C-0F9BE442555F')
-                        END" );
+            RockMigrationHelper.UpdateCategory( "57F8FA29-DCF1-4F74-8553-87E90F234139", "Zoom Room Occurrences", "fa fa-video", "Dataviews related to Zoom Room Occurrences", "409D543C-9D39-49D5-BF1C-0F9BE442555F" );
 
             // Create [GroupAll] DataViewFilter for DataView: Upcoming Zoom Room Occurrences
             Sql( @"IF NOT EXISTS (SELECT * FROM DataViewFilter where [Guid] = '823D3C22-EC26-42DF-BB3A-4E675734D010')
@@ -138,53 +120,13 @@ namespace rocks.kfs.Zoom.Migrations
             RockMigrationHelper.UpdateEntityType( "rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect.ZoomRoomNameSelect", "Zoom Room Name Select", "rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect.ZoomRoomNameSelect, rocks.kfs.Zoom, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", true, true, ZoomGuid.EntityType.REPORT_ZOOM_ROOM_NAME );
 
             // Create Zoom Room Occurrence Report Category
-            Sql( @"IF NOT EXISTS (SELECT * FROM Category where [Guid] = '5C73C293-031A-4D91-8947-23A506120D22')
-                        BEGIN
-                        DECLARE 
-                            @reportEntityTypeId int = (select top 1 [Id] from [EntityType] where [Guid] = 'F1F22D3E-FEFA-4C84-9FFA-9E8ACE60FCE7')
-                        INSERT INTO [Category] (
-                            IsSystem,
-                            EntityTypeId,
-                            Name,
-                            [Order],
-                            IconCssClass,
-                            [Guid])
-                        values (
-                            0,
-                            @reportEntityTypeId,
-                            'Zoom Room Occurrences',
-                            0,
-                            'fa fa-video',
-                            '5C73C293-031A-4D91-8947-23A506120D22')
-                        END" );
+            RockMigrationHelper.UpdateCategory( "F1F22D3E-FEFA-4C84-9FFA-9E8ACE60FCE7", "Zoom Room Occurrences", "fa fa-video", "Reports related to Zoom Room Occurrences", "5C73C293-031A-4D91-8947-23A506120D22" );
 
             // Create Report: Upcoming Zoom Room Occurrences
-            Sql( @"IF NOT EXISTS (SELECT * FROM [Report] where [Guid] = 'E89ED73D-3D1D-40EB-BC6A-5631C6BC9834')
-                    BEGIN
-                    DECLARE
-                        @categoryId int = (select top 1 [Id] from [Category] where [Guid] = '5C73C293-031A-4D91-8947-23A506120D22'),
-                        @entityTypeId int = (select top 1 [Id] from [EntityType] where [Guid] = '2A138B5B-3CD8-4F03-ACAD-4D544D257916'),
-                        @dataViewId int = (select top 1 [Id] from [DataView] where [Guid] = '45493469-8718-4C09-BB76-ED53AE3F2FA5')
+            RockMigrationHelper.AddReport( "5C73C293-031A-4D91-8947-23A506120D22", "45493469-8718-4C09-BB76-ED53AE3F2FA5", "2A138B5B-3CD8-4F03-ACAD-4D544D257916", "Upcoming Zoom Room Occurrences", "Upcoming Zoom Room Occurrences", "E89ED73D-3D1D-40EB-BC6A-5631C6BC9834" );
 
-                    INSERT INTO [Report] (
-                        [IsSystem],
-                        [Name],
-                        [Description],
-                        [CategoryId],
-                        [EntityTypeId],
-                        [DataViewId],
-                        [Guid])
-                    VALUES(
-                        0,
-                        'Upcoming Zoom Room Occurrences',
-                        '',
-                        @categoryId,
-                        @entityTypeId,
-                        @dataViewId,
-                        'E89ED73D-3D1D-40EB-BC6A-5631C6BC9834')
-                    END" );
-
-            // Create ReportField for Upcoming Zoom Room Occurrences report: Topic
+            // Create ReportFields for Upcoming Zoom Room Occurrences
+            // Topic
             Sql( @"IF NOT EXISTS (SELECT * FROM ReportField where [Guid] = '4A0F0FEB-780E-4D02-87E4-A908DCC41C2D')
                     BEGIN
                     DECLARE
@@ -213,7 +155,7 @@ namespace rocks.kfs.Zoom.Migrations
                         0 )
                     END" );
 
-            // Create ReportField for Upcoming Zoom Room Occurrences report: StartTime
+            // StartTime
             Sql( @"IF NOT EXISTS (SELECT * FROM ReportField where [Guid] = 'EFB0EA72-DBD5-4440-B53C-7637A2C0F8E1')
                     BEGIN
                     DECLARE
@@ -242,7 +184,7 @@ namespace rocks.kfs.Zoom.Migrations
                         0 )
                     END" );
 
-            // Create ReportField for Upcoming Zoom Room Occurrences report: Duration
+            // Duration
             Sql( @"IF NOT EXISTS (SELECT * FROM ReportField where [Guid] = 'F0E16384-17D0-4168-BE44-23859C088EA0')
                     BEGIN
                     DECLARE
@@ -271,7 +213,7 @@ namespace rocks.kfs.Zoom.Migrations
                         0 )
                     END" );
 
-            // Create ReportField for Upcoming Zoom Room Occurrences report: Password
+            // Password
             Sql( @"IF NOT EXISTS (SELECT * FROM ReportField where [Guid] = 'F04559AA-E192-4799-9434-B660BC097992')
                     BEGIN
                     DECLARE
@@ -300,65 +242,11 @@ namespace rocks.kfs.Zoom.Migrations
                         0 )
                     END" );
 
-            // Create ReportField for Upcoming Zoom Room Occurrences report: Location Name
-            Sql( @"IF NOT EXISTS (SELECT * FROM ReportField where [Guid] = 'E855930E-5B2E-4311-B494-EA7FD56E6B57')
-                    BEGIN
-                    DECLARE
-                        @reportId int = (select Id from [Report] where [Guid] = 'E89ED73D-3D1D-40EB-BC6A-5631C6BC9834'),
-                        @dataSelectEntityTypeId int = (select Id from [EntityType] where [Guid] = '" + ZoomGuid.EntityType.REPORT_LOCATION_NAME + @"')
-                    INSERT INTO [ReportField] (
-                        ReportId,
-                        ReportFieldType,
-                        ShowInGrid,
-                        DataSelectComponentEntityTypeId,
-                        Selection,
-                        [Guid],
-                        ColumnHeaderText,
-                        ColumnOrder,
-                        SortOrder,
-                        SortDirection )
-                    values (
-                        @reportId,
-                        2,
-                        1,
-                        @dataSelectEntityTypeId,
-                        '{}',
-                        'E855930E-5B2E-4311-B494-EA7FD56E6B57',
-                        'Location Name',
-                        4,
-                        1,
-                        0 )
-                    END" );
+            // Location Name
+            RockMigrationHelper.AddReportField( "E89ED73D-3D1D-40EB-BC6A-5631C6BC9834", Rock.Model.ReportFieldType.DataSelectComponent, true, ZoomGuid.EntityType.REPORT_LOCATION_NAME, "{}", 5, "Location Name", "E855930E-5B2E-4311-B494-EA7FD56E6B57" );
 
-            // Create ReportField for Upcoming Zoom Room Occurrences report: Zoom Room Name
-            Sql( @"IF NOT EXISTS (SELECT * FROM ReportField where [Guid] = 'F79941D9-8BC2-4812-A6A4-68143E5DBCBC')
-                    BEGIN
-                    DECLARE
-                        @reportId int = (select Id from [Report] where [Guid] = 'E89ED73D-3D1D-40EB-BC6A-5631C6BC9834'),
-                        @dataSelectEntityTypeId int = (select Id from [EntityType] where [Guid] = '" + ZoomGuid.EntityType.REPORT_ZOOM_ROOM_NAME + @"')
-                    INSERT INTO [ReportField] (
-                        ReportId,
-                        ReportFieldType,
-                        ShowInGrid,
-                        DataSelectComponentEntityTypeId,
-                        Selection,
-                        [Guid],
-                        ColumnHeaderText,
-                        ColumnOrder,
-                        SortOrder,
-                        SortDirection )
-                    values (
-                        @reportId,
-                        2,
-                        1,
-                        @dataSelectEntityTypeId,
-                        '{}',
-                        'F79941D9-8BC2-4812-A6A4-68143E5DBCBC',
-                        'Zoom Room Name',
-                        5,
-                        null,
-                        0 )
-                    END" );
+            // Zoom Room Name
+            RockMigrationHelper.AddReportField( "E89ED73D-3D1D-40EB-BC6A-5631C6BC9834", Rock.Model.ReportFieldType.DataSelectComponent, true, ZoomGuid.EntityType.REPORT_ZOOM_ROOM_NAME, "{}", 6, "Zoom Room Name", "F79941D9-8BC2-4812-A6A4-68143E5DBCBC" );
 
             #endregion Report
         }

@@ -28,12 +28,12 @@ namespace rocks.kfs.Zoom.Migrations
         public override void Up()
         {
             // Assign GUID to Zoom and add security
-            RockMigrationHelper.UpdateEntityType( "rocks.kfs.Zoom.ZoomApp", "Zoom App", "", false, true, ZoomGuid.EntityType.ZOOM );
+            RockMigrationHelper.UpdateEntityType( "rocks.kfs.Zoom.ZoomApp", ZoomGuid.EntityType.ZOOM, false, true );
             RockMigrationHelper.AddSecurityAuthForEntityType( "rocks.kfs.Zoom.ZoomApp", 0, Rock.Security.Authorization.VIEW, true, Rock.SystemGuid.Group.GROUP_ADMINISTRATORS, 0, "6BC0A6D7-844F-49DF-BE40-5AD45EAB3CEE" );
             RockMigrationHelper.AddSecurityAuthForEntityType( "rocks.kfs.Zoom.ZoomApp", 1, Rock.Security.Authorization.VIEW, false, null, Rock.Model.SpecialRole.AllUsers.ConvertToInt(), "3921542F-476D-48B4-97F5-788709A1F4B4" );
 
-            RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Key", "", "The API Key for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "D53A2B48-C8B4-4481-B2AB-139CAF90C78C", "rocks.kfs.KFSZoomApiKey" );
-            RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Secret", "", "The API Secret for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "CB89B071-4866-41BD-ACB1-1810F5224A82", "rocks.kfs.KFSZoomApiSecret" );
+            RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Key", "", "The API Key for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "D53A2B48-C8B4-4481-B2AB-139CAF90C78C", "rocks.kfs.ZoomApiKey" );
+            RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Secret", "", "The API Secret for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "CB89B071-4866-41BD-ACB1-1810F5224A82", "rocks.kfs.ZoomApiSecret" );
 
             // Only add the Reservation attribute if the Reservation table exists
             try
@@ -44,10 +44,10 @@ namespace rocks.kfs.Zoom.Migrations
             catch { }
 
             RockMigrationHelper.AddDefinedType( "Zoom", "Zoom Rooms", "Zoom Rooms available for linking to Rock Locations.", ZoomGuid.DefinedType.ZOOM_ROOM );
-            RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.TEXT, "Meeting Password", "rocks.kfs.ZoomMeetingPassword", "Zoom meeting password.", 2, "", ZoomGuid.Attribute.ZOOM_MEETING_PASSWORD );
-            RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.BOOLEAN, "Join Before Host", "rocks.kfs.ZoomJoinBeforeHost", "Zoom meeting's Join Before Host setting.", 3, "false", ZoomGuid.Attribute.ZOOM_MEETING_JOIN_BEFORE_HOST );
+            RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.TEXT, "Meeting Password", "rocks.kfs.ZoomMeetingPassword", "Zoom meeting password.", 1, "", ZoomGuid.Attribute.ZOOM_MEETING_PASSWORD );
+            RockMigrationHelper.AddDefinedTypeAttribute( ZoomGuid.DefinedType.ZOOM_ROOM, Rock.SystemGuid.FieldType.BOOLEAN, "Join Before Host", "rocks.kfs.ZoomJoinBeforeHost", "Zoom meeting's Join Before Host setting.", 2, "false", ZoomGuid.Attribute.ZOOM_MEETING_JOIN_BEFORE_HOST );
 
-            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.Location", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Zoom Room", "", "The Zoom Room associated with this location.", 0, "", ZoomGuid.Attribute.ZOOM_ROOM_LOCATION_ENTITY_ATTRIBUTE, "rocks.kfs.KFSZoomRoom" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.Location", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Zoom Room", "", "The Zoom Room associated with this location.", 0, "", ZoomGuid.Attribute.ZOOM_ROOM_LOCATION_ENTITY_ATTRIBUTE, "rocks.kfs.ZoomRoom" );
         }
 
         /// <summary>

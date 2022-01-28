@@ -24,8 +24,8 @@ namespace rocks.kfs.Zoom
                 var settings = GetSettings( rockContext );
                 if ( settings != null )
                 {
-                    var zoomApiKey = GetSettingValue( settings, "rocks.kfs.KFSZoomApiKey", true );
-                    var zoomApiSecret = GetSettingValue( settings, "rocks.kfs.KFSZoomApiSecret", true );
+                    var zoomApiKey = GetSettingValue( settings, "rocks.kfs.ZoomApiKey", true );
+                    var zoomApiSecret = GetSettingValue( settings, "rocks.kfs.ZoomApiSecret", true );
                     if ( !String.IsNullOrWhiteSpace( zoomApiKey ) && !String.IsNullOrWhiteSpace( zoomApiKey ) )
                     {
                         tokenString = JwtBuilder.Create()
@@ -54,7 +54,7 @@ namespace rocks.kfs.Zoom
                 var settings = GetSettings( rockContext );
                 if ( settings != null )
                 {
-                    zoomApiKey = GetSettingValue( settings, "rocks.kfs.KFSZoomApiKey", true );
+                    zoomApiKey = GetSettingValue( settings, "rocks.kfs.ZoomApiKey", true );
                 }
             }
             return zoomApiKey;
@@ -72,7 +72,7 @@ namespace rocks.kfs.Zoom
                 var settings = GetSettings( rockContext );
                 if ( settings != null )
                 {
-                    zoomApiSecret = GetSettingValue( settings, "rocks.kfs.KFSZoomApiSecret", true );
+                    zoomApiSecret = GetSettingValue( settings, "rocks.kfs.ZoomApiSecret", true );
                 }
             }
             return zoomApiSecret;
@@ -104,8 +104,8 @@ namespace rocks.kfs.Zoom
             using ( var rockContext = new RockContext() )
             {
                 var settings = GetSettings( rockContext );
-                SetSettingValue( rockContext, settings, "rocks.kfs.KFSZoomApiKey", apiKey, true );
-                SetSettingValue( rockContext, settings, "rocks.kfs.KFSZoomApiSecret", apiSecret, true );
+                SetSettingValue( rockContext, settings, "rocks.kfs.ZoomApiKey", apiKey, true );
+                SetSettingValue( rockContext, settings, "rocks.kfs.ZoomApiSecret", apiSecret, true );
 
                 rockContext.SaveChanges();
             }
