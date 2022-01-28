@@ -33,6 +33,7 @@ using rocks.kfs.Zoom.Model;
 using rocks.kfs.Zoom.ZoomGuid;
 using ZoomDotNetFramework.Entities;
 using ZoomDotNetFramework.Enums;
+using rocks.kfs.Zoom.Enums;
 
 namespace rocks.kfs.Zoom.Jobs
 {
@@ -187,7 +188,7 @@ namespace rocks.kfs.Zoom.Jobs
                     rockContext.SaveChanges();
                 }
 
-                // Check for active Room Occurrences tied to Zoom Meetings that no longer exist.
+                // Delete any active Room Occurrences tied to Zoom Meetings that no longer exist.
                 var linkedOccurrences = zrOccurrenceService
                                         .Queryable()
                                         .AsNoTracking()
@@ -206,6 +207,31 @@ namespace rocks.kfs.Zoom.Jobs
                 if ( orphanedOccurrences.Count() > 0 )
                 {
                     zrOccurrenceService.DeleteRange( orphanedOccurrences );
+                    rockContext.SaveChanges();
+                }
+
+                // Attempt to create Zoom Room Meeting for any Room Occurrences that may have had previous issues.
+                var unlinkedOccurrences = zrOccurrenceService
+                                            .Queryable()
+                                            .Where( ro => ro.EntityTypeId == reservationLocationEntityTypeId
+                                                && ( !ro.ZoomMeetingId.HasValue || ro.ZoomMeetingId <= 0 )
+                                                && !ro.IsCompleted
+                                                && ro.IsOccurring
+                                                && ro.StartTime >= beginDateTime
+                                                && ( ro.ZoomMeetingRequestStatus == ZoomMeetingRequestStatus.Failed || ro.ZoomMeetingRequestStatus == ZoomMeetingRequestStatus.ZoomRoomOffline ) );
+
+                foreach ( var rOcc in unlinkedOccurrences )
+                {
+                    var rLoc = reservationLocationService.Queryable( "Location" ).FirstOrDefault( rl => rl.Id == rOcc.EntityId );
+                    rLoc.Location.LoadAttributes();
+                    rOcc.ZoomMeetingRequestStatus = ZoomMeetingRequestStatus.Requested;
+                    var zoomRoomDV = DefinedValueCache.Get( rLoc.Location.GetAttributeValue( "rocks.kfs.ZoomRoom" ).AsGuid() );
+                    var zrPassword = zoomRoomDV.GetAttributeValue( "rocks.kfs.ZoomMeetingPassword" );
+                    var joinBeforeHost = zoomRoomDV.GetAttributeValue( "rocks.kfs.ZoomJoinBeforeHost" ).AsBoolean();
+                    CreateOccurrenceZoomMeeting( rOcc, zoomRoomDV.Value, joinBeforeHost );
+                }
+                if ( unlinkedOccurrences.Count() > 0 )
+                {
                     rockContext.SaveChanges();
                 }
 
@@ -342,7 +368,8 @@ namespace rocks.kfs.Zoom.Jobs
                                     Password = zrPassword,
                                     Duration = res.Schedule.DurationInMinutes,
                                     IsOccurring = true,
-                                    IsCompleted = false
+                                    IsCompleted = false,
+                                    ZoomMeetingRequestStatus = ZoomMeetingRequestStatus.Requested
                                 };
                                 zrOccurrenceService.Add( occurrence );
                                 rockContext.SaveChanges();
@@ -429,7 +456,7 @@ namespace rocks.kfs.Zoom.Jobs
                             var reservationDateTimes = res.GetReservationTimes( beginDateTime, endDate );
                             zrOccurrencesAdded += CreateZoomRoomOccurrences( zrOccurrenceService, zoomRoomDV.Value, res.Name, zrPassword, res.Schedule, joinBeforeHost, rl, reservationDateTimes, resLocOccurrences );
 
-                            // Capture existing Zoom Room Occurrences where the target Reservation "occurrence" no longer exists. This would happen if the Room Reservation schedule has been changed.
+                            // Delete existing Zoom Room Occurrences where the target Reservation "occurrence" no longer exists. This would happen if the Room Reservation schedule has been changed.
                             var resStartDateTimes = reservationDateTimes.Select( rdt => rdt.StartDateTime ).ToList();
                             foreach ( var roomOcc in resLocOccurrences.Where( o => o.IsOccurring && !resStartDateTimes.Any( st => st == o.StartTime ) ) )
                             {
@@ -463,16 +490,27 @@ namespace rocks.kfs.Zoom.Jobs
             {
                 LogEvent( null, "Zoom Room Reservation Sync", string.Format( "Begin create new Zoom Meeting Request: ZoomRoom {0} - {1}", zoomRoomId, occurrence.StartTime.ToShortDateTimeString() ) );
             }
-            var callbackUrl = string.Format( "{0}?token={1}", webhookBaseUrl, occurrence.Id );
-            var success = new Zoom().ScheduleZoomRoomMeeting( zoomRoomId, occurrence.Password, occurrence.Topic, occurrence.StartTime.ToRockDateTimeOffset(), occurrence.Duration, joinBeforeHost, enableLogging: verboseLogging, callbackUrl: callbackUrl );
-            if ( "test for offline logic" == "true" )
+            try
             {
-                occurrence.ZoomMeetingRequestStatus = ZoomMeetingRequestStatus.ZoomRoomOffline;
-                changesMade = true;
+                var callbackUrl = string.Format( "{0}?token={1}", webhookBaseUrl, occurrence.Id );
+                var success = new Zoom().ScheduleZoomRoomMeeting( zoomRoomId, occurrence.Password, occurrence.Topic, occurrence.StartTime.ToRockDateTimeOffset(), occurrence.Duration, joinBeforeHost, enableLogging: verboseLogging, callbackUrl: callbackUrl );              
+                if ( verboseLogging )
+                {
+                    LogEvent( null, "Zoom Room Reservation Sync", string.Format( "Create new Zoom Meeting {0}: ZoomRoom {1} - {2}", success ? "succeeded" : "failed", zoomRoomId, occurrence.StartTime.ToShortDateTimeString() ) );
+                }
             }
-            if ( verboseLogging )
+            catch ( Exception ex )
             {
-                LogEvent( null, "Zoom Room Reservation Sync", string.Format( "Create new Zoom Meeting {0}: ZoomRoom {1} - {2}", success ? "succeeded" : "failed", zoomRoomId, occurrence.StartTime.ToShortDateTimeString() ) );
+                if ( ex.Message.Contains( "Error Code 4008" ) )
+                {
+                    occurrence.ZoomMeetingRequestStatus = ZoomMeetingRequestStatus.ZoomRoomOffline;
+                    changesMade = true;
+                    LogEvent( null, "Zoom Room Reservation Sync", string.Format( "Create new Zoom Meeting failed for ZoomRoom {0} - {1}. Zoom Room client is offline.", zoomRoomId, occurrence.StartTime.ToShortDateTimeString() ) );
+                }
+                else
+                {
+                    throw ex;
+                }
             }
             return changesMade;
         }

@@ -23,6 +23,7 @@ namespace rocks.kfs.Zoom.Model
     using System.Runtime.Serialization;
     using Rock.Data;
     using Rock.Model;
+    using rocks.kfs.Zoom.Enums;
 
     /// <summary>
     /// A Zoom Room Occurrence
@@ -81,6 +82,9 @@ namespace rocks.kfs.Zoom.Model
 
         [DataMember]
         public int EntityId { get; set; }
+
+        [DataMember]
+        public ZoomMeetingRequestStatus? ZoomMeetingRequestStatus { get; set; }
 
         #endregion Entity Properties
 

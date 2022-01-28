@@ -93,6 +93,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\ZoomMeetingRequestStatus.cs" />
     <Compile Include="Jobs\ZoomMeetingGroupReminder.cs" />
     <Compile Include="Jobs\ZoomRoomSchedulingAndMaintenance.cs" />
     <Compile Include="Migrations\007_DataViewsAndReports.cs" />
