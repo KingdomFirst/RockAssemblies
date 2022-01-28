@@ -34,6 +34,8 @@ using rocks.kfs.Zoom.ZoomGuid;
 using ZoomDotNetFramework.Entities;
 using ZoomDotNetFramework.Enums;
 using rocks.kfs.Zoom.Enums;
+using System.Text;
+using Humanizer;
 
 namespace rocks.kfs.Zoom.Jobs
 {
@@ -78,7 +80,8 @@ namespace rocks.kfs.Zoom.Jobs
             public const string ImportMeetings = "ImportMeetings";
         }
 
-        private int errorCount = 0;
+        private List<ZoomRoomOfflineResult> zoomRoomOfflineResultList = new List<ZoomRoomOfflineResult>();
+        private int zrOfflineRequests = 0;
         private string webhookBaseUrl;
         private int reservationLocationEntityTypeId;
         private bool verboseLogging;
@@ -173,6 +176,7 @@ namespace rocks.kfs.Zoom.Jobs
                                                         && !reservationLocationIds.Any( id => id == ro.EntityId ) );
                 if ( orphanedOccs.Count() > 0 )
                 {
+                    var deleteCount = orphanedOccs.Count();
                     if ( verboseLogging )
                     {
                         LogEvent( rockContext, "Zoom Room Reservation Sync", string.Format( "Preparing to delete {0} orphaned RoomOccurrence(s)." ) );
@@ -206,6 +210,7 @@ namespace rocks.kfs.Zoom.Jobs
                 var orphanedOccurrences = linkedOccurrences.Where( ro => !zoomMeetingIds.Any( mid => mid == ro.ZoomMeetingId ) );
                 if ( orphanedOccurrences.Count() > 0 )
                 {
+                    var deleteCount = orphanedOccurrences.Count();
                     zrOccurrenceService.DeleteRange( orphanedOccurrences );
                     rockContext.SaveChanges();
                 }
@@ -228,7 +233,7 @@ namespace rocks.kfs.Zoom.Jobs
                     var zoomRoomDV = DefinedValueCache.Get( rLoc.Location.GetAttributeValue( "rocks.kfs.ZoomRoom" ).AsGuid() );
                     var zrPassword = zoomRoomDV.GetAttributeValue( "rocks.kfs.ZoomMeetingPassword" );
                     var joinBeforeHost = zoomRoomDV.GetAttributeValue( "rocks.kfs.ZoomJoinBeforeHost" ).AsBoolean();
-                    CreateOccurrenceZoomMeeting( rOcc, zoomRoomDV.Value, joinBeforeHost );
+                    CreateOccurrenceZoomMeeting( rOcc, zoomRoomDV.Value, joinBeforeHost, zoomRoomDV.Description );
                 }
                 if ( unlinkedOccurrences.Count() > 0 )
                 {
@@ -375,7 +380,7 @@ namespace rocks.kfs.Zoom.Jobs
                                 rockContext.SaveChanges();
                                 zrOccurrencesAdded++;
 
-                                if ( CreateOccurrenceZoomMeeting( occurrence, zoomRoomDV.Value, joinBeforeHost ) )
+                                if ( CreateOccurrenceZoomMeeting( occurrence, zoomRoomDV.Value, joinBeforeHost, zoomRoomDV.Description ) )
                                 {
                                     rockContext.SaveChanges();
                                 }
@@ -454,7 +459,7 @@ namespace rocks.kfs.Zoom.Jobs
                                 endDate = RockDateTime.Today.AddDays( daysOut + 1 ).AddMilliseconds( -1 ); // Set to last millisecond of days out date since we are working with DateTimes
                             }
                             var reservationDateTimes = res.GetReservationTimes( beginDateTime, endDate );
-                            zrOccurrencesAdded += CreateZoomRoomOccurrences( zrOccurrenceService, zoomRoomDV.Value, res.Name, zrPassword, res.Schedule, joinBeforeHost, rl, reservationDateTimes, resLocOccurrences );
+                            zrOccurrencesAdded += CreateZoomRoomOccurrences( zrOccurrenceService, zoomRoomDV.Value, res.Name, zrPassword, res.Schedule, joinBeforeHost, rl, reservationDateTimes, resLocOccurrences, zoomRoomDV.Description );
 
                             // Delete existing Zoom Room Occurrences where the target Reservation "occurrence" no longer exists. This would happen if the Room Reservation schedule has been changed.
                             var resStartDateTimes = reservationDateTimes.Select( rdt => rdt.StartDateTime ).ToList();
@@ -473,6 +478,17 @@ namespace rocks.kfs.Zoom.Jobs
                 LogEvent( rockContext, "Zoom Room Reservation Sync", string.Format( "{0} Zoom Room Occurrence(s) Created", zrOccurrencesAdded ) );
 
                 #endregion Process Reservations
+
+                #region Final Summary Report
+
+                StringBuilder errorSummaryBuilder = new StringBuilder();
+                foreach ( var zrOfflineResult in zoomRoomOfflineResultList )
+                {
+                    errorSummaryBuilder.AppendLine( GetFormattedResult( zrOfflineResult ) );
+                }
+
+                #endregion Final Summary Report
+
             }
         }
 
@@ -483,7 +499,7 @@ namespace rocks.kfs.Zoom.Jobs
         /// <param name="zoomRoomId"></param>
         /// <param name="joinBeforeHost"></param>
         /// <returns>Boolean indicating if any changes were made to the provided occurrence object.</returns>
-        private bool CreateOccurrenceZoomMeeting( RoomOccurrence occurrence, string zoomRoomId, bool joinBeforeHost )
+        private bool CreateOccurrenceZoomMeeting( RoomOccurrence occurrence, string zoomRoomId, bool joinBeforeHost, string zoomRoomName = null )
         {
             var changesMade = false;
             if ( verboseLogging )
@@ -505,6 +521,12 @@ namespace rocks.kfs.Zoom.Jobs
                 {
                     occurrence.ZoomMeetingRequestStatus = ZoomMeetingRequestStatus.ZoomRoomOffline;
                     changesMade = true;
+                    zoomRoomOfflineResultList.Add( new ZoomRoomOfflineResult
+                    {
+                        RoomId = zoomRoomId,
+                        RoomName = zoomRoomName,
+                        RowsAffected = 1
+                    } );
                     LogEvent( null, "Zoom Room Reservation Sync", string.Format( "Create new Zoom Meeting failed for ZoomRoom {0} - {1}. Zoom Room client is offline.", zoomRoomId, occurrence.StartTime.ToShortDateTimeString() ) );
                 }
                 else
@@ -539,7 +561,7 @@ namespace rocks.kfs.Zoom.Jobs
             LogEvent( null, "Zoom Room Reservation Sync", string.Format( "{0} Zoom Meetings successfully deleted.", occurrencesToCancel.Count() - errors.Count ) );
         }
 
-        private int CreateZoomRoomOccurrences( RoomOccurrenceService occService, string roomId, string occurrenceTopic, string password, Schedule schedule, bool joinBeforeHost, ReservationLocation reservationLocation, List<ReservationDateTime> reservationDateTimes, IQueryable<RoomOccurrence> existingRoomOccurrences )
+        private int CreateZoomRoomOccurrences( RoomOccurrenceService occService, string roomId, string occurrenceTopic, string password, Schedule schedule, bool joinBeforeHost, ReservationLocation reservationLocation, List<ReservationDateTime> reservationDateTimes, IQueryable<RoomOccurrence> existingRoomOccurrences, string roomName = null )
         {
             var occurrencesAdded = 0;
             foreach ( var dateTime in reservationDateTimes )
@@ -564,7 +586,7 @@ namespace rocks.kfs.Zoom.Jobs
                     {
                         Join_Before_Host = joinBeforeHost
                     };
-                    CreateOccurrenceZoomMeeting( occurrence, roomId, joinBeforeHost );
+                    CreateOccurrenceZoomMeeting( occurrence, roomId, joinBeforeHost, roomName );
                 }
             }
             return occurrencesAdded;
@@ -589,6 +611,58 @@ namespace rocks.kfs.Zoom.Jobs
             rockLogger.Add( serviceLog );
             rockContext.SaveChanges();
             return serviceLog;
+        }
+
+        /// <summary>
+        /// Get a cleanup job result as a formatted string
+        /// </summary>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        private string GetFormattedResult( ZoomRoomOfflineResult result )
+        {
+            var icon = "<i class='fa fa-circle text-danger'></i>";
+            var title = result.Title.PluralizeIf( result.RowsAffected != 1 ).ApplyCase( LetterCasing.Title );
+            return $"{icon} {result.RowsAffected} {title}";
+        }
+
+        /// <summary>
+        /// The result data from a cleanup task
+        /// </summary>
+        private class ZoomRoomOfflineResult
+        {
+            /// <summary>
+            /// Gets or sets the title.
+            /// </summary>
+            /// <value>
+            /// The title.
+            /// </value>
+            public string Title { get; set; }
+
+            /// <summary>
+            /// Gets or sets the Zoom Room Id.
+            /// </summary>
+            /// <value>
+            /// The title.
+            /// </value>
+            public string RoomId { get; set; }
+
+            /// <summary>
+            /// Gets or sets the Zoom Room Name.
+            /// </summary>
+            /// <value>
+            /// The title.
+            /// </value>
+            public string RoomName { get; set; }
+
+            /// <summary>
+            /// Gets or sets the rows affected.
+            /// </summary>
+            /// <value>
+            /// The rows affected.
+            /// </value>
+            public int RowsAffected { get; set; }
+
+            public Exception Exception { get; set; }
         }
     }
 }
