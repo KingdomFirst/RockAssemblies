@@ -35,7 +35,7 @@ using ZoomDotNetFramework.Entities;
 using ZoomDotNetFramework.Enums;
 using rocks.kfs.Zoom.Enums;
 using System.Text;
-using Humanizer;
+using Rock.Jobs;
 
 namespace rocks.kfs.Zoom.Jobs
 {
@@ -104,8 +104,8 @@ namespace rocks.kfs.Zoom.Jobs
             // Check Api connection first.
             if ( !Zoom.ZoomAuthCheck() )
             {
-                var strng = "What do I do here?";
-                return;
+                context.Result = "Zoom api authentication error. Check api settings for Zoom Room plugin or try again later.";
+                throw new Exception( "Authentication failed for Zoom api. Please verify the api settings configured in the Zoom Room plugin are valid and correct." );
             }
 
             using ( var rockContext = new RockContext() )
@@ -482,9 +482,27 @@ namespace rocks.kfs.Zoom.Jobs
                 #region Final Summary Report
 
                 StringBuilder errorSummaryBuilder = new StringBuilder();
-                foreach ( var zrOfflineResult in zoomRoomOfflineResultList )
+                var resultList = zoomRoomOfflineResultList.OrderBy( r => r.Title ).Select( r => r.Title ).Distinct();
+                foreach ( var result in resultList )
                 {
-                    errorSummaryBuilder.AppendLine( GetFormattedResult( zrOfflineResult ) );
+                    var zrResult = zoomRoomOfflineResultList.Where( r => r.Title == result )
+                                                            .GroupBy( r => r.Title )
+                                                            .Select( grp => new ZoomRoomOfflineResult
+                                                            {
+                                                                Title = string.Format( "{0} {1} {2} failed to schedule.", grp.Key, grp.Sum( r => r.RowsAffected ), "Zoom meeting".PluralizeIf( grp.Sum( r => r.RowsAffected ) != 1 ) ),
+                                                                RowsAffected = grp.Sum( r => r.RowsAffected )
+                                                            } )
+                                                            .FirstOrDefault();
+                    errorSummaryBuilder.AppendLine( GetFormattedResult( zrResult ) );
+                }
+                context.Result = errorSummaryBuilder.ToString();
+
+                var jobExceptions = zoomRoomOfflineResultList.Where( a => a.Exception != null ).Select( a => a.Exception ).ToList();
+
+                if ( jobExceptions.Any() )
+                {
+                    var exceptionList = new AggregateException( "One or more exceptions occurred during Zoom Room Scheduling.", jobExceptions );
+                    throw new RockJobWarningException( "Zoom Room Scheduling completed with warnings", exceptionList );
                 }
 
                 #endregion Final Summary Report
@@ -523,9 +541,9 @@ namespace rocks.kfs.Zoom.Jobs
                     changesMade = true;
                     zoomRoomOfflineResultList.Add( new ZoomRoomOfflineResult
                     {
-                        RoomId = zoomRoomId,
-                        RoomName = zoomRoomName,
-                        RowsAffected = 1
+                        Title = string.Format( "{0} ({1}) offline.", zoomRoomName, zoomRoomId ),
+                        RowsAffected = 1,
+                        Exception = new Exception( string.Format( "{0} ({1}) is offline. Unable to schedule meeting for {2}.", zoomRoomName, zoomRoomId, occurrence.StartTime ) )
                     } );
                     LogEvent( null, "Zoom Room Reservation Sync", string.Format( "Create new Zoom Meeting failed for ZoomRoom {0} - {1}. Zoom Room client is offline.", zoomRoomId, occurrence.StartTime.ToShortDateTimeString() ) );
                 }
@@ -621,8 +639,7 @@ namespace rocks.kfs.Zoom.Jobs
         private string GetFormattedResult( ZoomRoomOfflineResult result )
         {
             var icon = "<i class='fa fa-circle text-danger'></i>";
-            var title = result.Title.PluralizeIf( result.RowsAffected != 1 ).ApplyCase( LetterCasing.Title );
-            return $"{icon} {result.RowsAffected} {title}";
+            return $"{icon} {result.Title}";
         }
 
         /// <summary>
@@ -637,22 +654,6 @@ namespace rocks.kfs.Zoom.Jobs
             /// The title.
             /// </value>
             public string Title { get; set; }
-
-            /// <summary>
-            /// Gets or sets the Zoom Room Id.
-            /// </summary>
-            /// <value>
-            /// The title.
-            /// </value>
-            public string RoomId { get; set; }
-
-            /// <summary>
-            /// Gets or sets the Zoom Room Name.
-            /// </summary>
-            /// <value>
-            /// The title.
-            /// </value>
-            public string RoomName { get; set; }
 
             /// <summary>
             /// Gets or sets the rows affected.
