@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="com.bemaservices.RoomManagement">
-      <HintPath>..\..\RockWeb\Bin\com.bemaservices.RoomManagement.dll</HintPath>
+      <HintPath>libs\com.bemaservices.RoomManagement.dll</HintPath>
     </Reference>
     <Reference Include="itextsharp">
       <HintPath>libs\itextsharp.dll</HintPath>
