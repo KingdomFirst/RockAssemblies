@@ -17,7 +17,7 @@
 using Rock;
 using Rock.Plugin;
 
-namespace rocks.kfs.StepsToCare
+namespace rocks.kfs.StepsToCare.Migrations
 {
     [MigrationNumber( 5, "1.12.3" )]
     public class CreateJob : Migration

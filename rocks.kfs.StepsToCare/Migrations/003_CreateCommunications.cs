@@ -16,7 +16,7 @@
 //
 using Rock.Plugin;
 
-namespace rocks.kfs.StepsToCare
+namespace rocks.kfs.StepsToCare.Migrations
 {
     [MigrationNumber( 3, "1.12.3" )]
     public class CreateCommunications : Migration
@@ -31,9 +31,11 @@ namespace rocks.kfs.StepsToCare
     <b>Name:</b> {{ CareNeed.PersonAlias.Person.FullName }}<br>
     <b>Category:</b> {{ CareNeed.Category.Value }}<br>
     <b>Details:</b> {{ CareNeed.Details }}</blockquote>
-    <p><a href='{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}/{{ LinkedPages.CareDashboard }}'>View Care Dashboard</a></p>
+    <p><a href='{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}'>View Care Dashboard</a></p>
 {{ 'Global' | Attribute:'EmailFooter' }}
-", SystemGuid.SystemCommunication.CARE_NEED_ASSIGNED );
+", SystemGuid.SystemCommunication.CARE_NEED_ASSIGNED, true, @"You have been assigned a new Care Need for {{ CareNeed.PersonAlias.Person.FullName }}.
+""{{ CareNeed.Details | Truncate:20,'...' }}""
+{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}" );
 
             RockMigrationHelper.UpdateSystemCommunication( "Plugins", "Care Need Follow Up", "", "", "", "", "", "Care Need Follow Up Required", @"{{ 'Global' | Attribute:'EmailHeader' }}
     <p>{{ Person.FullName }},</p>
@@ -43,9 +45,11 @@ namespace rocks.kfs.StepsToCare
     <b>Name:</b> {{ CareNeed.PersonAlias.Person.FullName }}<br>
     <b>Category:</b> {{ CareNeed.Category.Value }}<br>
     <b>Details:</b> {{ CareNeed.Details }}</blockquote>
-    <p><a href='{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}/{{ LinkedPages.CareDashboard }}'>View Care Dashboard</a></p>
+    <p><a href='{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}'>View Care Dashboard</a></p>
 {{ 'Global' | Attribute:'EmailFooter' }}
-", SystemGuid.SystemCommunication.CARE_NEED_FOLLOWUP );
+", SystemGuid.SystemCommunication.CARE_NEED_FOLLOWUP, true, @"A Care Need has been flagged for follow up
+""{{ CareNeed.Details | Truncate:20,'...' }}""
+{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}" );
 
             RockMigrationHelper.UpdateSystemCommunication( "Plugins", "Outstanding Care Needs", "", "", "", "", "", "Outstanding Care Needs", @"{{ 'Global' | Attribute:'EmailHeader' }}
 <table class='row' style='border-collapse: collapse; border-spacing: 0; display: table; padding: 0; position: relative; text-align: left; vertical-align: top; width: 100%;'>
@@ -91,7 +95,7 @@ namespace rocks.kfs.StepsToCare
                                                 <table border='0' cellpadding='0' cellspacing='0' class='button-shell'>
                                                    <tbody>
                                                       <tr>
-                                                         <td align='center' valign='middle' class='button-content' style='border-radius: 3px; background-color: rgb(0, 0, 0);'><a class='button-link' title='View Detail' href='{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}/{{ LinkedPages.CareDetail }}?CareNeedId={{ careNeed.Id }}' target='_blank' style='color: rgb(255, 255, 255);display: inline-block;font-weight: normal;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;background-color: rgb(0, 0, 0);padding: 6px;border: 1px solid rgb(0, 0, 0);border-radius: 3px;font-size: 14px'>View Detail</a></td>
+                                                         <td align='center' valign='middle' class='button-content' style='border-radius: 3px; background-color: rgb(0, 0, 0);'><a class='button-link' title='View Detail' href='{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDetail }}?CareNeedId={{ careNeed.Id }}' target='_blank' style='color: rgb(255, 255, 255);display: inline-block;font-weight: normal;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;background-color: rgb(0, 0, 0);padding: 6px;border: 1px solid rgb(0, 0, 0);border-radius: 3px;font-size: 14px'>View Detail</a></td>
                                                       </tr>
                                                    </tbody>
                                                 </table>
@@ -124,7 +128,7 @@ namespace rocks.kfs.StepsToCare
             <table border='0' cellpadding='0' cellspacing='0' class='button-shell'>
                <tbody>
                   <tr>
-                     <td align='center' valign='middle' class='button-content' style='border-radius: 3px; background-color: rgb(0, 0, 0);'><a class='button-link' title='View Care Dashboard' href='{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}/{{ LinkedPages.CareDashboard }}' target='_blank' style='color: rgb(255, 255, 255);display: inline-block;font-weight: bold;font-size: 16px;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;background-color: rgb(0, 0, 0);padding: 15px;border: 1px solid rgb(0, 0, 0);border-radius: 3px;'>View Care Dashboard</a></td>
+                     <td align='center' valign='middle' class='button-content' style='border-radius: 3px; background-color: rgb(0, 0, 0);'><a class='button-link' title='View Care Dashboard' href='{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}' target='_blank' style='color: rgb(255, 255, 255);display: inline-block;font-weight: bold;font-size: 16px;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;background-color: rgb(0, 0, 0);padding: 15px;border: 1px solid rgb(0, 0, 0);border-radius: 3px;'>View Care Dashboard</a></td>
                   </tr>
                </tbody>
             </table>
@@ -132,7 +136,9 @@ namespace rocks.kfs.StepsToCare
       </tr>
    </tbody>
 </table>
-{{ 'Global' | Attribute:'EmailFooter' }}", SystemGuid.SystemCommunication.CARE_NEED_OUTSTANDING_NEEDS );
+{{ 'Global' | Attribute:'EmailFooter' }}", SystemGuid.SystemCommunication.CARE_NEED_OUTSTANDING_NEEDS, true, @"{{ Person.NickName }},
+You currently have {{ CareNeeds | Size }} care needs assigned to you.
+View them at {{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}" );
 
             RockMigrationHelper.UpdateSystemCommunication( "Plugins", "Care Touch Needed", "", "", "", "", "", "Your assigned Care Need requires attention", @"{{ 'Global' | Attribute:'EmailHeader' }}
     <p>{{ Person.FullName }},</p>
@@ -142,9 +148,11 @@ namespace rocks.kfs.StepsToCare
     <b>Name:</b> {{ CareNeed.PersonAlias.Person.FullName }}<br>
     <b>Details:</b> {{ CareNeed.Details }}<br>
     <b>Care Touches:</b> {{ TouchCount }}</blockquote>
-    <p><a href='{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}/{{ LinkedPages.CareDashboard }}'>View Care Dashboard</a></p>
+    <p><a href='{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}'>View Care Dashboard</a></p>
 {{ 'Global' | Attribute:'EmailFooter' }}
-", SystemGuid.SystemCommunication.CARE_NEED_TOUCH_NEEDED );
+", SystemGuid.SystemCommunication.CARE_NEED_TOUCH_NEEDED, true, @"Your assigned Care Need requires attention: 
+""{{ CareNeed.Details | Truncate:20,'...' }}""
+{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}" );
 
             Sql( string.Format( "UPDATE [SystemCommunication] SET [IsSystem] = 0 WHERE [Guid] = '{0}'", SystemGuid.SystemCommunication.CARE_NEED_ASSIGNED ) );
             Sql( string.Format( "UPDATE [SystemCommunication] SET [IsSystem] = 0 WHERE [Guid] = '{0}'", SystemGuid.SystemCommunication.CARE_NEED_FOLLOWUP ) );

@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using Rock;
 using Rock.Data;
+using rocks.kfs.Intacct.Enums;
 
 namespace rocks.kfs.Intacct
 {
@@ -76,6 +77,49 @@ namespace rocks.kfs.Intacct
         public string WarehouseId;
     }
 
+    public class OtherReceipt
+    {
+        public DateTime PaymentDate;
+        public string Payer; // Incorrectly named "payee" in API.
+        public DateTime ReceivedDate;
+        public PaymentMethod PaymentMethod;
+        public string UnDepGLAccountNo;
+        public string BankAccountId;
+        public DateTime? DepositDate;
+        public string RefId;
+        public string Description;
+        public string SupDocId;
+        public string Currency;
+        public DateTime? ExchRateDate;
+        public string ExchRateType;
+        public decimal? ExchRate;
+        public Dictionary<string, dynamic> CustomFields = new Dictionary<string, object>();
+        public bool? InclusiveTax;
+        public string TaxSolutionId;
+        public List<ReceiptLineItem> ReceiptItems;
+
+    }
+
+    public class ReceiptLineItem
+    {
+        public string GlAccountNo;
+        public string AccountLabel;
+        public decimal Amount;
+        public string Memo;
+        public string LocationId;
+        public string DepartmentId;
+        public Dictionary<string, dynamic> CustomFields = new Dictionary<string, object>();
+        public string ProjectId;
+        public string TaskId;
+        public string CostTypeId;
+        public string CustomerId;
+        public string VendorId;
+        public string EmployeeId;
+        public string ItemId;
+        public string ClassId;
+        public decimal TotalTrxAmount;
+    }
+
     public class GLTransaction : Rock.Lava.ILiquidizable
     {
         [LavaInclude]
@@ -95,6 +139,9 @@ namespace rocks.kfs.Intacct
 
         [LavaInclude]
         public int ProcessTransactionFees;
+
+        [LavaInclude]
+        public string Payer;
 
         #region ILiquidizable
 
@@ -201,5 +248,13 @@ namespace rocks.kfs.Intacct
         public string Description;
         public Dictionary<string, dynamic> CustomDimensions;
         public int ProcessTransactionFees;
+    }
+
+    public class CheckingAccount
+    {
+        public string BankAccountId { get; set; }
+        public string BankAcountNo { get; set; }
+        public string GLAccountNo { get; set; }
+        public string BankName { get; set; }
     }
 }

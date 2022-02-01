@@ -48,6 +48,7 @@
       <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
@@ -58,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataFilter\TicketClassFilter.cs" />
     <Compile Include="Entities\RockEventbriteEvent.cs" />
     <Compile Include="Entities\WebhookResponse.cs" />
     <Compile Include="EventbriteEvents.cs" />
