@@ -482,18 +482,16 @@ namespace rocks.kfs.Zoom.Jobs
                 #region Final Summary Report
 
                 StringBuilder errorSummaryBuilder = new StringBuilder();
-                var resultList = zoomRoomOfflineResultList.OrderBy( r => r.Title ).Select( r => r.Title ).Distinct();
+                var resultList = zoomRoomOfflineResultList.OrderBy( r => r.Title )
+                                                          .GroupBy( r => r.Title )
+                                                          .Select( grp => new ZoomRoomOfflineResult
+                                                          {
+                                                              Title = string.Format( "{0} {1} {2} failed to schedule.", grp.Key, grp.Sum( r => r.RowsAffected ), "Zoom meeting".PluralizeIf( grp.Sum( r => r.RowsAffected ) != 1 ) ),
+                                                              RowsAffected = grp.Sum( r => r.RowsAffected )
+                                                          } );
                 foreach ( var result in resultList )
                 {
-                    var zrResult = zoomRoomOfflineResultList.Where( r => r.Title == result )
-                                                            .GroupBy( r => r.Title )
-                                                            .Select( grp => new ZoomRoomOfflineResult
-                                                            {
-                                                                Title = string.Format( "{0} {1} {2} failed to schedule.", grp.Key, grp.Sum( r => r.RowsAffected ), "Zoom meeting".PluralizeIf( grp.Sum( r => r.RowsAffected ) != 1 ) ),
-                                                                RowsAffected = grp.Sum( r => r.RowsAffected )
-                                                            } )
-                                                            .FirstOrDefault();
-                    errorSummaryBuilder.AppendLine( GetFormattedResult( zrResult ) );
+                    errorSummaryBuilder.AppendLine( GetFormattedResult( result ) );
                 }
                 context.Result = errorSummaryBuilder.ToString();
 
