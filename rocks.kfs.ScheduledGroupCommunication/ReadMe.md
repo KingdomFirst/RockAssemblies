@@ -3,7 +3,7 @@
 
 
 # Send Scheduled Group Communications
-*Tested/Supported in Rock version:  8.0-13*   
+*Tested/Supported in Rock version:  8.0-13.0*   
 *Created:  11/20/2018*  
 *Updated:  2/2/2022*   
 *Rock Shop Plugin: https://www.rockrms.com/Plugin/100*
