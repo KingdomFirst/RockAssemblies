@@ -89,8 +89,8 @@ You will need to create two system jobs to send the communications.
 
 ![Group_Attributes (1)](https://user-images.githubusercontent.com/81330042/123460131-c9b36300-d5ac-11eb-9c1c-cb303788cbb3.png)
 
-4. All the fields for creating a communication are required. You can use Lava in the message field for both SMS and email communications. Recurrence defaults to One Time but you can also choose Weekly, Biweekly, or Monthly (the same day of the month each month). The Person, Group Member and Organization entities are all available for lava use in both email and SMS.
+4. All the fields for creating a communication are required. You can use Lava in the message field for both SMS and email communications. Recurrence defaults to One Time but you can also choose One Time, Daily, Weekly, Biweekly, or Monthly (the same day of the month each month). The Person, Group Member and Organization entities are all available for lava use in both email and SMS.
 
-![Create_Email (1)](https://user-images.githubusercontent.com/81330042/123460147-d041da80-d5ac-11eb-8e4b-1081c550560d.png)
+![Create_Email (1)](https://user-images.githubusercontent.com/81330042/152549353-6f5c3e2a-2f7c-47ef-b24a-0f281f95a7d4.png)
 
 ![Create_SMS (1)](https://user-images.githubusercontent.com/81330042/123460161-d6d05200-d5ac-11eb-89b6-012c214f5f23.png)
