@@ -65,7 +65,7 @@ You will need to create two system jobs to send the communications.
 1. Go to Admin Tools > System Settings > Jobs Administration
 2. Add a new job
 
-![Email_Job (2)](https://user-images.githubusercontent.com/81330042/123459947-8f49c600-d5ac-11eb-8fb0-3fa27aa8405e.png)
+![Email_Job (2)](https://user-images.githubusercontent.com/81330042/152584299-0ee58cc2-fa52-49ae-8adc-164aa9185d9e.png)
 
 > <span style="padding-left: 30px; margin-right: 10px; width: .8em;background: #d21919; border-radius: 100%; color: white; text-align: center; display: inline-block;">&nbsp;&nbsp;1&nbsp;&nbsp;</span> **Name** Give your job a name
 >
