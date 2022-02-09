@@ -36,6 +36,7 @@ using ZoomDotNetFramework.Enums;
 using rocks.kfs.Zoom.Enums;
 using System.Text;
 using Rock.Jobs;
+using ZoomDotNetFramework;
 
 namespace rocks.kfs.Zoom.Jobs
 {
@@ -132,7 +133,7 @@ namespace rocks.kfs.Zoom.Jobs
                 var zrOccurrencesCancel = new List<RoomOccurrence>();
                 reservationLocationEntityTypeId = new EntityTypeService( rockContext ).GetNoTracking( com.bemaservices.RoomManagement.SystemGuid.EntityType.RESERVATION_LOCATION.AsGuid() ).Id;
 
-                var zoom = new Zoom();
+                var zoom = Zoom.Api();
                 var logService = new ServiceLogService( rockContext );
                 var locationService = new LocationService( rockContext );
                 var zrLocations = locationService.Queryable()
@@ -200,10 +201,10 @@ namespace rocks.kfs.Zoom.Jobs
                                             && ro.ZoomMeetingId > 0
                                             && !ro.IsCompleted
                                             && ro.StartTime >= beginDateTime );
-                var zoomMeetings = new List<ZoomDotNetFramework.Entities.Meeting>();
+                var zoomMeetings = new List<Meeting>();
                 foreach ( var zrl in linkedZoomRoomLocations )
                 {
-                    zoomMeetings.AddRange( zoom.GetZoomRoomMeetings( zrl.Value, MeetingListType.Upcoming ) );
+                    zoomMeetings.AddRange( zoom.GetZoomMeetings( zrl.Value, MeetingListType.Upcoming ) );
                 }
                 var zoomMeetingIds = zoomMeetings.Select( m => m.Id ).ToList();
                 var orphanedOccurrences = linkedOccurrences.Where( ro => !zoomMeetingIds.Any( mid => mid == ro.ZoomMeetingId ) );
@@ -429,7 +430,7 @@ namespace rocks.kfs.Zoom.Jobs
                                 }
                                 if ( updateMeeting )
                                 {
-                                    zoom.UpdateZoomMeeting( connectedMeeting );
+                                    zoom.UpdateMeeting( connectedMeeting );
                                 }
                             }
                         }
@@ -458,7 +459,7 @@ namespace rocks.kfs.Zoom.Jobs
                                 zrOccurrenceService.Delete( roomOcc );
                                 if ( roomOcc.ZoomMeetingId.HasValue && roomOcc.ZoomMeetingId.Value > 0 )
                                 {
-                                    zoom.DeleteZoomMeeting( roomOcc.ZoomMeetingId.Value );
+                                    zoom.DeleteMeeting( roomOcc.ZoomMeetingId.Value );
                                 }
                             }
                         }
@@ -547,7 +548,7 @@ namespace rocks.kfs.Zoom.Jobs
             return changesMade;
         }
 
-        private void DeleteOccurrenceZoomMeetings( RockContext rockContext, IQueryable<RoomOccurrence> occurrencesToCancel, Zoom zoom )
+        private void DeleteOccurrenceZoomMeetings( IQueryable<RoomOccurrence> occurrencesToCancel, ZoomApi zoom )
         {
             var errors = new List<string>();
             if ( verboseLogging )
@@ -556,7 +557,7 @@ namespace rocks.kfs.Zoom.Jobs
             }
             foreach ( var roomOcc in occurrencesToCancel )
             {
-                if ( !zoom.DeleteZoomMeeting( roomOcc.ZoomMeetingId.Value ) )
+                if ( !zoom.DeleteMeeting( roomOcc.ZoomMeetingId.Value ) )
                 {
                     errors.Add( string.Format( "Unable to delete Zoom meeting ({0}).", roomOcc.ZoomMeetingId ) );
                 }

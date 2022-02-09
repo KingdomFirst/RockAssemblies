@@ -51,41 +51,6 @@ namespace rocks.kfs.Zoom
             return retVar;
         }
 
-        public Meeting GetZoomMeeting( long meetingId )
-        {
-            var zoom = Api();
-            var meeting = zoom.GetZoomMeeting( meetingId );
-            return meeting;
-        }
-
-        public Meeting CreateZoomMeeting( string userId, Meeting meetingInfo )
-        {
-            var zoom = Api();
-            var meeting = zoom.CreateMeeting( userId, meetingInfo );
-            return meeting;
-        }
-
-        public bool UpdateZoomMeeting( Meeting meetingInfo )
-        {
-            var zoom = Api();
-            var success = zoom.UpdateMeeting( meetingInfo );
-            return success;
-        }
-
-        public bool DeleteZoomMeeting( long meetingId )
-        {
-            var zoom = Api();
-            var success = zoom.DeleteMeeting( meetingId );
-            return success;
-        }
-
-        public List<Meeting> GetZoomRoomMeetings( string userId, MeetingListType meetingType = MeetingListType.Upcoming )
-        {
-            var zoom = Api();
-            var meeting = zoom.GetZoomMeetings( userId, meetingType );
-            return meeting;
-        }
-
         public static void SyncZoomRoomDT( RockContext rockContext = null, bool enableLogging = false )
         {
             if ( rockContext == null )
@@ -139,37 +104,6 @@ namespace rocks.kfs.Zoom
             {
                 LogEvent( rockContext, "SyncZoom", "Sync Zoom Rooms Defined Type", "Finished" );
             }
-        }
-
-        public bool ScheduleZoomRoomMeeting( string roomId, string password, string topic, DateTimeOffset startTime, int duration, bool joinBeforeHost, string timezone = "", bool enableLogging = false, string callbackUrl = "" )
-        {
-
-            if ( enableLogging )
-            {
-                LogEvent( null, "SyncZoom", "Schedule Zoom Room Meeting", "Started" );
-            }
-            var zoom = Api();
-            var success = zoom.ScheduleZoomRoomMeeting( roomId, password, callbackUrl, topic, startTime, timezone, duration, joinBeforeHost: joinBeforeHost );
-            if ( enableLogging )
-            {
-                LogEvent( null, "SyncZoom", "Schedule Zoom Room Meeting", string.Format( "Meeting schedule {0}.", success ? "succeeded" : "failed" ) );
-            }
-            return success;
-        }
-
-        public bool CancelZoomRoomMeeting( RockContext rockContext, string roomId, string topic, DateTimeOffset startTime, string timezone, int duration, bool enableLogging = false )
-        {
-            if ( enableLogging )
-            {
-                LogEvent( rockContext, "SyncZoom", "Cancel Zoom Room Meeting", "Started" );
-            }
-            var zoom = Api();
-            var success = zoom.CancelZoomRoomMeeting( roomId, topic, startTime, timezone, duration );
-            if ( enableLogging )
-            {
-                LogEvent( rockContext, "SyncZoom", "Cancel Zoom Room Meeting", string.Format( "Cancel of meeting {0}.", success ? "succeeded" : "failed" ) );
-            }
-            return success;
         }
 
         private static ServiceLog LogEvent( RockContext rockContext, string type, string input, string result )

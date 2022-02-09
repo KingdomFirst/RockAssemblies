@@ -110,7 +110,6 @@
     <Compile Include="Field\Types\ZoomRoomFieldType.cs" />
     <Compile Include="Migrations\001_CreateDb.cs" />
     <Compile Include="Migrations\002_CreateAttributes.cs" />
-    <Compile Include="Model\ScheduleMeetingWebhookResponse.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ScheduleEndDate.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ScheduleStartDate.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ScheduleName.cs" />
