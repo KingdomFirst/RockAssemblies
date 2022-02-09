@@ -5,14 +5,14 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("rocks.kfs.Zoom")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("rocks.kfs.Zoom")]
-[assembly: AssemblyCopyright("Copyright ©  2021")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+[assembly: AssemblyTitle( "KFS Zoom Integration" )]
+[assembly: AssemblyDescription( "" )]
+[assembly: AssemblyConfiguration( "" )]
+[assembly: AssemblyCompany( "Kingdom First Solutions" )]
+[assembly: AssemblyProduct( "KFS Zoom Integration" )]
+[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2022" )]
+[assembly: AssemblyTrademark( "" )]
+[assembly: AssemblyCulture( "" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
