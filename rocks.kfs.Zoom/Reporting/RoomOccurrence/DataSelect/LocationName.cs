@@ -84,7 +84,7 @@ namespace rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect
         /// <returns></returns>
         public override System.Linq.Expressions.Expression GetExpression( Rock.Data.RockContext context, System.Linq.Expressions.MemberExpression entityIdProperty, string selection )
         {
-            var occurrenceQuery = new RoomOccurrenceService( context ).Queryable();
+            var occurrenceQuery = new RoomOccurrenceService( context ).Queryable( "Location" );
 
             IQueryable<string> locationQuery;
 

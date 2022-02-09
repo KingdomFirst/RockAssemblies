@@ -15,9 +15,9 @@ namespace rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect
     /// <summary>
     /// A tabular report field that displays the name of the Zoom Room associated with the RoomOccurrence.
     /// </summary>
-    [Description( "Show Zoom Room Id" )]
+    [Description( "Show Zoom Room Name" )]
     [Export( typeof( DataSelectComponent ) )]
-    [ExportMetadata( "ComponentName", "Select Zoom Room Id" )]
+    [ExportMetadata( "ComponentName", "Select Zoom Room Name" )]
     public class ZoomRoomNameSelect : DataSelectComponent
     {
         /// <summary>
@@ -93,7 +93,7 @@ namespace rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect
             var serviceInstance = new AttributeValueService( context );
 
             var zRLocationEntityAttGuid = ZoomGuid.Attribute.ZOOM_ROOM_LOCATION_ENTITY_ATTRIBUTE.AsGuid();
-            var valuesQuery = serviceInstance.Queryable()
+            var valuesQuery = serviceInstance.Queryable( "Attribute" )
                 .Where( x => x.Attribute.Guid == zRLocationEntityAttGuid )
                 .Select( x => new { EntityId = x.EntityId, Value = x.Value } );
 

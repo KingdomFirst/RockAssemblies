@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2021 by Kingdom First Solutions
+// Copyright 2022 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -121,8 +121,8 @@ namespace rocks.kfs.Zoom.Model
         /// </summary> 
         public RoomOccurrenceConfiguration()
         {
-            this.HasRequired( ro => ro.Schedule ).WithMany().HasForeignKey( ro => ro.ScheduleId ).WillCascadeOnDelete( false );
-            this.HasRequired( ro => ro.Location ).WithMany().HasForeignKey( cn => cn.LocationId ).WillCascadeOnDelete( false );
+            this.HasRequired( ro => ro.Schedule ).WithMany().HasForeignKey( ro => ro.ScheduleId ).WillCascadeOnDelete( true );
+            this.HasRequired( ro => ro.Location ).WithMany().HasForeignKey( cn => cn.LocationId ).WillCascadeOnDelete( true );
 
 
             // IMPORTANT!!
