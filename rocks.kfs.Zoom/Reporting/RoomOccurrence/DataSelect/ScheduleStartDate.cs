@@ -101,9 +101,9 @@ namespace rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect
         {
             var occurrenceQuery = new RoomOccurrenceService( context ).Queryable( "Schedule" );
 
-            IQueryable<string> scheduleQuery;
+            IQueryable<DateTime> scheduleQuery;
 
-            scheduleQuery = occurrenceQuery.Select( ro => ro.Schedule.EffectiveStartDate.Value.ToShortDateString() );
+            scheduleQuery = occurrenceQuery.Select( ro => ro.Schedule.EffectiveStartDate.Value );
 
             var exp = SelectExpressionExtractor.Extract( scheduleQuery, entityIdProperty, "ro" );
 
