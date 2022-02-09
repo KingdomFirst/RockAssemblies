@@ -66,13 +66,6 @@ namespace rocks.kfs.Zoom.Model
         [DataMember]
         public int Duration { get; set; }
 
-        [DataMember]
-        public DateTime? SendAt { get; set; }
-
-        [Required]
-        [DataMember]
-        public bool IsOccurring { get; set; } = true;
-
         [Required]
         [DataMember]
         public bool IsCompleted { get; set; } = false;

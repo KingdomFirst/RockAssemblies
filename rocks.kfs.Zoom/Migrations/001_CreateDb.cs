@@ -40,12 +40,11 @@ namespace rocks.kfs.Zoom.Migrations
 	                [TimeZone] [varchar](50) NULL,
 	                [Password] [varchar](10) NULL,
 	                [Duration] [int] NOT NULL,
-	                [SendAt] [datetime] NULL,
-	                [IsOccurring] [bit] NOT NULL,
 	                [IsCompleted] [bit] NOT NULL,
 	                [EntityTypeId] [int] NULL,
 	                [EntityId] [int] NULL,
 	                [IsActive] [bit] NOT NULL,
+	                [ZoomMeetingRequestStatus] [int] NULL,
 	                [Guid] [uniqueidentifier] NOT NULL,
 	                [CreatedDateTime] [datetime] NULL,
 	                [ModifiedDateTime] [datetime] NULL,
@@ -72,8 +71,6 @@ namespace rocks.kfs.Zoom.Migrations
 	                [EntityTypeId] ASC,
 	                [EntityId] ASC
                 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-
-                ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] ADD  CONSTRAINT [DF__rocks_kfs_ZoomRoomOccurrence_IsOccurring]  DEFAULT ((1)) FOR [IsOccurring]
 
                 ALTER TABLE [dbo].[_rocks_kfs_ZoomRoomOccurrence] ADD  CONSTRAINT [DF__rocks_kfs_ZoomRoomOccurrence_IsCompleted]  DEFAULT ((0)) FOR [IsCompleted]
 
@@ -194,7 +191,11 @@ namespace rocks.kfs.Zoom.Migrations
             END
             IF EXISTS ( SELECT * FROM [dbo].[_com_bemaservices_RoomManagement_ReservationType] WHERE [Guid] = '{0}' )
             BEGIN
-                DELETE FROM [dbo].[_com_bemaservices_RoomManagement_ReservationType] WHERE [Guid] = '{0}'
+                DECLARE @KFSZoomReservationTypeId INT = ( SELECT Id FROM [_com_bemaservices_RoomManagement_ReservationType] WHERE [Guid] = '{0}' )
+                IF NOT EXISTS ( SELECT * FROM [_com_bemaservices_RoomManagement_Reservation] WHERE [ReservationTypeId] = @KFSZoomReservationTypeId )
+                BEGIN
+                    DELETE FROM [dbo].[_com_bemaservices_RoomManagement_ReservationType] WHERE [Guid] = '{0}'
+                END
             END
             ", RoomReservationType.ZOOMROOMIMPORT ) );
             RockMigrationHelper.DeleteSecurityAuth( "D32F44D8-22A0-4FEF-91C2-CF05833523DF" );

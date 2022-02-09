@@ -111,7 +111,7 @@ namespace rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect
             var zRLocationEntityAttGuid = ZoomGuid.Attribute.ZOOM_ROOM_LOCATION_ENTITY_ATTRIBUTE.AsGuid();
             var valuesQuery = serviceInstance.Queryable( "Attribute" )
                 .Where( x => x.Attribute.Guid == zRLocationEntityAttGuid )
-                .Select( x => new { EntityId = x.EntityId, Value = x.Value } );
+                .Select( x => new { x.EntityId, x.Value } );
 
             var occurrenceService = new RoomOccurrenceService( context );
 
