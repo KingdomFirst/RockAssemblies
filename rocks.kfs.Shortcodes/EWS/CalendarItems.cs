@@ -223,8 +223,16 @@ namespace rocks.kfs.Shortcodes.EWS
                 var url = parms[SERVER_URL];
                 var daysBack = parms[DAYS_BACK].AsIntegerOrNull();
                 var daysForward = parms[DAYS_FORWARD].AsIntegerOrNull();
-                var startDate = now.Date.AddDays( -daysBack.Value );
-                var endDate = now.Date.AddDays( daysForward.Value + 1 ).AddMilliseconds( -1 );
+                var startDate = now.Date;
+                var endDate = now.Date.AddDays( 8 ).AddMilliseconds( -1 );
+                if ( daysBack.HasValue )
+                {
+                    startDate = startDate.AddDays( -daysBack.Value );
+                }
+                if ( daysForward.HasValue )
+                {
+                    endDate = now.Date.AddDays( daysForward.Value + 1 ).AddMilliseconds( -1 );
+                }
 
                 if ( string.IsNullOrWhiteSpace( username ) || string.IsNullOrWhiteSpace( password ) || string.IsNullOrWhiteSpace( mailbox ) )
                 {
