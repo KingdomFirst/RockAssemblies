@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using Rock;
 using Rock.Plugin;
 
-namespace rocks.kfs.StepsToCare.Migrations
+namespace rocks.kfs.Shortcodes.Migrations
 {
     [MigrationNumber( 1, "1.12.6" )]
     public class CreateAttribute : Migration

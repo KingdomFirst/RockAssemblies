@@ -30,10 +30,10 @@ using Rock.Data;
 using Rock.Model;
 using Rock.Security;
 
-namespace Rock.Lava.Shortcodes
+namespace rocks.kfs.Shortcodes.EWS
 {
     /// <summary>
-    /// Lava shortcode for displaying content at scheduled times.
+    /// Lava shortcode for displaying calendar items from a Microsoft Exchange mailbox.
     /// </summary>
     [LavaShortcodeMetadata(
         "EWS Calendar Items",
