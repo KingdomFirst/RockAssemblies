@@ -26,7 +26,9 @@ using System.Text.RegularExpressions;
 using DotLiquid;
 using DotLiquid.Util;
 using Microsoft.Exchange.WebServices.Data;
+using Rock;
 using Rock.Data;
+using Rock.Lava.Shortcodes;
 using Rock.Model;
 using Rock.Security;
 
@@ -42,15 +44,15 @@ namespace rocks.kfs.Shortcodes.EWS
         @"<p>The EWS calendar items shortcode allows you to access calendar items from a specified Microsoft Exchange shared mailbox using the EWS managed API. Below is an example of how to use it.
             </p>
             <pre>{% assign username = 'Global' | Attribute:'rocks.kfs.EWSUsername' %}
-            {% assign password = 'Global' | Attribute:'rocks.kfs.EWSPassword' %}
-            {[ ewscalendaritems username:'{{ username }}' password:'{{ password }}' calendarmailbox:'kfscalendar@kingdomfirstsolutions.com' ]}
-        {% for calItem in CalendarItems %}
-            {{ calItem.Subject }}
-            {{ calItem.TextBody }}
-            {{ calItem.Location }}
-            {{ calItem.Start }}
-            {{ calItem.End }}
-        {% endfor %}
+{% assign password = 'Global' | Attribute:'rocks.kfs.EWSPassword' %}
+{[ ewscalendaritems username:'{{ username }}' password:'{{ password }}' calendarmailbox:'kfscalendar@kingdomfirstsolutions.com' ]}
+    {% for calItem in CalendarItems %}
+        {{ calItem.Subject }}
+        {{ calItem.TextBody }}
+        {{ calItem.Location }}
+        {{ calItem.Start }}
+        {{ calItem.End }}
+    {% endfor %}
  {[ endewscalendaritems ]}</pre>
         <p>Below is a list of available parameters.</p>
         <ul>
@@ -75,7 +77,7 @@ namespace rocks.kfs.Shortcodes.EWS
             <li><strong>DisplayCc</strong> - A text summarization of the CC recipients.</li>
             <li><strong>IsRecurring</strong> - A boolean indicating if the calendar item is part of a recurring series.</li>
         </ul>",
-        "username,password,calendarmailbox",
+        "username,password,calendarmailbox,serverurl,order,daysback,daysforward",
         "" )]
     public class EWSCalendarItems : RockLavaShortcodeBlockBase
     {
@@ -221,16 +223,8 @@ namespace rocks.kfs.Shortcodes.EWS
                 var url = parms[SERVER_URL];
                 var daysBack = parms[DAYS_BACK].AsIntegerOrNull();
                 var daysForward = parms[DAYS_FORWARD].AsIntegerOrNull();
-                var startDate = now.Date;
-                var endDate = now.Date.AddDays( 8 ).AddMilliseconds( -1 );
-                if ( daysBack.HasValue )
-                {
-                    startDate = startDate.AddDays( -daysBack.Value );
-                }
-                if ( daysForward.HasValue )
-                {
-                    endDate = now.Date.AddDays( daysForward.Value + 1 ).AddMilliseconds( -1 );
-                }
+                var startDate = now.Date.AddDays( -daysBack.Value );
+                var endDate = now.Date.AddDays( daysForward.Value + 1 ).AddMilliseconds( -1 );
 
                 if ( string.IsNullOrWhiteSpace( username ) || string.IsNullOrWhiteSpace( password ) || string.IsNullOrWhiteSpace( mailbox ) )
                 {
@@ -247,6 +241,7 @@ namespace rocks.kfs.Shortcodes.EWS
                     service.TraceFlags = TraceFlags.All;
                     service.Url = new Uri( url );
 
+                    var folderId = new FolderId( WellKnownFolderName.Calendar, mailbox );
                     CalendarView calView = new CalendarView( startDate, endDate );
                     calView.PropertySet = new PropertySet( PropertySet.IdOnly );
                     var addlPropSet = new PropertySet(
@@ -261,7 +256,7 @@ namespace rocks.kfs.Shortcodes.EWS
                                                                 AppointmentSchema.DisplayTo,
                                                                 AppointmentSchema.DisplayCc
                                                             );
-                    var appointments = service.FindAppointments( WellKnownFolderName.Calendar, calView );
+                    var appointments = service.FindAppointments( folderId, calView );
                     if ( appointments.Items.Count > 0 )
                     {
                         service.LoadPropertiesForItems( appointments.Items, addlPropSet );
