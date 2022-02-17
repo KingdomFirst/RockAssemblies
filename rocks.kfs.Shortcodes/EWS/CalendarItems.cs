@@ -71,6 +71,9 @@ namespace Rock.Lava.Shortcodes
             <li><strong>Location</strong> - The name of the location</li>
             <li><strong>Start</strong> - The start dateTime.</li>
             <li><strong>End</strong> - The end dateTime.</li>
+            <li><strong>DisplayTo</strong> - A text summarization of the To recipients.</li>
+            <li><strong>DisplayCc</strong> - A text summarization of the CC recipients.</li>
+            <li><strong>IsRecurring</strong> - A boolean indicating if the calendar item is part of a recurring series.</li>
         </ul>",
         "username,password,calendarmailbox",
         "" )]
@@ -222,7 +225,7 @@ namespace Rock.Lava.Shortcodes
                 var endDate = now.Date.AddDays( 8 ).AddMilliseconds( -1 );
                 if ( daysBack.HasValue )
                 {
-                    startDate = startDate.AddDays( daysBack.Value );
+                    startDate = startDate.AddDays( -daysBack.Value );
                 }
                 if ( daysForward.HasValue )
                 {
@@ -254,7 +257,9 @@ namespace Rock.Lava.Shortcodes
                                                                 AppointmentSchema.Body,
                                                                 AppointmentSchema.TextBody,
                                                                 AppointmentSchema.IsRecurring,
-                                                                AppointmentSchema.AppointmentType
+                                                                AppointmentSchema.AppointmentType,
+                                                                AppointmentSchema.DisplayTo,
+                                                                AppointmentSchema.DisplayCc
                                                             );
                     var appointments = service.FindAppointments( WellKnownFolderName.Calendar, calView );
                     if ( appointments.Items.Count > 0 )
@@ -269,7 +274,10 @@ namespace Rock.Lava.Shortcodes
                                                                 TextBody = a.TextBody,
                                                                 Start = a.Start,
                                                                 End = a.End,
-                                                                Location = a.Location
+                                                                Location = a.Location,
+                                                                DisplayTo = a.DisplayTo,
+                                                                DisplayCc = a.DisplayCc,
+                                                                IsRecurring = a.IsRecurring
                                                             } ) );
                     }
                 }
@@ -392,6 +400,15 @@ namespace Rock.Lava.Shortcodes
 
             [LavaInclude]
             public string Location { get; set; }
+
+            [LavaInclude]
+            public string DisplayTo { get; set; }
+
+            [LavaInclude]
+            public string DisplayCc { get; set; }
+
+            [LavaInclude]
+            public bool IsRecurring { get; set; }
         }
     }
 }
