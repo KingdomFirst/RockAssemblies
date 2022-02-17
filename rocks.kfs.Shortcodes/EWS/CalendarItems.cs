@@ -38,10 +38,10 @@ namespace rocks.kfs.Shortcodes.EWS
     /// Lava shortcode for displaying calendar items from a Microsoft Exchange mailbox.
     /// </summary>
     [LavaShortcodeMetadata(
-        "EWS Calendar Items",
+        "KFS - EWS Calendar Items",
         "ewscalendaritems",
         "Retrieves a list of calendar items from a specified Microsoft Exchange shared calendar mailbox.",
-        @"<p>The EWS calendar items shortcode allows you to access calendar items from a specified Microsoft Exchange shared mailbox using the EWS managed API. Below is an example of how to use it.
+        @"<p>The KFS - EWS calendar items shortcode allows you to access calendar items from a specified Microsoft Exchange shared mailbox using the EWS managed API. Below is an example of how to use it.
             </p>
             <pre>{% assign username = 'Global' | Attribute:'rocks.kfs.EWSUsername' %}
 {% assign password = 'Global' | Attribute:'rocks.kfs.EWSPassword' %}
