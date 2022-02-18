@@ -45,7 +45,7 @@ namespace rocks.kfs.Shortcodes.EWS
         @"<p>The KFS - EWS calendar items shortcode allows you to access calendar items from a specified Microsoft Exchange shared mailbox using the EWS managed API. Below is an example of how to use it.
             </p>
             <pre>{% assign username = 'Global' | Attribute:'rocks.kfs.EWSUsername' %}
-{% assign password = 'Global' | Attribute:'rocks.kfs.EWSPassword' %}
+{% assign password = 'Global' | Attribute:'rocks.kfs.EWSPassword','RawValue' %}
 {[ ewscalendaritems username:'{{ username }}' password:'{{ password }}' calendarmailbox:'kfscalendar@kingdomfirstsolutions.com' ]}
     {% for calItem in CalendarItems %}
         {{ calItem.Subject }}
