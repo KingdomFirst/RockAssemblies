@@ -44,26 +44,6 @@ namespace rocks.kfs.Zoom.Migrations
                         END" );
 
             // Create Rock.Reporting.DataFilter.PropertyFilter DataViewFilter for DataView: Upcoming Zoom Room Occurrences
-            Sql( @"IF NOT EXISTS (SELECT * FROM DataViewFilter where [Guid] = 'BB07CD19-F8B4-4F4C-AC4F-D4B95A03944C')
-                        BEGIN
-                        DECLARE
-                            @ParentDataViewFilterId int = (select Id from DataViewFilter where [Guid] = '823D3C22-EC26-42DF-BB3A-4E675734D010'),
-                            @DataViewFilterEntityTypeId int = (select Id from EntityType where [Guid] = '03F0D6AC-D181-48B6-B4BC-1F2652B55323')
-                        INSERT INTO [DataViewFilter] (
-                            ExpressionType,
-                            ParentId,
-                            EntityTypeId,
-                            Selection,
-                            [Guid])
-                        values (
-                            0,
-                            @ParentDataViewFilterId,
-                            @DataViewFilterEntityTypeId,
-                            '[""Property_IsOccurring"",""1"",""True""]',
-                            'BB07CD19-F8B4-4F4C-AC4F-D4B95A03944C')
-                        END" );
-
-            // Create Rock.Reporting.DataFilter.PropertyFilter DataViewFilter for DataView: Upcoming Zoom Room Occurrences
             Sql( @"IF NOT EXISTS (SELECT * FROM DataViewFilter where [Guid] = 'F1E656FA-FC12-410E-9EA7-8F48CFB9D85B')
                     BEGIN
                     DECLARE
@@ -276,9 +256,6 @@ namespace rocks.kfs.Zoom.Migrations
 
             // Delete DataViewFilter for DataView: Upcoming Zoom Room Occurrences
             Sql( @"DELETE FROM DataViewFilter where [Guid] = 'F1E656FA-FC12-410E-9EA7-8F48CFB9D85B'" );
-
-            // Delete DataViewFilter for DataView: Upcoming Zoom Room Occurrences
-            Sql( @"DELETE FROM DataViewFilter where [Guid] = 'BB07CD19-F8B4-4F4C-AC4F-D4B95A03944C'" );
 
             // Delete DataViewFilter for DataView: Upcoming Zoom Room Occurrences
             Sql( @"DELETE FROM DataViewFilter where [Guid] = '823D3C22-EC26-42DF-BB3A-4E675734D010'" );
