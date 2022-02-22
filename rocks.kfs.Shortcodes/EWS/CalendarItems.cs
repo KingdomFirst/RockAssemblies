@@ -22,6 +22,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 
 using DotLiquid;
 using DotLiquid.Util;
@@ -38,13 +39,13 @@ namespace rocks.kfs.Shortcodes.EWS
     /// Lava shortcode for displaying calendar items from a Microsoft Exchange mailbox.
     /// </summary>
     [LavaShortcodeMetadata(
-        "EWS Calendar Items",
+        "KFS - EWS Calendar Items",
         "ewscalendaritems",
         "Retrieves a list of calendar items from a specified Microsoft Exchange shared calendar mailbox.",
-        @"<p>The EWS calendar items shortcode allows you to access calendar items from a specified Microsoft Exchange shared mailbox using the EWS managed API. Below is an example of how to use it.
+        @"<p>The KFS - EWS calendar items shortcode allows you to access calendar items from a specified Microsoft Exchange shared mailbox using the EWS managed API. Below is an example of how to use it.
             </p>
             <pre>{% assign username = 'Global' | Attribute:'rocks.kfs.EWSUsername' %}
-{% assign password = 'Global' | Attribute:'rocks.kfs.EWSPassword' %}
+{% assign password = 'Global' | Attribute:'rocks.kfs.EWSPassword','RawValue' %}
 {[ ewscalendaritems username:'{{ username }}' password:'{{ password }}' calendarmailbox:'kfscalendar@kingdomfirstsolutions.com' ]}
     {% for calItem in CalendarItems %}
         {{ calItem.Subject }}
@@ -71,7 +72,7 @@ namespace rocks.kfs.Shortcodes.EWS
             <li><strong>Body</strong> - The full body.</li>
             <li><strong>TextBody</strong> - The plain text representation of the body.</li>
             <li><strong>Location</strong> - The name of the location</li>
-            <li><strong>Start</strong> - The start dateTime.</li>
+            <li><strong>Start</strong> - The start dateTime. (Time Zone is based on the authenticated Exchange user settings.)</li>
             <li><strong>End</strong> - The end dateTime.</li>
             <li><strong>DisplayTo</strong> - A text summarization of the To recipients.</li>
             <li><strong>DisplayCc</strong> - A text summarization of the CC recipients.</li>
@@ -286,6 +287,8 @@ namespace rocks.kfs.Shortcodes.EWS
                 }
                 catch ( Exception ex )
                 {
+                    ExceptionLogService.LogException( ex, HttpContext.Current );
+                    result.Write( string.Format( "<div class='alert alert-warning'>{0}</div>", ex.Message ) );
                     return;
                 }
                 if ( calendarItems.Count() == 0 )
