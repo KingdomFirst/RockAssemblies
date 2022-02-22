@@ -243,10 +243,10 @@ namespace rocks.kfs.Zoom.Migrations
                     END" );
 
             // Location Name
-            RockMigrationHelper.AddReportField( "E89ED73D-3D1D-40EB-BC6A-5631C6BC9834", Rock.Model.ReportFieldType.DataSelectComponent, true, ZoomGuid.EntityType.REPORT_LOCATION_NAME, "{}", 5, "Location Name", "E855930E-5B2E-4311-B494-EA7FD56E6B57" );
+            RockMigrationHelper.AddReportField( "E89ED73D-3D1D-40EB-BC6A-5631C6BC9834", Rock.Model.ReportFieldType.DataSelectComponent, true, ZoomGuid.EntityType.REPORT_LOCATION_NAME, "{}", 4, "Location Name", "E855930E-5B2E-4311-B494-EA7FD56E6B57" );
 
             // Zoom Room Name
-            RockMigrationHelper.AddReportField( "E89ED73D-3D1D-40EB-BC6A-5631C6BC9834", Rock.Model.ReportFieldType.DataSelectComponent, true, ZoomGuid.EntityType.REPORT_ZOOM_ROOM_NAME, "{}", 6, "Zoom Room Name", "F79941D9-8BC2-4812-A6A4-68143E5DBCBC" );
+            RockMigrationHelper.AddReportField( "E89ED73D-3D1D-40EB-BC6A-5631C6BC9834", Rock.Model.ReportFieldType.DataSelectComponent, true, ZoomGuid.EntityType.REPORT_ZOOM_ROOM_NAME, "{}", 5, "Zoom Room Name", "F79941D9-8BC2-4812-A6A4-68143E5DBCBC" );
 
             #endregion Report
         }

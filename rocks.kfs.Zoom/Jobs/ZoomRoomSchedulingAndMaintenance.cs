@@ -134,7 +134,6 @@ namespace rocks.kfs.Zoom.Jobs
                 reservationLocationEntityTypeId = new EntityTypeService( rockContext ).GetNoTracking( com.bemaservices.RoomManagement.SystemGuid.EntityType.RESERVATION_LOCATION.AsGuid() ).Id;
 
                 var zoom = Zoom.Api();
-                var logService = new ServiceLogService( rockContext );
                 var locationService = new LocationService( rockContext );
                 var zrLocations = locationService.Queryable()
                                                  .AsNoTracking()
@@ -145,8 +144,8 @@ namespace rocks.kfs.Zoom.Jobs
                 foreach ( var loc in zrLocations )
                 {
                     loc.LoadAttributes();
-                    var zoomRoomDT = DefinedValueCache.Get( loc.AttributeValues.FirstOrDefault( v => v.Key == "rocks.kfs.ZoomRoom" ).Value.Value.AsGuid() );
-                    linkedZoomRoomLocations.Add( loc.Id, zoomRoomDT.Value );
+                    var zoomRoomDV = DefinedValueCache.Get( loc.GetAttributeValue( "rocks.kfs.ZoomRoom" ).AsGuid() );
+                    linkedZoomRoomLocations.Add( loc.Id, zoomRoomDV.Value );
                 }
 
                 #endregion Setup Variables
@@ -210,7 +209,6 @@ namespace rocks.kfs.Zoom.Jobs
                 var orphanedOccurrences = linkedOccurrences.Where( ro => !zoomMeetingIds.Any( mid => mid == ro.ZoomMeetingId ) );
                 if ( orphanedOccurrences.Count() > 0 )
                 {
-                    var deleteCount = orphanedOccurrences.Count();
                     zrOccurrenceService.DeleteRange( orphanedOccurrences );
                     rockContext.SaveChanges();
                 }

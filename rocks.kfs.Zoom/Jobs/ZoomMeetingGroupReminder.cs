@@ -225,7 +225,7 @@ namespace rocks.kfs.Zoom.Jobs
                 var resLoc = resLocationsToRemind.FirstOrDefault( rl => rl.Id == roomOcc.EntityId );
                 resLoc.Reservation.LoadAttributes();
                 var groupAttributeValue = resLoc.Reservation.GetAttributeValue( resGroupAttribute.Key );
-                if ( !string.IsNullOrEmpty( groupAttributeValue ) )
+                if ( !string.IsNullOrWhiteSpace( groupAttributeValue ) )
                 {
                     var groupGuid = groupAttributeValue.Split( '|' )[1].AsGuid();
                     var group = groupService.Get( groupGuid );
