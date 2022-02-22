@@ -176,7 +176,6 @@ namespace rocks.kfs.Zoom.Jobs
                                                         && !reservationLocationIds.Any( id => id == ro.EntityId ) );
                 if ( orphanedOccs.Count() > 0 )
                 {
-                    var deleteCount = orphanedOccs.Count();
                     if ( verboseLogging )
                     {
                         LogEvent( rockContext, "Zoom Room Reservation Sync", string.Format( "Preparing to delete {0} orphaned RoomOccurrence(s)." ) );
