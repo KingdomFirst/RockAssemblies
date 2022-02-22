@@ -27,6 +27,7 @@ namespace rocks.kfs.Shortcodes.Migrations
         {
             RockMigrationHelper.AddGlobalAttribute( Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, null, null, "EWS Username", "The Microsoft Exchange server username to use with EWS managed API.", 0, null, "EDEEE121-BE8F-4B80-A567-80E8BB344346", "rocks.kfs.EWSUsername", true );
             RockMigrationHelper.AddGlobalAttribute( Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, null, null, "EWS Password", "The Microsoft Exchange server password to use with EWS managed API.", 0, null, "0C278C32-C179-4EBE-AF40-F9AD509B8450", "rocks.kfs.EWSPassword", true );
+            RockMigrationHelper.AddAttributeQualifier( "0C278C32-C179-4EBE-AF40-F9AD509B8450","ispassword","true", "08839315-119B-4F39-8EF9-A05B65449392" );
         }
 
         public override void Down()
