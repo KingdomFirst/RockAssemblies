@@ -253,7 +253,6 @@ namespace rocks.kfs.Zoom.Jobs
                     {
                         foreach ( var zrl in linkedZoomRoomLocations )
                         {
-                            var resNameString = "Imported from ZoomRooms";
                             foreach ( var meeting in missingMeetings.Where( m => m.Host_Id == zrl.Value ) )
                             {
                                 // Build the iCal string as it is a required property on the Schedule for Room Reservation block to display the Reservation
@@ -277,9 +276,11 @@ namespace rocks.kfs.Zoom.Jobs
                                     iCalendarContent = serializer.SerializeToString()
                                 };
                                 scheduleService.Add( schedule );
+
+                                var location = locationService.Get( zrl.Key );
                                 var newReservation = new Reservation
                                 {
-                                    Name = !string.IsNullOrWhiteSpace( meeting.Topic ) ? string.Format( "{0} ({1})", meeting.Topic, resNameString ) : resNameString,
+                                    Name = location.Name.Left( 50 ),  // NOTE: Reservation.Name is limited to 50 chars but Location.Name is up to 100 chars. 
                                     ReservationTypeId = zoomImportReservationType.Id,
                                     Guid = Guid.NewGuid(),
                                     Schedule = schedule,
@@ -292,10 +293,11 @@ namespace rocks.kfs.Zoom.Jobs
                                 var reservationLocation = new ReservationLocation
                                 {
                                     Reservation = newReservation,
-                                    LocationId = zrl.Key,
+                                    Location = location,
                                     ApprovalState = ReservationLocationApprovalState.Approved
                                 };
                                 reservationLocationService.Add( reservationLocation );
+                                rockContext.SaveChanges();
 
                                 var occurrence = new RoomOccurrence
                                 {
