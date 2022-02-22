@@ -11,7 +11,7 @@
     <AssemblyName>rocks.kfs.Zoom</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
+    <Deterministic>false</Deterministic>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -32,8 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="com.bemaservices.RoomManagement">
-      <HintPath>..\..\RockWeb\Bin\com.bemaservices.RoomManagement.dll</HintPath>
+    <Reference Include="com.bemaservices.RoomManagement, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\KFSRockAssemblies\libs\com.bemaservices.RoomManagement.dll</HintPath>
     </Reference>
     <Reference Include="DotLiquid">
       <HintPath>..\..\RockWeb\Bin\DotLiquid.dll</HintPath>
@@ -107,7 +108,6 @@
     <Compile Include="Migrations\005_CreateJobs.cs" />
     <Compile Include="Model\RoomOccurrenceService.cs" />
     <Compile Include="Model\RoomOccurrence.cs" />
-    <Compile Include="Field\Types\ZoomRoomFieldType.cs" />
     <Compile Include="Migrations\001_CreateDb.cs" />
     <Compile Include="Migrations\002_CreateAttributes.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ScheduleEndDate.cs" />
@@ -117,7 +117,6 @@
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ZoomRoomName.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\ZoomRoomId.cs" />
     <Compile Include="Reporting\RoomOccurrence\DataSelect\LocationName.cs" />
-    <Compile Include="Utility\ExtensionMethods\StringExtensions.cs" />
     <Compile Include="ZoomGuid\Attribute.cs" />
     <Compile Include="ZoomGuid\DefinedType.cs" />
     <Compile Include="ZoomGuid\SystemCommunication.cs" />
@@ -128,7 +127,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +146,7 @@ xcopy /Y /R "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)RockWeb\bin"
 xcopy /Y /R "$(ProjectDir)bin\Debug\ZoomDotNetFramework.dll" "$(SolutionDir)RockWeb\bin"
 xcopy /Y /R "$(ProjectDir)bin\Debug\ZoomDotNetFramework.pdb" "$(SolutionDir)RockWeb\bin"
 xcopy /Y /R "$(ProjectDir)bin\Debug\JWT.dll" "$(SolutionDir)RockWeb\bin"
-xcopy /Y /R "$(ProjectDir)bin\Debug\JWT.pdb" "$(SolutionDir)RockWeb\bin"</PostBuildEvent>
+xcopy /Y /R "$(ProjectDir)bin\Debug\JWT.pdb" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(ProjectDir)bin\Debug\com.bemaservices.RoomManagement.dll" "$(SolutionDir)RockWeb\bin"</PostBuildEvent>
   </PropertyGroup>
 </Project>

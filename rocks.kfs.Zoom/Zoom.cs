@@ -79,12 +79,11 @@ namespace rocks.kfs.Zoom
 
             if ( enableLogging )
             {
-                LogEvent( rockContext, "SyncZoom", "Remove Defined Values for Zoom Rooms that no longer exist.", string.Format( "Deleted {0} Zoom Room Defined Value(s).", zoomRoomsToDelete.Count() ) );
+                LogEvent( null, "SyncZoom", "Remove Defined Values for Zoom Rooms that no longer exist.", string.Format( "Deleted {0} Zoom Room Defined Value(s).", zoomRoomsToDelete.Count() ) );
             }
 
             // Add DefinedValue for any new Zoom Rooms
-            var newZoomRooms = zrList.Where( r => !zoomRoomDT.DefinedValues.Select( v => v.Value )
-                                        .Contains( r.Zr_Id ) )
+            var newZoomRooms = zrList.Where( r => !zoomRoomDT.DefinedValues.Select( v => v.Value ).Contains( r.Zr_Id ) )
                                         .Select( r => new DefinedValue
                                         {
                                             Value = r.Zr_Id,

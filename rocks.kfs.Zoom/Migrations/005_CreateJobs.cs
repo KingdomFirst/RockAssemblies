@@ -128,7 +128,7 @@ namespace rocks.kfs.Zoom.Migrations
             // remove ServiceJob: Zoom Room Scheduling And Maintenance
             Sql( @"IF EXISTS( SELECT [Id] FROM [ServiceJob] WHERE [Class] = 'rocks.kfs.Zoom.Jobs.ZoomRoomSchedulingAndMaintenance' AND [Guid] = 'B23BD7D6-046D-411D-8F06-64EE237FA770' )
             BEGIN
-               DELETE [ServiceJob]  WHERE [Guid] = 'B23BD7D6-046D-411D-8F06-64EE237FA770';
+               DELETE FROM [ServiceJob]  WHERE [Guid] = 'B23BD7D6-046D-411D-8F06-64EE237FA770';
             END" );
 
             #endregion Zoom Room Scheduling And Maintenance Job
@@ -142,7 +142,7 @@ namespace rocks.kfs.Zoom.Migrations
             // remove ServiceJob: Zoom Meeting Reminder
             Sql( @"IF EXISTS( SELECT [Id] FROM [ServiceJob] WHERE [Class] = 'rocks.kfs.Zoom.Jobs.ZoomMeetingGroupReminder' AND [Guid] = '07BCC7E6-0E02-4ECE-8948-422C4E4EF20D' )
             BEGIN
-               DELETE [ServiceJob]  WHERE [Guid] = '07BCC7E6-0E02-4ECE-8948-422C4E4EF20D';
+               DELETE FROM [ServiceJob]  WHERE [Guid] = '07BCC7E6-0E02-4ECE-8948-422C4E4EF20D';
             END" );
 
             #endregion Zoom Meeting Reminder Job
