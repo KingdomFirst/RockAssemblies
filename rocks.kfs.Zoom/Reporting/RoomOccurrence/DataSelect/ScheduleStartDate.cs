@@ -64,6 +64,17 @@ namespace rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect
         }
 
         /// <summary>
+        /// Gets the type of the column field.
+        /// </summary>
+        /// <value>
+        /// The type of the column field.
+        /// </value>
+        public override Type ColumnFieldType
+        {
+            get { return typeof( DateTime? ); }
+        }
+
+        /// <summary>
         /// Gets the section that this will appear in the Field Selector
         /// </summary>
         /// <value>
@@ -101,9 +112,9 @@ namespace rocks.kfs.Zoom.Reporting.RoomOccurrence.DataSelect
         {
             var occurrenceQuery = new RoomOccurrenceService( context ).Queryable( "Schedule" );
 
-            IQueryable<DateTime> scheduleQuery;
+            IQueryable<DateTime?> scheduleQuery;
 
-            scheduleQuery = occurrenceQuery.Select( ro => ro.Schedule.EffectiveStartDate.Value );
+            scheduleQuery = occurrenceQuery.Select( ro => ro.Schedule.EffectiveStartDate );
 
             var exp = SelectExpressionExtractor.Extract( scheduleQuery, entityIdProperty, "ro" );
 
