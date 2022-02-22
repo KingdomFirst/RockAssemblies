@@ -72,7 +72,7 @@ namespace rocks.kfs.Shortcodes.EWS
             <li><strong>Body</strong> - The full body.</li>
             <li><strong>TextBody</strong> - The plain text representation of the body.</li>
             <li><strong>Location</strong> - The name of the location</li>
-            <li><strong>Start</strong> - The start dateTime. (Time Zone is based on authentication credentials user settings.)</li>
+            <li><strong>Start</strong> - The start dateTime. (Time Zone is based on the authenticated Exchange user settings.)</li>
             <li><strong>End</strong> - The end dateTime.</li>
             <li><strong>DisplayTo</strong> - A text summarization of the To recipients.</li>
             <li><strong>DisplayCc</strong> - A text summarization of the CC recipients.</li>
