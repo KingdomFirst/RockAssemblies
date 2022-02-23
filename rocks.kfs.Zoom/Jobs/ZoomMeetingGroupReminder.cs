@@ -133,7 +133,7 @@ namespace rocks.kfs.Zoom.Jobs
 
             var jobPreferredCommunicationType = ( CommunicationType ) dataMap.GetString( AttributeKey.SendUsing ).AsInteger();
             var isSmsEnabled = MediumContainer.HasActiveSmsTransport() && !string.IsNullOrWhiteSpace( systemCommunication.SMSMessage );
-            var isPushEnabled = MediumContainer.HasActivePushTransport() && !string.IsNullOrWhiteSpace( systemCommunication.PushMessage );
+            var isPushEnabled = MediumContainer.HasActivePushTransport() && !string.IsNullOrWhiteSpace( systemCommunication.PushData );
 
             if ( jobPreferredCommunicationType == CommunicationType.SMS && !isSmsEnabled )
             {
@@ -176,7 +176,7 @@ namespace rocks.kfs.Zoom.Jobs
             var roomOccurrenceInfo = GetOccurenceAndGroupData( dataMap, rockContext );
 
             // Process reminders
-            var meetingRemindersResults = SendMeetingReminders( context, rockContext, roomOccurrenceInfo, systemCommunication, jobPreferredCommunicationType );
+            var meetingRemindersResults = SendMeetingReminders( context, rockContext, roomOccurrenceInfo, systemCommunication, jobPreferredCommunicationType, isSmsEnabled, isPushEnabled );
 
             results.AppendLine( $"{notificationEmails + notificationSms + notificationPush } meeting reminders sent." );
 
@@ -286,7 +286,9 @@ namespace rocks.kfs.Zoom.Jobs
                         RockContext rockContext,
                         Dictionary<RoomOccurrence, Group> occurrenceData,
                         SystemCommunication systemCommunication,
-                        CommunicationType jobPreferredCommunicationType )
+                        CommunicationType jobPreferredCommunicationType,
+                        bool isSmsEnabled,
+                        bool isPushEnabled )
         {
             var result = new SendMessageResult();
             var errorsEmail = new List<string>();
@@ -297,8 +299,8 @@ namespace rocks.kfs.Zoom.Jobs
             foreach ( var occurrence in occurrenceData )
             {
                 var emailMessage = new RockEmailMessage( systemCommunication );
-                var smsMessage = new RockSMSMessage( systemCommunication );
-                var pushMessage = new RockPushMessage( systemCommunication );
+                RockSMSMessage smsMessage = isSmsEnabled ? new RockSMSMessage( systemCommunication ) : null;
+                RockPushMessage pushMessage = isPushEnabled ? new RockPushMessage( systemCommunication ) : null;
                 var group = occurrence.Value;
                 foreach ( var groupMember in group.ActiveMembers().ToList() )
                 {
@@ -340,7 +342,7 @@ namespace rocks.kfs.Zoom.Jobs
                             }
                             break;
                         case CommunicationType.SMS:
-                            if ( string.IsNullOrWhiteSpace( smsNumber ) )
+                            if ( string.IsNullOrWhiteSpace( smsNumber ) || smsMessage == null )
                             {
                                 errorCount += 1;
                                 errorMessages.Add( string.Format( "No SMS number could be found for {0}.", groupMember.Person.FullName ) );
@@ -352,7 +354,7 @@ namespace rocks.kfs.Zoom.Jobs
                             }
                             break;
                         case CommunicationType.PushNotification:
-                            if ( pushDevices.Count == 0 )
+                            if ( pushDevices.Count == 0 || pushMessage == null )
                             {
                                 errorCount += 1;
                                 errorMessages.Add( string.Format( "No devices that support notifications could be found for {0}.", groupMember.Person.FullName ) );
@@ -381,7 +383,7 @@ namespace rocks.kfs.Zoom.Jobs
                         notificationEmails++;
                     }
                 }
-                if ( smsMessage.GetRecipients().Count > 0 )
+                if ( smsMessage != null && smsMessage.GetRecipients().Count > 0 )
                 {
                     smsMessage.Send( out errorsSms );
                     if ( errorsSms.Any() )
@@ -393,7 +395,7 @@ namespace rocks.kfs.Zoom.Jobs
                         notificationSms++;
                     }
                 }
-                if ( pushMessage.GetRecipients().Count > 0 )
+                if ( pushMessage != null && pushMessage.GetRecipients().Count > 0 )
                 {
                     pushMessage.Send( out errorsPush );
                     if ( errorsPush.Any() )
