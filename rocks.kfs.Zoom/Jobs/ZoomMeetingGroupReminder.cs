@@ -59,6 +59,7 @@ namespace rocks.kfs.Zoom.Jobs
 
     [AttributeField(
         "Reminder Group Attribute",
+        EntityTypeGuid = com.bemaservices.RoomManagement.SystemGuid.EntityType.RESERVATION,
         Description = "The \"Group Type Group\" type attribute on the Room Reservation entity to be used for sending reminders. This attribute is what connects a Room Reservation to a Group for Zoom meeting purposes.",
         DefaultValue = ZoomGuid.Attribute.ROOM_RESERVATION_GROUP_ATTRIBUTE,
         IsRequired = true,
