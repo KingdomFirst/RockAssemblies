@@ -34,14 +34,15 @@
   <ItemGroup>
     <Reference Include="com.bemaservices.RoomManagement, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\com.bemaservices.RoomManagement.dll</HintPath>
+      <HintPath>..\libs\com.bemaservices.RoomManagement.dll</HintPath>
     </Reference>
     <Reference Include="DotLiquid, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\DotLiquid.dll</HintPath>
     </Reference>
-    <Reference Include="itextsharp">
-      <HintPath>libs\itextsharp.dll</HintPath>
+    <Reference Include="itextsharp, Version=4.1.6.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\libs\itextsharp.dll</HintPath>
     </Reference>
     <Reference Include="Rock">
       <SpecificVersion>False</SpecificVersion>
