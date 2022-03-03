@@ -105,7 +105,7 @@ namespace rocks.kfs.Zoom.Migrations
 
             // Attribute: rocks.kfs.Zoom.Jobs.ZoomMeetingGroupReminder: Reminder Group Attribute 
             RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.ServiceJob", Rock.SystemGuid.FieldType.ATTRIBUTE, "Class", "rocks.kfs.Zoom.Jobs.ZoomMeetingGroupReminder", "Reminder Group Attribute", "Reminder Group", "The \"Group Type Group\" type attribute on the Room Reservation entity to be used for sending reminders. This attribute is what connects a Room Reservation to a Group for Zoom meeting purposes.", 3, ZoomGuid.Attribute.ROOM_RESERVATION_GROUP_ATTRIBUTE, "866D68EC-835E-4B2A-A2AC-791973D3B4A1", "GroupAttributeSetting" );
-            RockMigrationHelper.AddAttributeQualifier( "866D68EC-835E-4B2A-A2AC-791973D3B4A1", "entitytype", "839768A3-10D6-446C-A65B-B8F9EFD7808F", "C30C97A0 -2978-41E2-9F2C-EDF614CB9E22" );  // Value parameter is BEMA Room Management system guid for Reservation entity type
+            RockMigrationHelper.AddAttributeQualifier( "866D68EC-835E-4B2A-A2AC-791973D3B4A1", "entitytype", "839768A3-10D6-446C-A65B-B8F9EFD7808F", "C30C97A0-2978-41E2-9F2C-EDF614CB9E22" );  // Value parameter is BEMA Room Management system guid for Reservation entity type
             RockMigrationHelper.AddAttributeValue( "866D68EC-835E-4B2A-A2AC-791973D3B4A1", -1, ZoomGuid.Attribute.ROOM_RESERVATION_GROUP_ATTRIBUTE, "385C7944-9010-4DB1-9DA1-E4BD0F552C3A" );
 
             Sql( @"DECLARE @JobId int = ( SELECT TOP 1 [Id] FROM [ServiceJob] WHERE [Guid] = '07BCC7E6-0E02-4ECE-8948-422C4E4EF20D' )
