@@ -22,10 +22,10 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle( "rocks.kfs.Workflow.Action.CheckIn" )]
 [assembly: AssemblyProduct( "rocks.kfs.Workflow.Action.CheckIn" )]
-[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2021" )]
+[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2022" )]
 
 // Auto increment assembly versions
-[assembly: AssemblyVersion( "2.6.*" )]
+[assembly: AssemblyVersion( "2.7.*" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from

@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>rocks.kfs.RoomManagement.Templates</RootNamespace>
     <AssemblyName>rocks.kfs.RoomManagement.Templates</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>false</Deterministic>
     <TargetFrameworkProfile />
@@ -36,10 +36,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\libs\com.bemaservices.RoomManagement.dll</HintPath>
     </Reference>
-    <Reference Include="DotLiquid, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\RockWeb\Bin\DotLiquid.dll</HintPath>
-    </Reference>
     <Reference Include="itextsharp, Version=4.1.6.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\libs\itextsharp.dll</HintPath>
@@ -47,6 +43,9 @@
     <Reference Include="Rock">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
+    </Reference>
+    <Reference Include="Rock.Common">
+      <HintPath>..\..\RockWeb\Bin\Rock.Common.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
