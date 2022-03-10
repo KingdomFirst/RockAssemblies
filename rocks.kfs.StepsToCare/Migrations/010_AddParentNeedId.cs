@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2021 by Kingdom First Solutions
+// Copyright 2022 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,12 +30,42 @@ namespace rocks.kfs.StepsToCare.Migrations
                 REFERENCES [dbo].[_rocks_kfs_StepsToCare_CareNeed] ([Id])
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_ParentNeed]
+
+                -- Due to error of 'may cause cycles or multiple cascade paths.'
+                CREATE TRIGGER SetParentNeedNull 
+                   ON  _rocks_kfs_StepsToCare_CareNeed 
+                   INSTEAD OF DELETE
+                AS 
+                BEGIN
+	                SET NOCOUNT ON;
+	                DECLARE @Id int;
+                    SELECT @Id = Id FROM deleted;
+	
+	                IF EXISTS (SELECT Id FROM _rocks_kfs_StepsToCare_CareNeed WHERE ParentNeedId = @Id) 
+	                BEGIN
+		                UPDATE _rocks_kfs_StepsToCare_CareNeed SET ParentNeedId = null WHERE ParentNeedId = @Id;
+	                END
+
+	                DELETE _rocks_kfs_StepsToCare_CareNeed WHERE Id = @Id;
+                END
+
+                -- Fix to add Delete cascade on CareWorker/AssignedPerson constraint 
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_Worker]
+
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_Worker] FOREIGN KEY([WorkerId])
+                REFERENCES [dbo].[_rocks_kfs_StepsToCare_CareWorker] ([Id])
+                ON DELETE CASCADE
             " );
         }
 
         public override void Down()
         {
             Sql( @"
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_Worker]
+
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_Worker] FOREIGN KEY([WorkerId])
+                REFERENCES [dbo].[_rocks_kfs_StepsToCare_CareWorker] ([Id])
+
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_ParentNeed]
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP COLUMN [ParentNeedId]
