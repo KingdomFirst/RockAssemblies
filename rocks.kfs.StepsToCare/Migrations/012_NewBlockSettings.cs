@@ -39,13 +39,13 @@ namespace rocks.kfs.StepsToCare.Migrations
             //   BlockType: Care Entry
             //   Category: KFS > Steps To Care
             //   Attribute: Load Balanced Workers assignment type
-            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE", "7525C4CB-EE6B-41D4-9B64-A08048D5A5C0", "Load Balanced Workers assignment type", "LoadBalanceWorkersType", "Load Balanced Workers assignment type", @"How should the auto assign worker load balancing work? Prioritize, it will prioritize the workers being assigned based on campus, category and any other parameters on the worker but still assign to any worker if their workload matches. Exclusive, if there are workers with matching campus, category or other parameters it will only load balance between those workers.", 0, @"Prioritize", "CBC82754-CD05-4C45-873B-EC0689882A9F" );
+            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE", "7525C4CB-EE6B-41D4-9B64-A08048D5A5C0", "Load Balanced Workers assignment type", "LoadBalanceWorkersType", "Load Balanced Workers assignment type", @"How should the auto assign worker load balancing work? Default: Exclusive. ""Prioritize"", it will prioritize the workers being assigned based on campus, category and any other parameters on the worker but still assign to any worker if their workload matches. ""Exclusive"", if there are workers with matching campus, category or other parameters it will only load balance between those workers.", 0, @"Exclusive", "CBC82754-CD05-4C45-873B-EC0689882A9F" );
 
             // Attribute for BlockType
             //   BlockType: Care Entry
             //   Category: KFS > Steps To Care
             //   Attribute: Adults in Family Worker Assignment
-            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE", "7525C4CB-EE6B-41D4-9B64-A08048D5A5C0", "Adults in Family Worker Assignment", "AdultFamilyWorkers", "Adults in Family Workers", @"How should workers be assigned to other adults in family when using 'Family Needs'. Normal behavior, use the same settings as a normal Care Need (Group Leader, Geofence and load balanced), or assign to Care Workers Only (load balanced).", 0, @"Normal", "6424654F-AF58-40A0-9AC0-331ACBABD4D5" );
+            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE", "7525C4CB-EE6B-41D4-9B64-A08048D5A5C0", "Adults in Family Worker Assignment", "AdultFamilyWorkers", "Adults in Family Workers", @"How should workers be assigned to spouses and other adults in the family when using 'Family Needs'. Normal behavior, use the same settings as a normal Care Need (Group Leader, Geofence and load balanced), or assign to Care Workers Only (load balanced).", 0, @"Normal", "6424654F-AF58-40A0-9AC0-331ACBABD4D5" );
 
             // Add Block Attribute Value
             //   Block: Care Entry
@@ -72,7 +72,7 @@ namespace rocks.kfs.StepsToCare.Migrations
             //   Block Location: Page=Care Entry, Site=Rock RMS
             //   Attribute: Load Balanced Workers assignment type
             /*   Attribute Value: Prioritize */
-            RockMigrationHelper.AddBlockAttributeValue( "F953C5EF-6504-45F9-81A8-063518B7AB61", "CBC82754-CD05-4C45-873B-EC0689882A9F", @"Prioritize" );
+            RockMigrationHelper.AddBlockAttributeValue( "F953C5EF-6504-45F9-81A8-063518B7AB61", "CBC82754-CD05-4C45-873B-EC0689882A9F", @"Exclusive" );
 
             // Add Block Attribute Value
             //   Block: Care Entry
