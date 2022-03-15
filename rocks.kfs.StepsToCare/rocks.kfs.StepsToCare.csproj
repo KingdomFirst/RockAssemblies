@@ -73,6 +73,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Jobs\CareNeedAutomatedNotifications.cs" />
+    <Compile Include="Migrations\012_NewBlockSettings.cs" />
+    <Compile Include="Migrations\011_AddWorkerColumns.cs" />
+    <Compile Include="Migrations\010_AddParentNeedId.cs" />
     <Compile Include="Migrations\006_AddWorkersOnlyColumn.cs" />
     <Compile Include="Migrations\009_CreatePermissions.cs" />
     <Compile Include="Migrations\008_LavaShortcode.cs" />

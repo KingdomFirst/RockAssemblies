@@ -243,7 +243,7 @@ namespace rocks.kfs.StepsToCare.Migrations
             RockMigrationHelper.DeleteEntityType( "87AC878D-6740-43EB-9389-B8440AC595C3" );
 
             Sql( @"
-                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_WorkerPersonAlias]
+                ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_Worker]
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_PersonAlias]
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_ModifiedPersonAlias]
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_CreatedPersonAlias]
