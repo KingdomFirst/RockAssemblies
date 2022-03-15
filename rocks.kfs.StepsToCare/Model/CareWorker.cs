@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2021 by Kingdom First Solutions
+// Copyright 2022 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,6 +60,21 @@ namespace rocks.kfs.StepsToCare.Model
         [DataMember]
         public bool NotifyPush { get; set; }
 
+        [DataMember]
+        public decimal? AgeRangeMin { get; set; }
+
+        [DataMember]
+        public decimal? AgeRangeMax { get; set; }
+
+        /// <summary>
+        /// Gets or sets the gender of the people this Care Worker will be assigned to.
+        /// </summary>
+        /// <value>
+        /// A <see cref="Rock.Model.Gender"/> enum value representing the peoples gender assigned to this worker.  Valid values are <c>Gender.Unknown</c> if the gender should not be limited,
+        /// <c>Gender.Male</c> if the gender should be limited to Male, <c>Gender.Female</c> if the gender should be limited to Female.
+        /// </value>
+        [DataMember]
+        public Gender? Gender { get; set; }
         #endregion Entity Properties
 
         #region Virtual Properties

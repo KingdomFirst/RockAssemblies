@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2021 by Kingdom First Solutions
+// Copyright 2022 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -79,6 +79,9 @@ namespace rocks.kfs.StepsToCare.Model
         [DataMember]
         public bool WorkersOnly { get; set; }
 
+        [DataMember]
+        public int? ParentNeedId { get; set; }
+
         #endregion Entity Properties
 
         #region Virtual Properties
@@ -105,7 +108,13 @@ namespace rocks.kfs.StepsToCare.Model
         public virtual Campus Campus { get; set; }
 
         [LavaInclude]
+        public virtual CareNeed ParentNeed { get; set; }
+
+        [LavaInclude]
         public virtual ICollection<AssignedPerson> AssignedPersons { get; set; }
+
+        [LavaInclude]
+        public virtual ICollection<CareNeed> ChildNeeds { get; set; }
 
         #endregion Virtual Properties
 
@@ -166,7 +175,8 @@ namespace rocks.kfs.StepsToCare.Model
             this.HasOptional( cn => cn.Status ).WithMany().HasForeignKey( cn => cn.StatusValueId ).WillCascadeOnDelete( false );
             this.HasOptional( cn => cn.Category ).WithMany().HasForeignKey( cn => cn.CategoryValueId ).WillCascadeOnDelete( false );
             this.HasOptional( cn => cn.Campus ).WithMany().HasForeignKey( cn => cn.CampusId ).WillCascadeOnDelete( false );
-
+            // CascadeOnDelete is managed by a trigger that will set to null if parent need is deleted.
+            this.HasOptional( cn => cn.ParentNeed ).WithMany( cn => cn.ChildNeeds ).HasForeignKey( cn => cn.ParentNeedId ).WillCascadeOnDelete( false );
 
             // IMPORTANT!!
             this.HasEntitySetName( "CareNeed" );
