@@ -175,6 +175,7 @@ namespace rocks.kfs.StepsToCare.Model
             this.HasOptional( cn => cn.Status ).WithMany().HasForeignKey( cn => cn.StatusValueId ).WillCascadeOnDelete( false );
             this.HasOptional( cn => cn.Category ).WithMany().HasForeignKey( cn => cn.CategoryValueId ).WillCascadeOnDelete( false );
             this.HasOptional( cn => cn.Campus ).WithMany().HasForeignKey( cn => cn.CampusId ).WillCascadeOnDelete( false );
+            // CascadeOnDelete is managed by a trigger that will set to null if parent need is deleted.
             this.HasOptional( cn => cn.ParentNeed ).WithMany( cn => cn.ChildNeeds ).HasForeignKey( cn => cn.ParentNeedId ).WillCascadeOnDelete( false );
 
             // IMPORTANT!!
