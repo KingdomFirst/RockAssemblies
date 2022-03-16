@@ -3,9 +3,9 @@
 
 
 # Send Scheduled Group Communications
-*Tested/Supported in Rock version:  8.0-12.7*   
+*Tested/Supported in Rock version:  8.0-13.0*   
 *Created:  11/20/2018*  
-*Updated:  1/20/2022*   
+*Updated:  2/2/2022*   
 *Rock Shop Plugin: https://www.rockrms.com/Plugin/100*
 
 # Send Scheduled Group Communications
@@ -65,7 +65,7 @@ You will need to create two system jobs to send the communications.
 1. Go to Admin Tools > System Settings > Jobs Administration
 2. Add a new job
 
-![Email_Job (2)](https://user-images.githubusercontent.com/81330042/123459947-8f49c600-d5ac-11eb-8fb0-3fa27aa8405e.png)
+![Email_Job (2)](https://user-images.githubusercontent.com/81330042/152594198-ce4cc4a0-e4f1-4248-a7b5-ae2d99238db6.png)
 
 > <span style="padding-left: 30px; margin-right: 10px; width: .8em;background: #d21919; border-radius: 100%; color: white; text-align: center; display: inline-block;">&nbsp;&nbsp;1&nbsp;&nbsp;</span> **Name** Give your job a name
 >
@@ -89,8 +89,8 @@ You will need to create two system jobs to send the communications.
 
 ![Group_Attributes (1)](https://user-images.githubusercontent.com/81330042/123460131-c9b36300-d5ac-11eb-9c1c-cb303788cbb3.png)
 
-4. All the fields for creating a communication are required. You can use Lava in the message field for both SMS and email communications. Recurrence defaults to One Time but you can also choose Weekly, Biweekly, or Monthly (the same day of the month each month). The Person, Group Member and Organization entities are all available for lava use in both email and SMS.
+4. All the fields for creating a communication are required. You can use Lava in the message field for both SMS and email communications. Recurrence defaults to One Time but you can also choose One Time, Daily, Weekly, Biweekly, or Monthly (the same day of the month each month). The Person, Group Member and Organization entities are all available for lava use in both email and SMS.
 
-![Create_Email (1)](https://user-images.githubusercontent.com/81330042/123460147-d041da80-d5ac-11eb-8e4b-1081c550560d.png)
+![Create_Email (1)](https://user-images.githubusercontent.com/81330042/152549353-6f5c3e2a-2f7c-47ef-b24a-0f281f95a7d4.png)
 
 ![Create_SMS (1)](https://user-images.githubusercontent.com/81330042/123460161-d6d05200-d5ac-11eb-89b6-012c214f5f23.png)
