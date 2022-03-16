@@ -63,17 +63,17 @@ namespace rocks.kfs.StepsToCare.Migrations
             // Add Block Care Notes to Page: Care Entry, Site: Rock RMS
             RockMigrationHelper.AddBlock( true, "27953B65-21E2-4CA9-8461-3AFAD46D9BC8".AsGuid(), null, "C2D29296-6A87-47A9-A753-EE4E9159C4C4".AsGuid(), "2E9F32D4-B4FC-4A5F-9BE1-B2E3EA624DD3".AsGuid(), "Care Notes", "SectionA", @"", @"", 0, "A9F1F1C1-031B-4D87-BF52-0E5BC5423AC6" );
 
-            // Add Block Defined Value List - Categories to Page: Care Configuration, Site: Rock RMS
-            RockMigrationHelper.AddBlock( true, "39F72E9D-22B7-4F1E-8633-6C3745AC6F34".AsGuid(), null, "C2D29296-6A87-47A9-A753-EE4E9159C4C4".AsGuid(), "0AB2D5E9-9272-47D5-90E4-4AA838D2D3EE".AsGuid(), "Defined Value List - Categories", "SectionA", @"<div class=""col-sm-6"">", @"</div>", 0, "F588AEE4-3BFE-4025-AFF0-5C1569434924" );
-
-            // Add Block Defined Value List - Status to Page: Care Configuration, Site: Rock RMS
-            RockMigrationHelper.AddBlock( true, "39F72E9D-22B7-4F1E-8633-6C3745AC6F34".AsGuid(), null, "C2D29296-6A87-47A9-A753-EE4E9159C4C4".AsGuid(), "0AB2D5E9-9272-47D5-90E4-4AA838D2D3EE".AsGuid(), "Defined Value List - Status", "SectionA", @"<div class=""col-sm-6"">", @"</div>", 1, "362581DC-6224-40FA-B351-FC2572022166" );
-
             // Add Block Care Workers to Page: Care Configuration, Site: Rock RMS
-            RockMigrationHelper.AddBlock( true, "39F72E9D-22B7-4F1E-8633-6C3745AC6F34".AsGuid(), null, "C2D29296-6A87-47A9-A753-EE4E9159C4C4".AsGuid(), "FC3E03F3-80A0-42BF-AAFB-DD2095B7BE86".AsGuid(), "Care Workers", "Main", @"<div class=""col-md-6"">", @"</div>", 0, "8B0BBF03-2BAE-4B7D-9A4B-1CAE23F8E02E" );
+            RockMigrationHelper.AddBlock( true, "39F72E9D-22B7-4F1E-8633-6C3745AC6F34".AsGuid(), null, "C2D29296-6A87-47A9-A753-EE4E9159C4C4".AsGuid(), "FC3E03F3-80A0-42BF-AAFB-DD2095B7BE86".AsGuid(), "Care Workers", "Main", @"", @"", 0, "8B0BBF03-2BAE-4B7D-9A4B-1CAE23F8E02E" );
 
             // Add Block Care Note Templates to Page: Care Configuration, Site: Rock RMS
-            RockMigrationHelper.AddBlock( true, "39F72E9D-22B7-4F1E-8633-6C3745AC6F34".AsGuid(), null, "C2D29296-6A87-47A9-A753-EE4E9159C4C4".AsGuid(), "561E0D77-12F9-4863-B5E3-4C5F36FB2DB1".AsGuid(), "Care Note Templates", "Main", @"", @"", 1, "E4108097-F10B-4404-BD3C-D36D8DEB1A8B" );
+            RockMigrationHelper.AddBlock( true, "39F72E9D-22B7-4F1E-8633-6C3745AC6F34".AsGuid(), null, "C2D29296-6A87-47A9-A753-EE4E9159C4C4".AsGuid(), "561E0D77-12F9-4863-B5E3-4C5F36FB2DB1".AsGuid(), "Care Note Templates", "SectionB", @"", @"", 1, "E4108097-F10B-4404-BD3C-D36D8DEB1A8B" );
+
+            // Add Block Defined Value List - Categories to Page: Care Configuration, Site: Rock RMS
+            RockMigrationHelper.AddBlock( true, "39F72E9D-22B7-4F1E-8633-6C3745AC6F34".AsGuid(), null, "C2D29296-6A87-47A9-A753-EE4E9159C4C4".AsGuid(), "0AB2D5E9-9272-47D5-90E4-4AA838D2D3EE".AsGuid(), "Defined Value List - Categories", "SectionC", @"", @"", 0, "F588AEE4-3BFE-4025-AFF0-5C1569434924" );
+
+            // Add Block Defined Value List - Status to Page: Care Configuration, Site: Rock RMS
+            RockMigrationHelper.AddBlock( true, "39F72E9D-22B7-4F1E-8633-6C3745AC6F34".AsGuid(), null, "C2D29296-6A87-47A9-A753-EE4E9159C4C4".AsGuid(), "0AB2D5E9-9272-47D5-90E4-4AA838D2D3EE".AsGuid(), "Defined Value List - Status", "SectionD", @"", @"", 1, "362581DC-6224-40FA-B351-FC2572022166" );
 
             // update block order for pages with new blocks if the page,zone has multiple blocks
 
@@ -126,7 +126,7 @@ namespace rocks.kfs.StepsToCare.Migrations
             RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "AF14CB6C-F915-4449-9CB7-7C44B624B051", "A75DFC58-7A1B-4799-BF31-451B2BBE38FF", "Minimum Care Touches", "MinimumCareTouches", "Minimum Care Touches", @"Minimum care touches in 'Minimum Care Touch Hours' before the need gets 'flagged'.", 3, @"2", "8291F010-FFFE-4806-8E19-E701FAC62E10" );
 
             // Attribute for BlockType: Care Dashboard:Minimum Care Touch Hours
-            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "AF14CB6C-F915-4449-9CB7-7C44B624B051", "A75DFC58-7A1B-4799-BF31-451B2BBE38FF", "Minimum Care Touch Giyrs", "MinimumCareTouchHours", "Minimum Care Touch Hours", @"Minimum care touches in this time period before the need gets 'flagged'.", 3, @"24", "8945BE62-D065-4A19-89A8-B06CE51FFBFF" );
+            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "AF14CB6C-F915-4449-9CB7-7C44B624B051", "A75DFC58-7A1B-4799-BF31-451B2BBE38FF", "Minimum Care Touch Givers", "MinimumCareTouchHours", "Minimum Care Touch Hours", @"Minimum care touches in this time period before the need gets 'flagged'.", 3, @"24", "8945BE62-D065-4A19-89A8-B06CE51FFBFF" );
 
             // Attribute for BlockType: Care Dashboard:Detail Page
             RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "AF14CB6C-F915-4449-9CB7-7C44B624B051", "BD53F9C9-EBA9-4D3F-82EA-DE5DD34A8108", "Detail Page", "DetailPage", "Detail Page", @"Page used to modify and create care needs.", 1, @"", "83441829-9BAA-4C9A-921B-E3DCED54BB20" );
