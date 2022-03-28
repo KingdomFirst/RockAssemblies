@@ -30,8 +30,10 @@ namespace rocks.kfs.StepsToCare.Migrations
                 REFERENCES [dbo].[_rocks_kfs_StepsToCare_CareNeed] ([Id])
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_ParentNeed]
+            " );
 
-                -- Due to error of 'may cause cycles or multiple cascade paths.'
+            Sql( @"
+               -- Due to error of 'may cause cycles or multiple cascade paths.'
                 CREATE TRIGGER SetParentNeedNull 
                    ON  _rocks_kfs_StepsToCare_CareNeed 
                    INSTEAD OF DELETE
@@ -48,7 +50,9 @@ namespace rocks.kfs.StepsToCare.Migrations
 
 	                DELETE _rocks_kfs_StepsToCare_CareNeed WHERE Id = @Id;
                 END
+            " );
 
+            Sql( @"
                 -- Fix to add Delete cascade on CareWorker/AssignedPerson constraint 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_Worker]
 
@@ -65,6 +69,8 @@ namespace rocks.kfs.StepsToCare.Migrations
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_Worker] FOREIGN KEY([WorkerId])
                 REFERENCES [dbo].[_rocks_kfs_StepsToCare_CareWorker] ([Id])
+
+                DROP TRIGGER [dbo].[SetParentNeedNull]
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_CareNeed] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_CareNeed_ParentNeed]
 
