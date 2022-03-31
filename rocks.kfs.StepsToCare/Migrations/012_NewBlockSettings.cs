@@ -47,6 +47,12 @@ namespace rocks.kfs.StepsToCare.Migrations
             //   Attribute: Adults in Family Worker Assignment
             RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE", "7525C4CB-EE6B-41D4-9B64-A08048D5A5C0", "Adults in Family Worker Assignment", "AdultFamilyWorkers", "Adults in Family Workers", @"How should workers be assigned to spouses and other adults in the family when using 'Family Needs'. Normal behavior, use the same settings as a normal Care Need (Group Leader, Geofence and load balanced), or assign to Care Workers Only (load balanced).", 0, @"Normal", "6424654F-AF58-40A0-9AC0-331ACBABD4D5" );
 
+            // Attribute for BlockType
+            //   BlockType: Care Dashboard
+            //   Category: KFS > Steps To Care
+            //   Attribute: Complete Child Needs on Parent Completion
+            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "AF14CB6C-F915-4449-9CB7-7C44B624B051", "1EDAFDED-DFE6-4334-B019-6EECBA89E05A", "Complete Child Needs on Parent Completion", "CompleteChildNeeds", "Complete Child Needs on Parent Completion", @"", 12, @"True", "C7B0BBA5-94CC-43BE-B118-9B034EE32B90" );
+
             // Add Block Attribute Value
             //   Block: Care Entry
             //   BlockType: Care Entry
@@ -82,10 +88,25 @@ namespace rocks.kfs.StepsToCare.Migrations
             //   Attribute: Adults in Family Worker Assignment
             /*   Attribute Value: Normal */
             RockMigrationHelper.AddBlockAttributeValue( "F953C5EF-6504-45F9-81A8-063518B7AB61", "6424654F-AF58-40A0-9AC0-331ACBABD4D5", @"Normal" );
+
+            // Add Block Attribute Value
+            //   Block: Care Dashboard
+            //   BlockType: Care Dashboard
+            //   Category: KFS > Steps To Care
+            //   Block Location: Page=Steps to Care, Site=Rock RMS
+            //   Attribute: Enable Family Needs
+            /*   Attribute Value: False */
+            RockMigrationHelper.AddBlockAttributeValue( "EADBE3F0-F64B-4583-B49D-F0031BBC929F", "C7B0BBA5-94CC-43BE-B118-9B034EE32B90", @"True" );
         }
 
         public override void Down()
         {
+            // Attribute for BlockType
+            //   BlockType: Care Dashboard
+            //   Category: KFS > Steps To Care
+            //   Attribute: Complete Child Needs on Parent Completion
+            RockMigrationHelper.DeleteAttribute( "C7B0BBA5-94CC-43BE-B118-9B034EE32B90" );
+
             // Attribute for BlockType
             //   BlockType: Care Entry
             //   Category: KFS > Steps To Care
