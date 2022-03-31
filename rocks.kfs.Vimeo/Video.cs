@@ -38,16 +38,16 @@ namespace rocks.kfs.Vimeo
             {
                 var video = await client.GetVideoAsync( videoId );
                 videoInfo.vimeoId = videoId;
-                videoInfo.name = video.name;
-                if ( !string.IsNullOrWhiteSpace( video.description ) )
+                videoInfo.name = video.Name;
+                if ( !string.IsNullOrWhiteSpace( video.Description ) )
                 {
-                    videoInfo.description = string.Format( "<p>{0}</p>", video.description.Replace( "\n", "<br>" ) );
+                    videoInfo.description = string.Format( "<p>{0}</p>", video.Description.Replace( "\n", "<br>" ) );
                 }
                 else
                 {
                     videoInfo.description = "";
                 }
-                videoInfo.duration = video.duration;
+                videoInfo.duration = video.Duration;
                 videoInfo.hdLink = video.HighDefinitionVideoSecureLink;
                 videoInfo.sdLink = video.StandardVideoSecureLink;
                 videoInfo.hlsLink = video.StreamingVideoSecureLink;
@@ -55,8 +55,8 @@ namespace rocks.kfs.Vimeo
                 //
                 // for 0.8.x vimeo dot net structure
                 //
-                var pictures = video.pictures.ToList();
-                var picSizes = pictures.FirstOrDefault( p => p.active == true ).sizes.ToList();
+                var pictures = video.Pictures;
+                var picSizes = pictures.Sizes.ToList();
 
                 //
                 // for > 0.8.x vimeo dot net structure
@@ -65,7 +65,7 @@ namespace rocks.kfs.Vimeo
 
                 if ( picSizes.Count > 0 )
                 {
-                    videoInfo.imageUrl = picSizes.Aggregate( ( x, y ) => Math.Abs( x.width - width ) < Math.Abs( y.width - width ) ? x : y ).link;
+                    videoInfo.imageUrl = picSizes.Aggregate( ( x, y ) => Math.Abs( x.Width - width ) < Math.Abs( y.Width - width ) ? x : y ).Link;
                 }
             } );
             task.Wait();
@@ -90,17 +90,17 @@ namespace rocks.kfs.Vimeo
                 VimeoDotNet.Models.Paginated<VimeoDotNet.Models.Video> pagedVideos = null;
                 var task = Task.Run( async () =>
                 {
-                    pagedVideos = await client.GetUserVideosAsync( userId, page, null );
+                    pagedVideos = await client.GetVideosAsync( userId, page, null );
                 } );
                 task.Wait();
 
-                videos.AddRange( pagedVideos.data );
+                videos.AddRange( pagedVideos.Data );
 
                 int num = 0;
 
-                if ( pagedVideos.paging.next != null )
+                if ( pagedVideos.Paging.Next != null )
                 {
-                    int.TryParse( pagedVideos.paging.next.Split( '=' ).Last(), out num );
+                    int.TryParse( pagedVideos.Paging.Next.Split( '=' ).Last(), out num );
                 }
 
                 page = num;
@@ -110,29 +110,29 @@ namespace rocks.kfs.Vimeo
             {
                 var videoInfo = new VideoInfo();
 
-                videoInfo.vimeoId = ( long ) video.id;
-                videoInfo.name = video.name;
-                if ( string.IsNullOrWhiteSpace( video.description ) )
+                videoInfo.vimeoId = ( long ) video.Id;
+                videoInfo.name = video.Name;
+                if ( string.IsNullOrWhiteSpace( video.Description ) )
                 {
                     videoInfo.description = string.Empty;
                 }
                 else
                 {
-                    videoInfo.description = string.Format( "<p>{0}</p>", video.description.Replace( "\n", "<br>" ) );
+                    videoInfo.description = string.Format( "<p>{0}</p>", video.Description.Replace( "\n", "<br>" ) );
                 }
-                videoInfo.duration = video.duration;
+                videoInfo.duration = video.Duration;
                 videoInfo.hdLink = video.HighDefinitionVideoSecureLink;
                 videoInfo.sdLink = video.StandardVideoSecureLink;
                 videoInfo.hlsLink = video.StreamingVideoSecureLink;
 
-                if ( video.pictures != null )
+                if ( video.Pictures != null )
                 {
                     //
                     // for 0.8.x vimeo dot net structure
                     //
 
-                    var pictures = video.pictures.ToList();
-                    var picSizes = pictures.FirstOrDefault( p => p.active == true ).sizes.ToList();
+                    var pictures = video.Pictures;
+                    var picSizes = pictures.Sizes;
 
                     //
                     // for > 0.8.x vimeo dot net structure
@@ -141,7 +141,7 @@ namespace rocks.kfs.Vimeo
 
                     if ( picSizes.Count > 0 )
                     {
-                        videoInfo.imageUrl = picSizes.Aggregate( ( x, y ) => Math.Abs( x.width - width ) < Math.Abs( y.width - width ) ? x : y ).link;
+                        videoInfo.imageUrl = picSizes.Aggregate( ( x, y ) => Math.Abs( x.Width - width ) < Math.Abs( y.Width - width ) ? x : y ).Link;
                     }
                 }
 
