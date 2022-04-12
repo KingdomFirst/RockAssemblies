@@ -21,7 +21,7 @@ namespace rocks.kfs.Zoom.Model
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.ModelConfiguration;
     using System.Runtime.Serialization;
-    using Rock.Lava;
+    using Rock.Data;
     using Rock.Model;
     using rocks.kfs.Zoom.Enums;
 
@@ -83,13 +83,13 @@ namespace rocks.kfs.Zoom.Model
 
         #region Virtual Properties
 
-        [LavaVisible]
+        [LavaInclude]
         public virtual Schedule Schedule { get; set; }
 
-        [LavaVisible]
+        [LavaInclude]
         public virtual Location Location { get; set; }
 
-        [LavaVisible]
+        [LavaInclude]
         public virtual EntityType EntityType { get; set; }
 
         #endregion Virtual Properties
