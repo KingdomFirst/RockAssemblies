@@ -58,10 +58,13 @@ namespace rocks.kfs.Eventbrite.Field.Types
                 var linkedEventTickets = eb.GetTicketsById( longVal.Value );
                 var sold = 0;
                 var total = 0;
-                foreach ( var ticket in linkedEventTickets.Ticket_Classes )
+                if ( linkedEventTickets != null && linkedEventTickets.Ticket_Classes != null )
                 {
-                    sold += ticket.QuantitySold;
-                    total += ticket.QuantityTotal;
+                    foreach ( var ticket in linkedEventTickets.Ticket_Classes )
+                    {
+                        sold += ticket.QuantitySold;
+                        total += ticket.QuantityTotal;
+                    }
                 }
                 var available = total - sold;
 
@@ -69,13 +72,27 @@ namespace rocks.kfs.Eventbrite.Field.Types
                 {
                     if ( condensed )
                     {
-                        formattedValue = string.Format( "{0} - {1} ({2})", eventbriteEvent.Name.Text, eventbriteEvent.Start.Local, eventbriteEvent.Status );
+                        if ( eventbriteEvent.Name != null )
+                        {
+                            formattedValue = string.Format( "{0} - {1} ({2})", eventbriteEvent.Name.Text, eventbriteEvent.Start.Local, eventbriteEvent.Status );
+                        }
+                        else
+                        {
+                            formattedValue = "Unable to retrieve Event name from Eventbrite, are you authenticated?";
+                        }
                     }
                     else
                     {
                         var eventbriteStatus = new StringBuilder();
                         eventbriteStatus.Append( "<dl>" );
-                        eventbriteStatus.AppendFormat( "<dd>{0} - {1} ({2})</dd>", eventbriteEvent.Name.Html, eventbriteEvent.Start.Local, eventbriteEvent.Status );
+                        if ( eventbriteEvent.Name != null )
+                        {
+                            eventbriteStatus.AppendFormat( "<dd>{0} - {1} ({2})</dd>", eventbriteEvent.Name.Html, eventbriteEvent.Start.Local, eventbriteEvent.Status );
+                        }
+                        else
+                        {
+                            eventbriteStatus.Append( "<dd>Unable to retrieve Event from Eventbrite, are you authenticated?</dd>" );
+                        }
                         eventbriteStatus.AppendFormat( "<dt>Link</dt><dd><a href={0}>{0}</a></dd>", eventbriteEvent.Url );
                         eventbriteStatus.AppendFormat( "<dt>Capacity</dt><dd>{0}</dd>", eventbriteEvent.Capacity.ToString() );
                         eventbriteStatus.AppendFormat( "<dt>Tickets</dt><dd>{0} Available + {1} Sold = {2} Total</dd>", available, sold, total );
@@ -108,7 +125,7 @@ namespace rocks.kfs.Eventbrite.Field.Types
             var eb = new EBApi( Settings.GetAccessToken(), Settings.GetOrganizationId().ToLong( 0 ) );
 
             var organizationEvents = eb.GetOrganizationEvents( "all", 500 );
-            if ( organizationEvents.Pagination.Has_More_Items )
+            if ( organizationEvents != null && organizationEvents.Pagination != null && organizationEvents.Pagination.Has_More_Items )
             {
                 var looper = new OrganizationEventsResponse();
                 for ( int i = 2; i <= organizationEvents.Pagination.PageCount; i++ )

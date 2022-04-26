@@ -202,14 +202,17 @@ namespace rocks.kfs.Eventbrite
 
             //Get Eventbrite Attendees
             var ebOrderGet = eb.GetExpandedOrdersById( evntid );
-            ebOrders.AddRange( ebOrderGet.Orders );
-            if ( ebOrderGet.Pagination.PageCount > 1 )
+            if ( ebOrderGet != null && ebOrderGet.Orders != null )
             {
-                var looper = new EventOrders();
-                for ( int i = 2; i <= ebOrderGet.Pagination.PageCount; i++ )
+                ebOrders.AddRange( ebOrderGet.Orders );
+                if ( ebOrderGet.Pagination.PageCount > 1 )
                 {
-                    looper = eb.GetExpandedOrdersById( evntid, i );
-                    ebOrders.AddRange( looper.Orders );
+                    var looper = new EventOrders();
+                    for ( int i = 2; i <= ebOrderGet.Pagination.PageCount; i++ )
+                    {
+                        looper = eb.GetExpandedOrdersById( evntid, i );
+                        ebOrders.AddRange( looper.Orders );
+                    }
                 }
             }
 
@@ -242,9 +245,12 @@ namespace rocks.kfs.Eventbrite
             }
             rockContext.SaveChanges();
 
-            // Write the Sync Time
-            group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, string.Format( "{0}^{1}", groupEBEventIDAttr.Value.SplitDelimitedValues( "^" )[0], RockDateTime.Now.ToString( "g", CultureInfo.CreateSpecificCulture( "en-us" ) ) ) );
-            group.SaveAttributeValue( groupEBEventIDAttr.AttributeKey, rockContext );
+            if ( ebEvent != null && ebEvent.Name != null )
+            {
+                // Write the Sync Time
+                group.SetAttributeValue( groupEBEventIDAttr.AttributeKey, string.Format( "{0}^{1}", groupEBEventIDAttr.Value.SplitDelimitedValues( "^" )[0], RockDateTime.Now.ToString( "g", CultureInfo.CreateSpecificCulture( "en-us" ) ) ) );
+                group.SaveAttributeValue( groupEBEventIDAttr.AttributeKey, rockContext );
+            }
         }
         public static void SyncOrder( string apiUrl )
         {
@@ -357,6 +363,11 @@ namespace rocks.kfs.Eventbrite
                         // Attribute Values in our special eventBritePerson field type are stored as a delimited string Eventbrite Id^Ticket Class(es)^Eventbrite Order Id^RSVP/Ticket Count(s)
                         var splitVal = attributeVal.SplitDelimitedValues( "^" );
                         var ticketClasses = splitVal[1].SplitDelimitedValues( "||" );
+                        if ( splitVal.Length < 4 )
+                        {
+                            attributeVal += "^";
+                            splitVal = attributeVal.SplitDelimitedValues( "^" );
+                        }
                         var ticketQtys = splitVal[3].SplitDelimitedValues( "||" );
                         if ( !ticketClasses.Contains( attendee.Ticket_Class_Name ) )
                         {
@@ -716,21 +727,28 @@ namespace rocks.kfs.Eventbrite
         {
             var occurrenceService = new AttendanceOccurrenceService( rockContext );
 
-            // Get all the occurrences for this group for the selected dates, location and schedule
-            var occurrences = occurrenceService.GetGroupOccurrences( group, ebEvent.Start.Local.Date, null, new List<int>(), new List<int>() ).ToList();
-
-            var occ = occurrences.FirstOrDefault( o => o.OccurrenceDate.Date.Equals( ebEvent.Start.Local.Date ) );
-            if ( occ == null )
+            if ( ebEvent != null && ebEvent.Start != null )
             {
-                occ = new AttendanceOccurrence
-                {
-                    GroupId = group.Id,
-                    OccurrenceDate = ebEvent.Start.Local.Date
-                };
-                occurrenceService.Add( occ );
-            }
+                // Get all the occurrences for this group for the selected dates, location and schedule
+                var occurrences = occurrenceService.GetGroupOccurrences( group, ebEvent.Start.Local.Date, null, new List<int>(), new List<int>() ).ToList();
 
-            return occ;
+                var occ = occurrences.FirstOrDefault( o => o.OccurrenceDate.Date.Equals( ebEvent.Start.Local.Date ) );
+                if ( occ == null )
+                {
+                    occ = new AttendanceOccurrence
+                    {
+                        GroupId = group.Id,
+                        OccurrenceDate = ebEvent.Start.Local.Date
+                    };
+                    occurrenceService.Add( occ );
+                }
+
+                return occ;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }
