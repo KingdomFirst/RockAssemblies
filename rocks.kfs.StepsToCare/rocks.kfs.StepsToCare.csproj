@@ -66,6 +66,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Jobs\CareNeedAutomatedNotifications.cs" />
+    <Compile Include="Migrations\014_NewPageAndAttributes.cs" />
+    <Compile Include="Migrations\013_NewPermissions.cs" />
     <Compile Include="Migrations\012_NewBlockSettings.cs" />
     <Compile Include="Migrations\011_AddWorkerColumns.cs" />
     <Compile Include="Migrations\010_AddParentNeedId.cs" />
