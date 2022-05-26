@@ -14,11 +14,7 @@
 // limitations under the License.
 // </copyright>
 //
-using System;
-using System.Linq;
 using Rock;
-using Rock.Data;
-using Rock.Model;
 using Rock.Plugin;
 
 namespace rocks.kfs.Checkin.PagerEntry.Migrations
@@ -31,15 +27,14 @@ namespace rocks.kfs.Checkin.PagerEntry.Migrations
         /// </summary>
         public override void Up()
         {
-
-            // Add/Update BlockType 
+            // Add/Update BlockType
             //   Name: Pager Entry
             //   Category: KFS > Check-in
             //   Path: ~/Plugins/rocks_kfs/CheckIn/PagerEntry.ascx
             //   EntityType: -
             RockMigrationHelper.UpdateBlockType( "Pager Entry", "Displays a prompt for pager number entry.", "~/Plugins/rocks_kfs/CheckIn/PagerEntry.ascx", "KFS > Check-in", "176095E9-3BEB-44DC-AADB-B5CCA8F479DB" );
 
-            // Add/Update BlockType 
+            // Add/Update BlockType
             //   Name: Pager Entry Setup
             //   Category: KFS > Check-in
             //   Path: ~/Plugins/rocks_kfs/CheckIn/PagerEntry_Setup.ascx
@@ -54,45 +49,45 @@ namespace rocks.kfs.Checkin.PagerEntry.Migrations
                 WHERE [Guid] = '67BABAC3-7263-4230-A528-CC103C3CB5FD'
             " );
 
-            // Add Page 
+            // Add Page
             //  Internal Name: Pager Entry Setup
             //  Site: Rock RMS
             RockMigrationHelper.AddPage( true, "5B6DBC42-8B03-4D15-8D92-AAFA28FD8616", "D65F783D-87A9-4CC9-8110-E83466A0EADB", "Pager Entry Setup", "", "9668D7D9-EB92-4BAE-961C-C796882DCDD2", "fas fa-pager" );
 
-            // Add Page 
+            // Add Page
             //  Internal Name: Pager Number
             //  Site: Rock Check-in
             RockMigrationHelper.AddPage( true, "CDF2C599-D341-42FD-B7DC-CD402EA96050", "66FA0143-F04C-4447-A67A-2A10A6BB1A2B", "Pager Number", "", "50A1708F-D751-40C5-BE99-492C4E81AED0", "" );
 
-            // Add Block 
+            // Add Block
             //  Block Name: Pager Entry Setup
             //  Page Name: Pager Entry Setup
             //  Layout: -
             //  Site: Rock RMS
             RockMigrationHelper.AddBlock( true, "9668D7D9-EB92-4BAE-961C-C796882DCDD2".AsGuid(), null, "C2D29296-6A87-47A9-A753-EE4E9159C4C4".AsGuid(), "E5A2E9E8-712D-4D68-A1A7-1CEC632B9359".AsGuid(), "Pager Entry Setup", "Main", @"", @"", 0, "3786332E-03EC-4CA7-B513-8EF0001725F7" );
 
-            // Add Block 
+            // Add Block
             //  Block Name: Pager Entry
             //  Page Name: Pager Number
             //  Layout: -
             //  Site: Rock Check-in
             RockMigrationHelper.AddBlock( true, "50A1708F-D751-40C5-BE99-492C4E81AED0".AsGuid(), null, "15AEFC01-ACB3-4F5D-B83E-AB3AB7F2A54A".AsGuid(), "176095E9-3BEB-44DC-AADB-B5CCA8F479DB".AsGuid(), "Pager Entry", "Main", @"", @"", 0, "A6FE5ABF-25BD-49E2-AB9B-1820FB1AC8B9" );
 
-            // Add Block 
+            // Add Block
             //  Block Name: Idle Redirect
             //  Page Name: Pager Number
             //  Layout: -
             //  Site: Rock Check-in
             RockMigrationHelper.AddBlock( true, "50A1708F-D751-40C5-BE99-492C4E81AED0".AsGuid(), null, "15AEFC01-ACB3-4F5D-B83E-AB3AB7F2A54A".AsGuid(), "49FC4B38-741E-4B0B-B395-7C1929340D88".AsGuid(), "Idle Redirect", "Main", @"", @"", 1, "F56ADEDA-45D5-4597-8387-633B2B1A9DCC" );
 
-            // Add Block 
+            // Add Block
             //  Block Name: Family Attributes
             //  Page Name: Person Profile
             //  Layout: -
             //  Site: Rock Check-in Manager
             RockMigrationHelper.AddBlock( true, "F3062622-C6AD-48F3-ADD7-7F58E4BD4EF3".AsGuid(), null, "A5FA7C3C-A238-4E0B-95DE-B540144321EC".AsGuid(), "19B61D65-37E3-459F-A44F-DEF0089118A3".AsGuid(), "Family Attributes", "Sidebar1", @"", @"", 1, "AC41EA0D-2385-4797-9EAB-B8E1990B224E" );
 
-            // Add Block 
+            // Add Block
             //  Block Name: Family Attributes
             //  Page Name: Attendance Detail
             //  Layout: -
@@ -574,14 +569,14 @@ namespace rocks.kfs.Checkin.PagerEntry.Migrations
             //  from Page: Pager Number, Site: Rock Check-in
             RockMigrationHelper.DeleteBlock( "A6FE5ABF-25BD-49E2-AB9B-1820FB1AC8B9" );
 
-            // Delete BlockType 
+            // Delete BlockType
             //   Name: Pager Entry
             //   Category: KFS > Check-in
             //   Path: ~/Plugins/rocks_kfs/CheckIn/PagerEntry.ascx
             //   EntityType: -
             RockMigrationHelper.DeleteBlockType( "176095E9-3BEB-44DC-AADB-B5CCA8F479DB" );
 
-            // Delete Page 
+            // Delete Page
             //  Internal Name: Pager Number
             //  Site: Rock Check-in
             //  Layout: Checkin
