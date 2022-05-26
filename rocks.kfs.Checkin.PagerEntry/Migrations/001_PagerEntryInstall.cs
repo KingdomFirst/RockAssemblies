@@ -31,7 +31,7 @@ namespace rocks.kfs.Checkin.PagerEntry.Migrations
         /// </summary>
         public override void Up()
         {
-            
+
             // Add/Update BlockType 
             //   Name: Pager Entry
             //   Category: KFS > Check-in
@@ -50,7 +50,7 @@ namespace rocks.kfs.Checkin.PagerEntry.Migrations
 
             Sql( @"
                 UPDATE [Attribute]
-                SET [Key] = 'rocks.kfs.PagerNumber'
+                SET [Key] = 'rocks.kfs.PagerNumber', [IsSystem] = 0
                 WHERE [Guid] = '67BABAC3-7263-4230-A528-CC103C3CB5FD'
             " );
 
@@ -586,6 +586,6 @@ namespace rocks.kfs.Checkin.PagerEntry.Migrations
             //  Site: Rock Check-in
             //  Layout: Checkin
             RockMigrationHelper.DeletePage( "50A1708F-D751-40C5-BE99-492C4E81AED0" );
-        }        
+        }
     }
 }
