@@ -166,6 +166,12 @@ namespace rocks.kfs.Checkin.PagerEntry.Migrations
             //   Attribute: Pager Attribute Key
             RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "176095E9-3BEB-44DC-AADB-B5CCA8F479DB", "9C204CD0-1233-41C5-818A-C5DA439445AA", "Pager Attribute Key", "PagerAttribute", "Pager Attribute Key", @"Attribute Key on Family Group type for Pager.", 8, @"rocks.kfs.PagerNumber", "9462972C-B6DA-4741-B707-2DBB23ADFCF8" );
 
+            // Attribute for BlockType
+            //   BlockType: Pager Entry
+            //   Category: KFS > Check-in
+            //   Attribute: Check-in Type
+            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "176095E9-3BEB-44DC-AADB-B5CCA8F479DB", "7522975C-C224-489A-985D-B44580DFC5BD", "Check-in Type", "CheckinType", "Check-in Type", @"Select the check-in type(s) to utilize this capability. This capability will be displayed for all check-in types by default.", 9, @"", "8F049D0B-D775-4A6B-9C7A-768A94869A8D" );
+
             // Add Block Attribute Value
             //   Block: Pager Entry
             //   BlockType: Pager Entry
@@ -255,6 +261,15 @@ namespace rocks.kfs.Checkin.PagerEntry.Migrations
             //   Attribute: Pager Attribute Key
             /*   Attribute Value: rocks.kfs.PagerNumber */
             RockMigrationHelper.AddBlockAttributeValue( "A6FE5ABF-25BD-49E2-AB9B-1820FB1AC8B9", "9462972C-B6DA-4741-B707-2DBB23ADFCF8", @"rocks.kfs.PagerNumber" );
+
+            // Add Block Attribute Value
+            //   Block: Pager Entry
+            //   BlockType: Pager Entry
+            //   Category: KFS > Check-in
+            //   Block Location: Page=Pager Number, Site=Rock Check-in
+            //   Attribute: Check-in Type
+            /*   Attribute Value:  */
+            RockMigrationHelper.AddBlockAttributeValue( "A6FE5ABF-25BD-49E2-AB9B-1820FB1AC8B9", "8F049D0B-D775-4A6B-9C7A-768A94869A8D", @"" );
 
             // Add Block Attribute Value
             //   Block: Family Attributes
