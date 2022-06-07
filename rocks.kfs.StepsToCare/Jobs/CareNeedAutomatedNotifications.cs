@@ -285,7 +285,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                         //var pushMessage = new RockPushMessage( careTouchNeededCommunication );
                         var recipients = new List<RockMessageRecipient>();
 
-                        foreach ( var assignee in careNeed.AssignedPersons )
+                        foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value ) )
                         {
                             assignee.PersonAlias.Person.LoadAttributes();
 
