@@ -44,6 +44,10 @@
     <Reference Include="Microsoft.AspNetCore.Http.Abstractions">
       <HintPath>..\..\RockWeb\Bin\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
     </Reference>
+    <Reference Include="NuGet.Core, Version=2.11.1.812, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\NuGet.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Quartz">
       <HintPath>..\..\RockWeb\Bin\Quartz.dll</HintPath>
     </Reference>
@@ -88,7 +92,9 @@
     <Compile Include="Model\CareWorkerService.cs" />
     <Compile Include="Model\NoteTemplate.cs" />
     <Compile Include="Model\NoteTemplateService.cs" />
+    <Compile Include="Model\WorkerResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities.cs" />
     <Compile Include="SystemGuid\PersonAttribute.cs" />
     <Compile Include="SystemGuid\SystemCommunication.cs" />
     <Compile Include="SystemGuid\DefinedValue.cs" />

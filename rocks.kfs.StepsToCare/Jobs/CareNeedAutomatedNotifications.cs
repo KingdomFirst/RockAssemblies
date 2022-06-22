@@ -78,6 +78,55 @@ namespace rocks.kfs.StepsToCare.Jobs
         Description = "Page used to populate 'LinkedPages.CareDetail' lava field in notification.",
         Key = AttributeKey.CareDetailPage )]
 
+    [GroupRoleField( null, "Group Type and Role",
+        Description = "Select the group Type and Role of the leader you would like auto assigned to care need. If none are selected it will not auto assign the small group member to the need. ",
+        IsRequired = false,
+        Key = AttributeKey.GroupTypeAndRole,
+        Category = CategoryKey.FutureNeedAssignments )]
+
+    [BooleanField( "Auto Assign Worker with Geofence",
+        Description = "Care Need Workers can have Geofence locations assigned to them, if there are workers with geofences and this block setting is enabled it will auto assign workers to this need on new entries based on the requester home being in the geofence.",
+        DefaultBooleanValue = true,
+        Key = AttributeKey.AutoAssignWorkerGeofence,
+        Category = CategoryKey.FutureNeedAssignments )]
+
+    [BooleanField( "Auto Assign Worker (load balanced)",
+        Description = "Use intelligent load balancing to auto assign care workers to a care need based on their workload and other parameters?",
+        DefaultBooleanValue = true,
+        Key = AttributeKey.AutoAssignWorker,
+        Category = CategoryKey.FutureNeedAssignments )]
+
+    [SystemCommunicationField( "Newly Assigned Need Notification",
+        Description = "Select the system communication template for the new assignment notification.",
+        DefaultSystemCommunicationGuid = rocks.kfs.StepsToCare.SystemGuid.SystemCommunication.CARE_NEED_ASSIGNED,
+        Key = AttributeKey.NewAssignmentNotification,
+        Category = CategoryKey.FutureNeedAssignments )]
+
+    [CustomDropdownListField( "Load Balanced Workers assignment type",
+        Description = "How should the auto assign worker load balancing work? Default: Exclusive. \"Prioritize\", it will prioritize the workers being assigned based on campus, category and any other parameters on the worker but still assign to any worker if their workload matches. \"Exclusive\", if there are workers with matching campus, category or other parameters it will only load balance between those workers.",
+        ListSource = "Prioritize,Exclusive",
+        DefaultValue = "Exclusive",
+        Key = AttributeKey.LoadBalanceWorkersType,
+        Category = CategoryKey.FutureNeedAssignments )]
+
+    [CustomDropdownListField( "Adults in Family Worker Assignment",
+        Description = "How should workers be assigned to spouses and other adults in the family when using 'Family Needs'. Normal behavior, use the same settings as a normal Care Need (Group Leader, Geofence and load balanced), or assign to Care Workers Only (load balanced).",
+        ListSource = "Normal,Workers Only",
+        DefaultValue = "Normal",
+        Key = AttributeKey.AdultFamilyWorkers,
+        Category = CategoryKey.FutureNeedAssignments )]
+
+    [IntegerField( "Threshold of Days before Assignment",
+        Description = "The number of days you can schedule a need in the future before a need will be assigned to workers.",
+        IsRequired = true,
+        DefaultIntegerValue = 3,
+        Key = AttributeKey.FutureThresholdDays,
+        Category = CategoryKey.FutureNeedAssignments )]
+
+    [BooleanField( "Verbose Logging",
+        Description = "Enable verbose Logging to help in determining issues with adding needs or auto assigning workers. Not recommended for normal use.",
+        DefaultBooleanValue = false,
+        Key = AttributeKey.VerboseLogging )]
 
     [DisallowConcurrentExecution]
     public class CareNeedAutomatedNotifications : IJob
@@ -95,6 +144,19 @@ namespace rocks.kfs.StepsToCare.Jobs
             public const string FollowUpDays = "FollowUpDays";
             public const string CareDashboardPage = "CareDashboardPage";
             public const string CareDetailPage = "CareDetailPage";
+            public const string GroupTypeAndRole = "GroupTypeAndRole";
+            public const string AutoAssignWorkerGeofence = "AutoAssignWorkerGeofence";
+            public const string AutoAssignWorker = "AutoAssignWorker";
+            public const string NewAssignmentNotification = "NewAssignmentNotification";
+            public const string VerboseLogging = "VerboseLogging";
+            public const string AdultFamilyWorkers = "AdultFamilyWorkers";
+            public const string LoadBalanceWorkersType = "LoadBalanceWorkersType";
+            public const string FutureThresholdDays = "FutureThresholdDays";
+        }
+
+        private static class CategoryKey
+        {
+            public const string FutureNeedAssignments = "FutureNeedAssignments";
         }
 
         private int assignedPersonEmails = 0;
@@ -141,6 +203,15 @@ namespace rocks.kfs.StepsToCare.Jobs
                 var beginDateTime = lastStartDateTime ?? JobStartDateTime.AddDays( -1 );
                 //beginDateTime = JobStartDateTime.AddDays( -3 );
 
+                var detailPage = PageCache.Get( dataMap.GetString( AttributeKey.CareDetailPage ) );
+                var detailPageRoute = detailPage.PageRoutes.FirstOrDefault();
+                var detailPagePath = detailPageRoute != null ? "/" + detailPageRoute.Route : "/page/" + detailPage.Id;
+                var dashboardPage = PageCache.Get( dataMap.GetString( AttributeKey.CareDashboardPage ) );
+                var dashboardPageRoute = dashboardPage.PageRoutes.FirstOrDefault();
+                var dashboardPagePath = dashboardPageRoute != null ? "/" + dashboardPageRoute.Route : "/page/" + dashboardPage.Id;
+
+                AssignWorkersToNeeds( rockContext, beginDateTime, dataMap, detailPagePath, dashboardPagePath );
+
                 var careNeedService = new CareNeedService( rockContext );
                 var assignedPersonService = new AssignedPersonService( rockContext );
 
@@ -176,13 +247,9 @@ namespace rocks.kfs.StepsToCare.Jobs
                 var careTouchNeededCommunication = new SystemCommunicationService( rockContext ).Get( careTouchNeededCommunicationGuid );
                 var outstandingNeedsCommunication = new SystemCommunicationService( rockContext ).Get( outstandingNeedsCommunicationGuid );
 
-                var detailPage = PageCache.Get( dataMap.GetString( AttributeKey.CareDetailPage ) );
-                var detailPageRoute = detailPage.PageRoutes.FirstOrDefault();
-                var dashboardPage = PageCache.Get( dataMap.GetString( AttributeKey.CareDashboardPage ) );
-                var dashboardPageRoute = dashboardPage.PageRoutes.FirstOrDefault();
                 Dictionary<string, object> linkedPages = new Dictionary<string, object>();
-                linkedPages.Add( "CareDetail", detailPageRoute != null ? "/" + detailPageRoute.Route : "/page/" + detailPage.Id );
-                linkedPages.Add( "CareDashboard", dashboardPageRoute != null ? "/" + dashboardPageRoute.Route : "/page/" + dashboardPage.Id );
+                linkedPages.Add( "CareDetail", detailPagePath );
+                linkedPages.Add( "CareDashboard", dashboardPagePath );
 
                 var errors = new List<string>();
                 var errorsSms = new List<string>();
@@ -454,6 +521,47 @@ namespace rocks.kfs.StepsToCare.Jobs
                 HttpContext context2 = HttpContext.Current;
                 ExceptionLogService.LogException( exception, context2 );
                 throw exception;
+            }
+        }
+
+        private void AssignWorkersToNeeds( RockContext rockContext, DateTime beginDateTime, JobDataMap dataMap, string detailPagePath, string dashboardPagePath )
+        {
+            var autoAssignWorker = dataMap.GetBooleanFromString( AttributeKey.AutoAssignWorker );
+            var autoAssignWorkerGeofence = dataMap.GetBooleanFromString( AttributeKey.AutoAssignWorkerGeofence );
+            var loadBalanceType = dataMap.GetString( AttributeKey.LoadBalanceWorkersType );
+            var enableLogging = dataMap.GetBooleanFromString( AttributeKey.VerboseLogging );
+            var leaderRoleGuid = dataMap.GetString( AttributeKey.GroupTypeAndRole ).AsGuidOrNull() ?? Guid.Empty;
+            var futureThresholdDays = dataMap.GetDoubleFromString( AttributeKey.FutureThresholdDays );
+            var assignmentEmailTemplateGuid = dataMap.GetString( AttributeKey.NewAssignmentNotification ).AsGuidOrNull();
+            var adultFamilyWorkers = dataMap.GetString( AttributeKey.AdultFamilyWorkers );
+            var newlyAssignedPersons = new List<AssignedPerson>();
+
+            var careNeedService = new CareNeedService( rockContext );
+            var futureThresholdDate = DateTime.Now.AddDays( futureThresholdDays );
+            var unassignedCareNeeds = careNeedService.Queryable().Where( cn => cn.DateEntered >= beginDateTime && cn.DateEntered <= futureThresholdDate && !cn.AssignedPersons.Any() );
+
+            foreach ( var careNeed in unassignedCareNeeds )
+            {
+                CareUtilities.AutoAssignWorkers( careNeed, autoAssignWorker: autoAssignWorker, autoAssignWorkerGeofence: autoAssignWorkerGeofence, loadBalanceType: loadBalanceType, enableLogging: enableLogging, leaderRoleGuid: leaderRoleGuid );
+
+                if ( careNeed.ChildNeeds != null && careNeed.ChildNeeds.Any() )
+                {
+                    var familyGroupType = GroupTypeCache.GetFamilyGroupType();
+                    var adultRoleId = familyGroupType.Roles.FirstOrDefault( a => a.Guid == Rock.SystemGuid.GroupRole.GROUPROLE_FAMILY_MEMBER_ADULT.AsGuid() ).Id;
+                    foreach ( var need in careNeed.ChildNeeds )
+                    {
+                        if ( need.PersonAlias != null && need.PersonAlias.Person.GetFamilyRole().Id != adultRoleId )
+                        {
+                            CareUtilities.AutoAssignWorkers( need, true, true, autoAssignWorker: autoAssignWorker, autoAssignWorkerGeofence: autoAssignWorkerGeofence, loadBalanceType: loadBalanceType, enableLogging: enableLogging, leaderRoleGuid: leaderRoleGuid );
+                        }
+                        else
+                        {
+                            CareUtilities.AutoAssignWorkers( need, adultFamilyWorkers == "Workers Only", autoAssignWorker: autoAssignWorker, autoAssignWorkerGeofence: autoAssignWorkerGeofence, loadBalanceType: loadBalanceType, enableLogging: enableLogging, leaderRoleGuid: leaderRoleGuid );
+                        }
+                    }
+                }
+
+                CareUtilities.SendWorkerNotification( rockContext, careNeed, true, newlyAssignedPersons, assignmentEmailTemplateGuid, null, detailPagePath, dashboardPagePath, careNeed.SubmitterPersonAlias.Person );
             }
         }
     }
