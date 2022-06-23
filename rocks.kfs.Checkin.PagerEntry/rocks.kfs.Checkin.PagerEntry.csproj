@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\002_PagerEntryUpdate.cs" />
     <Compile Include="Migrations\001_PagerEntryInstall.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
