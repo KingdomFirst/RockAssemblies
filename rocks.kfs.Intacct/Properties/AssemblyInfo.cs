@@ -25,7 +25,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2021" )]
 
 // Auto increment assembly versions
-[assembly: AssemblyVersion( "2.2.*" )]
+[assembly: AssemblyVersion( "2.3.*" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
