@@ -113,7 +113,7 @@ namespace rocks.kfs.Intacct.Utils
                         Amount = transactionDetail.Amount,
                         FinancialAccountId = transactionDetail.AccountId,
                         Project = projectCode,
-                        TransactionFeeAmount = transactionDetail.FeeAmount != null && transactionDetail.FeeAmount.Value > 0 ? transactionDetail.FeeAmount.Value : 0.0M,
+                        TransactionFeeAmount = transactionDetail.FeeAmount != null && ( transactionDetail.FeeAmount.Value > 0 || transactionDetail.FeeAmount.Value < 0 ) ? transactionDetail.FeeAmount.Value : 0.0M,
                         TransactionFeeAccount = transactionFeeAccount,
                         ProcessTransactionFees = processTransactionFees
                     };
