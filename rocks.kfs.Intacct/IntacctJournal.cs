@@ -228,7 +228,7 @@ namespace rocks.kfs.Intacct
                     Summary = summary,
                     CustomDimensions = customDimensions
                 };
-                Dictionary<string, object> mergeFields = TransactionHelpers.GetMergeFieldsAndDimensions(  ref debugLava, customDimensionValues, mergeFieldObjects );
+                Dictionary<string, object> mergeFields = TransactionHelpers.GetMergeFieldsAndDimensions( ref debugLava, customDimensionValues, mergeFieldObjects );
 
                 var batchSummaryItem = new GLBatchTotals()
                 {
@@ -258,7 +258,7 @@ namespace rocks.kfs.Intacct
             foreach ( var transaction in transactionItems )
             {
                 var processTransactionFees = 0;
-                if ( transaction.ProcessTransactionFees > 0 && !string.IsNullOrWhiteSpace( transaction.TransactionFeeAccount ) && transaction.TransactionFeeAmount > 0 )
+                if ( transaction.ProcessTransactionFees > 0 && !string.IsNullOrWhiteSpace( transaction.TransactionFeeAccount ) && ( transaction.TransactionFeeAmount > 0 || transaction.TransactionFeeAmount < 0 ) )
                 {
                     processTransactionFees = transaction.ProcessTransactionFees;
                 }
