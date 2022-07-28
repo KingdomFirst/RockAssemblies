@@ -156,7 +156,7 @@ namespace rocks.kfs.StepsToCare.Jobs
 
         private static class CategoryKey
         {
-            public const string FutureNeedAssignments = "FutureNeedAssignments";
+            public const string FutureNeedAssignments = "Future Need Assignments";
         }
 
         private int assignedPersonEmails = 0;
