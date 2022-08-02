@@ -69,7 +69,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Jobs\CareNeedAutomatedNotifications.cs" />
+    <Compile Include="Jobs\CareNeedAutomatedProcesses.cs" />
+    <Compile Include="Migrations\015_UpdateJob.cs" />
     <Compile Include="Migrations\014_NewPageAndAttributes.cs" />
     <Compile Include="Migrations\013_NewPermissions.cs" />
     <Compile Include="Migrations\012_NewBlockSettings.cs" />

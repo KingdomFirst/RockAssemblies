@@ -129,7 +129,7 @@ namespace rocks.kfs.StepsToCare.Jobs
         Key = AttributeKey.VerboseLogging )]
 
     [DisallowConcurrentExecution]
-    public class CareNeedAutomatedNotifications : IJob
+    public class CareNeedAutomatedProcesses : IJob
     {
         /// <summary>
         /// Attribute Keys
@@ -168,7 +168,7 @@ namespace rocks.kfs.StepsToCare.Jobs
         /// <summary>
         /// Initializes a new instance of the <see cref="SendCommunications"/> class.
         /// </summary>
-        public CareNeedAutomatedNotifications()
+        public CareNeedAutomatedProcesses()
         {
         }
 
