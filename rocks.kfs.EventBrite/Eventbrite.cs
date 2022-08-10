@@ -230,7 +230,7 @@ namespace rocks.kfs.Eventbrite
             {
                 LogEvent( rockContext, "SyncEvent", string.Format( "GroupId: {0} Evntid: {1}", groupid, evntid ), "Begin For each order in ebOrders" );
             }
-            foreach ( var order in ebOrders )
+            foreach ( var order in ebOrders.OrderBy( o => o.Created ) )
             {
                 foreach ( var attendee in order.Attendees )
                 {
@@ -368,6 +368,7 @@ namespace rocks.kfs.Eventbrite
                         // Attribute Values in our special eventBritePerson field type are stored as a delimited string Eventbrite Id^Ticket Class(es)^Eventbrite Order Id^RSVP/Ticket Count(s)
                         var splitVal = attributeVal.SplitDelimitedValues( "^" );
                         var ticketClasses = splitVal[1].SplitDelimitedValues( "||" );
+                        var orderId = splitVal[2].ToLong( -1 );
                         if ( splitVal.Length < 4 )
                         {
                             attributeVal += "^";
@@ -381,7 +382,13 @@ namespace rocks.kfs.Eventbrite
                         }
                         else
                         {
-                            ticketQtys[Array.IndexOf( ticketClasses, attendee.Ticket_Class_Name )] = order.Attendees?.Count( a => a.Profile.First_Name == attendee.Profile.First_Name && a.Profile.Last_Name == attendee.Profile.Last_Name && a.Profile.Email == attendee.Profile.Email && a.Ticket_Class_Id == attendee.Ticket_Class_Id ).ToString();
+                            var countVal = order.Attendees?.Count( a => a.Profile.First_Name == attendee.Profile.First_Name && a.Profile.Last_Name == attendee.Profile.Last_Name && a.Profile.Email == attendee.Profile.Email && a.Ticket_Class_Id == attendee.Ticket_Class_Id );
+                            if ( orderId != order.Id )
+                            {
+                                var addTo = ticketQtys[Array.IndexOf( ticketClasses, attendee.Ticket_Class_Name )].AsInteger();
+                                countVal = addTo + countVal;
+                            }
+                            ticketQtys[Array.IndexOf( ticketClasses, attendee.Ticket_Class_Name )] = countVal.ToString();
                             splitVal[3] = ticketQtys.JoinStrings( "||" );
                         }
                         matchedGroupMember.SetAttributeValue( gmPersonAttributeKey, splitVal.JoinStrings( "^" ) );
