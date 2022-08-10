@@ -322,8 +322,13 @@ namespace rocks.kfs.Eventbrite
 
             if ( !string.IsNullOrWhiteSpace( attendee.Profile.First_Name ) && !string.IsNullOrWhiteSpace( attendee.Profile.Last_Name ) && !string.IsNullOrWhiteSpace( attendee.Profile.Email ) )
             {
-                var person = MatchOrAddPerson( rockContext, attendee.Profile, connectionStatusId, updatePrimaryEmail, EnableLogging );
-                var matchedGroupMember = MatchGroupMember( group.Members, order, person.Id, gmPersonAttributeKey, rockContext, EnableLogging );
+                Person person = null;
+                var matchedGroupMember = MatchGroupMember( group.Members, order, person, attendee.Profile, gmPersonAttributeKey, rockContext, EnableLogging );
+                if ( matchedGroupMember == null )
+                {
+                    person = MatchOrAddPerson( rockContext, attendee.Profile, connectionStatusId, updatePrimaryEmail, EnableLogging );
+                    matchedGroupMember = MatchGroupMember( group.Members, order, person, attendee.Profile, gmPersonAttributeKey, rockContext, EnableLogging );
+                }
                 if ( matchedGroupMember == null && ( order.Status != "deleted" || order.Status != "abandoned" ) )
                 {
                     var member = new GroupMember
@@ -661,11 +666,11 @@ namespace rocks.kfs.Eventbrite
             }
         }
 
-        private static GroupMember MatchGroupMember( ICollection<GroupMember> groupMembers, Order order, int PersonId, string attributeKey, RockContext rockContext = null, bool EnableLogging = false )
+        private static GroupMember MatchGroupMember( ICollection<GroupMember> groupMembers, Order order, Person person, Profile profile, string attributeKey, RockContext rockContext = null, bool EnableLogging = false )
         {
             if ( EnableLogging )
             {
-                LogEvent( rockContext, "MatchGroupMember", string.Format( "GroupMembers: {0} Order: {1} PersonId: {2}", groupMembers.Count, order.Id, PersonId ), "Start Match" );
+                LogEvent( rockContext, "MatchGroupMember", string.Format( "GroupMembers: {0} Order: {1} PersonId: {2}", groupMembers.Count, order.Id, person?.Id ), "Start Match" );
             }
 
             if ( rockContext == null )
@@ -675,28 +680,34 @@ namespace rocks.kfs.Eventbrite
             GroupMember retVar = null;
 
             // Attribute Values in our special eventBritePerson field type are stored as a delimited string Eventbrite Id^Ticket Class(es)^Eventbrite Order Id^RSVP/Ticket Count(s)
-            foreach ( var gm in groupMembers )
+            foreach ( var gm in groupMembers.OrderByDescending( gm => person != null && gm.Person != null && gm.PersonId == person.Id ) )
             {
                 if ( gm.Attributes == null )
                 {
                     gm.LoadAttributes( rockContext );
                 }
                 var attributeVal = gm.GetAttributeValue( attributeKey );
-                if ( attributeVal.IsNotNullOrWhiteSpace() && attributeVal.SplitDelimitedValues( "^" )[2] == order.Id.ToString() && gm.Person != null && gm.PersonId == PersonId )
+                if ( attributeVal.IsNotNullOrWhiteSpace() && attributeVal.SplitDelimitedValues( "^" )[2] == order.Id.ToString() && person != null && gm.Person != null && gm.PersonId == person.Id )
                 {
                     retVar = gm;
                     break;
                 }
+                else if ( attributeVal.IsNotNullOrWhiteSpace() && attributeVal.SplitDelimitedValues( "^" )[2] == order.Id.ToString() && gm.Person != null && ( gm.Person.FirstName == profile.First_Name || gm.Person.NickName == profile.First_Name ) && gm.Person.LastName == profile.Last_Name )
+                {
+                    retVar = gm;
+                    break;
+                }
+
             }
 
             if ( retVar == null )
             {
-                retVar = groupMembers.FirstOrDefault( gm => gm.Person != null && gm.PersonId == PersonId );
+                retVar = groupMembers.FirstOrDefault( gm => person != null && gm.Person != null && gm.PersonId == person.Id );
             }
 
             if ( EnableLogging )
             {
-                LogEvent( rockContext, "MatchGroupMember", string.Format( "GroupMembers: {0} Order: {1} PersonId: {2} Matched: {3}", groupMembers.Count, order.Id, PersonId, retVar ), "End Match" );
+                LogEvent( rockContext, "MatchGroupMember", string.Format( "GroupMembers: {0} Order: {1} Person Id: {2} Matched: {3}", groupMembers.Count, order.Id, person?.Id, retVar ), "End Match" );
             }
 
             return retVar;
