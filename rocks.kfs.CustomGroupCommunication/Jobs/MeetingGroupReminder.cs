@@ -111,8 +111,6 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
             var dataMap = context.JobDetail.JobDataMap;
 
             var groupAttributeSetting = dataMap.GetString( AttributeKey.GroupAttributeSetting ).AsGuid();
-
-
             var groups = new GroupService( rockContext ).Queryable().WhereAttributeValue( rockContext, av => av.Attribute.Guid.Equals( groupAttributeSetting ) );
 
             context.Result = "0 meeting reminders sent.";
