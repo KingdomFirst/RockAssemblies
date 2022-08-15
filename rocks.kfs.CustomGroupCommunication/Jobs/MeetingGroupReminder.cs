@@ -64,7 +64,7 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
 
     [AttributeField(
         "Group Attribute",
-        Description = "The Group Attribute where we will look for the set value",
+        Description = "The Group Attribute where we will look for the set value. We recommend a Boolean field type attribute.",
         EntityTypeGuid = Rock.SystemGuid.EntityType.GROUP,
         IsRequired = true,
         Order = 4,
