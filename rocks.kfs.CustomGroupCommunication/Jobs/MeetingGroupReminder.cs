@@ -45,6 +45,14 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
         Order = 1,
         Key = AttributeKey.SystemCommunication )]
 
+    [TextField(
+        "Days Prior",
+        Description = "Comma delimited list of days prior to a scheduled meeting to send a reminder. For example, a value of '2,4' would result in reminders getting sent two and four days prior to the meeting's scheduled meeting date.",
+        DefaultValue = "1",
+        IsRequired = true,
+        Order = 2,
+        Key = AttributeKey.DaysPrior )]
+
     [CustomDropdownListField(
         "Send Using",
         Description = "Specifies how the reminder will be sent.",
@@ -74,6 +82,7 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
         private static class AttributeKey
         {
             public const string SystemCommunication = "SystemCommunication";
+            public const string DaysPrior = "DaysPrior";
             public const string GroupAttributeSetting = "GroupAttributeSetting";
             public const string SendUsing = "SendUsing";
         }
