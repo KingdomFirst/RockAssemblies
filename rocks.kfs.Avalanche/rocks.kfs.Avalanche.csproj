@@ -62,6 +62,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Avalanche\Plugin\Avalanche.csproj">
+      <Project>{de6b9975-365c-4d0c-8cf9-8b7f5fdcd0d7}</Project>
+      <Name>Avalanche</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
