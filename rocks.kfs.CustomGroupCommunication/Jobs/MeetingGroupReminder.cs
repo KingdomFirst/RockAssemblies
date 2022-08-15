@@ -186,9 +186,11 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
         /// </summary>
         /// <param name="context">The overall job context.</param>
         /// <param name="rockContext">The rockContext.</param>
-        /// <param name="occurrenceData">The occurrenceData to process.</param>
+        /// <param name="groups">The groups.</param>
         /// <param name="systemCommunication">The system communication.</param>
         /// <param name="jobPreferredCommunicationType">Type of the job preferred communication.</param>
+        /// <param name="isSmsEnabled">if set to <c>true</c> [is SMS enabled].</param>
+        /// <param name="isPushEnabled">if set to <c>true</c> [is push enabled].</param>
         /// <returns></returns>
         private SendMessageResult SendMeetingReminders( IJobExecutionContext context,
                         RockContext rockContext,
