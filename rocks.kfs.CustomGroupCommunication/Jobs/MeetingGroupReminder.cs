@@ -56,7 +56,7 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
 
     [AttributeField(
         "Group Attribute",
-        Description = "The Group Attribute where we will look for the set value",
+        Description = "The Group Attribute where we will look for the set value. We recommend a Boolean field type attribute.",
         EntityTypeGuid = Rock.SystemGuid.EntityType.GROUP,
         IsRequired = true,
         Order = 4,
@@ -102,8 +102,6 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
             var dataMap = context.JobDetail.JobDataMap;
 
             var groupAttributeSetting = dataMap.GetString( AttributeKey.GroupAttributeSetting ).AsGuid();
-
-
             var groups = new GroupService( rockContext ).Queryable().WhereAttributeValue( rockContext, av => av.Attribute.Guid.Equals( groupAttributeSetting ) );
 
             context.Result = "0 meeting reminders sent.";
