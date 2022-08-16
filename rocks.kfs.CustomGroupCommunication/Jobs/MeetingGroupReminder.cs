@@ -40,7 +40,7 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
     [SystemCommunicationField(
         "System Communication",
         Description = "The system communication to use when sending meeting reminders.",
-        DefaultValue = Rock.SystemGuid.SystemCommunication.SCHEDULING_REMINDER,
+        DefaultValue = Guid.SystemComunication.CUSTOM_GROUP_MEETING_REMINDER,
         IsRequired = true,
         Order = 1,
         Key = AttributeKey.SystemCommunication )]

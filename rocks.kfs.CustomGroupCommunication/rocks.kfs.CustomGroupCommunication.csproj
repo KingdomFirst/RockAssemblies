@@ -65,7 +65,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Guids\SystemCommunication.cs" />
     <Compile Include="Jobs\MeetingGroupReminder.cs" />
+    <Compile Include="Migrations\001_CreateCommunications.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
