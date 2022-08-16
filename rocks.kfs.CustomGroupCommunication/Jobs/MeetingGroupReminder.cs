@@ -111,18 +111,13 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
             var dataMap = context.JobDetail.JobDataMap;
 
             var groupAttributeSetting = dataMap.GetString( AttributeKey.GroupAttributeSetting ).AsGuid();
-            var groups = new GroupService( rockContext ).Queryable().WhereAttributeValue( rockContext, av => av.Attribute.Guid.Equals( groupAttributeSetting ) );
+            var daysPrior = dataMap.GetDouble( AttributeKey.DaysPrior );
+            var groupQuery = new GroupService( rockContext )
+                            .Queryable( "Schedule" )
+                            .WhereAttributeValue( rockContext, av => av.Attribute.Guid.Equals( groupAttributeSetting ) );
+            var groups = groupQuery.ToList().Where( g => g.Schedule.GetNextStartDateTime( DateTime.Now ) <= DateTime.Now.AddDays( daysPrior ) );
 
             context.Result = "0 meeting reminders sent.";
-
-            if ( groups == null )
-            {
-                var errorMessages = new List<string>
-                {
-                    $"The Custom Communication Group Attribute job setting is invalid. Please check your Custom Communication job configuration."
-                };
-                HandleErrorMessages( context, errorMessages );
-            }
 
             var systemCommunicationGuid = dataMap.GetString( AttributeKey.SystemCommunication ).AsGuid();
             var systemCommunication = new SystemCommunicationService( rockContext ).Get( systemCommunicationGuid );
@@ -169,7 +164,13 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
             }
 
             // Process reminders
-            var meetingRemindersResults = SendMeetingReminders( context, rockContext, groups, systemCommunication, jobPreferredCommunicationType, isSmsEnabled, isPushEnabled );
+            SendMessageResult meetingRemindersResults;
+
+            if ( groups.Any() )
+            {
+                meetingRemindersResults = SendMeetingReminders( context, rockContext, groups, systemCommunication, jobPreferredCommunicationType, isSmsEnabled, isPushEnabled );
+            }
+
 
             results.AppendLine( $"{notificationEmails + notificationSms + notificationPush } meeting reminders sent." );
 
@@ -194,7 +195,7 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
         /// <returns></returns>
         private SendMessageResult SendMeetingReminders( IJobExecutionContext context,
                         RockContext rockContext,
-                        IQueryable<Group> groups,
+                        IEnumerable<Group> groups,
                         SystemCommunication systemCommunication,
                         CommunicationType jobPreferredCommunicationType,
                         bool isSmsEnabled,
