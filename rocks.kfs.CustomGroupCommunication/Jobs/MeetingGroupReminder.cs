@@ -229,6 +229,8 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
                     var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, groupMember.Person );
                     mergeFields.Add( "Group", group );
                     mergeFields.Add( "Person", groupMember.Person );
+                    mergeFields.Add( "NextMeetingDate", group.Schedule.GetNextStartDateTime( DateTime.Now ) );
+
 
                     var notificationType = ( CommunicationType ) Communication.DetermineMediumEntityTypeId(
                                         ( int ) CommunicationType.Email,
