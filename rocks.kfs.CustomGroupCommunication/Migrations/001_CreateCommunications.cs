@@ -31,14 +31,15 @@ namespace rocks.kfs.CustomGroupCommunication.Migrations
                     <p>{{ Person.FullName }},</p>
                     <p>You have a scheduled group meeting coming up:</p>
                     <blockquote><b>Meeting for {{ Group.Name }}</b><br>
-                    <b>Date:</b> {{ Occurrence.StartTime }}<br>
-                    <b>Topic:</b> {{ Occurrence.Topic }}</blockquote>
+                    <b>Date:</b> {{ NextMeetingDate }}</blockquote>
                     {{ 'Global' | Attribute:'EmailFooter' }}"
                 , Guid.SystemComunication.CUSTOM_GROUP_MEETING_REMINDER
                 , isActive: true
-                , smsMessage: @"Upcoming group meeting for {{ Group.Name }} ( {{ Occurrence.StartTime }} )."
+                , smsMessage: @"Upcoming group meeting for {{ Group.Name }} ( {{ NextMeetingDate }} )."
                 , pushTitle: "Upcoming Group Meeting"
-                , pushMessage: @"Upcoming group meeting for {{ Group.Name }} ( {{ Occurrence.StartTime }} )." );
+                , pushMessage: @"Upcoming group meeting for {{ Group.Name }} ( {{ NextMeetingDate }} )." );
+
+            Sql( string.Format( "UPDATE [SystemCommunication] SET [IsSystem] = 0 WHERE [Guid] = '{0}'", Guid.SystemComunication.CUSTOM_GROUP_MEETING_REMINDER ) );
         }
 
         /// <summary>
