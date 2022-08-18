@@ -313,7 +313,7 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
                     var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, groupMember.Person );
                     mergeFields.Add( "Group", group );
                     mergeFields.Add( "Person", groupMember.Person );
-                    mergeFields.Add( "NextMeetingDates", string.Join( "    ", meetingDates ) );
+                    mergeFields.Add( "NextMeetingDates", string.Join( "<br />", meetingDates ) );
 
 
                     var notificationType = ( CommunicationType ) Communication.DetermineMediumEntityTypeId(

@@ -27,17 +27,17 @@ namespace rocks.kfs.CustomGroupCommunication.Migrations
         {
             RockMigrationHelper.UpdateSystemCommunication( "Plugins"
                 , "Group Meeting Reminder", "", "", "", "", ""
-                , "You have a group meeting starting soon", @"{{ 'Global' | Attribute:'EmailHeader' }}
+                , "You have group meeting(s) starting soon", @"{{ 'Global' | Attribute:'EmailHeader' }}
                     <p>{{ Person.FullName }},</p>
                     <p>You have a scheduled group meeting coming up:</p>
                     <blockquote><b>Meeting for {{ Group.Name }}</b><br>
-                    <b>Date:</b> {{ NextMeetingDates }}</blockquote>
+                    <b>Date(s):</b> {{ NextMeetingDates }}</blockquote>
                     {{ 'Global' | Attribute:'EmailFooter' }}"
                 , Guid.SystemComunication.CUSTOM_GROUP_MEETING_REMINDER
                 , isActive: true
-                , smsMessage: @"Upcoming group meeting for {{ Group.Name }} ( {{ NextMeetingDates }} )."
+                , smsMessage: @"Upcoming group meeting(s) for {{ Group.Name }} ( {{ NextMeetingDates }} )."
                 , pushTitle: "Upcoming Group Meeting"
-                , pushMessage: @"Upcoming group meeting for {{ Group.Name }} ( {{ NextMeetingDates }} )." );
+                , pushMessage: @"Upcoming group meeting(s) for {{ Group.Name }} ( {{ NextMeetingDates }} )." );
 
             Sql( string.Format( "UPDATE [SystemCommunication] SET [IsSystem] = 0 WHERE [Guid] = '{0}'", Guid.SystemComunication.CUSTOM_GROUP_MEETING_REMINDER ) );
         }
