@@ -31,7 +31,7 @@ namespace rocks.kfs.CustomGroupCommunication.Migrations
                     <p>{{ Person.FullName }},</p>
                     <p>You have a scheduled group meeting coming up:</p>
                     <blockquote><b>Meeting for {{ Group.Name }}</b><br>
-                    <b>Date:</b> {{ NextMeetingDate }}</blockquote>
+                    <b>Date:</b> {{ NextMeetingDates }}</blockquote>
                     {{ 'Global' | Attribute:'EmailFooter' }}"
                 , Guid.SystemComunication.CUSTOM_GROUP_MEETING_REMINDER
                 , isActive: true
