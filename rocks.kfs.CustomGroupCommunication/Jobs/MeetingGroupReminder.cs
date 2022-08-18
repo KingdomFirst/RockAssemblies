@@ -109,13 +109,95 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
         {
             var rockContext = new RockContext();
             var dataMap = context.JobDetail.JobDataMap;
+            var groupsToNotify = new Dictionary<Group, List<DateTime>>();
+
+            // Get the schedule dates that apply
+            var dates = new List<DateTime>();
+            // This job was specifically requested for future reminders only.
+            //dates.Add( RockDateTime.Today );
+            try
+            {
+                List<int> reminderDays = dataMap.GetString( AttributeKey.DaysPrior ).Split( ',' ).Select( d => Convert.ToInt32( d.Trim() ) ).ToList();
+                foreach ( int reminderDay in reminderDays )
+                {
+                    var reminderDate = RockDateTime.Today.AddDays( reminderDay );
+                    if ( !dates.Contains( reminderDate ) )
+                    {
+                        dates.Add( reminderDate );
+                    }
+                }
+            }
+            catch { }
+
+            var startDateSearch = dates.Min();
+            var endDateSearch = dates.Max().AddDays( 1 );
 
             var groupAttributeSetting = dataMap.GetString( AttributeKey.GroupAttributeSetting ).AsGuid();
             var daysPrior = dataMap.GetDouble( AttributeKey.DaysPrior );
             var groupQuery = new GroupService( rockContext )
                             .Queryable( "Schedule" )
+                            .Where( g =>
+                                g.IsActive &&
+                                g.Schedule != null )
                             .WhereAttributeValue( rockContext, av => av.Attribute.Guid.Equals( groupAttributeSetting ) );
-            var groups = groupQuery.ToList().Where( g => g.Schedule.GetNextStartDateTime( DateTime.Now ) <= DateTime.Now.AddDays( daysPrior ) );
+
+            foreach ( var group in groupQuery.ToList() )
+            {
+                if ( !string.IsNullOrWhiteSpace( group.Schedule.iCalendarContent ) )
+                {
+                    // If schedule has an iCal schedule, get occurrences between first and last dates
+                    foreach ( var occurrence in group.Schedule.GetICalOccurrences( startDateSearch, endDateSearch ) )
+                    {
+                        var startTime = occurrence.Period.StartTime.Value;
+                        if ( dates.Contains( startTime.Date ) )
+                        {
+                            if ( !groupsToNotify.ContainsKey( group ) )
+                            {
+                                groupsToNotify.Add( group, new List<DateTime>() );
+                            }
+                            groupsToNotify[group].Add( startTime );
+                        }
+                    }
+                }
+                else if ( group.Schedule.WeeklyDayOfWeek.HasValue )
+                {
+                    foreach ( var date in dates )
+                    {
+                        if ( date.DayOfWeek == group.Schedule.WeeklyDayOfWeek.Value )
+                        {
+                            var startTime = date;
+                            if ( group.Schedule.WeeklyTimeOfDay.HasValue )
+                            {
+                                startTime = startTime.Add( group.Schedule.WeeklyTimeOfDay.Value );
+                            }
+                            if ( !groupsToNotify.ContainsKey( group ) )
+                            {
+                                groupsToNotify.Add( group, new List<DateTime>() );
+                            }
+                            groupsToNotify[group].Add( startTime );
+                        }
+                    }
+                }
+
+                // Remove any occurrences during group type exclusion date ranges
+                foreach ( var exclusion in group.GroupType.GroupScheduleExclusions )
+                {
+                    if ( exclusion.StartDate.HasValue && exclusion.EndDate.HasValue )
+                    {
+                        foreach ( var keyVal in groupsToNotify )
+                        {
+                            foreach ( var occurrenceDate in keyVal.Value.ToList() )
+                            {
+                                if ( occurrenceDate >= exclusion.StartDate.Value &&
+                                    occurrenceDate < exclusion.EndDate.Value.AddDays( 1 ) )
+                                {
+                                    keyVal.Value.Remove( occurrenceDate );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             context.Result = "0 meeting reminders sent.";
 
@@ -166,9 +248,9 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
             // Process reminders
             SendMessageResult meetingRemindersResults;
 
-            if ( groups.Any() )
+            if ( groupsToNotify.Any() )
             {
-                meetingRemindersResults = SendMeetingReminders( context, rockContext, groups, systemCommunication, jobPreferredCommunicationType, isSmsEnabled, isPushEnabled );
+                meetingRemindersResults = SendMeetingReminders( context, rockContext, groupsToNotify, systemCommunication, jobPreferredCommunicationType, isSmsEnabled, isPushEnabled );
             }
 
 
@@ -195,7 +277,7 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
         /// <returns></returns>
         private SendMessageResult SendMeetingReminders( IJobExecutionContext context,
                         RockContext rockContext,
-                        IEnumerable<Group> groups,
+                        Dictionary<Group, List<DateTime>> groups,
                         SystemCommunication systemCommunication,
                         CommunicationType jobPreferredCommunicationType,
                         bool isSmsEnabled,
@@ -206,12 +288,14 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
             var errorsSms = new List<string>();
             var errorsPush = new List<string>();
 
-            // Loop through the room occurrence data
-            foreach ( var group in groups )
+            foreach ( var notify in groups )
             {
                 var emailMessage = new RockEmailMessage( systemCommunication );
                 RockSMSMessage smsMessage = isSmsEnabled ? new RockSMSMessage( systemCommunication ) : null;
                 RockPushMessage pushMessage = isPushEnabled ? new RockPushMessage( systemCommunication ) : null;
+
+                var group = notify.Key;
+                var meetingDates = notify.Value.Select( d => d.ToString() );
 
                 foreach ( var groupMember in group.ActiveMembers().ToList() )
                 {
@@ -229,7 +313,7 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
                     var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, groupMember.Person );
                     mergeFields.Add( "Group", group );
                     mergeFields.Add( "Person", groupMember.Person );
-                    mergeFields.Add( "NextMeetingDate", group.Schedule.GetNextStartDateTime( DateTime.Now ) );
+                    mergeFields.Add( "NextMeetingDates", string.Join( "    ", meetingDates ) );
 
 
                     var notificationType = ( CommunicationType ) Communication.DetermineMediumEntityTypeId(

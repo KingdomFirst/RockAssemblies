@@ -46,6 +46,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\EntityFramework.Utilities.dll</HintPath>
     </Reference>
+    <Reference Include="Ical.Net, Version=2.1.0.20781, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="Quartz">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Quartz.dll</HintPath>

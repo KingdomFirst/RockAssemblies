@@ -35,9 +35,9 @@ namespace rocks.kfs.CustomGroupCommunication.Migrations
                     {{ 'Global' | Attribute:'EmailFooter' }}"
                 , Guid.SystemComunication.CUSTOM_GROUP_MEETING_REMINDER
                 , isActive: true
-                , smsMessage: @"Upcoming group meeting for {{ Group.Name }} ( {{ NextMeetingDate }} )."
+                , smsMessage: @"Upcoming group meeting for {{ Group.Name }} ( {{ NextMeetingDates }} )."
                 , pushTitle: "Upcoming Group Meeting"
-                , pushMessage: @"Upcoming group meeting for {{ Group.Name }} ( {{ NextMeetingDate }} )." );
+                , pushMessage: @"Upcoming group meeting for {{ Group.Name }} ( {{ NextMeetingDates }} )." );
 
             Sql( string.Format( "UPDATE [SystemCommunication] SET [IsSystem] = 0 WHERE [Guid] = '{0}'", Guid.SystemComunication.CUSTOM_GROUP_MEETING_REMINDER ) );
         }
