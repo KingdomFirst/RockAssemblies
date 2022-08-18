@@ -23,4 +23,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("2e6ca020-205d-4fb8-ad08-91866d653c4b")]
 
 // Auto increment assembly versions
-[assembly: AssemblyVersion( "1.0.*" )]
+[assembly: AssemblyVersion( "1.1.*" )]
