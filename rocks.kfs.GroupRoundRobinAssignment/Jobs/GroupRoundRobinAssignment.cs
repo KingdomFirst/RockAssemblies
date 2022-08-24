@@ -196,14 +196,11 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                             groupToAddTo = groupsForCampus.FirstOrDefault();
                         }
 
-                        if ( defaultGroup != null )
+                        // If Person campus is not set and Default Group is set or a matching group to Person's campus is not found use Default Group
+                        if ( groupToAddTo == null && defaultGroup != null )
                         {
                             groupToAddTo = defaultGroup;
                             errorMessages.Add( string.Format( "Group not found with matching campus for {0} ({1}), added to Default Group.", person.FullName, person.Id ) );
-                        }
-                        else
-                        {
-                            errorMessages.Add( string.Format( "Group not found with matching campus for {0} ({1}) and no Default Group set. Please check the person's campus and the default settings on this job.", person.FullName, person.Id ) );
                         }
 
                         if ( groupToAddTo != null )
