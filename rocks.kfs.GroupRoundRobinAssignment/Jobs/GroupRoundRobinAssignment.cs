@@ -36,11 +36,14 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
     ///
     [DataViewField(
         "People to Add Data View",
-        "Select the data view you wish to use as your source for people to add to the round robin group assignment. For speed purposes we recommend it filter out people already assigned to groups.",
-        true,
-        "",
-        "Rock.Model.Person" )]
-    [CustomEnhancedListField( "Groups to Cycle Through", "Select the groups and/or parent groups to cycle assigning users to based on campus group = person group.", @"SELECT 
+        Description = "Select the data view you wish to use as your source for people to add to the round robin group assignment. For speed purposes we recommend it filter out people already assigned to groups.",
+        IsRequired = true,
+        EntityTypeName = "Rock.Model.Person",
+        Key = AttributeKey.PeopleToAddDataView )]
+    [CustomEnhancedListField(
+        "Groups to Cycle Through",
+        Description = "Select the groups and/or parent groups to cycle assigning users to based on campus group = person group.",
+         ListSource = @"SELECT 
         CASE WHEN ggpg.Name IS NOT NULL THEN
 	        CONCAT(ggpg.name, ' > ',gpg.Name,' > ',pg.Name,' > ', g.Name)
         WHEN gpg.Name IS NOT NULL THEN
@@ -64,20 +67,36 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
 	            CONCAT(pg.Name,' > ', g.Name)
             ELSE
                 g.Name 
-        END", true )]
+        END",
+        IsRequired = true,
+        Key = AttributeKey.GroupsToCycleThrough )]
+
     [CampusField(
-        "Default Campus",
-        "Default campus to assign people to and use if a family does not have a campus. If both group and campus are set, group takes precedence. If neither are set the person will remain unassigned.",
-        false,
-        "",
-        false )]
+        name: "Default Campus",
+        description: "Default campus to assign people to and use if a family does not have a campus. If both group and campus are set, group takes precedence. If neither are set the person will remain unassigned.",
+        required: false,
+        includeInactive: false,
+        key: AttributeKey.DefaultCampus )]
+
     [GroupField(
         "Default Group",
-        "Default group to assign people to and use if a family does not have a campus. If both group and campus are set, group takes precedence. If neither are set the person will remain unassigned.",
-        false )]
+        Description = "Default group to assign people to and use if a family does not have a campus. If both group and campus are set, group takes precedence. If neither are set the person will remain unassigned.",
+        IsRequired = false )]
+
     [DisallowConcurrentExecution]
     public class GroupRoundRobinAssignment : IJob
     {
+        /// <summary>
+        /// Attribute Keys
+        /// </summary>
+        private static class AttributeKey
+        {
+            public const string PeopleToAddDataView = "PeopleToAddDataView";
+            public const string GroupsToCycleThrough = "GroupsToCycleThrough";
+            public const string DefaultCampus = "DefaultCampus";
+            public const string DefaultGroup = "DefaultGroup";
+        }
+
         private int errorCount = 0;
         private List<string> errorMessages = new List<string>();
 
@@ -96,10 +115,10 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
         {
             JobDataMap dataMap = context.JobDetail.JobDataMap;
 
-            var dataViewGuid = dataMap.GetString( "PeopletoAddDataView" ).AsGuidOrNull();
-            var groupIds = dataMap.GetString( "GroupstoCycleThrough" ).StringToIntList().ToList();
-            var defaultGroupGuid = dataMap.GetString( "DefaultGroup" ).AsGuidOrNull();
-            var defaultCampusGuid = dataMap.GetString( "DefaultCampus" ).AsGuidOrNull();
+            var dataViewGuid = dataMap.GetString( AttributeKey.PeopleToAddDataView ).AsGuidOrNull();
+            var groupIds = dataMap.GetString( AttributeKey.GroupsToCycleThrough ).StringToIntList().ToList();
+            var defaultGroupGuid = dataMap.GetString( AttributeKey.DefaultGroup ).AsGuidOrNull();
+            var defaultCampusGuid = dataMap.GetString( AttributeKey.DefaultCampus ).AsGuidOrNull();
             var addedCount = 0;
 
             using ( var rockContext = new RockContext() )
@@ -161,10 +180,11 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                         var personCampusId = person.PrimaryCampusId;
                         Group groupToAddTo = null;
 
-                        // If both Default Campus and Default Group are set, just set to Default group if person campus is empty.
+                        // If both Default Campus and Default Group are set, only the Default Group will be used
                         if ( personCampusId == null && defaultCampus != null && defaultGroup == null )
                         {
                             personCampusId = defaultCampus.Id;
+                            errorMessages.Add( string.Format( "Campus not found for {0} ({1}), setting to Default Campus for group search.", person.FullName, person.Id ) );
                         }
 
                         if ( personCampusId != null )
@@ -175,32 +195,37 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
 
                             groupToAddTo = groupsForCampus.FirstOrDefault();
                         }
-                        else if ( defaultGroup != null )
+
+                        if ( defaultGroup != null )
                         {
                             groupToAddTo = defaultGroup;
+                            errorMessages.Add( string.Format( "Group not found with matching campus for {0} ({1}), added to Default Group.", person.FullName, person.Id ) );
                         }
                         else
                         {
-                            errorMessages.Add( string.Format( "Campus not set for {0} ({1}) and no Default Group set. Please check the person's campus and the default settings if this was unexpected.", person.FullName, person.Id ) );
+                            errorMessages.Add( string.Format( "Group not found with matching campus for {0} ({1}) and no Default Group set. Please check the person's campus and the default settings on this job.", person.FullName, person.Id ) );
                         }
 
                         if ( groupToAddTo != null )
                         {
                             var groupMember = new GroupMember
                             {
-                                Person = person,
-                                Group = groupToAddTo,
+                                PersonId = person.Id,
+                                GroupId = groupToAddTo.Id,
                                 GroupRoleId = groupToAddTo.GroupType.DefaultGroupRoleId.Value,
                                 GroupMemberStatus = GroupMemberStatus.Active
                             };
 
-                            groupMemberService.Add( groupMember );
+                            if ( groupMember.IsValidGroupMember( rockContext ) )
+                            {
+                                groupMemberService.Add( groupMember );
+                            }
 
                             addedCount++;
                         }
                         else
                         {
-                            errorMessages.Add( string.Format( "No Group found to add {0} ({1}) to. Please check the person's campus, the default settings and group campuses to ensure there is a match available.", person.FullName, person.Id ) );
+                            errorMessages.Add( string.Format( "No Group found to add {0} ({1}) to. Please check the person's campus, the default settings on this job and group campuses to ensure there is a match available.", person.FullName, person.Id ) );
                         }
                     }
 
@@ -214,14 +239,18 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
             {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine();
-                sb.Append( string.Format( "{0} Errors: ", errorCount ) );
+                sb.AppendLine();
+                sb.Append( string.Format( "{0} Errors: ", errorMessages.Count ) );
                 errorMessages.ForEach( e => { sb.AppendLine(); sb.Append( e ); } );
                 string errors = sb.ToString();
                 context.Result += errors;
-                var exception = new Exception( errors );
-                HttpContext context2 = HttpContext.Current;
-                ExceptionLogService.LogException( exception, context2 );
-                throw exception;
+                if ( addedCount == 0 )
+                {
+                    var exception = new Exception( errors );
+                    HttpContext context2 = HttpContext.Current;
+                    ExceptionLogService.LogException( exception, context2 );
+                    throw exception;
+                }
             }
         }
     }
