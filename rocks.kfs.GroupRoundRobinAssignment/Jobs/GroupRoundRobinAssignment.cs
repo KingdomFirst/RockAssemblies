@@ -80,7 +80,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
 
     [GroupField(
         "Default Group",
-        Description = "Default group to assign people to and use if a family does not have a campus. If both group and campus are set, group takes precedence. If neither are set the person will remain unassigned.",
+        Description = "Default group to assign people to and use if a family does not have a campus. If both Default Group and Default Campus are set, Default Group takes precedence. If neither are set the person will remain unassigned.",
         IsRequired = false )]
 
     [DisallowConcurrentExecution]
@@ -97,7 +97,6 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
             public const string DefaultGroup = "DefaultGroup";
         }
 
-        private int errorCount = 0;
         private List<string> errorMessages = new List<string>();
 
         /// <summary>
@@ -111,7 +110,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
         /// Executes the specified context.
         /// </summary>
         /// <param name="context">The context.</param>
-        public virtual void Execute(IJobExecutionContext context)
+        public virtual void Execute( IJobExecutionContext context )
         {
             JobDataMap dataMap = context.JobDetail.JobDataMap;
 
@@ -216,9 +215,8 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                             if ( groupMember.IsValidGroupMember( rockContext ) )
                             {
                                 groupMemberService.Add( groupMember );
+                                addedCount++;
                             }
-
-                            addedCount++;
                         }
                         else
                         {
