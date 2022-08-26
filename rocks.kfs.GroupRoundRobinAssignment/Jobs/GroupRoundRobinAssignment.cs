@@ -20,13 +20,12 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Web;
+
 using Quartz;
 using Rock;
 using Rock.Attribute;
-using Rock.Communication;
 using Rock.Data;
 using Rock.Model;
-using Rock.Web.Cache;
 
 namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
 {
