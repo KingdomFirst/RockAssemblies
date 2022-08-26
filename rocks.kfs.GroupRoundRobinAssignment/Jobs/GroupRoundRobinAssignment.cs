@@ -40,6 +40,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
         IsRequired = true,
         EntityTypeName = "Rock.Model.Person",
         Key = AttributeKey.PeopleToAddDataView )]
+
     [CustomEnhancedListField(
         "Groups to Cycle Through",
         Description = "Select the groups and/or parent groups to cycle assigning users to based on campus group = person group.",
@@ -83,6 +84,12 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
         Description = "Default group to assign people to and use if a family does not have a campus. If both Default Group and Default Campus are set, Default Group takes precedence. If neither are set the person will remain unassigned.",
         IsRequired = false )]
 
+    [BooleanField(
+        "Include Selected Groups",
+        Description = "Should we include the selected groups in the round robin assignment or only the child groups? Default: False",
+        DefaultBooleanValue = false,
+        Key = AttributeKey.IncludeSelectedGroups )]
+
     [DisallowConcurrentExecution]
     public class GroupRoundRobinAssignment : IJob
     {
@@ -95,6 +102,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
             public const string GroupsToCycleThrough = "GroupsToCycleThrough";
             public const string DefaultCampus = "DefaultCampus";
             public const string DefaultGroup = "DefaultGroup";
+            public const string IncludeSelectedGroups = "IncludeSelectedGroups";
         }
 
         private List<string> errorMessages = new List<string>();
@@ -118,6 +126,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
             var groupIds = dataMap.GetString( AttributeKey.GroupsToCycleThrough ).StringToIntList().ToList();
             var defaultGroupGuid = dataMap.GetString( AttributeKey.DefaultGroup ).AsGuidOrNull();
             var defaultCampusGuid = dataMap.GetString( AttributeKey.DefaultCampus ).AsGuidOrNull();
+            var includeSelectedGroups = dataMap.GetBooleanFromString( AttributeKey.IncludeSelectedGroups );
             var addedCount = 0;
 
             using ( var rockContext = new RockContext() )
@@ -132,17 +141,10 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                     var campusService = new CampusService( rockContext );
                     var personService = new PersonService( rockContext );
                     var groupService = new GroupService( rockContext );
+                    var groupMemberService = new GroupMemberService( rockContext );
 
-                    Campus defaultCampus = null;
-                    if ( defaultCampusGuid != null )
-                    {
-                        defaultCampus = campusService.Get( defaultCampusGuid.Value );
-                    }
-                    Group defaultGroup = null;
-                    if ( defaultGroupGuid != null )
-                    {
-                        defaultGroup = groupService.Get( defaultGroupGuid.Value );
-                    }
+                    var defaultCampus = campusService.Get( defaultCampusGuid ?? Guid.Empty );
+                    var defaultGroup = groupService.Get( defaultGroupGuid ?? Guid.Empty );
 
                     // Filter people by dataview
                     var paramExpression = personService.ParameterExpression;
@@ -157,15 +159,13 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
 
                     foreach ( var group in groupQry )
                     {
-                        var childGroups = groupService.GetChildren( group.Id, 0, false, new List<int>(), new List<int>(), false, false );
-                        if ( childGroups.Any() )
-                        {
-                            groups.AddRange( childGroups );
-                        }
-                        else
+                        if ( includeSelectedGroups )
                         {
                             groups.Add( group );
                         }
+
+                        var descendantGroups = groupService.GetAllDescendentGroups( group.Id, false );
+                        groups.AddRange( descendantGroups );
                     }
 
                     if ( !groups.Any() )
@@ -173,7 +173,10 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                         errorMessages.Add( "No valid groups were found. Did you select active groups?" );
                     }
 
-                    var groupMemberService = new GroupMemberService( rockContext );
+                    var allGroupIds = groups.Select( g => g.Id ).ToList();
+                    var groupMemberServiceQry = groupMemberService.Queryable( true ).Where( gm => allGroupIds.Contains( gm.GroupId ) );
+                    personQry = personQry.Where( p => !groupMemberServiceQry.Any( gm => gm.PersonId == p.Id ) );
+
                     foreach ( var person in personQry )
                     {
                         var personCampusId = person.PrimaryCampusId;
@@ -220,7 +223,15 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                         }
                         else
                         {
-                            errorMessages.Add( string.Format( "No Group found to add {0} ({1}) to. Please check the person's campus, the default settings on this job and group campuses to ensure there is a match available.", person.FullName, person.Id ) );
+                            if ( person.PrimaryCampusId == null )
+                            {
+                                errorMessages.Add( string.Format( "{0} ({1}) does not have a campus set and there are no defaults set on the job. Please try again.", person.FullName, person.Id ) );
+
+                            }
+                            else
+                            {
+                                errorMessages.Add( string.Format( "No Group for the {2} campus ({3}) found to add {0} ({1}) to. Please check the person's campus, group campuses and the default settings on this job to ensure there is a match available.", person.FullName, person.Id, person.PrimaryCampus.Name, person.PrimaryCampusId ) );
+                            }
                         }
                     }
 
