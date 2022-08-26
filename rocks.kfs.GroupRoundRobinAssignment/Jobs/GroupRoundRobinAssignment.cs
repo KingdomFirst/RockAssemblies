@@ -176,6 +176,8 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                     var groupMemberServiceQry = groupMemberService.Queryable( true ).Where( gm => allGroupIds.Contains( gm.GroupId ) );
                     personQry = personQry.Where( p => !groupMemberServiceQry.Any( gm => gm.PersonId == p.Id ) );
 
+                    var addedPeopleIds = new List<int>();
+
                     foreach ( var person in personQry )
                     {
                         var personCampusId = person.PrimaryCampusId;
@@ -204,7 +206,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                             errorMessages.Add( string.Format( "Group not found with matching campus for {0} ({1}), added to Default Group.", person.FullName, person.Id ) );
                         }
 
-                        if ( groupToAddTo != null )
+                        if ( groupToAddTo != null && !groupMemberService.GetByGroupIdAndPersonId( groupToAddTo.Id, person.Id ).Any() && !addedPeopleIds.Contains( person.Id ) )
                         {
                             var groupMember = new GroupMember
                             {
@@ -217,7 +219,34 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                             if ( groupMember.IsValidGroupMember( rockContext ) )
                             {
                                 groupMemberService.Add( groupMember );
+                                addedPeopleIds.Add( person.Id );
                                 addedCount++;
+
+                                foreach ( var familyMember in person.GetFamilyMembers( false, rockContext ) )
+                                {
+                                    var fPerson = familyMember.Person;
+                                    try
+                                    {
+                                        var fGroupMember = new GroupMember
+                                        {
+                                            PersonId = fPerson.Id,
+                                            GroupId = groupToAddTo.Id,
+                                            GroupRoleId = groupToAddTo.GroupType.DefaultGroupRoleId.Value,
+                                            GroupMemberStatus = GroupMemberStatus.Active
+                                        };
+
+                                        if ( fGroupMember.IsValidGroupMember( rockContext ) )
+                                        {
+                                            groupMemberService.Add( fGroupMember );
+                                            addedPeopleIds.Add( fPerson.Id );
+                                            addedCount++;
+                                        }
+                                    }
+                                    catch ( Exception e )
+                                    {
+                                        errorMessages.Add( string.Format( "There was an error adding family member {0} ({1}) to {2} group. Exception: {3}", fPerson.FullName, fPerson.Id, groupToAddTo.Name, e.Message ) );
+                                    }
+                                }
                             }
                         }
                         else
@@ -225,7 +254,6 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                             if ( person.PrimaryCampusId == null )
                             {
                                 errorMessages.Add( string.Format( "{0} ({1}) does not have a campus set and there are no defaults set on the job. Please try again.", person.FullName, person.Id ) );
-
                             }
                             else
                             {
