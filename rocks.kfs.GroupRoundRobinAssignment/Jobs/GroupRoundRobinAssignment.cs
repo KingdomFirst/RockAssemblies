@@ -73,7 +73,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
 
     [CampusField(
         name: "Default Campus",
-        description: "Default campus to assign people to and use if a family does not have a campus. If both group and campus are set, group takes precedence. If neither are set the person will remain unassigned.",
+        description: "Default campus to assign people to and use if a family does not have a campus. If both Default Group and Default Campus are set, Default Group takes precedence. If neither are set the person will remain unassigned.",
         required: false,
         includeInactive: false,
         key: AttributeKey.DefaultCampus )]
