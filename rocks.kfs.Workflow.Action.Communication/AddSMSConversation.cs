@@ -65,6 +65,7 @@ namespace rocks.kfs.Workflow.Action.Communication
 
             Person person = null;
             int? conversationPersonAliasId = null;
+            var personMessageKey = "";
             var isRead = GetAttributeValue( action, "MarkasRead" ).AsBoolean();
             var message = GetAttributeValue( action, "MessageinConversation" );
             var smsFromGuid = GetAttributeValue( action, "SMSFromNumber" ).AsGuidOrNull();
@@ -90,6 +91,17 @@ namespace rocks.kfs.Workflow.Action.Communication
             if ( person != null )
             {
                 conversationPersonAliasId = person.PrimaryAliasId;
+                personMessageKey = person.PhoneNumbers.GetFirstSmsNumber();
+
+                if ( personMessageKey.IsNullOrWhiteSpace() )
+                {
+                    personMessageKey = person.PhoneNumbers.FirstOrDefault()?.Number;
+
+                    if ( personMessageKey.IsNullOrWhiteSpace() )
+                    {
+                        personMessageKey = person.Email;
+                    }
+                }
             }
             else
             {
@@ -98,8 +110,6 @@ namespace rocks.kfs.Workflow.Action.Communication
                 return true;
             }
 
-
-
             // mark as approved if needed
             if ( isRead )
             {
@@ -107,20 +117,22 @@ namespace rocks.kfs.Workflow.Action.Communication
             }
             var smsMediumEntityTypeId = EntityTypeCache.GetId( Rock.SystemGuid.EntityType.COMMUNICATION_MEDIUM_SMS ).Value;
             var smsDefinedValueId = DefinedValueCache.GetId( smsFromGuid ?? Guid.Empty );
+            var smsTransport = new Rock.Communication.Medium.Sms().Transport.EntityType.Id;
 
-            //IQueryable<CommunicationResponse> communicationResponseQuery = this.Queryable()
-            //    .Where( r => r.RelatedMediumEntityTypeId == smsMediumEntityTypeId && r.RelatedSmsFromDefinedValueId == relatedSmsFromDefinedValueId && r.CreatedDateTime >= startDateTime && r.FromPersonAliasId.HasValue );
+            var mergeFields = GetMergeFields( action );
 
             // create the conversation
             var response = new CommunicationResponse
             {
                 FromPersonAliasId = conversationPersonAliasId,
+                MessageKey = personMessageKey.IsNullOrWhiteSpace() ? person.FullName : personMessageKey, // message key is required to have something when saved to the database, so if all else fails use the person's name.
                 IsRead = isRead,
                 CreatedDateTime = RockDateTime.Now,
                 CreatedByPersonAliasId = conversationPersonAliasId,
                 RelatedSmsFromDefinedValueId = smsDefinedValueId,
+                RelatedTransportEntityTypeId = smsTransport,
                 RelatedMediumEntityTypeId = smsMediumEntityTypeId,
-                Response = message
+                Response = message.ResolveMergeFields( mergeFields )
             };
 
             // add the SMS Conversation
@@ -132,11 +144,6 @@ namespace rocks.kfs.Workflow.Action.Communication
             {
                 rockContext.SaveChanges();
             } );
-
-            if ( response.Guid != null )
-            {
-
-            }
 
             return true;
         }
