@@ -41,7 +41,7 @@ namespace rocks.kfs.Workflow.Action.Communication
     #region Action Settings
 
     [TextField( "Message in Conversation", "Message to display in conversation as though it was from the recipient. Default: Blank <span class='tip tip-lava'></span>", false, "" )]
-    [BooleanField( "Mark as Read", "Flag indicating if the conversation should be marked as read when submitted. Default: false", defaultValue: false, order: 1 )]
+    [BooleanField( "Mark as Read", "Flag indicating if the conversation should be marked as read when submitted. Default: No", defaultValue: false, order: 1 )]
     [WorkflowAttribute( "Person", "The workflow attribute of the person to be the recipient.", true, "", "", 7, null, new string[] { "Rock.Field.Types.PersonFieldType" } )]
     [DefinedValueField( Rock.SystemGuid.DefinedType.COMMUNICATION_SMS_FROM, "SMS From Number", "The SMS number the conversation will appear under.", false, false )]
     #endregion
