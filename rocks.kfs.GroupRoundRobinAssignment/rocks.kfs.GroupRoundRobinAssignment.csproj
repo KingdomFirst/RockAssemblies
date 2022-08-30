@@ -7,8 +7,8 @@
     <ProjectGuid>{E2040E07-572B-4629-8B9F-6B53EC7C077C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>rocks.kfs.GroupRoleAttendanceReminder</RootNamespace>
-    <AssemblyName>rocks.kfs.GroupRoleAttendanceReminder</AssemblyName>
+    <RootNamespace>rocks.kfs.GroupRoundRobinAssignment</RootNamespace>
+    <AssemblyName>rocks.kfs.GroupRoundRobinAssignment</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
