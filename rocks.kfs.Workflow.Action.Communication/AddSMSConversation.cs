@@ -110,11 +110,6 @@ namespace rocks.kfs.Workflow.Action.Communication
                 return true;
             }
 
-            // mark as approved if needed
-            if ( isRead )
-            {
-                dateRead = RockDateTime.Now;
-            }
             var smsMediumEntityTypeId = EntityTypeCache.GetId( Rock.SystemGuid.EntityType.COMMUNICATION_MEDIUM_SMS ).Value;
             var smsDefinedValueId = DefinedValueCache.GetId( smsFromGuid ?? Guid.Empty );
             var smsTransport = new Rock.Communication.Medium.Sms().Transport.EntityType.Id;
