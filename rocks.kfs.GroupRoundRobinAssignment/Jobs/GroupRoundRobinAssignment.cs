@@ -34,14 +34,14 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
     /// </summary>
     ///
     [DataViewField(
-        "People to Add Data View",
+        "People Data View",
         Description = "Select the data view you wish to use as your source for people to add to the round robin group assignment. For speed purposes we recommend it filter out people already assigned to groups.",
         IsRequired = true,
         EntityTypeName = "Rock.Model.Person",
         Key = AttributeKey.PeopleToAddDataView )]
 
     [CustomEnhancedListField(
-        "Groups to Cycle Through",
+        "Groups to Assign People to",
         Description = "Select the groups and/or parent groups to cycle assigning users to based on campus group = person group.",
          ListSource = @"SELECT 
         CASE WHEN ggpg.Name IS NOT NULL THEN
@@ -85,9 +85,16 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
 
     [BooleanField(
         "Include Selected Groups",
-        Description = "Should we include the selected groups in the round robin assignment or only the child groups? Default: False",
+        Description = "Should we include the selected groups in the round robin assignment or only the child groups? Default: No",
         DefaultBooleanValue = false,
         Key = AttributeKey.IncludeSelectedGroups )]
+
+    [CustomDropdownListField(
+        "Include Family Members",
+        Description = "Should we include family members in the group as each person gets assigned? 'None', each person in the data view gets assigned to a different group. 'Adults Only', Family members with the 'Adult' Role will be added to the same group. 'All Family Members', every family member for the first individual encountered will be assigned to the same group. Default: All Family Members",
+        DefaultValue = "All",
+        ListSource = "All^All Family Members,Adults^Adults Only,None",
+        Key = AttributeKey.IncludeFamilyMembers )]
 
     [DisallowConcurrentExecution]
     public class GroupRoundRobinAssignment : IJob
@@ -102,6 +109,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
             public const string DefaultCampus = "DefaultCampus";
             public const string DefaultGroup = "DefaultGroup";
             public const string IncludeSelectedGroups = "IncludeSelectedGroups";
+            public const string IncludeFamilyMembers = "IncludeFamilyMembers";
         }
 
         private List<string> errorMessages = new List<string>();
@@ -126,6 +134,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
             var defaultGroupGuid = dataMap.GetString( AttributeKey.DefaultGroup ).AsGuidOrNull();
             var defaultCampusGuid = dataMap.GetString( AttributeKey.DefaultCampus ).AsGuidOrNull();
             var includeSelectedGroups = dataMap.GetBooleanFromString( AttributeKey.IncludeSelectedGroups );
+            var includeFamilyMembers = dataMap.GetString( AttributeKey.IncludeFamilyMembers );
             var addedCount = 0;
 
             using ( var rockContext = new RockContext() )
@@ -176,6 +185,8 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                     var groupMemberServiceQry = groupMemberService.Queryable( true ).Where( gm => allGroupIds.Contains( gm.GroupId ) );
                     personQry = personQry.Where( p => !groupMemberServiceQry.Any( gm => gm.PersonId == p.Id ) );
 
+                    var addedPeopleIds = new List<int>();
+
                     foreach ( var person in personQry )
                     {
                         var personCampusId = person.PrimaryCampusId;
@@ -204,7 +215,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                             errorMessages.Add( string.Format( "Group not found with matching campus for {0} ({1}), added to Default Group.", person.FullName, person.Id ) );
                         }
 
-                        if ( groupToAddTo != null )
+                        if ( groupToAddTo != null && !groupMemberService.GetByGroupIdAndPersonId( groupToAddTo.Id, person.Id ).Any() && !addedPeopleIds.Contains( person.Id ) )
                         {
                             var groupMember = new GroupMember
                             {
@@ -217,7 +228,41 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                             if ( groupMember.IsValidGroupMember( rockContext ) )
                             {
                                 groupMemberService.Add( groupMember );
+                                addedPeopleIds.Add( person.Id );
                                 addedCount++;
+
+                                if ( includeFamilyMembers != "None" )
+                                {
+                                    foreach ( var familyMember in person.GetFamilyMembers( false, rockContext ) )
+                                    {
+                                        var fPerson = familyMember.Person;
+
+                                        if ( includeFamilyMembers != "Adults" || fPerson.GetFamilyRole( rockContext ).Guid == Rock.SystemGuid.GroupRole.GROUPROLE_FAMILY_MEMBER_ADULT.AsGuid() )
+                                        {
+                                            try
+                                            {
+                                                var fGroupMember = new GroupMember
+                                                {
+                                                    PersonId = fPerson.Id,
+                                                    GroupId = groupToAddTo.Id,
+                                                    GroupRoleId = groupToAddTo.GroupType.DefaultGroupRoleId.Value,
+                                                    GroupMemberStatus = GroupMemberStatus.Active
+                                                };
+
+                                                if ( fGroupMember.IsValidGroupMember( rockContext ) )
+                                                {
+                                                    groupMemberService.Add( fGroupMember );
+                                                    addedPeopleIds.Add( fPerson.Id );
+                                                    addedCount++;
+                                                }
+                                            }
+                                            catch ( Exception e )
+                                            {
+                                                errorMessages.Add( string.Format( "There was an error adding family member {0} ({1}) to {2} group. Exception: {3}", fPerson.FullName, fPerson.Id, groupToAddTo.Name, e.Message ) );
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                         else
@@ -225,7 +270,10 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                             if ( person.PrimaryCampusId == null )
                             {
                                 errorMessages.Add( string.Format( "{0} ({1}) does not have a campus set and there are no defaults set on the job. Please try again.", person.FullName, person.Id ) );
-
+                            }
+                            else if ( groupToAddTo != null )
+                            {
+                                errorMessages.Add( string.Format( "{0} ({1}) was added with a family member or is already in a group assignment. You may ignore this error or consider refining your data view to single members of household. ", person.FullName, person.Id ) );
                             }
                             else
                             {
