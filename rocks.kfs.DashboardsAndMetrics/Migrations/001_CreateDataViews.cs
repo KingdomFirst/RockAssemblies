@@ -33,8 +33,8 @@ namespace rocks.kfs.DashboardsAndMetrics.Migrations
             RockMigrationHelper.UpdateCategory( "57F8FA29-DCF1-4F74-8553-87E90F234139", "Metric Views", "", "Metric Data Views used for KFS dashboards.", "D900BCBC-59F4-4975-808B-0041F601D044" );
 
             // Create sub-categories
-            RockMigrationHelper.UpdateCategory( "57F8FA29-DCF1-4F74-8553-87E90F234139", "Simple Financial Dashboard", "", "Financial metric Data Views for KFS dashboards.", "B229F71C-2A6A-46F0-8D4A-898673D94F68", parentCategoryGuid: "D900BCBC-59F4-4975-808B-0041F601D044" );
-            RockMigrationHelper.UpdateCategory( "57F8FA29-DCF1-4F74-8553-87E90F234139", "Simple Group Metrics Dashboard", "", "Group metric Data Views for KFS dashboards.", "D206BCC0-C784-4E90-ADC4-0EB0BC74517A", parentCategoryGuid: "D900BCBC-59F4-4975-808B-0041F601D044" );
+            RockMigrationHelper.UpdateCategory( "57F8FA29-DCF1-4F74-8553-87E90F234139", "KFS Financial Dashboard", "", "Financial metric Data Views for KFS dashboards.", "B229F71C-2A6A-46F0-8D4A-898673D94F68", parentCategoryGuid: "D900BCBC-59F4-4975-808B-0041F601D044" );
+            RockMigrationHelper.UpdateCategory( "57F8FA29-DCF1-4F74-8553-87E90F234139", "KFS Group Metrics Dashboard", "", "Group metric Data Views for KFS dashboards.", "D206BCC0-C784-4E90-ADC4-0EB0BC74517A", parentCategoryGuid: "D900BCBC-59F4-4975-808B-0041F601D044" );
 
             #endregion Categories
 

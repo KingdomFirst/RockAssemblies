@@ -33,8 +33,8 @@ namespace rocks.kfs.DashboardsAndMetrics.Migrations
             RockMigrationHelper.UpdateCategory( "3D35C859-DF37-433F-A20A-0FFD0FCB9862", "KFS Dashboards", "", "Metrics used for Kingdom First Solutions dashboards.", "3E650C53-9D8F-4946-8F6E-432B36CDC9E1" );
 
             // Create sub-categories
-            RockMigrationHelper.UpdateCategory( "3D35C859-DF37-433F-A20A-0FFD0FCB9862", "Simple Groups Dashboard Metrics", "", "Group metrics for KFS dashboards.", "5A7A99D2-33C7-4684-9500-E200503C311F", parentCategoryGuid: "3E650C53-9D8F-4946-8F6E-432B36CDC9E1" );
-            RockMigrationHelper.UpdateCategory( "3D35C859-DF37-433F-A20A-0FFD0FCB9862", "Simple Financial Dashboard Metrics", "", "Financial metrics for KFS dashboards.", "B6F5E7C3-4AF0-490E-8634-5405A1E84D88", parentCategoryGuid: "3E650C53-9D8F-4946-8F6E-432B36CDC9E1" );
+            RockMigrationHelper.UpdateCategory( "3D35C859-DF37-433F-A20A-0FFD0FCB9862", "KFS Groups Dashboard Metrics", "", "Group metrics for KFS dashboards.", "5A7A99D2-33C7-4684-9500-E200503C311F", parentCategoryGuid: "3E650C53-9D8F-4946-8F6E-432B36CDC9E1" );
+            RockMigrationHelper.UpdateCategory( "3D35C859-DF37-433F-A20A-0FFD0FCB9862", "KFS Financial Dashboard Metrics", "", "Financial metrics for KFS dashboards.", "B6F5E7C3-4AF0-490E-8634-5405A1E84D88", parentCategoryGuid: "3E650C53-9D8F-4946-8F6E-432B36CDC9E1" );
 
             #endregion Categories
 
