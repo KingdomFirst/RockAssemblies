@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("rocks.kfs.DashboardsAndMetrics")]
 [assembly: AssemblyProduct("rocks.kfs.DashboardsAndMetrics")]
-[assembly: AssemblyCopyright("Copyright ©  2022")]
+[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2022" )]
 
 // Auto increment assembly versions
 [assembly: AssemblyVersion( "1.1.*" )]
