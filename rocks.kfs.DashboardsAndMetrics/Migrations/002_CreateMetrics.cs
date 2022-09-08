@@ -58,7 +58,19 @@ namespace rocks.kfs.DashboardsAndMetrics.Migrations
                     VALUES (
                         'Monday Metrics - 1AM',
                         '',
-                        'BEGIN:VCALENDAR  PRODID:-//github.com/rianjs/ical.net//NONSGML ical.net 2.2//EN  VERSION:2.0  BEGIN:VEVENT  DTEND:20220901T010001  DTSTAMP:20220901T133602  DTSTART:20220901T010000  RRULE:FREQ=WEEKLY;BYDAY=MO  SEQUENCE:0  UID:54a91b6c-d4b0-4c5b-9125-98aa1b00377d  END:VEVENT  END:VCALENDAR  ',
+                        'BEGIN:VCALENDAR
+PRODID:-//github.com/rianjs/ical.net//NONSGML ical.net 2.2//EN
+VERSION:2.0
+BEGIN:VEVENT
+DTEND:20220901T010001
+DTSTAMP:20220901T133602
+DTSTART:20220901T010000
+RRULE:FREQ=WEEKLY;BYDAY=MO
+SEQUENCE:0
+UID:54a91b6c-d4b0-4c5b-9125-98aa1b00377d
+END:VEVENT
+END:VCALENDAR
+',
                         GETDATE(),
                         @CategoryId,
                         '077AB9CB-842D-4B78-8D95-83E3ED5B59B0',
@@ -94,7 +106,11 @@ namespace rocks.kfs.DashboardsAndMetrics.Migrations
                         '',
                         0,
                         @SQLMetricValueSourceDVId,
-                        'SELECT SUM(Amount)   FROM [AnalyticsFactFinancialTransaction]   WHERE TransactionTypeValueId = 53   AND TransactionDateTime <= DATEADD(wk, DATEDIFF(wk, 6, GETDATE()), 6)   AND TransactionDateTime > DateAdd(wk, -1, DateAdd(wk, DateDiff(wk, 6, GETDATE()), 6))',
+                        'SELECT SUM(Amount)
+  FROM [AnalyticsFactFinancialTransaction]
+  WHERE TransactionTypeValueId = 53
+  AND TransactionDateTime <= DATEADD(wk, DATEDIFF(wk, 6, GETDATE()), 6)
+  AND TransactionDateTime > DateAdd(wk, -1, DateAdd(wk, DateDiff(wk, 6, GETDATE()), 6))',
                         'Dollars',
                         @ScheduleId,
                         '56EF54EA-715B-4CF2-B401-60E3D3AF1389',
@@ -237,7 +253,11 @@ namespace rocks.kfs.DashboardsAndMetrics.Migrations
                         '',
                         0,
                         @SQLMetricValueSourceDVId,
-                        'SELECT COUNT(DISTINCT GivingGroupId)   FROM [AnalyticsFactFinancialTransaction]   WHERE TransactionTypeValueId = 53   AND TransactionDateTime <= DATEADD(wk, DATEDIFF(wk, 6, GETDATE()), 6)   AND TransactionDateTime > DateAdd(wk, -1, DateAdd(wk, DateDiff(wk, 6, GETDATE()), 6))',
+                        'SELECT COUNT(DISTINCT GivingGroupId)
+  FROM [AnalyticsFactFinancialTransaction]
+  WHERE TransactionTypeValueId = 53
+  AND TransactionDateTime <= DATEADD(wk, DATEDIFF(wk, 6, GETDATE()), 6)
+  AND TransactionDateTime > DateAdd(wk, -1, DateAdd(wk, DateDiff(wk, 6, GETDATE()), 6))',
                         'Giving Units',
                         @ScheduleId,
                         '62D95833-346B-4244-91A0-89B8CB72B561',
@@ -384,7 +404,25 @@ namespace rocks.kfs.DashboardsAndMetrics.Migrations
                         '',
                         0,
                         @SQLMetricValueSourceDVId,
-                        'WITH SmallGroup AS (     SELECT g.[Id]     FROM [Group] g     WHERE g.[GroupTypeId] = 25         AND g.[IsActive] = 1         AND g.[IsArchived] = 0 ), ActiveMember AS (     SELECT gm.[PersonId], gm.[GroupId]     FROM [GroupMember] gm         JOIN [SmallGroup] sm ON gm.[GroupId] = sm.[Id]     WHERE gm.[GroupMemberStatus] = 1         AND gm.[IsArchived] = 0 )  SELECT CAST((CAST(COUNT(DISTINCT am.[PersonId]) AS DECIMAL(5,2))/CAST(COUNT(DISTINCT adp.[PersonId])AS DECIMAL(5,2)))*100 AS DECIMAL(5,2)) FROM AnalyticsDimPersonCurrent adp  LEFT JOIN [ActiveMember] am ON adp.[PersonId] = am.[PersonId] WHERE adp.core_CurrentlyAnEra = 1 ',
+                        'WITH SmallGroup AS (
+    SELECT g.[Id]
+    FROM [Group] g
+    WHERE g.[GroupTypeId] = 25
+        AND g.[IsActive] = 1
+        AND g.[IsArchived] = 0
+),
+ActiveMember AS (
+    SELECT gm.[PersonId], gm.[GroupId]
+    FROM [GroupMember] gm
+        JOIN [SmallGroup] sm ON gm.[GroupId] = sm.[Id]
+    WHERE gm.[GroupMemberStatus] = 1
+        AND gm.[IsArchived] = 0
+)
+
+SELECT CAST((CAST(COUNT(DISTINCT am.[PersonId]) AS DECIMAL(5,2))/CAST(COUNT(DISTINCT adp.[PersonId])AS DECIMAL(5,2)))*100 AS DECIMAL(5,2))
+FROM AnalyticsDimPersonCurrent adp
+	LEFT JOIN [ActiveMember] am ON adp.[PersonId] = am.[PersonId]
+WHERE adp.core_CurrentlyAnEra = 1',
                         'Percent',
                         @ScheduleId,
                         '848416B7-5095-4342-AD4E-94FBCA5BB171',
@@ -451,7 +489,7 @@ namespace rocks.kfs.DashboardsAndMetrics.Migrations
                         AutoPartitionOnPrimaryCampus)
                     VALUES (
                         0,
-                        '% of Era Active in Small Groups',
+                        'Active Small Group Members',
                         '',
                         '',
                         0,

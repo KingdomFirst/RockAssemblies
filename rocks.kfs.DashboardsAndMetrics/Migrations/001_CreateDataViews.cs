@@ -142,7 +142,8 @@ namespace rocks.kfs.DashboardsAndMetrics.Migrations
                         [Guid])
                     VALUES (
                         0,
-                        @ParentDataViewFilterId,@DataViewFilterEntityTypeId,
+                        @ParentDataViewFilterId,
+                        @DataViewFilterEntityTypeId,
                         '{""ComparisonType"":256,""Amount"":1000.00,""SlidingDateRangePickerDelimitedValues"":""Previous|1|Week||"",""AccountGuids"":[""4410306f-3fb5-4a57-9a80-09a3f9d40d0c""],""CombineGiving"":false,""UseAnalyticsModels"":false,""IncludeChildAccounts"":false,""IgnoreInactiveAccounts"":false}',
                         '900B5D94-F44B-40D0-8A3F-190BAB9292D3')
                     END");

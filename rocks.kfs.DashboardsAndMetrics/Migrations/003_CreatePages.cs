@@ -38,7 +38,38 @@ namespace rocks.kfs.DashboardsAndMetrics.Migrations
             RockMigrationHelper.AddBlock( true, "DAE58EFA-8315-4F0A-A7EE-DDD0B986C20E".AsGuid(), null, "C2D29296-6A87-47A9-A753-EE4E9159C4C4".AsGuid(), "19B61D65-37E3-459F-A44F-DEF0089118A3".AsGuid(), "KFS Financial Dashboard Content", "Main", @"", @"", 0, "8CB0BFB1-8B29-4DCA-9373-E52B1FD4759A" );
 
             // Add/Update HtmlContent for Block: KFS Financial Dashboard Content
-            RockMigrationHelper.UpdateHtmlContentBlock( "8CB0BFB1-8B29-4DCA-9373-E52B1FD4759A", @"{% metric where:'Guid == ""56EF54EA-715B-4CF2-B401-60E3D3AF1389""' limit:'1' securityenabled:'false' %}         {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}         {% assign total = metricvalue.YValue %}     {% endmetricvalue %} {% endmetric %}  {% metric where:'Guid == ""7C85C112-2D1E-4F34-9BA3-FE9357CD570A""' limit:'1' securityenabled:'false' %}         {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}         {% assign firsttime = metricvalue.YValue | AsInteger %}     {% endmetricvalue %} {% endmetric %}  {% metric where:'Guid == ""62D95833-346B-4244-91A0-89B8CB72B561""' limit:'1' securityenabled:'false' %}         {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}         {% assign units = metricvalue.YValue | AsInteger %}     {% endmetricvalue %} {% endmetric %}  {% metric where:'Guid == ""1DB4EBB4-8B92-4A0F-86AE-CC6442E7CCA4""' limit:'1' securityenabled:'false' %}         {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}         {% assign largegifts = metricvalue.YValue | AsInteger %}     {% endmetricvalue %} {% endmetric %}  {[kpis size:'xl']}     [[ kpi icon:'fa-dollar-sign' value:'{{ total | FormatAsCurrency }}' label:'Contributions Last Week' color:'green-500']][[endkpi]]     [[ kpi icon:'fa-user' value:'{{ firsttime }}' label:'First Time Givers Last Week' color:'green-500']][[endkpi]]     [[ kpi icon:'fa-users' value:'{{ units }}' label:'Giving Units that Gave Last Week' color:'green-500']][[endkpi]]     [[ kpi icon:'fa-money-bill' value:'{{ largegifts }}' label:'Large Gifts Last Week' color:'green-500']][[endkpi]] {[endkpis]}", "D8AA5074-9AD8-4340-8E57-1E3D18C8BB5B" );
+            RockMigrationHelper.UpdateHtmlContentBlock( "8CB0BFB1-8B29-4DCA-9373-E52B1FD4759A", 
+                @"{% metric where:'Guid == "56EF54EA-715B-4CF2-B401-60E3D3AF1389"' limit:'1' securityenabled:'false' %}    
+    {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
+        {% assign total = metricvalue.YValue %}
+    {% endmetricvalue %}
+{% endmetric %}
+
+{% metric where:'Guid == "7C85C112-2D1E-4F34-9BA3-FE9357CD570A"' limit:'1' securityenabled:'false' %}    
+    {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
+        {% assign firsttime = metricvalue.YValue | AsInteger %}
+    {% endmetricvalue %}
+{% endmetric %}
+
+{% metric where:'Guid == "62D95833-346B-4244-91A0-89B8CB72B561"' limit:'1' securityenabled:'false' %}    
+    {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
+        {% assign units = metricvalue.YValue | AsInteger %}
+    {% endmetricvalue %}
+{% endmetric %}
+
+{% metric where:'Guid == "1DB4EBB4-8B92-4A0F-86AE-CC6442E7CCA4"' limit:'1' securityenabled:'false' %}    
+    {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
+        {% assign largegifts = metricvalue.YValue | AsInteger %}
+    {% endmetricvalue %}
+{% endmetric %}
+
+{[kpis size:'xl']}
+    [[ kpi icon:'fa-dollar-sign' value:'{{ total | FormatAsCurrency }}' label:'Contributions Last Week' color:'green-500']][[endkpi]]
+    [[ kpi icon:'fa-user' value:'{{ firsttime }}' label:'First Time Givers Last Week' color:'green-500']][[endkpi]]
+    [[ kpi icon:'fa-users' value:'{{ units }}' label:'Giving Units that Gave Last Week' color:'green-500']][[endkpi]]
+    [[ kpi icon:'fa-money-bill' value:'{{ largegifts }}' label:'Large Gifts Last Week' color:'green-500']][[endkpi]]
+{[endkpis]}", 
+                "D8AA5074-9AD8-4340-8E57-1E3D18C8BB5B" );
 
             // Add Block Attribute Value
             //   Block: KFS Financial Dashboard Content
@@ -146,7 +177,38 @@ namespace rocks.kfs.DashboardsAndMetrics.Migrations
             RockMigrationHelper.AddBlock( true, "8D00C825-E78D-4F01-8F69-62BA2D168C76".AsGuid(), null, "C2D29296-6A87-47A9-A753-EE4E9159C4C4".AsGuid(), "19B61D65-37E3-459F-A44F-DEF0089118A3".AsGuid(), "KFS Groups Dashboard Content", "Main", @"", @"", 0, "548E8070-13EB-4B26-BB1B-E5EC49919BD3" );
 
             // Add/Update HtmlContent for Block: KFS Groups Dashboard Content
-            RockMigrationHelper.UpdateHtmlContentBlock( "548E8070-13EB-4B26-BB1B-E5EC49919BD3", @"{% metric where:'Guid == ""FA9DB967-39E3-4A77-85DB-3041A272D78F""' limit:'1' securityenabled:'false' %}     {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}         {% assign activegroups = metricvalue.YValue | AsInteger %}     {% endmetricvalue %} {% endmetric %}  {% metric where:'Guid == ""8B0CE73B-5557-4F93-939B-BBA640BE760E""' limit:'1' securityenabled:'false' %}     {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}         {% assign attendance = metricvalue.YValue | AsInteger %}     {% endmetricvalue %} {% endmetric %}  {% metric where:'Guid == ""D4E7CF72-B001-4AF4-B52B-B3711FEF7D1B""' limit:'1' securityenabled:'false' %}     {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}         {% assign members = metricvalue.YValue | AsInteger %}     {% endmetricvalue %} {% endmetric %}  {% metric where:'Guid == ""848416B7-5095-4342-AD4E-94FBCA5BB171""' limit:'1' securityenabled:'false' %}     {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}         {% assign percent = metricvalue.YValue | AsInteger %}     {% endmetricvalue %} {% endmetric %}  {[kpis size:'xl']}     [[ kpi icon:'fa-users' value:'{{ activegroups }}' label:'Active Groups' color:'blue-500']][[endkpi]]     [[ kpi icon:'fa-check-square-o' value:'{{ attendance }}' label:'Attendance Last Week' color:'blue-500']][[endkpi]]     [[ kpi icon:'fa-user' value:'{{ members }}' label:'Active Small Group Members' color:'blue-500']][[endkpi]]     [[ kpi icon:'fa-user' value:'{{ percent }}%' label:'% Era in a Small Group' color:'blue-500']][[endkpi]] {[endkpis]}", "A9E681DF-3AFD-4E21-84C6-BD5231247F8E" );
+            RockMigrationHelper.UpdateHtmlContentBlock( "548E8070-13EB-4B26-BB1B-E5EC49919BD3",
+                @"{% metric where:'Guid == "FA9DB967-39E3-4A77-85DB-3041A272D78F"' limit:'1' securityenabled:'false' %}
+    {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
+        {% assign activegroups = metricvalue.YValue | AsInteger %}
+    {% endmetricvalue %}
+{% endmetric %}
+
+{% metric where:'Guid == "8B0CE73B-5557-4F93-939B-BBA640BE760E"' limit:'1' securityenabled:'false' %}
+    {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
+        {% assign attendance = metricvalue.YValue | AsInteger %}
+    {% endmetricvalue %}
+{% endmetric %}
+
+{% metric where:'Guid == "D4E7CF72-B001-4AF4-B52B-B3711FEF7D1B"' limit:'1' securityenabled:'false' %}
+    {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
+        {% assign members = metricvalue.YValue | AsInteger %}
+    {% endmetricvalue %}
+{% endmetric %}
+
+{% metric where:'Guid == "848416B7-5095-4342-AD4E-94FBCA5BB171"' limit:'1' securityenabled:'false' %}
+    {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
+        {% assign percent = metricvalue.YValue | AsInteger %}
+    {% endmetricvalue %}
+{% endmetric %}
+
+{[kpis size:'xl']}
+    [[ kpi icon:'fa-users' value:'{{ activegroups }}' label:'Active Groups' color:'blue-500']][[endkpi]]
+    [[ kpi icon:'fa-check-square-o' value:'{{ attendance }}' label:'Attendance Last Week' color:'blue-500']][[endkpi]]
+    [[ kpi icon:'fa-user' value:'{{ members }}' label:'Active Small Group Members' color:'blue-500']][[endkpi]]
+    [[ kpi icon:'fa-user' value:'{{ percent }}%' label:'% Era in a Small Group' color:'blue-500']][[endkpi]]
+{[endkpis]}",
+                "A9E681DF-3AFD-4E21-84C6-BD5231247F8E" );
 
             // Add Block Attribute Value
             //   Block: KFS Groups Dashboard Content
