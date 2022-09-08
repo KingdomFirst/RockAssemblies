@@ -39,25 +39,25 @@ namespace rocks.kfs.DashboardsAndMetrics.Migrations
 
             // Add/Update HtmlContent for Block: KFS Financial Dashboard Content
             RockMigrationHelper.UpdateHtmlContentBlock( "8CB0BFB1-8B29-4DCA-9373-E52B1FD4759A", 
-                @"{% metric where:'Guid == "56EF54EA-715B-4CF2-B401-60E3D3AF1389"' limit:'1' securityenabled:'false' %}    
+                @"{% metric where:'Guid == ""56EF54EA-715B-4CF2-B401-60E3D3AF1389""' limit:'1' securityenabled:'false' %}    
     {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
         {% assign total = metricvalue.YValue %}
     {% endmetricvalue %}
 {% endmetric %}
 
-{% metric where:'Guid == "7C85C112-2D1E-4F34-9BA3-FE9357CD570A"' limit:'1' securityenabled:'false' %}    
+{% metric where:'Guid == ""7C85C112-2D1E-4F34-9BA3-FE9357CD570A""' limit:'1' securityenabled:'false' %}    
     {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
         {% assign firsttime = metricvalue.YValue | AsInteger %}
     {% endmetricvalue %}
 {% endmetric %}
 
-{% metric where:'Guid == "62D95833-346B-4244-91A0-89B8CB72B561"' limit:'1' securityenabled:'false' %}    
+{% metric where:'Guid == ""62D95833-346B-4244-91A0-89B8CB72B561""' limit:'1' securityenabled:'false' %}    
     {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
         {% assign units = metricvalue.YValue | AsInteger %}
     {% endmetricvalue %}
 {% endmetric %}
 
-{% metric where:'Guid == "1DB4EBB4-8B92-4A0F-86AE-CC6442E7CCA4"' limit:'1' securityenabled:'false' %}    
+{% metric where:'Guid == ""1DB4EBB4-8B92-4A0F-86AE-CC6442E7CCA4""' limit:'1' securityenabled:'false' %}    
     {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
         {% assign largegifts = metricvalue.YValue | AsInteger %}
     {% endmetricvalue %}
@@ -178,25 +178,25 @@ namespace rocks.kfs.DashboardsAndMetrics.Migrations
 
             // Add/Update HtmlContent for Block: KFS Groups Dashboard Content
             RockMigrationHelper.UpdateHtmlContentBlock( "548E8070-13EB-4B26-BB1B-E5EC49919BD3",
-                @"{% metric where:'Guid == "FA9DB967-39E3-4A77-85DB-3041A272D78F"' limit:'1' securityenabled:'false' %}
+                @"{% metric where:'Guid == ""FA9DB967-39E3-4A77-85DB-3041A272D78F""' limit:'1' securityenabled:'false' %}
     {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
         {% assign activegroups = metricvalue.YValue | AsInteger %}
     {% endmetricvalue %}
 {% endmetric %}
 
-{% metric where:'Guid == "8B0CE73B-5557-4F93-939B-BBA640BE760E"' limit:'1' securityenabled:'false' %}
+{% metric where:'Guid == ""8B0CE73B-5557-4F93-939B-BBA640BE760E""' limit:'1' securityenabled:'false' %}
     {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
         {% assign attendance = metricvalue.YValue | AsInteger %}
     {% endmetricvalue %}
 {% endmetric %}
 
-{% metric where:'Guid == "D4E7CF72-B001-4AF4-B52B-B3711FEF7D1B"' limit:'1' securityenabled:'false' %}
+{% metric where:'Guid == ""D4E7CF72-B001-4AF4-B52B-B3711FEF7D1B""' limit:'1' securityenabled:'false' %}
     {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
         {% assign members = metricvalue.YValue | AsInteger %}
     {% endmetricvalue %}
 {% endmetric %}
 
-{% metric where:'Guid == "848416B7-5095-4342-AD4E-94FBCA5BB171"' limit:'1' securityenabled:'false' %}
+{% metric where:'Guid == ""848416B7-5095-4342-AD4E-94FBCA5BB171""' limit:'1' securityenabled:'false' %}
     {% metricvalue where:'MetricId == {{ metric.Id }}' sort:'MetricValueDateTime,desc' limit:'1' securityenabled:'false' %}
         {% assign percent = metricvalue.YValue | AsInteger %}
     {% endmetricvalue %}
