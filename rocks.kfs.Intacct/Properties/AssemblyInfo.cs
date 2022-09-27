@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle( "rocks.kfs.Intacct" )]
 [assembly: AssemblyProduct( "rocks.kfs.Intacct" )]
-[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2021" )]
+[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2022" )]
 
 // Auto increment assembly versions
 [assembly: AssemblyVersion( "2.3.*" )]

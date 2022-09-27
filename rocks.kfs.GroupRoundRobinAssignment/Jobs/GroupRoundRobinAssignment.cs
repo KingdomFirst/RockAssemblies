@@ -135,6 +135,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
             var defaultCampusGuid = dataMap.GetString( AttributeKey.DefaultCampus ).AsGuidOrNull();
             var includeSelectedGroups = dataMap.GetBooleanFromString( AttributeKey.IncludeSelectedGroups );
             var includeFamilyMembers = dataMap.GetString( AttributeKey.IncludeFamilyMembers );
+
             var addedCount = 0;
 
             using ( var rockContext = new RockContext() )
