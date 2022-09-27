@@ -58,10 +58,13 @@ namespace EventbriteDotNetFramework.Entities
         {
             var retVar = false;
             var cq = eb.GetEventCannedQuestionsById( Id );
-            var test = cq.Questions.FirstOrDefault( q => q.Respondent.Equals( "attendee", StringComparison.CurrentCultureIgnoreCase ) );
-            if ( test == null )
+            if ( cq != null && cq.Questions != null )
             {
-                retVar = true;
+                var test = cq.Questions.FirstOrDefault( q => q.Respondent.Equals( "attendee", StringComparison.CurrentCultureIgnoreCase ) );
+                if ( test == null )
+                {
+                    retVar = true;
+                }
             }
             return retVar;
         }
@@ -71,10 +74,13 @@ namespace EventbriteDotNetFramework.Entities
             var retVar = false;
             var eb = new EBApi( oAuthToken );
             var cq = eb.GetEventCannedQuestionsById( Id );
-            var test = cq.Questions.FirstOrDefault( q => q.Respondent.Equals( "attendee", StringComparison.CurrentCultureIgnoreCase ) );
-            if ( test == null )
+            if ( cq != null && cq.Questions != null )
             {
-                retVar = true;
+                var test = cq.Questions.FirstOrDefault( q => q.Respondent.Equals( "attendee", StringComparison.CurrentCultureIgnoreCase ) );
+                if ( test == null )
+                {
+                    retVar = true;
+                }
             }
             return retVar;
         }
