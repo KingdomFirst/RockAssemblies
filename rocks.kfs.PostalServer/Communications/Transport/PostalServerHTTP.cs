@@ -45,13 +45,8 @@ namespace rocks.kfs.PostalServer.Communications.Transport
     [TextField( "API Key",
         Description = "The API Key provided by Postal Server API Credentials.",
         IsRequired = true,
-        Order = 3,
+        Order = 1,
         Key = AttributeKey.ApiKey )]
-    [BooleanField( "Track Opens",
-        Description = "Allow Postal Server to track opens, clicks, and unsubscribes.",
-        DefaultValue = "true",
-        Order = 4,
-        Key = AttributeKey.TrackOpens )]
     public class PostalServerHTTP : EmailTransportComponent
     {
         /// <summary>
@@ -59,11 +54,6 @@ namespace rocks.kfs.PostalServer.Communications.Transport
         /// </summary>
         public class AttributeKey
         {
-            /// <summary>
-            /// The track opens
-            /// </summary>
-            public const string TrackOpens = "TrackOpens";
-
             /// <summary>
             /// The API key
             /// </summary>
@@ -76,20 +66,7 @@ namespace rocks.kfs.PostalServer.Communications.Transport
         }
 
         /// <summary>
-        /// Gets a value indicating whether transport has ability to track recipients opening the communication.
-        /// Postal Server automatically tracks opens, clicks, and unsubscribes. Use this to override domain setting.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if transport can track opens; otherwise, <c>false</c>.
-        /// </value>
-        public override bool CanTrackOpens
-        {
-            get { return GetAttributeValue( AttributeKey.TrackOpens ).AsBoolean( true ); }
-        }
-
-        /// <summary>
-        /// Send the implementation specific email. This class will call this method and pass the post processed data in a rock email message which
-        /// can then be used to send the implementation specific message.
+        /// Send the Postal Server specific email. 
         /// </summary>
         /// <param name="rockEmailMessage">The rock email message.</param>
         /// <returns></returns>
@@ -106,23 +83,20 @@ namespace rocks.kfs.PostalServer.Communications.Transport
             string replyTo = null;
             string tag = null;
 
-            // To
-            var toEmail = rockEmailMessage.GetRecipients();
-            toEmail.ForEach( r => toEmailList.Add( r.To ) );
-
             if ( rockEmailMessage.ReplyToEmail.IsNotNullOrWhiteSpace() )
             {
                 replyTo = rockEmailMessage.ReplyToEmail;
             }
 
-            // CC
+            var toEmail = rockEmailMessage.GetRecipients();
+            toEmail.ForEach( r => toEmailList.Add( r.To ) );
+
             var ccEmailAddresses = rockEmailMessage
                 .CCEmails
                 .Where( cc => cc != string.Empty )
                 .Where( cc => !toEmail.Any( te => te.To == cc ) )
                 .ToList();
 
-            // BCC
             var bccEmailAddresses = rockEmailMessage
                 .BCCEmails
                 .Where( bcc => bcc != string.Empty )
@@ -130,18 +104,12 @@ namespace rocks.kfs.PostalServer.Communications.Transport
                 .Where( bcc => !ccEmailAddresses.Contains( bcc ) )
                 .ToList();
 
-            // Communication record for tracking opens & clicks
+            // Tag Communication record for tracking opens & clicks
             if ( rockEmailMessage.MessageMetaData != null && rockEmailMessage.MessageMetaData.Count > 0 )
             {
                 tag = rockEmailMessage.MessageMetaData.Join( "|" );
             }
 
-            if ( CanTrackOpens )
-            {
-                //ToDo, what do we need to do to enable or disable tracking via the api, can we?
-            }
-
-            // Attachments
             if ( rockEmailMessage.Attachments.Any() )
             {
                 foreach ( var attachment in rockEmailMessage.Attachments )
@@ -159,7 +127,6 @@ namespace rocks.kfs.PostalServer.Communications.Transport
                 }
             }
 
-            // Send it
             try
             {
                 var response = client.SendMessage( rockEmailMessage.FromEmail, toEmailList, ccEmailList, bccEmailList, sender, rockEmailMessage.Subject, tag, replyTo, rockEmailMessage.PlainTextMessage, rockEmailMessage.Message, attachments );
