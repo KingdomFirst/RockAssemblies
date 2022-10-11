@@ -26,28 +26,31 @@ using Rock.Attribute;
 using Rock.Communication;
 using Rock.Communication.Transport;
 using Rock.Model;
+using Rock.Web.Cache;
 
-namespace rocks.kfs.PostalServer.Communications.Transport
+namespace rocks.kfs.Edify.Communications.Transport
 {
     /// <summary>
-    /// Used to send communication through Postal Server's HTTP API.
+    /// Used to send communication through Edify's HTTP API.
     /// </summary>
     /// <seealso cref="Rock.Communication.EmailTransportComponent" />
-    [Description( "Sends a communication through Postal Server's HTTP API" )]
+    [Description( "Sends a communication through Edify's HTTP API" )]
     [Export( typeof( TransportComponent ) )]
-    [ExportMetadata( "ComponentName", "Postal Server HTTP" )]
-    [TextField( "Base URL",
-        Description = "The API URL provided by Postal Server, generally the server url you use to login to the Postal Server with '/api/v1' appended.",
+    [ExportMetadata( "ComponentName", "Edify HTTP" )]
+    [DefinedValueField( "Base URL",
+        Description = "The API URL provided by Edify.",
+        DefinedTypeGuid = SystemGuid.BASE_URL_DEFINED_TYPE,
+        DisplayDescription = true,
         IsRequired = true,
-        DefaultValue = @"",
+        DefaultValue = SystemGuid.BASE_URL_SERVER1,
         Order = 0,
         Key = AttributeKey.BaseUrl )]
     [TextField( "API Key",
-        Description = "The API Key provided by Postal Server API Credentials.",
+        Description = "The API Key provided by Edify API Credentials.",
         IsRequired = true,
         Order = 1,
         Key = AttributeKey.ApiKey )]
-    public class PostalServerHTTP : EmailTransportComponent
+    public class EdifyHTTP : EmailTransportComponent
     {
         /// <summary>
         /// Class for storing attribute keys.
@@ -66,13 +69,16 @@ namespace rocks.kfs.PostalServer.Communications.Transport
         }
 
         /// <summary>
-        /// Send the Postal Server specific email. 
+        /// Send the Edify specific email. 
         /// </summary>
         /// <param name="rockEmailMessage">The rock email message.</param>
         /// <returns></returns>
         protected override EmailSendResponse SendEmail( RockEmailMessage rockEmailMessage )
         {
-            var client = new PostalServerDotNet.v1.Client( GetAttributeValue( AttributeKey.BaseUrl ), GetAttributeValue( AttributeKey.ApiKey ) );
+            var selectedBaseUrlGuid = GetAttributeValue( AttributeKey.BaseUrl ).AsGuid();
+            var definedValueBaseUrl = DefinedValueCache.Get( selectedBaseUrlGuid );
+            var baseUrl = $"https://{definedValueBaseUrl.Value}.edify.press/api/v1";
+            var client = new PostalServerDotNet.v1.Client( baseUrl, GetAttributeValue( AttributeKey.ApiKey ) );
 
             var toEmailList = new List<string>();
             var ccEmailList = new List<string>();
