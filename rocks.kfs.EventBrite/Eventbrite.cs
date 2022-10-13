@@ -329,6 +329,10 @@ namespace rocks.kfs.Eventbrite
                     person = MatchOrAddPerson( rockContext, attendee.Profile, connectionStatusId, updatePrimaryEmail, EnableLogging );
                     matchedGroupMember = MatchGroupMember( group.Members, order, person, attendee.Profile, gmPersonAttributeKey, rockContext, EnableLogging );
                 }
+                else
+                {
+                    person = matchedGroupMember.Person;
+                }
                 if ( matchedGroupMember == null && ( order.Status != "deleted" || order.Status != "abandoned" ) )
                 {
                     var member = new GroupMember
