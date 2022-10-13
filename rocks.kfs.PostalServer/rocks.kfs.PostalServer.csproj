@@ -34,14 +34,18 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PostalServerDotNet, Version=1.0.8312.28336, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PostalServerDotNet.1.0.8312.28336\lib\net452\PostalServerDotNet.dll</HintPath>
+    <Reference Include="PostalServerDotNet, Version=1.1.8319.31316, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\PostalServerDotNet.1.1.8319.31316\lib\net452\PostalServerDotNet.dll</HintPath>
     </Reference>
     <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\RestSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Rock">
+    <Reference Include="UAParser, Version=3.1.44.0, Culture=neutral, PublicKeyToken=f7377bf021646069, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\UAParser.dll</HintPath>
+    </Reference>
+	<Reference Include="Rock">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
     </Reference>
@@ -50,7 +54,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
