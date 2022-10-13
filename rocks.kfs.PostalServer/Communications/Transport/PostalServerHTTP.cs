@@ -79,7 +79,7 @@ namespace rocks.kfs.PostalServer.Communications.Transport
             var bccEmailList = new List<string>();
             var attachments = new List<MessageAttachment>();
 
-            string sender = null;
+            string sender = rockEmailMessage.FromEmail;
             string replyTo = null;
             string tag = null;
 

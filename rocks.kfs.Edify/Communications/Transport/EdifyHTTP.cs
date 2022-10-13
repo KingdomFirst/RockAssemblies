@@ -85,7 +85,7 @@ namespace rocks.kfs.Edify.Communications.Transport
             var bccEmailList = new List<string>();
             var attachments = new List<MessageAttachment>();
 
-            string sender = null;
+            string sender = rockEmailMessage.FromEmail;
             string replyTo = null;
             string tag = null;
 
@@ -135,6 +135,7 @@ namespace rocks.kfs.Edify.Communications.Transport
 
             try
             {
+                // Future enhancement possibility to convert Rock HTML Message to a readable Plain Text Message
                 var response = client.SendMessage( rockEmailMessage.FromEmail, toEmailList, ccEmailList, bccEmailList, sender, rockEmailMessage.Subject, tag, replyTo, rockEmailMessage.PlainTextMessage, rockEmailMessage.Message, attachments );
                 return new EmailSendResponse
                 {
