@@ -6,7 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "RockWeb", "RockWeb\", "{E43B5D55-BED0-4E74-BF97-9327F9A9D656}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.2"
-		ProjectReferences = "{00edcb8d-ef33-459c-ad62-02876bd24dff}|DotLiquid.dll;{185a31d7-3037-4dae-8797-0459849a84bd}|Rock.dll;{d6b19c0d-da5e-4f75-8001-04ded86b741f}|Rock.Mailgun.dll;{cf8c694a-55a0-434f-bc96-3450b96ec12a}|Rock.Mandrill.dll;{704740d8-b539-4560-9f8c-681670c9d6ad}|Rock.Migrations.dll;{f3692909-952d-4c4a-b2d2-d90d0083cf53}|Rock.NMI.dll;{a005d091-140e-4ec4-bcdf-cf7d42bb702c}|Rock.PayFlowPro.dll;{add1edd0-a4cb-4e82-b6ad-6ad1d556deae}|Rock.Rest.dll;{6fe0930c-6832-4c2f-8a76-d4e4a2d80ddf}|Rock.Version.dll;{1f5956f2-2b0f-49b8-aaf1-2cc28f01426a}|Rock.SignNow.dll;{69AC175C-3997-4514-8C9E-5D24811928C2}|SignNowSDK.dll;{c1dd2402-5fb2-411e-bf8d-5d9cb3a58e8b}|Rock.Slingshot.dll;{962944DE-8BF4-4175-B55A-E75CF7918272}|Rock.Slingshot.Model.dll;{42edf2dd-5284-4b64-93c3-5186619d2b14}|Rock.StatementGenerator.dll;{5055f482-72c7-4cc9-8ed0-a77090c777db}|Rock.Security.Authentication.Auth0.dll;{515e22e4-4b9b-4886-8477-e5b312b75eb4}|Rock.WebStartup.dll;{94a5f880-31ae-4889-b9be-ba1fdc258e83}|Rock.Checkr.dll;{cadd9206-2c6b-42e4-b20b-2dfc3eb4d6d4}|Rock.DownhillCss.dll;{13711bed-69dd-4182-9bb5-b3c9a4de32df}|Rock.MyWell.dll;{205f439a-2ccc-42c1-b1ab-09e1b629d88c}|Rock.SendGrid.dll;{8ccb8e2a-073c-48cb-b31a-621ec5430a42}|Rock.Oidc.dll;{b62b27c8-1f77-43cf-8ee7-30de7f93facd}|Rock.Update.dll;{bc36cac2-1f25-4190-9297-157ddd2e4960}|cc.newspring.AttendedCheckIn.dll;{e3c37e39-0dae-4826-b38f-eb6a4d23842f}|com.centralaz.RoomManagement.dll;"
+		ProjectReferences = "{00edcb8d-ef33-459c-ad62-02876bd24dff}|DotLiquid.dll;{185a31d7-3037-4dae-8797-0459849a84bd}|Rock.dll;{d6b19c0d-da5e-4f75-8001-04ded86b741f}|Rock.Mailgun.dll;{cf8c694a-55a0-434f-bc96-3450b96ec12a}|Rock.Mandrill.dll;{704740d8-b539-4560-9f8c-681670c9d6ad}|Rock.Migrations.dll;{f3692909-952d-4c4a-b2d2-d90d0083cf53}|Rock.NMI.dll;{a005d091-140e-4ec4-bcdf-cf7d42bb702c}|Rock.PayFlowPro.dll;{add1edd0-a4cb-4e82-b6ad-6ad1d556deae}|Rock.Rest.dll;{6fe0930c-6832-4c2f-8a76-d4e4a2d80ddf}|Rock.Version.dll;{1f5956f2-2b0f-49b8-aaf1-2cc28f01426a}|Rock.SignNow.dll;{69AC175C-3997-4514-8C9E-5D24811928C2}|SignNowSDK.dll;{c1dd2402-5fb2-411e-bf8d-5d9cb3a58e8b}|Rock.Slingshot.dll;{962944DE-8BF4-4175-B55A-E75CF7918272}|Rock.Slingshot.Model.dll;{42edf2dd-5284-4b64-93c3-5186619d2b14}|Rock.StatementGenerator.dll;{5055f482-72c7-4cc9-8ed0-a77090c777db}|Rock.Security.Authentication.Auth0.dll;{515e22e4-4b9b-4886-8477-e5b312b75eb4}|Rock.WebStartup.dll;{94a5f880-31ae-4889-b9be-ba1fdc258e83}|Rock.Checkr.dll;{cadd9206-2c6b-42e4-b20b-2dfc3eb4d6d4}|Rock.DownhillCss.dll;{13711bed-69dd-4182-9bb5-b3c9a4de32df}|Rock.MyWell.dll;{205f439a-2ccc-42c1-b1ab-09e1b629d88c}|Rock.SendGrid.dll;{8ccb8e2a-073c-48cb-b31a-621ec5430a42}|Rock.Oidc.dll;{b62b27c8-1f77-43cf-8ee7-30de7f93facd}|Rock.Update.dll;{bc36cac2-1f25-4190-9297-157ddd2e4960}|cc.newspring.AttendedCheckIn.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_6229"
 		Debug.AspNetCompiler.PhysicalPath = "RockWeb\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_6229\"
@@ -151,11 +151,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Security.External
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Avalanche", "Avalanche\Plugin\Avalanche.csproj", "{DE6B9975-365C-4D0C-8CF9-8B7F5FDCD0D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.centralaz.RoomManagement", "CentralAZ\com.CentralAZ.RoomManagement\com.centralaz.RoomManagement.csproj", "{E3C37E39-0DAE-4826-B38F-EB6A4D23842F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Workflow.Action.Core", "KFSRockAssemblies\rocks.kfs.Workflow.Action.Core\rocks.kfs.Workflow.Action.Core.csproj", "{4CDCD152-1CDA-4A9A-9B22-22AD9316EFB6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.StepsToCare", "KFSRockAssemblies\rocks.kfs.StepsToCare\rocks.kfs.StepsToCare.csproj", "{44B89D21-5AF4-4E89-A49D-31B60EC4AB4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Shortcodes", "KFSRockAssemblies\rocks.kfs.Shortcodes\rocks.kfs.Shortcodes.csproj", "{EA104634-0BAA-402F-B901-E2016990237E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Checkin.PagerEntry", "KFSRockAssemblies\rocks.kfs.Checkin.PagerEntry\rocks.kfs.Checkin.PagerEntry.csproj", "{86F7A34A-D1AF-444D-9245-75760F97D469}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Zoom", "KFSRockAssemblies\rocks.kfs.Zoom\rocks.kfs.Zoom.csproj", "{2E6CA020-205D-4FB8-AD08-91866D653C4B}"
 EndProject
@@ -164,6 +166,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.GroupRoundRobinAssignment", "KFSRockAssemblies\rocks.kfs.GroupRoundRobinAssignment\rocks.kfs.GroupRoundRobinAssignment.csproj", "{E2040E07-572B-4629-8B9F-6B53EC7C077C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.CustomGroupCommunication", "KFSRockAssemblies\rocks.kfs.CustomGroupCommunication\rocks.kfs.CustomGroupCommunication.csproj", "{CB69A1A9-DFD2-40D0-829B-AF9558DEBFD2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Workflow.Action.Communication", "KFSRockAssemblies\rocks.kfs.Workflow.Action.Communication\rocks.kfs.Workflow.Action.Communication.csproj", "{1832B422-27F0-11ED-A261-0242AC120002}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.PostalServer", "KFSRockAssemblies\rocks.kfs.PostalServer\rocks.kfs.PostalServer.csproj", "{0D13E326-BBB8-4834-A5A8-EC0448F0F232}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Edify", "KFSRockAssemblies\rocks.kfs.Edify\rocks.kfs.Edify.csproj", "{9FD4BFBA-B6F2-47CD-A68A-4048687362DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -231,10 +239,6 @@ Global
 		{962944DE-8BF4-4175-B55A-E75CF7918272}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{962944DE-8BF4-4175-B55A-E75CF7918272}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{962944DE-8BF4-4175-B55A-E75CF7918272}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5BC16478-A45D-4F65-87B2-FFD61650D541}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5BC16478-A45D-4F65-87B2-FFD61650D541}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5BC16478-A45D-4F65-87B2-FFD61650D541}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5BC16478-A45D-4F65-87B2-FFD61650D541}.Release|Any CPU.Build.0 = Release|Any CPU
 		{42EDF2DD-5284-4B64-93C3-5186619D2B14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{42EDF2DD-5284-4B64-93C3-5186619D2B14}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42EDF2DD-5284-4B64-93C3-5186619D2B14}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -419,10 +423,6 @@ Global
 		{DE6B9975-365C-4D0C-8CF9-8B7F5FDCD0D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE6B9975-365C-4D0C-8CF9-8B7F5FDCD0D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE6B9975-365C-4D0C-8CF9-8B7F5FDCD0D7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E3C37E39-0DAE-4826-B38F-EB6A4D23842F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E3C37E39-0DAE-4826-B38F-EB6A4D23842F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E3C37E39-0DAE-4826-B38F-EB6A4D23842F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E3C37E39-0DAE-4826-B38F-EB6A4D23842F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4CDCD152-1CDA-4A9A-9B22-22AD9316EFB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4CDCD152-1CDA-4A9A-9B22-22AD9316EFB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CDCD152-1CDA-4A9A-9B22-22AD9316EFB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -431,6 +431,14 @@ Global
 		{44B89D21-5AF4-4E89-A49D-31B60EC4AB4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44B89D21-5AF4-4E89-A49D-31B60EC4AB4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44B89D21-5AF4-4E89-A49D-31B60EC4AB4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA104634-0BAA-402F-B901-E2016990237E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA104634-0BAA-402F-B901-E2016990237E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA104634-0BAA-402F-B901-E2016990237E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA104634-0BAA-402F-B901-E2016990237E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86F7A34A-D1AF-444D-9245-75760F97D469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86F7A34A-D1AF-444D-9245-75760F97D469}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86F7A34A-D1AF-444D-9245-75760F97D469}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86F7A34A-D1AF-444D-9245-75760F97D469}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2E6CA020-205D-4FB8-AD08-91866D653C4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2E6CA020-205D-4FB8-AD08-91866D653C4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E6CA020-205D-4FB8-AD08-91866D653C4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -447,6 +455,18 @@ Global
 		{CB69A1A9-DFD2-40D0-829B-AF9558DEBFD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CB69A1A9-DFD2-40D0-829B-AF9558DEBFD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CB69A1A9-DFD2-40D0-829B-AF9558DEBFD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1832B422-27F0-11ED-A261-0242AC120002}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1832B422-27F0-11ED-A261-0242AC120002}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1832B422-27F0-11ED-A261-0242AC120002}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1832B422-27F0-11ED-A261-0242AC120002}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D13E326-BBB8-4834-A5A8-EC0448F0F232}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D13E326-BBB8-4834-A5A8-EC0448F0F232}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D13E326-BBB8-4834-A5A8-EC0448F0F232}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D13E326-BBB8-4834-A5A8-EC0448F0F232}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FD4BFBA-B6F2-47CD-A68A-4048687362DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FD4BFBA-B6F2-47CD-A68A-4048687362DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FD4BFBA-B6F2-47CD-A68A-4048687362DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FD4BFBA-B6F2-47CD-A68A-4048687362DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
