@@ -488,9 +488,12 @@ namespace com.kfs.Security.ExternalAuthentication
                             person.EmailPreference = EmailPreference.EmailAllowed;
                             person.Gender = Gender.Unknown;
 
-                            var phoneNumber = new PhoneNumber { NumberTypeValueId = phoneNumberTypeId };
-                            person.PhoneNumbers.Add( phoneNumber );
-                            phoneNumber.Number = PhoneNumber.CleanNumber( oauthUser.contact.phone.AsNumeric() );
+                            if ( oauthUser.contact != null && !string.IsNullOrWhiteSpace( oauthUser.contact.phone ) )
+                            {
+                                var phoneNumber = new PhoneNumber { NumberTypeValueId = phoneNumberTypeId };
+                                person.PhoneNumbers.Add( phoneNumber );
+                                phoneNumber.Number = PhoneNumber.CleanNumber( oauthUser.contact.phone.AsNumeric() );
+                            }
 
                             if ( oauthUser.contact != null && !string.IsNullOrWhiteSpace( oauthUser.contact.birthday ) )
                             {
