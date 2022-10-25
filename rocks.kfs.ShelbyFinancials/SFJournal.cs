@@ -180,7 +180,8 @@ namespace rocks.kfs.ShelbyFinancials
                     DepartmentNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Department" ),
                     CreditAccountNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.CreditAccount" ),
                     DebitAccountNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.DebitAccount" ),
-                    AccountSub = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.AccountSub" ),
+                    RevenueAccountSub = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.AccountSub" ),
+                    DebitAccountSub = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.DebitAccountSub" ),
                     Amount = summary.Amount,
                     Project = summary.Project,
                     JournalNumber = financialBatch.Id,
@@ -215,7 +216,7 @@ namespace rocks.kfs.ShelbyFinancials
                     CostCenterNumber = transaction.CostCenterNumber,
                     DepartmentNumber = transaction.DepartmentNumber,
                     AccountNumber = transaction.CreditAccountNumber,
-                    AccountSub = transaction.AccountSub,
+                    AccountSub = transaction.RevenueAccountSub,
                     Amount = transaction.Amount * -1,
                     Project = transaction.Project,
                     JournalNumber = transaction.JournalNumber,
@@ -236,7 +237,7 @@ namespace rocks.kfs.ShelbyFinancials
                     CostCenterNumber = transaction.CostCenterNumber,
                     DepartmentNumber = "0",
                     AccountNumber = transaction.DebitAccountNumber,
-                    AccountSub = transaction.AccountSub,
+                    AccountSub = transaction.DebitAccountSub,
                     Amount = transaction.Amount,
                     Project = transaction.Project,
                     JournalNumber = transaction.JournalNumber,
@@ -713,7 +714,8 @@ namespace rocks.kfs.ShelbyFinancials
             public string DepartmentNumber;
             public string CreditAccountNumber;
             public string DebitAccountNumber;
-            public string AccountSub;
+            public string RevenueAccountSub;
+            public string DebitAccountSub;
             public decimal Amount;
             public string Project;
             public int JournalNumber;
