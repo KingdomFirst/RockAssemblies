@@ -44,6 +44,23 @@ namespace rocks.kfs.ShelbyFinancials.Migrations
             RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Location", "", 10, "", "22699ECA-BB71-4EFD-B416-17B41ED3DBEC", "rocks.kfs.ShelbyFinancials.Location" );
             RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Cost Center", "", 11, "", "CD925E61-F87D-461F-9EFA-C1E14397FC4D", "rocks.kfs.ShelbyFinancials.CostCenter" );
 
+            // set attribute category for new attribute
+
+            Sql( @"
+                    DECLARE @AccountCategoryId int = ( SELECT TOP 1 [Id] FROM [Category] WHERE [Guid] = 'F8893830-B331-4C9F-AA4C-470F0C9B0D18' )
+                    DECLARE @DebitAccountSubAttributeId int = ( SELECT TOP 1 [Id] FROM [Attribute] WHERE [Guid] = '4F1BA61A-31C3-4FD6-9758-E3FE17A2D746' )
+
+                    IF NOT EXISTS (
+                        SELECT *
+                        FROM [AttributeCategory]
+                        WHERE [AttributeId] = @AccountCategoryId
+                        AND [CategoryId] = @DebitAccountSubAttributeId )
+                    BEGIN
+                        INSERT INTO [AttributeCategory] ( [AttributeId], [CategoryId] )
+                        VALUES( @AccountCategoryId, @DebitAccountSubAttributeId )
+                    END
+                " );
+
             // copy values already provided in AccountSub into DebitAccountSub as well to keep previous functionality in tact
             Sql( @"
                 DECLARE @RevAccSubAttrId int = ( SELECT TOP 1 [Id] FROM [Attribute] WHERE [Guid] = '65D935EC-3501-41A6-A2C5-CABC62AB9EF1' )
