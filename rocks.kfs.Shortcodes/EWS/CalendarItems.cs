@@ -267,6 +267,7 @@ namespace rocks.kfs.Shortcodes.EWS
                 try
                 {
                     service.Credentials = oauthCreds;
+
                     //Impersonate the mailbox we want to access.
                     service.ImpersonatedUserId = new ImpersonatedUserId( ConnectingIdType.SmtpAddress, mailbox );
                     service.TraceEnabled = true;
