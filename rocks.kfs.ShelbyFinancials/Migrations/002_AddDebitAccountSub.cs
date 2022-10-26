@@ -53,11 +53,11 @@ namespace rocks.kfs.ShelbyFinancials.Migrations
                     IF NOT EXISTS (
                         SELECT *
                         FROM [AttributeCategory]
-                        WHERE [AttributeId] = @AccountCategoryId
-                        AND [CategoryId] = @DebitAccountSubAttributeId )
+                        WHERE [AttributeId] = @DebitAccountSubAttributeId
+                        AND [CategoryId] = @AccountCategoryId )
                     BEGIN
                         INSERT INTO [AttributeCategory] ( [AttributeId], [CategoryId] )
-                        VALUES( @AccountCategoryId, @DebitAccountSubAttributeId )
+                        VALUES( @DebitAccountSubAttributeId, @AccountCategoryId )
                     END
                 " );
 
