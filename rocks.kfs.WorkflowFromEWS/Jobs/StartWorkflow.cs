@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2019 by Kingdom First Solutions
+// Copyright 2022 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ using System.Text;
 using System.Web;
 
 using Microsoft.Exchange.WebServices.Data;
+using Microsoft.Identity.Client;
 using Quartz;
 
 using Rock;
@@ -34,13 +35,14 @@ using Rock.Web.Cache;
 
 namespace rocks.kfs.WorkflowFromEWS.Jobs
 {
-    [EncryptedTextField( "Username", "The domain\\username or email address for authentication.", order: 0 )]
-    [EncryptedTextField( "Password", isPassword: true, order: 1 )]
-    [TextField( "Email Address", "The email address for the authenticated user to check.", order: 2 )]
-    [UrlLinkField( "Server Url", "", defaultValue: "https://outlook.office365.com/EWS/Exchange.asmx", order: 3 )]
-    [IntegerField( "Max Emails", "The maximum number of emails to process each time the job runs.", defaultValue: 100, order: 4 )]
-    [BooleanField( "Delete Messages", "Each message will be deleted after it is processed.", false, order: 5 )]
-    [BooleanField( "One Workflow Per Conversation", "If a workflow has already been created for a message in this conversation, additional workflows be not created. For example, replies will not activate new workflows.", false, order: 6 )]
+    [EncryptedTextField( "ApplicationId", "The Application (client) ID in Microsoft Azure for the registered application that has access to the target Email Address.", order: 0 )]
+    [EncryptedTextField( "TenantId", "The Directory (tenant) ID in Microsoft Azure for the registered application that has access to the target Email Address.", order: 1 )]
+    [EncryptedTextField( "Application Secret", "The Secret Value in Microsoft Azure for the registered application that has access to the target Email Address.", order: 2 )]
+    [TextField( "Email Address", "The email address for the authenticated user to check.", order: 3 )]
+    [UrlLinkField( "Server Url", "", defaultValue: "https://outlook.office365.com/EWS/Exchange.asmx", order: 4 )]
+    [IntegerField( "Max Emails", "The maximum number of emails to process each time the job runs.", defaultValue: 100, order: 5 )]
+    [BooleanField( "Delete Messages", "Each message will be deleted after it is processed.", false, order: 6 )]
+    [BooleanField( "One Workflow Per Conversation", "If a workflow has already been created for a message in this conversation, additional workflows be not created. For example, replies will not activate new workflows.", false, order: 7 )]
     [WorkflowTypeField( "Workflow Type", "The workflow type to be initiated for each message.", required: true, order: 8 )]
     [KeyValueListField( "Workflow Attributes", "Used to match the email properties to the new workflow.", true, keyPrompt: "Attribute Key", valuePrompt: "Email Property", customValues: "DateReceived^Date Received,FromEmail^From Email,FromName^From Name,Subject^Subject,Body^Body", displayValueFirst: true, order: 9 )]
 
@@ -81,8 +83,9 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
 
                 if ( workflowType != null )
                 {
-                    var username = Encryption.DecryptString( dataMap.GetString( "Username" ) );
-                    var password = Encryption.DecryptString( dataMap.GetString( "Password" ) );
+                    var applicationId = Encryption.DecryptString( dataMap.GetString( "ApplicationId" ) );
+                    var tenantId = Encryption.DecryptString( dataMap.GetString( "TenantId" ) );
+                    var appSecret = Encryption.DecryptString( dataMap.GetString( "ApplicationSecret" ) );
                     var emailAddress = dataMap.GetString( "EmailAddress" );
                     var url = new Uri( dataMap.GetString( "ServerUrl" ) );
                     var maxEmails = dataMap.GetString( "MaxEmails" ).AsInteger();
@@ -100,10 +103,14 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
 
                     try
                     {
+                        var oauthCreds = GetOauthCreds( applicationId, tenantId, appSecret );
                         using ( var rockContext = new RockContext() )
                         {
                             var service = new ExchangeService();
-                            service.Credentials = new WebCredentials( username, password );
+                            service.Credentials = oauthCreds;
+
+                            //Impersonate the mailbox we want to access.
+                            service.ImpersonatedUserId = new ImpersonatedUserId( ConnectingIdType.SmtpAddress, emailAddress );
                             service.TraceEnabled = true;
                             service.TraceFlags = TraceFlags.All;
                             service.Url = url;
@@ -285,6 +292,26 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
             {
                 context.Result = "Valid workflow type guid was not set.";
             }
+        }
+
+
+        private OAuthCredentials GetOauthCreds( string applicationId, string tenantId, string secret )
+        {
+            // Using Microsoft.Identity.Client 4.22.0
+            var cca = ConfidentialClientApplicationBuilder
+            .Create( applicationId )
+            .WithClientSecret( secret )
+            .WithTenantId( tenantId )
+            .Build();
+
+            // The permission scope required for EWS access
+            var ewsScopes = new string[] { "https://outlook.office365.com/.default" };
+
+            //Make the token request
+            var authResult = cca.AcquireTokenForClient( ewsScopes ).ExecuteAsync().Result;
+
+            var oauthCreds = new OAuthCredentials( authResult.AccessToken );
+            return oauthCreds;
         }
     }
 }
