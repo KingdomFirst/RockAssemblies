@@ -27,6 +27,7 @@ using System.Web;
 using DotLiquid;
 using DotLiquid.Util;
 using Microsoft.Exchange.WebServices.Data;
+using Microsoft.Identity.Client;
 using Rock;
 using Rock.Data;
 using Rock.Lava.Shortcodes;
@@ -44,9 +45,10 @@ namespace rocks.kfs.Shortcodes.EWS
         "Retrieves a list of calendar items from a specified Microsoft Exchange shared calendar mailbox.",
         @"<p>The KFS - EWS calendar items shortcode allows you to access calendar items from a specified Microsoft Exchange shared mailbox using the EWS managed API. Below is an example of how to use it.
             </p>
-            <pre>{% assign username = 'Global' | Attribute:'rocks.kfs.EWSUsername' %}
-{% assign password = 'Global' | Attribute:'rocks.kfs.EWSPassword','RawValue' %}
-{[ ewscalendaritems username:'{{ username }}' password:'{{ password }}' calendarmailbox:'kfscalendar@kingdomfirstsolutions.com' ]}
+            <pre>{% assign applicationid = 'Global' | Attribute:'rocks.kfs.EWSAppApplicationId' %}
+{% assign tenantid = 'Global' | Attribute:'rocks.kfs.EWSAppTenantId' %}
+{% assign appsecret = 'Global' | Attribute:'rocks.kfs.EWSAppSecret', 'RawValue' %}
+{[ ewscalendaritems applicationid:'{{ applicationid }}' tenantid:'{{ tenantid }}' appsecret:'{{ appsecret }}' calendarmailbox:'kfscalendar@kingdomfirstsolutions.com' ]}
     {% for calItem in CalendarItems %}
         {{ calItem.Subject }}
         {{ calItem.TextBody }}
@@ -57,8 +59,9 @@ namespace rocks.kfs.Shortcodes.EWS
  {[ endewscalendaritems ]}</pre>
         <p>Below is a list of available parameters.</p>
         <ul>
-            <li><strong>username</strong> REQUIRED - The username of an account on the target Exchange server that has access to the target mailbox. This value can be either encrypted or non-encrypted. It is recommended this value be stored as a global attribute of type EncryptedText and passed to the shortcode directly from the global attribute value for higher security.</li>
-            <li><strong>password</strong> REQUIRED - The password of an account on the target Exchange server that has access to the target mailbox. This value can be either encrypted or non-encrypted. It is recommended this value be stored as a global attribute of type EncryptedText and passed to the shortcode directly from the global attribute value for higher security.</li>
+            <li><strong>applicationid</strong> REQUIRED - The Application (client) ID in Microsoft Azure for the registered application that has access to the target mailbox. This value can be either encrypted or non-encrypted. It is recommended this value be stored in the global attribute EWS Azure Application ID and passed to the shortcode directly from the global attribute value for higher security.</li>
+            <li><strong>tenantid</strong> REQUIRED - The Directory (tenant) ID in Microsoft Azure for the registered application that has access to the target mailbox. This value can be either encrypted or non-encrypted. It is recommended this value be stored in the global attribute EWS Azure Tenant ID and passed to the shortcode directly from the global attribute value for higher security.</li>
+            <li><strong>appsecret</strong> REQUIRED - The Secret Value in Microsoft Azure for the registered application that has access to the target mailbox. This value can be either encrypted or non-encrypted. It is recommended this value be stored in the global attribute EWS Azure Secret and passed to the shortcode directly from the global attribute value for higher security.</li>
             <li><strong>calendarmailbox</strong> REQUIRED - The address of the mailbox for the target calendar.</li>
             <li><strong>serverurl</strong> - The url for the Microsoft Exchange server. Default: https://outlook.office365.com/EWS/Exchange.asmx</li>
             <li><strong>order</strong> - An optional parameter to change the ordering of the returned items based on their Start value. By default items are ordered by Start ascending. Set value to 'desc' will cause the results to be orded by Start descending.</li>
@@ -78,7 +81,7 @@ namespace rocks.kfs.Shortcodes.EWS
             <li><strong>DisplayCc</strong> - A text summarization of the CC recipients.</li>
             <li><strong>IsRecurring</strong> - A boolean indicating if the calendar item is part of a recurring series.</li>
         </ul>",
-        "username,password,calendarmailbox,serverurl,order,daysback,daysforward",
+        "applicationid,tenantid,appsecret,calendarmailbox,serverurl,order,daysback,daysforward",
         "" )]
     public class EWSCalendarItems : RockLavaShortcodeBlockBase
     {
@@ -90,8 +93,9 @@ namespace rocks.kfs.Shortcodes.EWS
         string _tagName = "ewscalendaritems";
 
         // Keys
-        const string EWS_USERNAME = "username";
-        const string EWS_PASSWORD = "password";
+        const string EWS_APPID = "applicationid";
+        const string EWS_TENANTID = "tenantid";
+        const string EWS_APPSECRET = "appsecret";
         const string SERVER_URL = "serverurl";
         const string CALENDAR_MAILBOX = "calendarmailbox";
         const string ORDER = "order";
@@ -191,6 +195,7 @@ namespace rocks.kfs.Shortcodes.EWS
         public override void Render( Context context, TextWriter result )
         {
             var rockContext = new RockContext();
+            ExchangeCredentials oauthCreds = null;
 
             // Get enabled security commands
             if ( context.Registers.ContainsKey( "EnabledCommands" ) )
@@ -205,22 +210,43 @@ namespace rocks.kfs.Shortcodes.EWS
                 base.Render( context, writer );
 
                 var parms = ParseMarkup( _markup, context );
-                string username;
-                string password;
-                var rawUsername = username = parms[EWS_USERNAME];
-                var rawPassword = password = parms[EWS_PASSWORD];
-                var decryptedUn = Encryption.DecryptString( rawUsername );
-                var decryptedPw = Encryption.DecryptString( rawPassword );
-                if ( !string.IsNullOrWhiteSpace( decryptedUn ) )
-                {
-                    username = decryptedUn;
-                }
-                if ( !string.IsNullOrWhiteSpace( decryptedPw ) )
-                {
-                    password = decryptedPw;
-                }
-                var order = parms[ORDER];
                 var mailbox = parms[CALENDAR_MAILBOX];
+
+                string applicationId;
+                string tenantId;
+                string appSecret;
+                var rawApplicationId = applicationId = parms[EWS_APPID];
+                var rawTenantId = tenantId = parms[EWS_TENANTID];
+                var rawAppSecret = appSecret = parms[EWS_APPSECRET];
+                var decryptedAppId = Encryption.DecryptString( rawApplicationId );
+                var decryptedTenantId = Encryption.DecryptString( rawTenantId );
+                var decryptedSecret = Encryption.DecryptString( rawAppSecret );
+                if ( !string.IsNullOrWhiteSpace( decryptedAppId ) )
+                {
+                    applicationId = decryptedAppId;
+                }
+                if ( !string.IsNullOrWhiteSpace( decryptedTenantId ) )
+                {
+                    tenantId = decryptedTenantId;
+                }
+                if ( !string.IsNullOrWhiteSpace( decryptedSecret ) )
+                {
+                    appSecret = decryptedSecret;
+                }
+                if ( string.IsNullOrWhiteSpace( applicationId ) || string.IsNullOrWhiteSpace( tenantId ) || string.IsNullOrWhiteSpace( appSecret ) || string.IsNullOrWhiteSpace( mailbox ) )
+                {
+                    return;
+                }
+                else
+                {
+                    oauthCreds = GetOauthCreds( applicationId, tenantId, appSecret, result );
+                    if ( oauthCreds == null )
+                    {
+                        return;
+                    }
+                }
+
+                var order = parms[ORDER];
                 var url = parms[SERVER_URL];
                 var daysBack = parms[DAYS_BACK].AsIntegerOrNull();
                 var daysForward = parms[DAYS_FORWARD].AsIntegerOrNull();
@@ -235,17 +261,15 @@ namespace rocks.kfs.Shortcodes.EWS
                     endDate = now.Date.AddDays( daysForward.Value + 1 ).AddMilliseconds( -1 );
                 }
 
-                if ( string.IsNullOrWhiteSpace( username ) || string.IsNullOrWhiteSpace( password ) || string.IsNullOrWhiteSpace( mailbox ) )
-                {
-                    return;
-                }
-
                 var calendarItems = new List<CalendarItemResult>();
                 var service = new ExchangeService();
 
                 try
                 {
-                    service.Credentials = new WebCredentials( username, password );
+                    service.Credentials = oauthCreds;
+
+                    //Impersonate the mailbox we want to access.
+                    service.ImpersonatedUserId = new ImpersonatedUserId( ConnectingIdType.SmtpAddress, mailbox );
                     service.TraceEnabled = true;
                     service.TraceFlags = TraceFlags.All;
                     service.Url = new Uri( url );
@@ -310,6 +334,34 @@ namespace rocks.kfs.Shortcodes.EWS
             }
         }
 
+        private OAuthCredentials GetOauthCreds( string applicationId, string tenantId, string secret, TextWriter result )
+        {
+            try
+            {
+                // Using Microsoft.Identity.Client 4.22.0
+                var cca = ConfidentialClientApplicationBuilder
+                .Create( applicationId )
+                .WithClientSecret( secret )
+                .WithTenantId( tenantId )
+                .Build();
+
+                // The permission scope required for EWS access
+                var ewsScopes = new string[] { "https://outlook.office365.com/.default" };
+
+                //Make the token request
+                var authResult = cca.AcquireTokenForClient( ewsScopes ).ExecuteAsync().Result;
+
+                var oauthCreds = new OAuthCredentials( authResult.AccessToken );
+                return oauthCreds;
+            }
+            catch ( Exception ex )
+            {
+                ExceptionLogService.LogException( ex, HttpContext.Current );
+                result.Write( string.Format( "<div class='alert alert-warning'>{0}</div>", ex.Message ) );
+                return null;
+            }
+        }
+
         /// <summary>
         /// Parses the markup.
         /// </summary>
@@ -341,8 +393,9 @@ namespace rocks.kfs.Shortcodes.EWS
             var resolvedMarkup = markup.ResolveMergeFields( internalMergeFields );
 
             var parms = new Dictionary<string, string>();
-            parms.Add( EWS_USERNAME, "" );
-            parms.Add( EWS_PASSWORD, "" );
+            parms.Add( EWS_APPID, "" );
+            parms.Add( EWS_TENANTID, "" );
+            parms.Add( EWS_APPSECRET, "" );
             parms.Add( SERVER_URL, "https://outlook.office365.com/EWS/Exchange.asmx" );
             parms.Add( CALENDAR_MAILBOX, "" );
             parms.Add( ORDER, "" );
