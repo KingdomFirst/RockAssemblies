@@ -465,13 +465,6 @@ Global
 		{779475E3-F5F7-4F5D-9641-3A0A543EBE12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{779475E3-F5F7-4F5D-9641-3A0A543EBE12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{779475E3-F5F7-4F5D-9641-3A0A543EBE12}.Release|Any CPU.Build.0 = Release|Any CPU
-<<<<<<< HEAD
-=======
-		{DE6B9975-365C-4D0C-8CF9-8B7F5FDCD0D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DE6B9975-365C-4D0C-8CF9-8B7F5FDCD0D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DE6B9975-365C-4D0C-8CF9-8B7F5FDCD0D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DE6B9975-365C-4D0C-8CF9-8B7F5FDCD0D7}.Release|Any CPU.Build.0 = Release|Any CPU
->>>>>>> b5bc059 (Merge pull request #97 from KingdomFirst/feature/nbh-postalserver-transportcomponent)
 		{4CDCD152-1CDA-4A9A-9B22-22AD9316EFB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4CDCD152-1CDA-4A9A-9B22-22AD9316EFB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CDCD152-1CDA-4A9A-9B22-22AD9316EFB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -480,12 +473,6 @@ Global
 		{44B89D21-5AF4-4E89-A49D-31B60EC4AB4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44B89D21-5AF4-4E89-A49D-31B60EC4AB4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44B89D21-5AF4-4E89-A49D-31B60EC4AB4D}.Release|Any CPU.Build.0 = Release|Any CPU
-<<<<<<< HEAD
-		{B710207F-009F-4DDE-B74A-D08925F3BF42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B710207F-009F-4DDE-B74A-D08925F3BF42}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B710207F-009F-4DDE-B74A-D08925F3BF42}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B710207F-009F-4DDE-B74A-D08925F3BF42}.Release|Any CPU.Build.0 = Release|Any CPU
-=======
 		{EA104634-0BAA-402F-B901-E2016990237E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EA104634-0BAA-402F-B901-E2016990237E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA104634-0BAA-402F-B901-E2016990237E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -494,7 +481,6 @@ Global
 		{86F7A34A-D1AF-444D-9245-75760F97D469}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86F7A34A-D1AF-444D-9245-75760F97D469}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86F7A34A-D1AF-444D-9245-75760F97D469}.Release|Any CPU.Build.0 = Release|Any CPU
->>>>>>> b5bc059 (Merge pull request #97 from KingdomFirst/feature/nbh-postalserver-transportcomponent)
 		{2E6CA020-205D-4FB8-AD08-91866D653C4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2E6CA020-205D-4FB8-AD08-91866D653C4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E6CA020-205D-4FB8-AD08-91866D653C4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
