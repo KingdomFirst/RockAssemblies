@@ -395,6 +395,7 @@ namespace rocks.kfs.Shortcodes.EWS
             var parms = new Dictionary<string, string>();
             parms.Add( EWS_APPID, "" );
             parms.Add( EWS_TENANTID, "" );
+            parms.Add( EWS_APPSECRET, "" );
             parms.Add( SERVER_URL, "https://outlook.office365.com/EWS/Exchange.asmx" );
             parms.Add( CALENDAR_MAILBOX, "" );
             parms.Add( ORDER, "" );
