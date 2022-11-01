@@ -86,6 +86,10 @@ namespace rocks.kfs.Edify.Communications.Transport
             var attachments = new List<MessageAttachment>();
 
             string sender = rockEmailMessage.FromEmail;
+            if ( rockEmailMessage.FromName.IsNotNullOrWhiteSpace() && rockEmailMessage.FromName != rockEmailMessage.FromEmail )
+            {
+                sender = $"{rockEmailMessage.FromName} <{rockEmailMessage.FromEmail}>";
+            }
             string replyTo = null;
             string tag = null;
 
@@ -136,7 +140,7 @@ namespace rocks.kfs.Edify.Communications.Transport
             try
             {
                 // Future enhancement possibility to convert Rock HTML Message to a readable Plain Text Message
-                var response = client.SendMessage( rockEmailMessage.FromEmail, toEmailList, ccEmailList, bccEmailList, sender, rockEmailMessage.Subject, tag, replyTo, rockEmailMessage.PlainTextMessage, rockEmailMessage.Message, attachments );
+                var response = client.SendMessage( sender, toEmailList, ccEmailList, bccEmailList, sender, rockEmailMessage.Subject, tag, replyTo, rockEmailMessage.PlainTextMessage, rockEmailMessage.Message, attachments );
                 return new EmailSendResponse
                 {
                     Status = response.Status == "success" ? CommunicationRecipientStatus.Delivered : CommunicationRecipientStatus.Failed,
