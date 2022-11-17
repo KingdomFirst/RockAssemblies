@@ -45,9 +45,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
     </Reference>
-    <Reference Include="SimpleTextingDotNet, Version=1.0.8343.27917, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\RockWeb\Bin\SimpleTextingDotNet.dll</HintPath>
+    <Reference Include="SimpleTextingDotNet, Version=1.0.8354.33013, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\SimpleTextingDotNet.1.0.8354.33013\lib\net452\SimpleTextingDotNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -70,8 +69,6 @@
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y /R "$(TargetPath)" "$(SolutionDir)RockWeb\bin"
 xcopy /Y /R "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)RockWeb\bin"
-xcopy /Y /R "$(ProjectDir)bin\Debug\SimpleTextingDotNet.dll" "$(SolutionDir)RockWeb\bin"
-xcopy /Y /R "$(ProjectDir)bin\Debug\SimpleTextingDotNet.pdb" "$(SolutionDir)RockWeb\bin"
-</PostBuildEvent>
+xcopy /Y /R "$(ProjectDir)bin\Debug\SimpleTextingDotNet.dll" "$(SolutionDir)RockWeb\bin"</PostBuildEvent>
   </PropertyGroup>
 </Project>
