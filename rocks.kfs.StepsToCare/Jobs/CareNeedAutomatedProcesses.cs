@@ -542,7 +542,7 @@ namespace rocks.kfs.StepsToCare.Jobs
 
             foreach ( var careNeed in unassignedCareNeeds )
             {
-                CareUtilities.AutoAssignWorkers( careNeed, autoAssignWorker: autoAssignWorker, autoAssignWorkerGeofence: autoAssignWorkerGeofence, loadBalanceType: loadBalanceType, enableLogging: enableLogging, leaderRoleGuid: leaderRoleGuid );
+                CareUtilities.AutoAssignWorkers( careNeed, careNeed.WorkersOnly, autoAssignWorker: autoAssignWorker, autoAssignWorkerGeofence: autoAssignWorkerGeofence, loadBalanceType: loadBalanceType, enableLogging: enableLogging, leaderRoleGuid: leaderRoleGuid );
 
                 if ( careNeed.ChildNeeds != null && careNeed.ChildNeeds.Any() )
                 {
@@ -556,7 +556,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                         }
                         else
                         {
-                            CareUtilities.AutoAssignWorkers( need, adultFamilyWorkers == "Workers Only", autoAssignWorker: autoAssignWorker, autoAssignWorkerGeofence: autoAssignWorkerGeofence, loadBalanceType: loadBalanceType, enableLogging: enableLogging, leaderRoleGuid: leaderRoleGuid );
+                            CareUtilities.AutoAssignWorkers( need, adultFamilyWorkers == "Workers Only" || careNeed.WorkersOnly, autoAssignWorker: autoAssignWorker, autoAssignWorkerGeofence: autoAssignWorkerGeofence, loadBalanceType: loadBalanceType, enableLogging: enableLogging, leaderRoleGuid: leaderRoleGuid );
                         }
                     }
                 }
