@@ -48,7 +48,7 @@ namespace rocks.kfs.Shortcodes.EWS
             <pre>{% assign applicationid = 'Global' | Attribute:'rocks.kfs.EWSAppApplicationId' %}
 {% assign tenantid = 'Global' | Attribute:'rocks.kfs.EWSAppTenantId' %}
 {% assign appsecret = 'Global' | Attribute:'rocks.kfs.EWSAppSecret', 'RawValue' %}
-{[ ewscalendaritems applicationid:'{{ applicationid }}' tenantid:'{{ tenantid }}' appsecret:'{{ appsecret }}' calendarmailbox:'kfscalendar@kingdomfirstsolutions.com' ]}
+{[ ewscalendaritems applicationid:'{{ applicationid }}' tenantid:'{{ tenantid }}' appsecret:'{{ appsecret }}' calendarmailbox:'example@kingdomfirstsolutions.com' impersonate:'user@kingdomfirstsolutions.com' ]}
     {% for calItem in CalendarItems %}
         {{ calItem.Subject }}
         {{ calItem.TextBody }}
@@ -63,6 +63,7 @@ namespace rocks.kfs.Shortcodes.EWS
             <li><strong>tenantid</strong> REQUIRED - The Directory (tenant) ID in Microsoft Azure for the registered application that has access to the target mailbox. This value can be either encrypted or non-encrypted. It is recommended this value be stored in the global attribute EWS Azure Tenant ID and passed to the shortcode directly from the global attribute value for higher security.</li>
             <li><strong>appsecret</strong> REQUIRED - The Secret Value in Microsoft Azure for the registered application that has access to the target mailbox. This value can be either encrypted or non-encrypted. It is recommended this value be stored in the global attribute EWS Azure Secret and passed to the shortcode directly from the global attribute value for higher security.</li>
             <li><strong>calendarmailbox</strong> REQUIRED - The address of the mailbox for the target calendar.</li>
+            <li><strong>impersonate</strong> The user account to impersonate that has access to the calendarmailbox. If not provided, the calendarmailbox address will be used.</li>
             <li><strong>serverurl</strong> - The url for the Microsoft Exchange server. Default: https://outlook.office365.com/EWS/Exchange.asmx</li>
             <li><strong>order</strong> - An optional parameter to change the ordering of the returned items based on their Start value. By default items are ordered by Start ascending. Set value to 'desc' will cause the results to be orded by Start descending.</li>
             <li><strong>daysback</strong> (0)- The number of days to look back to find calendar items.</li>
@@ -81,7 +82,7 @@ namespace rocks.kfs.Shortcodes.EWS
             <li><strong>DisplayCc</strong> - A text summarization of the CC recipients.</li>
             <li><strong>IsRecurring</strong> - A boolean indicating if the calendar item is part of a recurring series.</li>
         </ul>",
-        "applicationid,tenantid,appsecret,calendarmailbox,serverurl,order,daysback,daysforward",
+        "applicationid,tenantid,appsecret,calendarmailbox,impersonate,serverurl,order,daysback,daysforward",
         "" )]
     public class EWSCalendarItems : RockLavaShortcodeBlockBase
     {
@@ -98,6 +99,7 @@ namespace rocks.kfs.Shortcodes.EWS
         const string EWS_APPSECRET = "appsecret";
         const string SERVER_URL = "serverurl";
         const string CALENDAR_MAILBOX = "calendarmailbox";
+        const string IMPERSONATE = "impersonate";
         const string ORDER = "order";
         const string DAYS_BACK = "daysback";
         const string DAYS_FORWARD = "daysforward";
@@ -211,6 +213,11 @@ namespace rocks.kfs.Shortcodes.EWS
 
                 var parms = ParseMarkup( _markup, context );
                 var mailbox = parms[CALENDAR_MAILBOX];
+                var impersonate = parms[IMPERSONATE];
+                if ( impersonate.IsNullOrWhiteSpace() )
+                {
+                    impersonate = mailbox;
+                }
 
                 string applicationId;
                 string tenantId;
@@ -269,7 +276,7 @@ namespace rocks.kfs.Shortcodes.EWS
                     service.Credentials = oauthCreds;
 
                     //Impersonate the mailbox we want to access.
-                    service.ImpersonatedUserId = new ImpersonatedUserId( ConnectingIdType.SmtpAddress, mailbox );
+                    service.ImpersonatedUserId = new ImpersonatedUserId( ConnectingIdType.SmtpAddress, impersonate );
                     service.TraceEnabled = true;
                     service.TraceFlags = TraceFlags.All;
                     service.Url = new Uri( url );
