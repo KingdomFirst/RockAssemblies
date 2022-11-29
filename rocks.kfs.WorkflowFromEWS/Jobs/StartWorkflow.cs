@@ -39,12 +39,13 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
     [EncryptedTextField( "TenantId", "The Directory (tenant) ID in Microsoft Azure for the registered application that has access to the target Email Address.", order: 1 )]
     [EncryptedTextField( "Application Secret", "The Secret Value in Microsoft Azure for the registered application that has access to the target Email Address.", order: 2 )]
     [TextField( "Email Address", "The email address for the authenticated user to check.", order: 3 )]
-    [UrlLinkField( "Server Url", "", defaultValue: "https://outlook.office365.com/EWS/Exchange.asmx", order: 4 )]
-    [IntegerField( "Max Emails", "The maximum number of emails to process each time the job runs.", defaultValue: 100, order: 5 )]
-    [BooleanField( "Delete Messages", "Each message will be deleted after it is processed.", false, order: 6 )]
-    [BooleanField( "One Workflow Per Conversation", "If a workflow has already been created for a message in this conversation, additional workflows be not created. For example, replies will not activate new workflows.", false, order: 7 )]
-    [WorkflowTypeField( "Workflow Type", "The workflow type to be initiated for each message.", required: true, order: 8 )]
-    [KeyValueListField( "Workflow Attributes", "Used to match the email properties to the new workflow.", true, keyPrompt: "Attribute Key", valuePrompt: "Email Property", customValues: "DateReceived^Date Received,FromEmail^From Email,FromName^From Name,Subject^Subject,Body^Body", displayValueFirst: true, order: 9 )]
+    [TextField( "Impersonate User", "The email address of the account to use for impersonation. This account must have access to the inbox provided in the Email Address setting. If left blank, the Email Address will be used.", order: 4 )]
+    [UrlLinkField( "Server Url", "", defaultValue: "https://outlook.office365.com/EWS/Exchange.asmx", order: 5 )]
+    [IntegerField( "Max Emails", "The maximum number of emails to process each time the job runs.", defaultValue: 100, order: 6 )]
+    [BooleanField( "Delete Messages", "Each message will be deleted after it is processed.", false, order: 7 )]
+    [BooleanField( "One Workflow Per Conversation", "If a workflow has already been created for a message in this conversation, additional workflows be not created. For example, replies will not activate new workflows.", false, order: 8 )]
+    [WorkflowTypeField( "Workflow Type", "The workflow type to be initiated for each message.", required: true, order: 9 )]
+    [KeyValueListField( "Workflow Attributes", "Used to match the email properties to the new workflow.", true, keyPrompt: "Attribute Key", valuePrompt: "Email Property", customValues: "DateReceived^Date Received,FromEmail^From Email,FromName^From Name,Subject^Subject,Body^Body", displayValueFirst: true, order: 10 )]
 
     /// <summary>
     /// Job to create workflow using Exchange Web Services.
@@ -87,6 +88,11 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                     var tenantId = Encryption.DecryptString( dataMap.GetString( "TenantId" ) );
                     var appSecret = Encryption.DecryptString( dataMap.GetString( "ApplicationSecret" ) );
                     var emailAddress = dataMap.GetString( "EmailAddress" );
+                    var impersonate = dataMap.GetString( "ImpersonateUser" );
+                    if ( impersonate.IsNullOrWhiteSpace() )
+                    {
+                        impersonate = emailAddress;
+                    }
                     var url = new Uri( dataMap.GetString( "ServerUrl" ) );
                     var maxEmails = dataMap.GetString( "MaxEmails" ).AsInteger();
                     var delete = dataMap.GetString( "DeleteMessages" ).AsBoolean();
@@ -110,7 +116,7 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                             service.Credentials = oauthCreds;
 
                             //Impersonate the mailbox we want to access.
-                            service.ImpersonatedUserId = new ImpersonatedUserId( ConnectingIdType.SmtpAddress, emailAddress );
+                            service.ImpersonatedUserId = new ImpersonatedUserId( ConnectingIdType.SmtpAddress, impersonate );
                             service.TraceEnabled = true;
                             service.TraceFlags = TraceFlags.All;
                             service.Url = url;
