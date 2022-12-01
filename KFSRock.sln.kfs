@@ -173,6 +173,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.PostalServer", "K
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Edify", "KFSRockAssemblies\rocks.kfs.Edify\rocks.kfs.Edify.csproj", "{9FD4BFBA-B6F2-47CD-A68A-4048687362DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.SimpleTexting", "KFSRockAssemblies\rocks.kfs.SimpleTexting\rocks.kfs.SimpleTexting.csproj", "{63F45FC6-C6C8-4D27-8C5C-67C7563E85A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -467,6 +469,10 @@ Global
 		{9FD4BFBA-B6F2-47CD-A68A-4048687362DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FD4BFBA-B6F2-47CD-A68A-4048687362DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FD4BFBA-B6F2-47CD-A68A-4048687362DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63F45FC6-C6C8-4D27-8C5C-67C7563E85A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63F45FC6-C6C8-4D27-8C5C-67C7563E85A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63F45FC6-C6C8-4D27-8C5C-67C7563E85A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63F45FC6-C6C8-4D27-8C5C-67C7563E85A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
