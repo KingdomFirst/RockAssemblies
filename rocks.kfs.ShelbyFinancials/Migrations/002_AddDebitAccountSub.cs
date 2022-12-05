@@ -67,6 +67,17 @@ namespace rocks.kfs.ShelbyFinancials.Migrations
                 DECLARE @DebAccSubAttrId int = ( SELECT TOP 1 [Id] FROM [Attribute] WHERE [Guid] = '4F1BA61A-31C3-4FD6-9758-E3FE17A2D746' )
 
                 INSERT INTO [AttributeValue]
+                   ([IsSystem]
+                   ,[AttributeId]
+                   ,[EntityId]
+                   ,[Value]
+                   ,[Guid]
+                   ,[CreatedDateTime]
+                   ,[ModifiedDateTime]
+                   ,[CreatedByPersonAliasId]
+                   ,[ModifiedByPersonAliasId]
+                   ,[ValueAsNumeric])
+
                 SELECT AV.[IsSystem], 
                     @DebAccSubAttrId, 
                     AV.[EntityId], 
@@ -76,10 +87,6 @@ namespace rocks.kfs.ShelbyFinancials.Migrations
                     AV.[ModifiedDateTime], 
                     AV.[CreatedByPersonAliasId],
                     AV.[ModifiedByPersonAliasId],
-                    NULL,
-                    NULL,
-                    NULL,
-                    NULL,
                     AV.[ValueAsNumeric]
                 FROM AttributeValue AV WITH(NOLOCK)
                 LEFT JOIN AttributeValue AV2 WITH(NOLOCK) ON AV.EntityId = AV2.EntityId AND AV2.AttributeId = @DebAccSubAttrId 
