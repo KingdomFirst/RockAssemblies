@@ -133,12 +133,20 @@ namespace rocks.kfs.PostalServer.Communications.Transport
 
             try
             {
-                var response = client.SendMessage( sender, toEmailList, ccEmailList, bccEmailList, sender, rockEmailMessage.Subject, tag, replyTo, rockEmailMessage.PlainTextMessage, rockEmailMessage.Message, attachments );
-                return new EmailSendResponse
+                if ( toEmailList.Any( e => e.Trim() != "" ) || ccEmailList.Any( e => e.Trim() != "" ) || bccEmailList.Any( e => e.Trim() != "" ) )
                 {
-                    Status = response.Status == "success" ? CommunicationRecipientStatus.Delivered : CommunicationRecipientStatus.Failed,
-                    StatusNote = "Message Sent"
-                };
+                    // Future enhancement possibility to convert Rock HTML Message to a readable Plain Text Message
+                    var response = client.SendMessage( sender, toEmailList, ccEmailList, bccEmailList, sender, rockEmailMessage.Subject, tag, replyTo, ( !attachments.Any() ) ? rockEmailMessage.PlainTextMessage : "", rockEmailMessage.Message, attachments );
+                    return new EmailSendResponse
+                    {
+                        Status = response.Status == "success" ? CommunicationRecipientStatus.Delivered : CommunicationRecipientStatus.Failed,
+                        StatusNote = "Message Sent"
+                    };
+                }
+                else
+                {
+                    throw new Exception( "No Recipients found for this message." );
+                }
             }
             catch ( Exception e )
             {
