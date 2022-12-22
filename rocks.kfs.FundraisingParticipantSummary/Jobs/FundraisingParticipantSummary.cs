@@ -64,7 +64,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
         Key = AttributeKey.SendZeroDonations )]
 
     [BooleanField( "Verbose Logging",
-        Description = "Enable verbose Logging to help in determining issues with adding needs or auto assigning workers. Not recommended for normal use.",
+        Description = "Enable verbose Logging to help in troubleshooting errors with obscure traceability. Not recommended for normal use.",
         DefaultBooleanValue = false,
         Key = AttributeKey.VerboseLogging )]
     [DisallowConcurrentExecution]
