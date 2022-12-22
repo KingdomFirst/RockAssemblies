@@ -25,6 +25,7 @@ using Rock;
 using Rock.Attribute;
 using Rock.Communication;
 using Rock.Data;
+using Rock.Jobs;
 using Rock.Model;
 using Rock.Web.Cache;
 
@@ -262,8 +263,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
 
                             if ( errors.Any() )
                             {
-                                errorCount += errors.Count;
-                                errorMessages.AddRange( errors );
+                                errors.ForEach( e => { emailSendErrorMessages.Add( $"{e} - {groupMember.Person.FullName}" ); } );
                             }
                             else
                             {
@@ -274,25 +274,45 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                     }
                     else if ( !disablePublicContributionRequests )
                     {
-                        errorCount += 1;
-                        errorMessages.Add( string.Format( "No email specified for {0}.", groupMember.Person.FullName ) );
+                        generalErrorMessages.Add( string.Format( "No email specified for {0}.", groupMember.Person.FullName ) );
                     }
                     LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Finish processing group member.", enableLogging );
                 }
             }
-            context.Result = string.Format( "{0} emails sent", groupMemberEmails );
-            if ( errorMessages.Any() )
+            context.Result = $"{groupMemberEmails} Email{(groupMemberEmails == 1 ? string.Empty:"s")} sent.";
+
+            if ( emailSendErrorMessages.Any() || generalErrorMessages.Any() )
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine();
-                sb.Append( string.Format( "{0} Errors: ", errorCount ) );
-                errorMessages.ForEach( e => { sb.AppendLine(); sb.Append( e ); } );
-                string errors = sb.ToString();
-                context.Result += errors;
-                var exception = new Exception( errors );
+                List<string> errorsCombined = new List<string>();
+                errorsCombined.AddRange( generalErrorMessages );
+                errorsCombined.AddRange( emailSendErrorMessages );
+
+                StringBuilder sbException = new StringBuilder();
+                sbException.Append( $"{errorsCombined.Count()} Error{( errorsCombined.Count() == 1 ? string.Empty : "s" )}:" );
+                errorsCombined.ForEach( e => { sbException.AppendLine(); sbException.Append( e ); } );
+                string exceptionString = sbException.ToString();
+                var exception = new Exception( exceptionString );
                 HttpContext context2 = HttpContext.Current;
                 ExceptionLogService.LogException( exception, context2 );
-                throw exception;
+                if ( emailSendErrorMessages.Any() && groupMemberEmails == 0 )
+                {
+                    throw exception;
+                }
+                else
+                {
+                    // Build string for result display
+                    var icon = "<i class='fa fa-circle text-danger'></i>";
+                    StringBuilder sbErrors = new StringBuilder();
+                    sbErrors.AppendLine();
+                    sbErrors.Append( $"{errorsCombined.Count()} Error{( errorsCombined.Count() == 1 ? string.Empty : "s" )}:" );
+                    errorsCombined.ForEach( e => { sbErrors.AppendLine(); sbErrors.Append( $"{icon} {e}" ); } );
+                    string errors = sbErrors.ToString();
+                    context.Result += errors;
+                    var ex = new AggregateException( "Fundraising Participant Summary completed with errors.", exception );
+                    throw new RockJobWarningException( "Fundraising Participant Summary completed with errors.", ex );
+                }
+            }
+        }
 
         private static ServiceLog LogEvent( RockContext rockContext, string type, string input, string result, bool enableLogging = false )
         {
