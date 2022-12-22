@@ -33,19 +33,54 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
     /// <summary>
     /// Job to send fundraising participant summary emails with donations since the last run of the job.
     /// </summary>
-    [SystemCommunicationField( "System Communication", "The system communication to use when sending the fundraising participant summary email.", true, "553B6FCA-9AFF-4618-BDE9-FF41A1EC689E", "" )]
-    [GroupTypesField( "Group Types", "Use this setting to send the fundraising participant summary email to entire GroupType(s).", false, "", "" )]
-    [GroupField( "Group", "Use this setting to send the fundraising participant summary email to a specific Group and its child Groups.", false )]
-    [BooleanField( "Show Address", "Determines if the Address column should be displayed in the Contributions List. (Sent to lava, has to be handled in lava display).", true )]
-    [BooleanField( "Show Amount", "Determines if the Amount column should be displayed in the Contributions List. (Sent to lava, has to be handled in lava display).", true )]
-    [BooleanField( "Send Emails with Zero Donations", "Should the emails to the group members still be sent if they had 0 donations in the time period? The time period for this job is anything since it last ran.", false )]
+    [SystemCommunicationField( "System Communication",
+        Description = "The system communication to use when sending the fundraising participant summary email.",
+        IsRequired = true,
+        DefaultSystemCommunicationGuid = "553B6FCA-9AFF-4618-BDE9-FF41A1EC689E",
+        Key = AttributeKey.SystemCommunication )]
+
+    [GroupTypesField( "Group Types",
+        Description = "Use this setting to send the fundraising participant summary email to entire GroupType(s).",
+        Key = AttributeKey.GroupTypes )]
+
+    [GroupField( "Group",
+        Description = "Use this setting to send the fundraising participant summary email to a specific Group and its child Groups.",
+        Key = AttributeKey.Group )]
+
+    [BooleanField( "Show Address",
+        Description = "Determines if the Address column should be displayed in the Contributions List. (Sent to lava, has to be handled in lava display).",
+        DefaultBooleanValue = true,
+        Key = AttributeKey.ShowAddress )]
+
+    [BooleanField( "Show Amount",
+        Description = "Determines if the Amount column should be displayed in the Contributions List. (Sent to lava, has to be handled in lava display).",
+        DefaultBooleanValue = true,
+        Key = AttributeKey.ShowAmount )]
+
+    [BooleanField( "Send Emails with Zero Donations",
+        Description = "Should the emails to the group members still be sent if they had 0 donations in the time period? The time period for this job is anything since it last ran.",
+        DefaultBooleanValue = false,
+        Key = AttributeKey.SendZeroDonations )]
     [DisallowConcurrentExecution]
     public class FundraisingParticipantSummary : IJob
     {
-        private int groupMemberEmails = 0;
-        private int errorCount = 0;
+        /// <summary>
+        /// Attribute Keys
+        /// </summary>
+        private static class AttributeKey
+        {
+            public const string SystemCommunication = "SystemCommunication";
+            public const string GroupTypes = "GroupTypes";
+            public const string Group = "Group";
+            public const string ShowAddress = "ShowAddress";
+            public const string ShowAmount = "ShowAmount";
+            public const string SendZeroDonations = "SendEmailswithZeroDonations";
+        }
 
-        private List<string> errorMessages = new List<string>();
+        private int groupMemberEmails = 0;
+
+        private List<string> emailSendErrorMessages = new List<string>();
+        private List<string> generalErrorMessages = new List<string>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SendCommunications"/> class.
@@ -65,9 +100,9 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
             var systemCommunicationGuid = Guid.Empty;
             var groupTypes = new List<int>();
             var groups = new List<int>();
-            var showAddress = dataMap.Get( "ShowAddress" ).ToString().AsBoolean();
-            var showAmount = dataMap.Get( "ShowAmount" ).ToString().AsBoolean();
-            var sendZero = dataMap.Get( "SendEmailswithZeroDonations" ).ToString().AsBoolean();
+            var showAddress = dataMap.GetBooleanFromString( AttributeKey.ShowAddress ); ;
+            var showAmount = dataMap.GetBooleanFromString( AttributeKey.ShowAmount ); ;
+            var sendZero = dataMap.GetBooleanFromString( AttributeKey.SendZeroDonations ); ;
 
             using ( var rockContext = new RockContext() )
             {
@@ -92,14 +127,14 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                 var groupMemberService = new GroupMemberService( rockContext );
                 var groupService = new GroupService( rockContext );
 
-                var selectedGroupTypes = dataMap.Get( "GroupTypes" ).ToString().Split( new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries );
+                var selectedGroupTypes = dataMap.GetString( AttributeKey.GroupTypes ).Split( new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries );
 
                 if ( selectedGroupTypes.Any() )
                 {
                     groupTypes = new List<int>( groupTypeService.GetByGuids( selectedGroupTypes.Select( Guid.Parse ).ToList() ).Select( gt => gt.Id ) );
                 }
 
-                var groupGuid = dataMap.Get( "Group" ).ToString().AsGuidOrNull();
+                var groupGuid = dataMap.GetString( AttributeKey.Group ).AsGuidOrNull();
 
                 if ( ( groupTypes.IsNull() || groupTypes.Count == 0 ) && !groupGuid.HasValue )
                 {
@@ -114,7 +149,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                     groups.Add( groupSetting.Id );
                 }
 
-                systemCommunicationGuid = dataMap.GetString( "SystemCommunication" ).AsGuid();
+                systemCommunicationGuid = dataMap.GetString( AttributeKey.SystemCommunication ).AsGuid();
 
                 var groupMembers = groupMemberService
                     .Queryable( "Group,Person" ).AsNoTracking()
