@@ -170,7 +170,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                     groupSetting = groupService.Get( groupGuid.Value );
                     var groupIds = groupService.GetAllDescendentGroupIds( groupSetting.Id, false );
                     groupIds.Add( groupSetting.Id );
-                    groups = groupService.Queryable( "Members" ).Where( g => groupIds.Contains( g.Id ) ).ToList();
+                    groups = groupService.Queryable( "Members" ).AsNoTracking().Where( g => groupIds.Contains( g.Id ) ).ToList();
                     LogEvent( null, "GroupInfo", string.Format( "Groups: {0}", groups.Count() ), "Finished getting Groups from group setting.", enableLogging );
                 }
                 else
