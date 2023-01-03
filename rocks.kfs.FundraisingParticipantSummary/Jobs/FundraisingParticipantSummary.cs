@@ -207,6 +207,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
 
                                 LogEvent( null, "GroupMemberInfo - Contributions", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Calculate contribution total.", enableLogging );
                                 var contributionTotal = new FinancialTransactionDetailService( rockContext ).Queryable()
+                                            .AsNoTracking()
                                             .Where( d => d.EntityTypeId == entityTypeIdGroupMember
                                                     && d.EntityId == groupMember.Id )
                                             .Sum( a => ( decimal? ) a.Amount ) ?? 0.00M;
@@ -223,6 +224,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
 
                                 LogEvent( null, "GroupMemberInfo - Contributions", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Get financial transactions related to GroupMember.", enableLogging );
                                 var financialTransactions = new FinancialTransactionDetailService( rockContext ).Queryable()
+                                    .AsNoTracking()
                                     .Where( d => d.EntityTypeId == entityTypeIdGroupMember
                                             && d.EntityId == groupMember.Id
                                             && d.Transaction.TransactionDateTime >= beginDateTime )
