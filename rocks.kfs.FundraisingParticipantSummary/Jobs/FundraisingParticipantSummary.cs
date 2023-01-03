@@ -172,120 +172,121 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                     groups.Add( groupSetting.Id );
                     LogEvent( null, "GroupInfo", string.Format( "Groups: {0}", groups.Count() ), "Finished getting Groups from group setting.", enableLogging );
                 }
+                else
+                {
+                    LogEvent( null, "GroupInfo", string.Format( "Selected Group: {0}", groupGuid.Value ), "Get Groups from group type setting.", enableLogging );
+                    groups = groupService.Queryable().AsNoTracking().Where( g => groupTypes.Contains( g.GroupTypeId ) ).Select( g => g.Id ).ToList();
+                    LogEvent( null, "GroupInfo", string.Format( "Groups: {0}", groups.Count() ), "Finished getting Groups from group type setting.", enableLogging );
+                }
 
                 systemCommunicationGuid = dataMap.GetString( AttributeKey.SystemCommunication ).AsGuid();
 
-                LogEvent( null, "GroupMembers", string.Format( "Selected Group: {0}", groupGuid.Value ), "Build GroupMember query.", enableLogging );
-                var groupMemberQuery = groupMemberService
-                    .Queryable( "Group,Person" ).AsNoTracking()
-                    .Where( m =>
-                        m.GroupMemberStatus == GroupMemberStatus.Active &&
-                        (
-                          ( groupGuid.HasValue && groups.Contains( m.GroupId ) ) ||
-                          ( !groupGuid.HasValue && groupTypes.Contains( m.Group.GroupTypeId ) )
-                        ) );
-                LogEvent( null, "GroupMembers", string.Format( "Query: {0}", groupMemberQuery.ToString() ), "Get GroupMembers from database.", enableLogging );
-                var groupMembers = groupMemberQuery.ToList();
-                LogEvent( null, "GroupMembers", string.Format( "GroupMembers: {0}", groupMembers.Count() ), "Finished getting GroupMembers from database.", enableLogging );
-                foreach ( var groupMember in groupMembers )
+                foreach ( var groupId in groups )
                 {
-                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Load GroupMember attributes.", enableLogging );
-                    groupMember.LoadAttributes();
-                    var email = groupMember.Person.Email;
-                    var person = groupMember.Person;
-                    var group = groupMember.Group;
-                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Load Group Attributes.", enableLogging );
-                    group.LoadAttributes();
-                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished loading Group Attributes.", enableLogging );
-                    bool disablePublicContributionRequests = groupMember.GetAttributeValue( "DisablePublicContributionRequests" ).AsBoolean();
-
-                    // only show Contribution stuff if contribution requests haven't been disabled
-                    if ( email.IsNotNullOrWhiteSpace() && !disablePublicContributionRequests )
+                    var group = groupService.Get( groupId );
+                    var groupMembers = group.ActiveMembers();
+                    if ( groupMembers.Count() > 0 )
                     {
-                        // Progress
-                        var entityTypeIdGroupMember = EntityTypeCache.GetId<Rock.Model.GroupMember>();
+                        LogEvent( null, "GroupInfo", string.Format( "Group: {0}", group.Id ), "Load Group Attributes.", enableLogging );
+                        group.LoadAttributes();
+                        LogEvent( null, "GroupInfo", string.Format( "Group: {0}", group.Id ), "Finished loading Group Attributes.", enableLogging );
+                        foreach ( var groupMember in groupMembers )
+                        {
+                            LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Load GroupMember attributes.", enableLogging );
+                            groupMember.LoadAttributes();
+                            var email = groupMember.Person.Email;
+                            var person = groupMember.Person;
+                            bool disablePublicContributionRequests = groupMember.GetAttributeValue( "DisablePublicContributionRequests" ).AsBoolean();
 
-                        LogEvent( null, "GroupMemberInfo - Contributions", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Calculate contribution total.", enableLogging );
-                        var contributionTotal = new FinancialTransactionDetailService( rockContext ).Queryable()
+                            // only show Contribution stuff if contribution requests haven't been disabled
+                            if ( email.IsNotNullOrWhiteSpace() && !disablePublicContributionRequests )
+                            {
+                                // Progress
+                                var entityTypeIdGroupMember = EntityTypeCache.GetId<Rock.Model.GroupMember>();
+
+                                LogEvent( null, "GroupMemberInfo - Contributions", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Calculate contribution total.", enableLogging );
+                                var contributionTotal = new FinancialTransactionDetailService( rockContext ).Queryable()
+                                            .Where( d => d.EntityTypeId == entityTypeIdGroupMember
+                                                    && d.EntityId == groupMember.Id )
+                                            .Sum( a => ( decimal? ) a.Amount ) ?? 0.00M;
+                                LogEvent( null, "GroupMemberInfo - Contributions", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished calculating contribution total.", enableLogging );
+
+                                var individualFundraisingGoal = groupMember.GetAttributeValue( "IndividualFundraisingGoal" ).AsDecimalOrNull();
+                                if ( !individualFundraisingGoal.HasValue )
+                                {
+                                    individualFundraisingGoal = group.GetAttributeValue( "IndividualFundraisingGoal" ).AsDecimalOrNull();
+                                }
+
+                                var amountLeft = individualFundraisingGoal - contributionTotal;
+                                var percentMet = individualFundraisingGoal > 0 ? contributionTotal * 100 / individualFundraisingGoal : 100;
+
+                                LogEvent( null, "GroupMemberInfo - Contributions", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Get financial transactions related to GroupMember.", enableLogging );
+                                var financialTransactions = new FinancialTransactionDetailService( rockContext ).Queryable()
                                     .Where( d => d.EntityTypeId == entityTypeIdGroupMember
-                                            && d.EntityId == groupMember.Id )
-                                    .Sum( a => ( decimal? ) a.Amount ) ?? 0.00M;
-                        LogEvent( null, "GroupMemberInfo - Contributions", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished calculating contribution total.", enableLogging );
+                                            && d.EntityId == groupMember.Id
+                                            && d.Transaction.TransactionDateTime >= beginDateTime )
+                                    .OrderByDescending( a => a.Transaction.TransactionDateTime );
 
-                        var individualFundraisingGoal = groupMember.GetAttributeValue( "IndividualFundraisingGoal" ).AsDecimalOrNull();
-                        if ( !individualFundraisingGoal.HasValue )
-                        {
-                            individualFundraisingGoal = group.GetAttributeValue( "IndividualFundraisingGoal" ).AsDecimalOrNull();
-                        }
+                                LogEvent( null, "GroupMemberInfo - Contributions", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished getting financial transactions related to GroupMember.", enableLogging );
 
-                        var amountLeft = individualFundraisingGoal - contributionTotal;
-                        var percentMet = individualFundraisingGoal > 0 ? contributionTotal * 100 / individualFundraisingGoal : 100;
+                                if ( financialTransactions.Any() || sendZero )
+                                {
+                                    LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Start processing GroupMember communication.", enableLogging );
+                                    var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, groupMember.Person );
+                                    mergeFields.Add( "BeginDateTime", beginDateTime );
+                                    mergeFields.Add( "FundraisingGoal", individualFundraisingGoal );
+                                    mergeFields.Add( "AmountLeft", amountLeft );
+                                    mergeFields.Add( "ContributionTotal", contributionTotal );
+                                    mergeFields.Add( "PercentMet", percentMet );
+                                    mergeFields.Add( "ShowAddress", showAddress );
+                                    mergeFields.Add( "ShowAmount", showAmount );
+                                    mergeFields.Add( "GroupMember", groupMember );
+                                    mergeFields.Add( "Contributions", financialTransactions );
 
-                        LogEvent( null, "GroupMemberInfo - Contributions", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Get financial transactions related to GroupMember.", enableLogging );
-                        var financialTransactions = new FinancialTransactionDetailService( rockContext ).Queryable()
-                            .Where( d => d.EntityTypeId == entityTypeIdGroupMember
-                                    && d.EntityId == groupMember.Id
-                                    && d.Transaction.TransactionDateTime >= beginDateTime )
-                            .OrderByDescending( a => a.Transaction.TransactionDateTime );
+                                    //var queryParams = new Dictionary<string, string>();
+                                    //queryParams.Add( "GroupId", group.Id.ToString() );
+                                    //queryParams.Add( "GroupMemberId", groupMember.Id.ToString() );
+                                    //mergeFields.Add( "MakeDonationUrl", LinkedPageUrl( "DonationPage", queryParams ) );
 
-                        LogEvent( null, "GroupMemberInfo - Contributions", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished getting financial transactions related to GroupMember.", enableLogging );
+                                    //string makeDonationButtonText = null;
+                                    //makeDonationButtonText = "Make Payment";
 
-                        if ( financialTransactions.Any() || sendZero )
-                        {
-                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Start processing GroupMember communication.", enableLogging );
-                            var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, groupMember.Person );
-                            mergeFields.Add( "BeginDateTime", beginDateTime );
-                            mergeFields.Add( "FundraisingGoal", individualFundraisingGoal );
-                            mergeFields.Add( "AmountLeft", amountLeft );
-                            mergeFields.Add( "ContributionTotal", contributionTotal );
-                            mergeFields.Add( "PercentMet", percentMet );
-                            mergeFields.Add( "ShowAddress", showAddress );
-                            mergeFields.Add( "ShowAmount", showAmount );
-                            mergeFields.Add( "GroupMember", groupMember );
-                            mergeFields.Add( "Contributions", financialTransactions );
+                                    //mergeFields.Add( "MakeDonationButtonText", makeDonationButtonText );
 
-                            //var queryParams = new Dictionary<string, string>();
-                            //queryParams.Add( "GroupId", group.Id.ToString() );
-                            //queryParams.Add( "GroupMemberId", groupMember.Id.ToString() );
-                            //mergeFields.Add( "MakeDonationUrl", LinkedPageUrl( "DonationPage", queryParams ) );
+                                    var recipients = new List<RockMessageRecipient>();
 
-                            //string makeDonationButtonText = null;
-                            //makeDonationButtonText = "Make Payment";
+                                    LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Add GroupMember as communication recipient.", enableLogging );
+                                    recipients.Add( new RockEmailMessageRecipient( person, mergeFields ) );
+                                    LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished adding GroupMember as communication recipient.", enableLogging );
 
-                            //mergeFields.Add( "MakeDonationButtonText", makeDonationButtonText );
+                                    var emailMessage = new RockEmailMessage( systemCommunicationGuid );
 
-                            var recipients = new List<RockMessageRecipient>();
+                                    LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Set communication recipients.", enableLogging );
+                                    emailMessage.SetRecipients( recipients );
+                                    LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished setting communication recipients.", enableLogging );
+                                    var errors = new List<string>();
+                                    LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Send email.", enableLogging );
+                                    emailMessage.Send( out errors );
+                                    LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished email send.", enableLogging );
 
-                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Add GroupMember as communication recipient.", enableLogging );
-                            recipients.Add( new RockEmailMessageRecipient( person, mergeFields ) );
-                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished adding GroupMember as communication recipient.", enableLogging );
-
-                            var emailMessage = new RockEmailMessage( systemCommunicationGuid );
-
-                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Set communication recipients.", enableLogging );
-                            emailMessage.SetRecipients( recipients );
-                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished setting communication recipients.", enableLogging );
-                            var errors = new List<string>();
-                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Send email.", enableLogging );
-                            emailMessage.Send( out errors );
-                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished email send.", enableLogging );
-
-                            if ( errors.Any() )
-                            {
-                                errors.ForEach( e => { emailSendErrorMessages.Add( $"{e} - {groupMember.Person.FullName}" ); } );
+                                    if ( errors.Any() )
+                                    {
+                                        errors.ForEach( e => { emailSendErrorMessages.Add( $"{e} - {groupMember.Person.FullName}" ); } );
+                                    }
+                                    else
+                                    {
+                                        groupMemberEmails++;
+                                    }
+                                    LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished processing GroupMember communication.", enableLogging );
+                                }
                             }
-                            else
+                            else if ( !disablePublicContributionRequests )
                             {
-                                groupMemberEmails++;
+                                generalErrorMessages.Add( string.Format( "No email specified for {0}.", groupMember.Person.FullName ) );
                             }
-                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished processing GroupMember communication.", enableLogging );
+                            LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Finished processing GroupMember.", enableLogging );
                         }
                     }
-                    else if ( !disablePublicContributionRequests )
-                    {
-                        generalErrorMessages.Add( string.Format( "No email specified for {0}.", groupMember.Person.FullName ) );
-                    }
-                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Finished processing GroupMember.", enableLogging );
                 }
             }
             var redIcon = "<i class='fa fa-circle text-danger'></i>";
