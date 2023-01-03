@@ -279,7 +279,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                     LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Finish processing group member.", enableLogging );
                 }
             }
-            context.Result = $"{groupMemberEmails} Email{(groupMemberEmails == 1 ? string.Empty:"s")} sent.";
+            context.Result = $"{groupMemberEmails} {"Email".PluralizeIf( groupMemberEmails > 1 )} sent.";
 
             if ( emailSendErrorMessages.Any() || generalErrorMessages.Any() )
             {
