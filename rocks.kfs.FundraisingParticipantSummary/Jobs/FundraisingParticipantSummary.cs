@@ -177,13 +177,16 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
 
 
                 LogEvent( null, "GroupInfo", string.Format( "Selected Group: {0}", groupGuid.Value ), "Start getting Group Members from groups.", enableLogging );
-                var groupMembers = groupMemberService
+                LogEvent( null, "GroupInfo", string.Format( "Selected Group: {0}", groupGuid.Value ), "Building GroupMember query.", enableLogging );
+                var groupMemberQuery = groupMemberService
                     .Queryable( "Group,Person" ).AsNoTracking()
                     .Where( m =>
                         m.GroupMemberStatus == GroupMemberStatus.Active &&
                         (
                           ( groupGuid.HasValue && groups.Contains( m.GroupId ) ) ||
                           ( !groupGuid.HasValue && groupTypes.Contains( m.Group.GroupTypeId ) )
+                        ) );
+                LogEvent( null, "GroupInfo", string.Format( "Query: {0}", groupMemberQuery.ToString() ), "Getting GroupMembers from database.", enableLogging );
                 var groupMembers = groupMemberQuery.ToList();
                 LogEvent( null, "GroupInfo", string.Format( "GroupMembers: {0}", groupMembers.Count() ), "Finished getting Group Members from groups.", enableLogging );
                 foreach ( var groupMember in groupMembers )
