@@ -148,12 +148,12 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
 
                 var selectedGroupTypes = dataMap.GetString( AttributeKey.GroupTypes ).Split( new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries );
 
-                LogEvent( null, "GroupInfo", string.Format( "Selected Group Types: {0}", selectedGroupTypes.Count() ), "Start getting GroupTypes from selected group types.", enableLogging );
+                LogEvent( null, "GroupTypes", string.Format( "Selected Group Types: {0}", selectedGroupTypes.Count() ), "Get selected GroupTypes.", enableLogging );
                 if ( selectedGroupTypes.Any() )
                 {
                     groupTypes = new List<int>( groupTypeService.GetByGuids( selectedGroupTypes.Select( Guid.Parse ).ToList() ).Select( gt => gt.Id ) );
                 }
-                LogEvent( null, "GroupInfo", string.Format( "GroupTypes: {0}", groupTypes.Count() ), "Finished getting GroupTypes from selected group types.", enableLogging );
+                LogEvent( null, "GroupTypes", string.Format( "GroupTypes: {0}", groupTypes.Count() ), "Finished getting selected GroupTypes.", enableLogging );
 
                 var groupGuid = dataMap.GetString( AttributeKey.Group ).AsGuidOrNull();
 
@@ -166,18 +166,16 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
 
                 if ( groupGuid.HasValue )
                 {
-                    LogEvent( null, "GroupInfo", string.Format( "Selected Group: {0}", groupGuid.Value ), "Start getting Groups from selected group.", enableLogging );
+                    LogEvent( null, "GroupInfo", string.Format( "Selected Group: {0}", groupGuid.Value ), "Get Groups from group setting.", enableLogging );
                     groupSetting = groupService.Get( groupGuid.Value );
                     groups = groupService.GetAllDescendentGroupIds( groupSetting.Id, false );
                     groups.Add( groupSetting.Id );
-                    LogEvent( null, "GroupInfo", string.Format( "Groups: {0}", groups.Count() ), "Finished getting Groups from selected group.", enableLogging );
+                    LogEvent( null, "GroupInfo", string.Format( "Groups: {0}", groups.Count() ), "Finished getting Groups from group setting.", enableLogging );
                 }
 
                 systemCommunicationGuid = dataMap.GetString( AttributeKey.SystemCommunication ).AsGuid();
 
-
-                LogEvent( null, "GroupInfo", string.Format( "Selected Group: {0}", groupGuid.Value ), "Start getting Group Members from groups.", enableLogging );
-                LogEvent( null, "GroupInfo", string.Format( "Selected Group: {0}", groupGuid.Value ), "Building GroupMember query.", enableLogging );
+                LogEvent( null, "GroupMembers", string.Format( "Selected Group: {0}", groupGuid.Value ), "Build GroupMember query.", enableLogging );
                 var groupMemberQuery = groupMemberService
                     .Queryable( "Group,Person" ).AsNoTracking()
                     .Where( m =>
@@ -186,21 +184,19 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                           ( groupGuid.HasValue && groups.Contains( m.GroupId ) ) ||
                           ( !groupGuid.HasValue && groupTypes.Contains( m.Group.GroupTypeId ) )
                         ) );
-                LogEvent( null, "GroupInfo", string.Format( "Query: {0}", groupMemberQuery.ToString() ), "Getting GroupMembers from database.", enableLogging );
+                LogEvent( null, "GroupMembers", string.Format( "Query: {0}", groupMemberQuery.ToString() ), "Get GroupMembers from database.", enableLogging );
                 var groupMembers = groupMemberQuery.ToList();
-                LogEvent( null, "GroupInfo", string.Format( "GroupMembers: {0}", groupMembers.Count() ), "Finished getting Group Members from groups.", enableLogging );
+                LogEvent( null, "GroupMembers", string.Format( "GroupMembers: {0}", groupMembers.Count() ), "Finished getting GroupMembers from database.", enableLogging );
                 foreach ( var groupMember in groupMembers )
                 {
-                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Start processing group member.", enableLogging );
-                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Start loading group member attributes.", enableLogging );
+                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Load GroupMember attributes.", enableLogging );
                     groupMember.LoadAttributes();
-                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Finished loading group member attributes.", enableLogging );
                     var email = groupMember.Person.Email;
                     var person = groupMember.Person;
                     var group = groupMember.Group;
-                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Start loading group attributes.", enableLogging );
+                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Load Group Attributes.", enableLogging );
                     group.LoadAttributes();
-                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished loading group attributes.", enableLogging );
+                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished loading Group Attributes.", enableLogging );
                     bool disablePublicContributionRequests = groupMember.GetAttributeValue( "DisablePublicContributionRequests" ).AsBoolean();
 
                     // only show Contribution stuff if contribution requests haven't been disabled
@@ -209,12 +205,12 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                         // Progress
                         var entityTypeIdGroupMember = EntityTypeCache.GetId<Rock.Model.GroupMember>();
 
-                        LogEvent( null, "GroupMemberContributionInfo", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Start calculating contribution total.", enableLogging );
+                        LogEvent( null, "GroupMemberInfo - Contributions", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Calculate contribution total.", enableLogging );
                         var contributionTotal = new FinancialTransactionDetailService( rockContext ).Queryable()
                                     .Where( d => d.EntityTypeId == entityTypeIdGroupMember
                                             && d.EntityId == groupMember.Id )
                                     .Sum( a => ( decimal? ) a.Amount ) ?? 0.00M;
-                        LogEvent( null, "GroupMemberContributionInfo", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished calculating contribution total.", enableLogging );
+                        LogEvent( null, "GroupMemberInfo - Contributions", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished calculating contribution total.", enableLogging );
 
                         var individualFundraisingGoal = groupMember.GetAttributeValue( "IndividualFundraisingGoal" ).AsDecimalOrNull();
                         if ( !individualFundraisingGoal.HasValue )
@@ -225,18 +221,18 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                         var amountLeft = individualFundraisingGoal - contributionTotal;
                         var percentMet = individualFundraisingGoal > 0 ? contributionTotal * 100 / individualFundraisingGoal : 100;
 
-                        LogEvent( null, "GroupMemberContributionInfo", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Start getting financial transactions.", enableLogging );
+                        LogEvent( null, "GroupMemberInfo - Contributions", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Get financial transactions related to GroupMember.", enableLogging );
                         var financialTransactions = new FinancialTransactionDetailService( rockContext ).Queryable()
                             .Where( d => d.EntityTypeId == entityTypeIdGroupMember
                                     && d.EntityId == groupMember.Id
                                     && d.Transaction.TransactionDateTime >= beginDateTime )
                             .OrderByDescending( a => a.Transaction.TransactionDateTime );
 
-                        LogEvent( null, "GroupMemberContributionInfo", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished getting financial transactions.", enableLogging );
+                        LogEvent( null, "GroupMemberInfo - Contributions", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished getting financial transactions related to GroupMember.", enableLogging );
 
                         if ( financialTransactions.Any() || sendZero )
                         {
-                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Start processing group member for communication.", enableLogging );
+                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Start processing GroupMember communication.", enableLogging );
                             var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, groupMember.Person );
                             mergeFields.Add( "BeginDateTime", beginDateTime );
                             mergeFields.Add( "FundraisingGoal", individualFundraisingGoal );
@@ -260,19 +256,19 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
 
                             var recipients = new List<RockMessageRecipient>();
 
-                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Start adding group member as recipient.", enableLogging );
+                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Add GroupMember as communication recipient.", enableLogging );
                             recipients.Add( new RockEmailMessageRecipient( person, mergeFields ) );
-                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished adding group member as recipient.", enableLogging );
+                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished adding GroupMember as communication recipient.", enableLogging );
 
                             var emailMessage = new RockEmailMessage( systemCommunicationGuid );
 
-                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Start set recipients.", enableLogging );
+                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Set communication recipients.", enableLogging );
                             emailMessage.SetRecipients( recipients );
-                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished set recipients.", enableLogging );
+                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished setting communication recipients.", enableLogging );
                             var errors = new List<string>();
-                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Start email send.", enableLogging );
+                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Send email.", enableLogging );
                             emailMessage.Send( out errors );
-                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished email send.", enableLogging );
+                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished email send.", enableLogging );
 
                             if ( errors.Any() )
                             {
@@ -282,14 +278,14 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                             {
                                 groupMemberEmails++;
                             }
-                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished processing group member for communication.", enableLogging );
+                            LogEvent( null, "GroupMemberInfo - Communication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished processing GroupMember communication.", enableLogging );
                         }
                     }
                     else if ( !disablePublicContributionRequests )
                     {
                         generalErrorMessages.Add( string.Format( "No email specified for {0}.", groupMember.Person.FullName ) );
                     }
-                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Finish processing group member.", enableLogging );
+                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Finished processing GroupMember.", enableLogging );
                 }
             }
             var redIcon = "<i class='fa fa-circle text-danger'></i>";
