@@ -112,7 +112,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
             var JobStartDateTime = RockDateTime.Now;
             var systemCommunicationGuid = Guid.Empty;
             var groupTypes = new List<int>();
-            var groups = new List<int>();
+            var groups = new List<Group>();
             var showAddress = dataMap.GetBooleanFromString( AttributeKey.ShowAddress );
             var showAmount = dataMap.GetBooleanFromString( AttributeKey.ShowAmount );
             var sendZero = dataMap.GetBooleanFromString( AttributeKey.SendZeroDonations );
@@ -168,23 +168,24 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                 {
                     LogEvent( null, "GroupInfo", string.Format( "Selected Group: {0}", groupGuid.Value ), "Get Groups from group setting.", enableLogging );
                     groupSetting = groupService.Get( groupGuid.Value );
-                    groups = groupService.GetAllDescendentGroupIds( groupSetting.Id, false );
-                    groups.Add( groupSetting.Id );
+                    var groupIds = groupService.GetAllDescendentGroupIds( groupSetting.Id, false );
+                    groupIds.Add( groupSetting.Id );
+                    groups = groupService.Queryable( "Members" ).Where( g => groupIds.Contains( g.Id ) ).ToList();
                     LogEvent( null, "GroupInfo", string.Format( "Groups: {0}", groups.Count() ), "Finished getting Groups from group setting.", enableLogging );
                 }
                 else
                 {
                     LogEvent( null, "GroupInfo", string.Format( "Selected Group: {0}", groupGuid.Value ), "Get Groups from group type setting.", enableLogging );
-                    groups = groupService.Queryable().AsNoTracking().Where( g => groupTypes.Contains( g.GroupTypeId ) ).Select( g => g.Id ).ToList();
+                    groups = groupService.Queryable( "Members" ).AsNoTracking().Where( g => groupTypes.Contains( g.GroupTypeId ) ).ToList();
                     LogEvent( null, "GroupInfo", string.Format( "Groups: {0}", groups.Count() ), "Finished getting Groups from group type setting.", enableLogging );
                 }
 
                 systemCommunicationGuid = dataMap.GetString( AttributeKey.SystemCommunication ).AsGuid();
 
-                foreach ( var groupId in groups )
+                LogEvent( null, "GroupInfo", string.Format( "Groups: {0}", groups.Count() ), "Start processing Groups.", enableLogging );
+                foreach ( var group in groups )
                 {
-                    var group = groupService.Get( groupId );
-                    var groupMembers = group.ActiveMembers();
+                    var groupMembers = group.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Active );
                     if ( groupMembers.Count() > 0 )
                     {
                         LogEvent( null, "GroupInfo", string.Format( "Group: {0}", group.Id ), "Load Group Attributes.", enableLogging );
@@ -288,6 +289,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                         }
                     }
                 }
+                LogEvent( null, "GroupInfo", string.Format( "Groups: {0}", groups.Count() ), "Finished processing Groups.", enableLogging );
             }
             var redIcon = "<i class='fa fa-circle text-danger'></i>";
             var greenIcon = "<i class='fa fa-circle text-success'></i>";
