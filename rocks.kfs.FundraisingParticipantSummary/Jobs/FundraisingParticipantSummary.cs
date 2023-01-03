@@ -67,6 +67,11 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
         Description = "Enable verbose Logging to help in troubleshooting errors with obscure traceability. Not recommended for normal use.",
         DefaultBooleanValue = false,
         Key = AttributeKey.VerboseLogging )]
+
+    [IntegerField( "Command Timeout Override",
+        Description = "Command Timeout value (in seconds) to use instead of default database connection timeout.",
+        IsRequired = false,
+        Key = AttributeKey.CommandTimeoutOverride ) ]
     [DisallowConcurrentExecution]
     public class FundraisingParticipantSummary : IJob
     {
@@ -82,6 +87,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
             public const string ShowAmount = "ShowAmount";
             public const string SendZeroDonations = "SendEmailswithZeroDonations";
             public const string VerboseLogging = "VerboseLogging";
+            public const string CommandTimeoutOverride = "CommandTimeoutOverride";
         }
 
         private int groupMemberEmails = 0;
@@ -111,9 +117,14 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
             var showAmount = dataMap.GetBooleanFromString( AttributeKey.ShowAmount );
             var sendZero = dataMap.GetBooleanFromString( AttributeKey.SendZeroDonations );
             var enableLogging = dataMap.GetBooleanFromString( AttributeKey.VerboseLogging );
+            var commandTimeout = dataMap.GetString( AttributeKey.CommandTimeoutOverride ).AsIntegerOrNull();
 
             using ( var rockContext = new RockContext() )
             {
+                if ( commandTimeout.HasValue )
+                {
+                    rockContext.Database.CommandTimeout = commandTimeout;
+                }
                 // get the last run date or yesterday
                 DateTime? lastStartDateTime = null;
 
