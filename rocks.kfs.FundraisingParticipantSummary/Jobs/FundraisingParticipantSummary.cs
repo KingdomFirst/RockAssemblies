@@ -170,7 +170,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                     groupSetting = groupService.Get( groupGuid.Value );
                     groups = groupService.GetAllDescendentGroupIds( groupSetting.Id, false );
                     groups.Add( groupSetting.Id );
-                    LogEvent( null, "GroupInfo", string.Format( "Groups: {0}", groups.Count() ), "Finish getting Groups from selected group.", enableLogging );
+                    LogEvent( null, "GroupInfo", string.Format( "Groups: {0}", groups.Count() ), "Finished getting Groups from selected group.", enableLogging );
                 }
 
                 systemCommunicationGuid = dataMap.GetString( AttributeKey.SystemCommunication ).AsGuid();
@@ -184,21 +184,20 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                         (
                           ( groupGuid.HasValue && groups.Contains( m.GroupId ) ) ||
                           ( !groupGuid.HasValue && groupTypes.Contains( m.Group.GroupTypeId ) )
-                        ) )
-                    .ToList();
-                LogEvent( null, "GroupInfo", string.Format( "GroupMembers: {0}", groupMembers.Count() ), "Finish getting Group Members from groups.", enableLogging );
+                var groupMembers = groupMemberQuery.ToList();
+                LogEvent( null, "GroupInfo", string.Format( "GroupMembers: {0}", groupMembers.Count() ), "Finished getting Group Members from groups.", enableLogging );
                 foreach ( var groupMember in groupMembers )
                 {
                     LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Start processing group member.", enableLogging );
                     LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Start loading group member attributes.", enableLogging );
                     groupMember.LoadAttributes();
-                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Finish loading group member attributes.", enableLogging );
+                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Finished loading group member attributes.", enableLogging );
                     var email = groupMember.Person.Email;
                     var person = groupMember.Person;
                     var group = groupMember.Group;
                     LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Start loading group attributes.", enableLogging );
                     group.LoadAttributes();
-                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finish loading group attributes.", enableLogging );
+                    LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished loading group attributes.", enableLogging );
                     bool disablePublicContributionRequests = groupMember.GetAttributeValue( "DisablePublicContributionRequests" ).AsBoolean();
 
                     // only show Contribution stuff if contribution requests haven't been disabled
@@ -230,7 +229,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                                     && d.Transaction.TransactionDateTime >= beginDateTime )
                             .OrderByDescending( a => a.Transaction.TransactionDateTime );
 
-                        LogEvent( null, "GroupMemberContributionInfo", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finish getting financial transactions.", enableLogging );
+                        LogEvent( null, "GroupMemberContributionInfo", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished getting financial transactions.", enableLogging );
 
                         if ( financialTransactions.Any() || sendZero )
                         {
@@ -260,17 +259,17 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
 
                             LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Start adding group member as recipient.", enableLogging );
                             recipients.Add( new RockEmailMessageRecipient( person, mergeFields ) );
-                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finish adding group member as recipient.", enableLogging );
+                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished adding group member as recipient.", enableLogging );
 
                             var emailMessage = new RockEmailMessage( systemCommunicationGuid );
 
                             LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Start set recipients.", enableLogging );
                             emailMessage.SetRecipients( recipients );
-                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finish set recipients.", enableLogging );
+                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished set recipients.", enableLogging );
                             var errors = new List<string>();
                             LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Start email send.", enableLogging );
                             emailMessage.Send( out errors );
-                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finish email send.", enableLogging );
+                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished email send.", enableLogging );
 
                             if ( errors.Any() )
                             {
@@ -280,7 +279,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                             {
                                 groupMemberEmails++;
                             }
-                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finish processing group member for communication.", enableLogging );
+                            LogEvent( null, "ProcessCommunication", string.Format( "GroupMember: {0}, Group: {1}", groupMember.Id, groupMember.Group.Id ), "Finished processing group member for communication.", enableLogging );
                         }
                     }
                     else if ( !disablePublicContributionRequests )
