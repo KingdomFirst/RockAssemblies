@@ -107,9 +107,9 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
             var systemCommunicationGuid = Guid.Empty;
             var groupTypes = new List<int>();
             var groups = new List<int>();
-            var showAddress = dataMap.GetBooleanFromString( AttributeKey.ShowAddress ); ;
-            var showAmount = dataMap.GetBooleanFromString( AttributeKey.ShowAmount ); ;
-            var sendZero = dataMap.GetBooleanFromString( AttributeKey.SendZeroDonations ); ;
+            var showAddress = dataMap.GetBooleanFromString( AttributeKey.ShowAddress );
+            var showAmount = dataMap.GetBooleanFromString( AttributeKey.ShowAmount );
+            var sendZero = dataMap.GetBooleanFromString( AttributeKey.SendZeroDonations );
             var enableLogging = dataMap.GetBooleanFromString( AttributeKey.VerboseLogging );
 
             using ( var rockContext = new RockContext() )
