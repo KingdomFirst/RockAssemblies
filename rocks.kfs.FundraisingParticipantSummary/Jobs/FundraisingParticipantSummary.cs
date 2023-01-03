@@ -279,7 +279,9 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                     LogEvent( null, "GroupMemberInfo", string.Format( "GroupMember: {0}", groupMember.Id ), "Finish processing group member.", enableLogging );
                 }
             }
-            context.Result = $"{groupMemberEmails} {"Email".PluralizeIf( groupMemberEmails > 1 )} sent.";
+            var redIcon = "<i class='fa fa-circle text-danger'></i>";
+            var greenIcon = "<i class='fa fa-circle text-success'></i>";
+            context.Result = $"{greenIcon} {groupMemberEmails} {"Email".PluralizeIf( groupMemberEmails != 1 )} sent.";
 
             if ( emailSendErrorMessages.Any() || generalErrorMessages.Any() )
             {
@@ -288,7 +290,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                 errorsCombined.AddRange( emailSendErrorMessages );
 
                 StringBuilder sbException = new StringBuilder();
-                sbException.Append( $"{errorsCombined.Count()} Error{( errorsCombined.Count() == 1 ? string.Empty : "s" )}:" );
+                sbException.Append( $"{errorsCombined.Count()} {"Error".PluralizeIf( errorsCombined.Count() != 1 )}." );
                 errorsCombined.ForEach( e => { sbException.AppendLine(); sbException.Append( e ); } );
                 string exceptionString = sbException.ToString();
                 var exception = new Exception( exceptionString );
@@ -301,11 +303,10 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                 else
                 {
                     // Build string for result display
-                    var icon = "<i class='fa fa-circle text-danger'></i>";
                     StringBuilder sbErrors = new StringBuilder();
                     sbErrors.AppendLine();
-                    sbErrors.Append( $"{errorsCombined.Count()} Error{( errorsCombined.Count() == 1 ? string.Empty : "s" )}:" );
-                    errorsCombined.ForEach( e => { sbErrors.AppendLine(); sbErrors.Append( $"{icon} {e}" ); } );
+                    sbErrors.Append( $"{redIcon} {errorsCombined.Count()} {"Error".PluralizeIf( errorsCombined.Count() > 1 )}:" );
+                    errorsCombined.ForEach( e => { sbErrors.AppendLine(); sbErrors.Append( $"{e}" ); } );
                     string errors = sbErrors.ToString();
                     context.Result += errors;
                     var ex = new AggregateException( "Fundraising Participant Summary completed with errors.", exception );
