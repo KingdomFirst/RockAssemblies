@@ -69,13 +69,14 @@ namespace rocks.kfs.Zoom
             }
 
             var zoomRoomDT = new DefinedTypeService( rockContext ).Get( ZoomGuid.DefinedType.ZOOM_ROOM.AsGuid() );
+            var dvService = new DefinedValueService( rockContext );
+            var zoomRoomDV = dvService.Queryable().Where( v => v.DefinedTypeId == zoomRoomDT.Id );
 
             // Delete DefinedValue for any rooms that no longer exist
-            var zoomRoomsToDelete = zoomRoomDT.DefinedValues.Where( v => !zrList.Select( zr => zr.Zr_Id ).Contains( v.Value ) );
-            foreach ( var zrDV in zoomRoomsToDelete )
-            {
-                zoomRoomDT.DefinedValues.Remove( zrDV );
-            }
+            var zrIds = new List<string>();
+            zrIds.AddRange( zrList.Select( zr => zr.Zr_Id ).ToList() );
+            var zoomRoomsToDelete = zoomRoomDV.Where( v => !zrIds.Contains( v.Value ) );
+            dvService.DeleteRange( zoomRoomsToDelete );
 
             if ( enableLogging )
             {
