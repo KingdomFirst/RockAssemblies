@@ -67,8 +67,10 @@
     <Compile Include="Enums\MeetingListType.cs" />
     <Compile Include="Enums\UserType.cs" />
     <Compile Include="Enums\RoomType.cs" />
+    <Compile Include="Responses\OauthTokenResponse.cs" />
     <Compile Include="Responses\ListMeetingsResponse.cs" />
     <Compile Include="Responses\RoomsResponse.cs" />
+    <Compile Include="Responses\OauthErrorResponse.cs" />
     <Compile Include="Responses\ZRScheduleMeetingWebhookResponse.cs" />
     <Compile Include="Responses\ZoomBaseResponse.cs" />
     <Compile Include="Responses\ZRBaseMeetingInfo.cs" />

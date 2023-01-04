@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2022 by Kingdom First Solutions
+// Copyright 2023 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,18 +32,18 @@ namespace rocks.kfs.Zoom
     {
         public static ZoomApi Api()
         {
-            return new ZoomApi( Settings.GetJwtString() );
+            return new ZoomApi( Settings.GetOauthString() );
         }
 
-        public static ZoomApi Api( string jwtString )
+        public static ZoomApi Api( string oAuthString )
         {
-            return new ZoomApi( jwtString );
+            return new ZoomApi( oAuthString );
         }
 
         public static bool ZoomAuthCheck()
         {
             var retVar = false;
-            var zmUser = new ZoomApi( Settings.GetJwtString() ).GetUser();
+            var zmUser = new ZoomApi( Settings.GetOauthString() ).GetUser();
             if ( zmUser != null && zmUser.Id.IsNotNullOrWhiteSpace() )
             {
                 retVar = true;
