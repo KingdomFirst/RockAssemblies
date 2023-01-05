@@ -185,7 +185,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                 LogEvent( null, "GroupInfo", string.Format( "Groups: {0}", groups.Count() ), "Start processing Groups.", enableLogging );
                 foreach ( var group in groups )
                 {
-                    var groupMembers = group.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Active );
+                    var groupMembers = group.ActiveMembers();
                     if ( groupMembers.Count() > 0 )
                     {
                         LogEvent( null, "GroupInfo", string.Format( "Group: {0}", group.Id ), "Load Group Attributes.", enableLogging );
