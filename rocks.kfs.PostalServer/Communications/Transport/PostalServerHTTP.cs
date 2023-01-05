@@ -95,17 +95,17 @@ namespace rocks.kfs.PostalServer.Communications.Transport
             var toEmail = rockEmailMessage.GetRecipients();
             toEmail.ForEach( r => toEmailList.Add( r.To ) );
 
-            var ccEmailAddresses = rockEmailMessage
+            ccEmailList = rockEmailMessage
                 .CCEmails
                 .Where( cc => cc != string.Empty )
                 .Where( cc => !toEmail.Any( te => te.To == cc ) )
                 .ToList();
 
-            var bccEmailAddresses = rockEmailMessage
+            bccEmailList = rockEmailMessage
                 .BCCEmails
                 .Where( bcc => bcc != string.Empty )
                 .Where( bcc => !toEmail.Any( te => te.To == bcc ) )
-                .Where( bcc => !ccEmailAddresses.Contains( bcc ) )
+                .Where( bcc => !ccEmailList.Contains( bcc ) )
                 .ToList();
 
             // Tag Communication record for tracking opens & clicks

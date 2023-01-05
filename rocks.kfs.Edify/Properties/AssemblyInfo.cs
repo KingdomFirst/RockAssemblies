@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2022 by Kingdom First Solutions
+// Copyright 2023 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "Kingdom First Solutions" )]
 [assembly: AssemblyProduct( "rocks.kfs.Edify" )]
-[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2022" )]
+[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2023" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
@@ -47,4 +47,4 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
-[assembly: AssemblyVersion( "1.3.*" )]
+[assembly: AssemblyVersion( "1.4.*" )]
