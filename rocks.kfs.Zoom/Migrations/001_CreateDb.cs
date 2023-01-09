@@ -107,7 +107,9 @@ namespace rocks.kfs.Zoom.Migrations
                         ,[Guid]
                         ,[CreatedDateTime]
                         ,[ModifiedDateTime]
-                        ,[IsReservationBookedOnApproval])
+                        ,[IsReservationBookedOnApproval]
+                        ,[IsCampusRequired]
+                        ,[DefaultReservationDuration])
                         VALUES (
                         1
                         ,'Zoom Room Import'
@@ -121,6 +123,8 @@ namespace rocks.kfs.Zoom.Migrations
                         ,GETDATE()
                         ,GETDATE()
                         ,0
+                        ,0
+                        ,7305
                         )
                 END
 
