@@ -73,8 +73,7 @@ namespace rocks.kfs.Zoom
             var zoomRoomDV = dvService.Queryable().Where( v => v.DefinedTypeId == zoomRoomDT.Id );
 
             // Delete DefinedValue for any rooms that no longer exist
-            var zrIds = new List<string>();
-            zrIds.AddRange( zrList.Select( zr => zr.Zr_Id ).ToList() );
+            var zrIds = zrList.Select( zr => zr.Zr_Id ).ToList();
             var zoomRoomsToDelete = zoomRoomDV.Where( v => !zrIds.Contains( v.Value ) );
             dvService.DeleteRange( zoomRoomsToDelete );
 

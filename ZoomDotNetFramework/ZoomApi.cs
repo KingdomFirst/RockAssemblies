@@ -83,7 +83,7 @@ namespace ZoomDotNetFramework
                 BaseUrl = new System.Uri( BaseUrl )
             };
             request.AddHeader( "content-type", "application/json" );
-            request.AddHeader( "authorization", "Bearer " + _oAuthToken ); // used on every request
+            request.AddHeader( "authorization", "Bearer " + _oAuthToken );
             var response = client.Execute<T>( request );
 
             if ( response.ErrorException != null )
