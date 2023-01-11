@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2022 by Kingdom First Solutions
+// Copyright 2023 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,24 +35,91 @@ using Rock.Web.Cache;
 
 namespace rocks.kfs.WorkflowFromEWS.Jobs
 {
-    [EncryptedTextField( "ApplicationId", "The Application (client) ID in Microsoft Azure for the registered application that has access to the target Email Address.", order: 0 )]
-    [EncryptedTextField( "TenantId", "The Directory (tenant) ID in Microsoft Azure for the registered application that has access to the target Email Address.", order: 1 )]
-    [EncryptedTextField( "Application Secret", "The Secret Value in Microsoft Azure for the registered application that has access to the target Email Address.", order: 2 )]
-    [TextField( "Email Address", "The email address for the authenticated user to check.", order: 3 )]
-    [TextField( "Impersonate User", "The email address of the account to use for impersonation. This account must have access to the inbox provided in the Email Address setting. If left blank, the Email Address will be used.", order: 4 )]
-    [UrlLinkField( "Server Url", "", defaultValue: "https://outlook.office365.com/EWS/Exchange.asmx", order: 5 )]
-    [IntegerField( "Max Emails", "The maximum number of emails to process each time the job runs.", defaultValue: 100, order: 6 )]
-    [BooleanField( "Delete Messages", "Each message will be deleted after it is processed.", false, order: 7 )]
-    [BooleanField( "One Workflow Per Conversation", "If a workflow has already been created for a message in this conversation, additional workflows be not created. For example, replies will not activate new workflows.", false, order: 8 )]
-    [WorkflowTypeField( "Workflow Type", "The workflow type to be initiated for each message.", required: true, order: 9 )]
-    [KeyValueListField( "Workflow Attributes", "Used to match the email properties to the new workflow.", true, keyPrompt: "Attribute Key", valuePrompt: "Email Property", customValues: "DateReceived^Date Received,FromEmail^From Email,FromName^From Name,Subject^Subject,Body^Body", displayValueFirst: true, order: 10 )]
+    [EncryptedTextField( "Application Id",
+        Description = "The Application (client) ID in Microsoft Azure for the registered application that has access to the target Email Address.",
+        Order = 0,
+        Key = AttributeKey.ApplicationId )]
+
+    [EncryptedTextField( "Tenant Id",
+        Description ="The Directory (tenant) ID in Microsoft Azure for the registered application that has access to the target Email Address.",
+        Order = 1,
+        Key = AttributeKey.TenantId )]
+
+    [EncryptedTextField( "Application Secret",
+        Description ="The Secret Value in Microsoft Azure for the registered application that has access to the target Email Address.",
+        Order = 2,
+        Key = AttributeKey.ApplicationSecret )]
+
+    [TextField( "Email Address",
+        Description ="The email address for the authenticated user to check.",
+        Order = 3,
+        Key = AttributeKey.EmailAddress )]
+
+    [TextField( "Impersonate User",
+        Description = "The email address of the account to use for impersonation. This account must have access to the inbox provided in the Email Address setting. If left blank, the Email Address will be used.",
+        Order = 4,
+        Key = AttributeKey.ImpersonateUser )]
+
+    [UrlLinkField( "Server Url",
+        DefaultValue = "https://outlook.office365.com/EWS/Exchange.asmx",
+        Order = 5,
+        Key = AttributeKey.ServerUrl )]
+
+    [IntegerField( "Max Emails",
+        Description ="The maximum number of emails to process each time the job runs.",
+        DefaultIntegerValue = 100,
+        Order = 6,
+        Key = AttributeKey.MaxEmails )]
+
+    [BooleanField( "Delete Messages",
+        Description = "Each message will be deleted after it is processed.",
+        DefaultBooleanValue = false,
+        Order = 7,
+        Key = AttributeKey.DeleteMessages )]
+
+    [BooleanField( "One Workflow Per Conversation",
+        Description = "If a workflow has already been created for a message in this conversation, additional workflows be not created. For example, replies will not activate new workflows.",
+        DefaultBooleanValue = false,
+        Order = 8,
+        Key = AttributeKey.OneWorkflowPerConversation )]
+
+    [WorkflowTypeField( "Workflow Type",
+        Description = "The workflow type to be initiated for each message.",
+        IsRequired = true,
+        Order = 9,
+        Key = AttributeKey.WorkflowType )]
+
+    [KeyValueListField( "Workflow Attributes",
+        description: "Used to match the email properties to the new workflow.",
+        required: true,
+        keyPrompt: "Attribute Key",
+        valuePrompt: "Email Property",
+        customValues: "DateReceived^Date Received,FromEmail^From Email,FromName^From Name,Subject^Subject,Body^Body",
+        displayValueFirst: true,
+        order: 10,
+        key: AttributeKey.WorkflowAttributes )]
 
     /// <summary>
     /// Job to create workflow using Exchange Web Services.
     /// </summary>
     [DisallowConcurrentExecution]
-    public class StartWorkflow : IJob
+    public class LaunchWorkflowFromEWSAccount : IJob
     {
+        private static class AttributeKey
+        {
+            public const string ApplicationId = "ApplicationId";
+            public const string TenantId = "TenantId";
+            public const string ApplicationSecret = "ApplicationSecret";
+            public const string EmailAddress = "EmailAddress";
+            public const string ImpersonateUser = "ImpersonateUser";
+            public const string ServerUrl = "ServerUrl";
+            public const string MaxEmails = "MaxEmails";
+            public const string DeleteMessages = "DeleteMessages";
+            public const string OneWorkflowPerConversation = "OneWorkflowPerConversation";
+            public const string WorkflowType = "WorkflowType";
+            public const string WorkflowAttributes = "WorkflowAttributes";
+        }
+
         /// <summary>
         /// Empty constructor for job initialization
         /// <para>
@@ -60,7 +127,7 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
         /// scheduler can instantiate the class whenever it needs.
         /// </para>
         /// </summary>
-        public StartWorkflow()
+        public LaunchWorkflowFromEWSAccount()
         {
         }
 
@@ -76,7 +143,7 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
             var dataMap = context.JobDetail.JobDataMap;
             var messages = new List<string>();
             var workflowsStarted = 0;
-            var workflowTypeGuid = dataMap.GetString( "WorkflowType" ).AsGuidOrNull();
+            var workflowTypeGuid = dataMap.GetString( AttributeKey.WorkflowType ).AsGuidOrNull();
 
             if ( workflowTypeGuid.HasValue )
             {
@@ -84,22 +151,22 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
 
                 if ( workflowType != null )
                 {
-                    var applicationId = Encryption.DecryptString( dataMap.GetString( "ApplicationId" ) );
-                    var tenantId = Encryption.DecryptString( dataMap.GetString( "TenantId" ) );
-                    var appSecret = Encryption.DecryptString( dataMap.GetString( "ApplicationSecret" ) );
-                    var emailAddress = dataMap.GetString( "EmailAddress" );
-                    var impersonate = dataMap.GetString( "ImpersonateUser" );
+                    var applicationId = Encryption.DecryptString( dataMap.GetString( AttributeKey.ApplicationId ) );
+                    var tenantId = Encryption.DecryptString( dataMap.GetString( AttributeKey.TenantId ) );
+                    var appSecret = Encryption.DecryptString( dataMap.GetString( AttributeKey.ApplicationSecret ) );
+                    var emailAddress = dataMap.GetString( AttributeKey.EmailAddress );
+                    var impersonate = dataMap.GetString( AttributeKey.ImpersonateUser );
                     if ( impersonate.IsNullOrWhiteSpace() )
                     {
                         impersonate = emailAddress;
                     }
-                    var url = new Uri( dataMap.GetString( "ServerUrl" ) );
-                    var maxEmails = dataMap.GetString( "MaxEmails" ).AsInteger();
-                    var delete = dataMap.GetString( "DeleteMessages" ).AsBoolean();
-                    var onePer = dataMap.GetString( "OneWorkflowPerConversation" ).AsBoolean();
+                    var url = new Uri( dataMap.GetString( AttributeKey.ServerUrl ) );
+                    var maxEmails = dataMap.GetString( AttributeKey.MaxEmails ).AsInteger();
+                    var delete = dataMap.GetString( AttributeKey.DeleteMessages ).AsBoolean();
+                    var onePer = dataMap.GetString( AttributeKey.OneWorkflowPerConversation ).AsBoolean();
 
                     Dictionary<string, string> attributeKeyMap = null;
-                    var workflowAttributeKeys = dataMap.GetString( "WorkflowAttributes" );
+                    var workflowAttributeKeys = dataMap.GetString( AttributeKey.WorkflowAttributes );
                     if ( workflowAttributeKeys.IsNotNullOrWhiteSpace() )
                     {
                         attributeKeyMap = workflowAttributeKeys.AsDictionaryOrNull();
