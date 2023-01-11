@@ -31,6 +31,10 @@ namespace rocks.kfs.Zoom.Migrations
             RockMigrationHelper.UpdateEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "Zoom OAuth App Account Id", "The Application Id for the Zoom Marketplace Server-to-Server OAuth app to use for KFS Zoom integration elements.", 0, "", "803991F1-9FA1-4AF7-94A7-D1748CBA764F", "rocks.kfs.ZoomAppAccountId" );
             RockMigrationHelper.UpdateEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "Zoom OAuth App Client Id", "The Client Id for the Zoom Marketplace Server-to-Server OAuth app to use for KFS Zoom integration elements.", 0, "", "D66B02B7-8298-4371-B1FB-B02AC5C552D0", "rocks.kfs.ZoomAppClientId" );
             RockMigrationHelper.UpdateEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "Zoom OAuth App Client Secret", "The Client Secret for the Zoom Marketplace Server-to-Server OAuth app to use for KFS Zoom integration elements.", 0, "", "9A1CC332-E7CE-4A0A-860E-513A73E8C2F8", "rocks.kfs.ZoomAppClientSecret" );
+
+            // Delete old Zoom JWT App attributes
+            RockMigrationHelper.DeleteAttribute( "CB89B071-4866-41BD-ACB1-1810F5224A82" );
+            RockMigrationHelper.DeleteAttribute( "D53A2B48-C8B4-4481-B2AB-139CAF90C78C" );
         }
 
         /// <summary>
@@ -41,6 +45,9 @@ namespace rocks.kfs.Zoom.Migrations
             RockMigrationHelper.DeleteAttribute( "803991F1-9FA1-4AF7-94A7-D1748CBA764F" );
             RockMigrationHelper.DeleteAttribute( "D66B02B7-8298-4371-B1FB-B02AC5C552D0" );
             RockMigrationHelper.DeleteAttribute( "9A1CC332-E7CE-4A0A-860E-513A73E8C2F8" );
+
+            RockMigrationHelper.UpdateEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Key", "The API Key for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "D53A2B48-C8B4-4481-B2AB-139CAF90C78C", "rocks.kfs.ZoomApiKey" );
+            RockMigrationHelper.UpdateEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Secret", "The API Secret for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "CB89B071-4866-41BD-ACB1-1810F5224A82", "rocks.kfs.ZoomApiSecret" );
         }
     }
 }
