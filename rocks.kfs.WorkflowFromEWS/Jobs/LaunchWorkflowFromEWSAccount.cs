@@ -41,17 +41,17 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
         Key = AttributeKey.ApplicationId )]
 
     [EncryptedTextField( "Tenant Id",
-        Description ="The Directory (tenant) ID in Microsoft Azure for the registered application that has access to the target Email Address.",
+        Description = "The Directory (tenant) ID in Microsoft Azure for the registered application that has access to the target Email Address.",
         Order = 1,
         Key = AttributeKey.TenantId )]
 
     [EncryptedTextField( "Application Secret",
-        Description ="The Secret Value in Microsoft Azure for the registered application that has access to the target Email Address.",
+        Description = "The Secret Value in Microsoft Azure for the registered application that has access to the target Email Address.",
         Order = 2,
         Key = AttributeKey.ApplicationSecret )]
 
     [TextField( "Email Address",
-        Description ="The email address for the authenticated user to check.",
+        Description = "The email address for the authenticated user to check.",
         Order = 3,
         Key = AttributeKey.EmailAddress )]
 
@@ -66,27 +66,41 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
         Key = AttributeKey.ServerUrl )]
 
     [IntegerField( "Max Emails",
-        Description ="The maximum number of emails to process each time the job runs.",
+        Description = "The maximum number of emails to process each time the job runs.",
         DefaultIntegerValue = 100,
         Order = 6,
         Key = AttributeKey.MaxEmails )]
 
+    [EnumsField( "Launch Workflows with",
+        Description = "What emails should this job use to launch workflows? Default: Unread (When multiple options are selected these are a combined search result, i.e Unread AND Flagged)",
+        DefaultValue = "0",
+        EnumSourceType = typeof( ProcessEmailsBy ),
+        Order = 7,
+        Key = AttributeKey.LaunchWorkflowsWith )]
+
+    [EnumsField( "Mark Processed Emails by",
+        Description = "How should the emails be marked within EWS once they are processed. Default: Read (Note: not all options will work without appropriate permissions. Multiple options will perform all that it can in order presented.).",
+        DefaultValue = "0",
+        EnumSourceType = typeof( MarkEmailBy ),
+        Order = 8,
+        Key = AttributeKey.MarkEmailsBy )]
+
     [BooleanField( "Delete Messages",
         Description = "Each message will be deleted after it is processed.",
         DefaultBooleanValue = false,
-        Order = 7,
+        Order = 9,
         Key = AttributeKey.DeleteMessages )]
 
     [BooleanField( "One Workflow Per Conversation",
         Description = "If a workflow has already been created for a message in this conversation, additional workflows be not created. For example, replies will not activate new workflows.",
         DefaultBooleanValue = false,
-        Order = 8,
+        Order = 10,
         Key = AttributeKey.OneWorkflowPerConversation )]
 
     [WorkflowTypeField( "Workflow Type",
         Description = "The workflow type to be initiated for each message.",
         IsRequired = true,
-        Order = 9,
+        Order = 11,
         Key = AttributeKey.WorkflowType )]
 
     [KeyValueListField( "Workflow Attributes",
@@ -96,8 +110,9 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
         valuePrompt: "Email Property",
         customValues: "DateReceived^Date Received,FromEmail^From Email,FromName^From Name,Subject^Subject,Body^Body",
         displayValueFirst: true,
-        order: 10,
+        order: 12,
         key: AttributeKey.WorkflowAttributes )]
+
 
     /// <summary>
     /// Job to create workflow using Exchange Web Services.
@@ -118,6 +133,8 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
             public const string OneWorkflowPerConversation = "OneWorkflowPerConversation";
             public const string WorkflowType = "WorkflowType";
             public const string WorkflowAttributes = "WorkflowAttributes";
+            public const string LaunchWorkflowsWith = "LaunchWorkflowsWith";
+            public const string MarkEmailsBy = "MarkEmailsBy";
         }
 
         /// <summary>
@@ -164,6 +181,8 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                     var maxEmails = dataMap.GetString( AttributeKey.MaxEmails ).AsInteger();
                     var delete = dataMap.GetString( AttributeKey.DeleteMessages ).AsBoolean();
                     var onePer = dataMap.GetString( AttributeKey.OneWorkflowPerConversation ).AsBoolean();
+                    var launchWith = dataMap.GetString( AttributeKey.LaunchWorkflowsWith ).StringToIntList();
+                    var markWith = dataMap.GetString( AttributeKey.MarkEmailsBy ).StringToIntList();
 
                     Dictionary<string, string> attributeKeyMap = null;
                     var workflowAttributeKeys = dataMap.GetString( AttributeKey.WorkflowAttributes );
@@ -193,14 +212,45 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
 
                             var userMailbox = new Mailbox( emailAddress );
                             var folderId = new FolderId( WellKnownFolderName.Inbox, userMailbox );
-                            var sf = new SearchFilter.SearchFilterCollection( LogicalOperator.And, new SearchFilter.IsEqualTo( EmailMessageSchema.IsRead, false ) );
+                            var sf = new SearchFilter.SearchFilterCollection( LogicalOperator.And );
+
+                            if ( launchWith.Contains( ( ( int ) ProcessEmailsBy.Unread ) ) )
+                            {
+                                sf.Add( new SearchFilter.IsEqualTo( EmailMessageSchema.IsRead, false ) );
+                            }
+                            if ( launchWith.Contains( ( ( int ) ProcessEmailsBy.Flagged ) ) )
+                            {
+                                ExtendedPropertyDefinition pidTagFlagStatus = new ExtendedPropertyDefinition( 0x1090, MapiPropertyType.Integer );
+                                SearchFilter Flagged = new SearchFilter.IsEqualTo( pidTagFlagStatus, 2 );
+                                sf.Add( Flagged );
+                            }
+                            if ( launchWith.Contains( ( ( int ) ProcessEmailsBy.FlaggedComplete ) ) )
+                            {
+                                ExtendedPropertyDefinition pidTagTaskStatus = new ExtendedPropertyDefinition( DefaultExtendedPropertySet.Task, 0x8101, MapiPropertyType.Integer );
+                                SearchFilter SetComplete = new SearchFilter.IsEqualTo( pidTagTaskStatus, 2 );
+                                sf.Add( SetComplete );
+                            }
+                            if ( launchWith.Contains( ( ( int ) ProcessEmailsBy.HasAttachments ) ) )
+                            {
+                                sf.Add( new SearchFilter.IsEqualTo( EmailMessageSchema.HasAttachments, true ) );
+                            }
                             var view = new ItemView( maxEmails );
                             view.PropertySet = findItemPropertySet;
                             view.OrderBy.Add( ItemSchema.DateTimeReceived, SortDirection.Descending );
-                            var findResults = service.FindItems( folderId, sf, view );
+                            FindItemsResults<Item> findResults = null;
+                            if ( launchWith.Count() == 1 && launchWith.FirstOrDefault() == ( int ) ProcessEmailsBy.ExistsInFolder )
+                            {
+                                findResults = service.FindItems( folderId, view );
+                            }
+                            else
+                            {
+                                findResults = service.FindItems( folderId, sf, view );
+                            }
 
                             if ( findResults.Items.Count > 0 )
                             {
+                                var archiveItemIds = new List<ItemId>();
+
                                 var getMessagePropertySet = new PropertySet( BasePropertySet.FirstClassProperties );
                                 //getMessagePropertySet.Add( ItemSchema.Attachments ); // for future
 
@@ -322,13 +372,47 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                                         messages.Add( string.Format( "{0} workflow was appended.", existingWorkflow.Name ) );
                                     }
 
-                                    message.IsRead = true;
+                                    if ( markWith.Contains( ( ( int ) MarkEmailBy.Read ) ) )
+                                    {
+                                        message.IsRead = true;
+                                    }
+                                    if ( markWith.Contains( ( ( int ) MarkEmailBy.RemoveFlag ) ) )
+                                    {
+                                        message.Flag = new Flag { FlagStatus = ItemFlagStatus.NotFlagged };
+                                    }
+                                    if ( markWith.Contains( ( ( int ) MarkEmailBy.AddFlag ) ) )
+                                    {
+                                        message.Flag = new Flag { FlagStatus = ItemFlagStatus.Flagged };
+                                    }
+                                    if ( markWith.Contains( ( ( int ) MarkEmailBy.MarkComplete ) ) && message.Flag != null )
+                                    {
+                                        var flag = message.Flag;
+                                        flag.CompleteDate = RockDateTime.Now;
+                                        flag.FlagStatus = ItemFlagStatus.Complete;
+                                        message.Flag = flag;
+                                    }
+                                    // Most users will receive error "Archive mailbox is not enabled for this user."
+                                    // This archive is actual mailbox archiving, not just move to archive folder.
+                                    // Unable to test feature, requires Exchange Online Plan 2 or Exchange Online Archiving license, add note to documentation or remove?
+                                    if ( markWith.Contains( ( ( int ) MarkEmailBy.Archive ) ) )
+                                    {
+                                        archiveItemIds.Add( message.Id );
+                                    }
+                                    if ( markWith.Contains( ( ( int ) MarkEmailBy.Delete ) ) )
+                                    {
+                                        delete = true;
+                                    }
+
                                     message.Update( ConflictResolutionMode.AlwaysOverwrite, true );
 
                                     if ( delete )
                                     {
                                         message.Delete( DeleteMode.MoveToDeletedItems );
                                     }
+                                }
+                                if ( archiveItemIds.Any() )
+                                {
+                                    service.ArchiveItems( archiveItemIds, folderId );
                                 }
                             }
 
@@ -386,5 +470,24 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
             var oauthCreds = new OAuthCredentials( authResult.AccessToken );
             return oauthCreds;
         }
+    }
+
+    public enum ProcessEmailsBy
+    {
+        Unread,
+        Flagged,
+        FlaggedComplete,
+        HasAttachments,
+        ExistsInFolder
+    }
+
+    public enum MarkEmailBy
+    {
+        Read,
+        AddFlag,
+        RemoveFlag,
+        MarkComplete,
+        Archive,
+        Delete
     }
 }
