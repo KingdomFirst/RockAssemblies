@@ -79,7 +79,7 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
         Key = AttributeKey.LaunchWorkflowsWith )]
 
     [EnumsField( "Mark Processed Emails by",
-        Description = "How should the emails be marked within EWS once they are processed. Default: Read (Note: not all options will work without appropriate permissions. Multiple options will perform all that it can in order presented.).",
+        Description = "How should the emails be marked within EWS once they are processed. Default: Read (Note: not all options will work without appropriate permissions. Multiple options will perform all that it can in order presented.)",
         DefaultValue = "0",
         EnumSourceType = typeof( MarkEmailBy ),
         Order = 8,
