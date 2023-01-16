@@ -109,8 +109,6 @@ namespace ZoomDotNetFramework
             return response.Data;
         }
 
-        #region Pure Rest Calls
-
         #region Zoom API
 
         public User GetUser()
@@ -209,31 +207,51 @@ namespace ZoomDotNetFramework
             return result != null;
         }
 
+        public List<ZoomRoom> GetZoomRoomList( RoomStatus? status = null, RoomType? type = null, string locationId = null, string roomName = null, bool unassignedOnly = false, int? pageSize = null, string nextPageToken = null )
+        {
+            var request = new RestRequest
+            {
+                Resource = "rooms",
+                Method = Method.GET
+            };
+
+            if ( status.HasValue )
+            {
+                request.AddParameter( "status", status.ToString() );
+            }
+            if ( type.HasValue )
+            {
+                request.AddParameter( "type", type.ToString() );
+            }
+            if ( !string.IsNullOrWhiteSpace( locationId ) )
+            {
+                request.AddParameter( "location_id", locationId );
+            }
+            if ( !string.IsNullOrWhiteSpace( roomName ) )
+            {
+                request.AddParameter( "query_name", roomName );
+            }
+            if ( unassignedOnly )
+            {
+                request.AddParameter( "unassigned_rooms", bool.TrueString );
+            }
+            if ( pageSize.HasValue && pageSize.Value > 0 )
+            {
+                var pageSizeInt = pageSize.Value < 300 ? pageSize.Value : 300;  // Max for api is 300
+                request.AddParameter( "unassigned_rooms", pageSizeInt );
+            }
+            if ( !string.IsNullOrWhiteSpace( nextPageToken ) )
+            {
+                request.AddParameter( "next_page_token", nextPageToken );
+            }
+
+            var result = Execute<ListRoomsResponse>( request );
+            return result.Rooms;
+        }
+
         #endregion Zoom API
 
         #region Zoom Room API
-
-        public List<ZRRoom> GetZoomRoomList()
-        {
-            var result = new List<ZRRoom>();
-            var request = new RestRequest
-            {
-                Resource = "rooms/zrlist",
-                Method = Method.POST
-            };
-            var reqBody = new ZRRequestBodyBase
-            {
-                Method = "list",
-                JsonRPC = _jsonRpc
-            };
-            AddRequestJsonBody( request, reqBody );
-            var roomResponse = Execute<ZRListResponse>( request );
-            if ( roomResponse.Result?.Data != null )
-            {
-                result = roomResponse.Result.Data;
-            }
-            return result;
-        }
 
         public bool ScheduleZoomRoomMeeting( string roomId, string password, string callbackUrl, string topic, DateTimeOffset startTime, string timezone, int duration, bool joinBeforeHost = false )
         {
@@ -300,8 +318,6 @@ namespace ZoomDotNetFramework
         }
 
         #endregion Zoom Room API
-
-        #endregion Pure Rest Calls
 
         public RestRequest AddRequestJsonBody( RestRequest request, object bodyObject )
         {

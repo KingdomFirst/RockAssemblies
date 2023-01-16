@@ -14,24 +14,14 @@
 // limitations under the License.
 // </copyright>
 //
-using ZoomDotNetFramework.Enums;
+using System.Collections.Generic;
+using ZoomDotNetFramework.Entities;
 
-namespace ZoomDotNetFramework.Entities
+
+namespace ZoomDotNetFramework.Responses
 {
-    public class ZoomRoom
+    public class ListRoomsResponse : ZoomBaseResponse
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public RoomType Type { get; set; }
-        public string Activation_Code { get; set; }
-        public RoomStatus Status { get; set; }
-        public string Room_Id { get; set; }
-        public string Location_Id { get; set; }
-    }
-
-    public class ZRRoom
-    {
-        public string Zr_Name { get; set; }
-        public string Zr_Id { get; set; }
+        public List<ZoomRoom> Rooms { get; set; }
     }
 }
