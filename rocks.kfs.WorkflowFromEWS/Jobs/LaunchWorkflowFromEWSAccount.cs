@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2022 by Kingdom First Solutions
+// Copyright 2023 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,24 +35,101 @@ using Rock.Web.Cache;
 
 namespace rocks.kfs.WorkflowFromEWS.Jobs
 {
-    [EncryptedTextField( "ApplicationId", "The Application (client) ID in Microsoft Azure for the registered application that has access to the target Email Address.", order: 0 )]
-    [EncryptedTextField( "TenantId", "The Directory (tenant) ID in Microsoft Azure for the registered application that has access to the target Email Address.", order: 1 )]
-    [EncryptedTextField( "Application Secret", "The Secret Value in Microsoft Azure for the registered application that has access to the target Email Address.", order: 2 )]
-    [TextField( "Email Address", "The email address for the authenticated user to check.", order: 3 )]
-    [TextField( "Impersonate User", "The email address of the account to use for impersonation. This account must have access to the inbox provided in the Email Address setting. If left blank, the Email Address will be used.", order: 4 )]
-    [UrlLinkField( "Server Url", "", defaultValue: "https://outlook.office365.com/EWS/Exchange.asmx", order: 5 )]
-    [IntegerField( "Max Emails", "The maximum number of emails to process each time the job runs.", defaultValue: 100, order: 6 )]
-    [BooleanField( "Delete Messages", "Each message will be deleted after it is processed.", false, order: 7 )]
-    [BooleanField( "One Workflow Per Conversation", "If a workflow has already been created for a message in this conversation, additional workflows be not created. For example, replies will not activate new workflows.", false, order: 8 )]
-    [WorkflowTypeField( "Workflow Type", "The workflow type to be initiated for each message.", required: true, order: 9 )]
-    [KeyValueListField( "Workflow Attributes", "Used to match the email properties to the new workflow.", true, keyPrompt: "Attribute Key", valuePrompt: "Email Property", customValues: "DateReceived^Date Received,FromEmail^From Email,FromName^From Name,Subject^Subject,Body^Body", displayValueFirst: true, order: 10 )]
+    [EncryptedTextField( "Application Id",
+        Description = "The Application (client) ID in Microsoft Azure for the registered application that has access to the target Email Address.",
+        Order = 0,
+        Key = AttributeKey.ApplicationId )]
+
+    [EncryptedTextField( "Tenant Id",
+        Description = "The Directory (tenant) ID in Microsoft Azure for the registered application that has access to the target Email Address.",
+        Order = 1,
+        Key = AttributeKey.TenantId )]
+
+    [EncryptedTextField( "Application Secret",
+        Description = "The Secret Value in Microsoft Azure for the registered application that has access to the target Email Address.",
+        Order = 2,
+        Key = AttributeKey.ApplicationSecret )]
+
+    [TextField( "Email Address",
+        Description = "The email address for the authenticated user to check.",
+        Order = 3,
+        Key = AttributeKey.EmailAddress )]
+
+    [TextField( "Impersonate User",
+        Description = "The email address of the account to use for impersonation. This account must have access to the inbox provided in the Email Address setting. If left blank, the Email Address will be used.",
+        Order = 4,
+        Key = AttributeKey.ImpersonateUser )]
+
+    [UrlLinkField( "Server Url",
+        DefaultValue = "https://outlook.office365.com/EWS/Exchange.asmx",
+        Order = 5,
+        Key = AttributeKey.ServerUrl )]
+
+    [IntegerField( "Max Emails",
+        Description = "The maximum number of emails to process each time the job runs.",
+        DefaultIntegerValue = 100,
+        Order = 6,
+        Key = AttributeKey.MaxEmails )]
+
+    [EnumsField( "Launch Workflows with",
+        Description = "What emails should this job use to launch workflows? If none are selected, any items within the inbox provided in the Email Address setting will be processed. Default: Unread (When multiple options are selected these are a combined search result, i.e Unread AND Flagged)",
+        IsRequired = false,
+        EnumSourceType = typeof( ProcessEmailsBy ),
+        Order = 7,
+        Key = AttributeKey.LaunchWorkflowsWith )]
+
+    [EnumsField( "Mark Processed Emails by",
+        Description = "How should the emails be marked within EWS once they are processed. Default: Read (Note: not all options will work without appropriate permissions. Multiple options will perform all that it can in order presented.)",
+        DefaultValue = "0",
+        EnumSourceType = typeof( MarkEmailBy ),
+        Order = 8,
+        Key = AttributeKey.MarkEmailsBy )]
+
+    [BooleanField( "One Workflow Per Conversation",
+        Description = "If a workflow has already been created for a message in this conversation, additional workflows be not created. For example, replies will not activate new workflows.",
+        DefaultBooleanValue = true,
+        Order = 9,
+        Key = AttributeKey.OneWorkflowPerConversation )]
+
+    [WorkflowTypeField( "Workflow Type",
+        Description = "The workflow type to be initiated for each message.",
+        IsRequired = true,
+        Order = 10,
+        Key = AttributeKey.WorkflowType )]
+
+    [KeyValueListField( "Workflow Attributes",
+        description: "Used to match the email properties to the new workflow.",
+        required: true,
+        keyPrompt: "Attribute Key",
+        valuePrompt: "Email Property",
+        customValues: "DateReceived^Date Received,FromEmail^From Email,FromName^From Name,Subject^Subject,Body^Body",
+        displayValueFirst: true,
+        order: 11,
+        key: AttributeKey.WorkflowAttributes )]
+
 
     /// <summary>
     /// Job to create workflow using Exchange Web Services.
     /// </summary>
     [DisallowConcurrentExecution]
-    public class StartWorkflow : IJob
+    public class LaunchWorkflowFromEWSAccount : IJob
     {
+        private static class AttributeKey
+        {
+            public const string ApplicationId = "ApplicationId";
+            public const string TenantId = "TenantId";
+            public const string ApplicationSecret = "ApplicationSecret";
+            public const string EmailAddress = "EmailAddress";
+            public const string ImpersonateUser = "ImpersonateUser";
+            public const string ServerUrl = "ServerUrl";
+            public const string MaxEmails = "MaxEmails";
+            public const string OneWorkflowPerConversation = "OneWorkflowPerConversation";
+            public const string WorkflowType = "WorkflowType";
+            public const string WorkflowAttributes = "WorkflowAttributes";
+            public const string LaunchWorkflowsWith = "LaunchWorkflowsWith";
+            public const string MarkEmailsBy = "MarkEmailsBy";
+        }
+
         /// <summary>
         /// Empty constructor for job initialization
         /// <para>
@@ -60,7 +137,7 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
         /// scheduler can instantiate the class whenever it needs.
         /// </para>
         /// </summary>
-        public StartWorkflow()
+        public LaunchWorkflowFromEWSAccount()
         {
         }
 
@@ -76,7 +153,7 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
             var dataMap = context.JobDetail.JobDataMap;
             var messages = new List<string>();
             var workflowsStarted = 0;
-            var workflowTypeGuid = dataMap.GetString( "WorkflowType" ).AsGuidOrNull();
+            var workflowTypeGuid = dataMap.GetString( AttributeKey.WorkflowType ).AsGuidOrNull();
 
             if ( workflowTypeGuid.HasValue )
             {
@@ -84,22 +161,23 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
 
                 if ( workflowType != null )
                 {
-                    var applicationId = Encryption.DecryptString( dataMap.GetString( "ApplicationId" ) );
-                    var tenantId = Encryption.DecryptString( dataMap.GetString( "TenantId" ) );
-                    var appSecret = Encryption.DecryptString( dataMap.GetString( "ApplicationSecret" ) );
-                    var emailAddress = dataMap.GetString( "EmailAddress" );
-                    var impersonate = dataMap.GetString( "ImpersonateUser" );
+                    var applicationId = Encryption.DecryptString( dataMap.GetString( AttributeKey.ApplicationId ) );
+                    var tenantId = Encryption.DecryptString( dataMap.GetString( AttributeKey.TenantId ) );
+                    var appSecret = Encryption.DecryptString( dataMap.GetString( AttributeKey.ApplicationSecret ) );
+                    var emailAddress = dataMap.GetString( AttributeKey.EmailAddress );
+                    var impersonate = dataMap.GetString( AttributeKey.ImpersonateUser );
                     if ( impersonate.IsNullOrWhiteSpace() )
                     {
                         impersonate = emailAddress;
                     }
-                    var url = new Uri( dataMap.GetString( "ServerUrl" ) );
-                    var maxEmails = dataMap.GetString( "MaxEmails" ).AsInteger();
-                    var delete = dataMap.GetString( "DeleteMessages" ).AsBoolean();
-                    var onePer = dataMap.GetString( "OneWorkflowPerConversation" ).AsBoolean();
+                    var url = new Uri( dataMap.GetString( AttributeKey.ServerUrl ) );
+                    var maxEmails = dataMap.GetString( AttributeKey.MaxEmails ).AsInteger();
+                    var onePer = dataMap.GetString( AttributeKey.OneWorkflowPerConversation ).AsBoolean();
+                    var launchWith = dataMap.GetString( AttributeKey.LaunchWorkflowsWith ).StringToIntList();
+                    var markWith = dataMap.GetString( AttributeKey.MarkEmailsBy ).StringToIntList();
 
                     Dictionary<string, string> attributeKeyMap = null;
-                    var workflowAttributeKeys = dataMap.GetString( "WorkflowAttributes" );
+                    var workflowAttributeKeys = dataMap.GetString( AttributeKey.WorkflowAttributes );
                     if ( workflowAttributeKeys.IsNotNullOrWhiteSpace() )
                     {
                         attributeKeyMap = workflowAttributeKeys.AsDictionaryOrNull();
@@ -126,14 +204,45 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
 
                             var userMailbox = new Mailbox( emailAddress );
                             var folderId = new FolderId( WellKnownFolderName.Inbox, userMailbox );
-                            var sf = new SearchFilter.SearchFilterCollection( LogicalOperator.And, new SearchFilter.IsEqualTo( EmailMessageSchema.IsRead, false ) );
+                            var sf = new SearchFilter.SearchFilterCollection( LogicalOperator.And );
+
+                            if ( launchWith.Contains( ( ( int ) ProcessEmailsBy.Unread ) ) )
+                            {
+                                sf.Add( new SearchFilter.IsEqualTo( EmailMessageSchema.IsRead, false ) );
+                            }
+                            if ( launchWith.Contains( ( ( int ) ProcessEmailsBy.Flagged ) ) )
+                            {
+                                ExtendedPropertyDefinition pidTagFlagStatus = new ExtendedPropertyDefinition( 0x1090, MapiPropertyType.Integer );
+                                SearchFilter Flagged = new SearchFilter.IsEqualTo( pidTagFlagStatus, 2 );
+                                sf.Add( Flagged );
+                            }
+                            if ( launchWith.Contains( ( ( int ) ProcessEmailsBy.FlaggedComplete ) ) )
+                            {
+                                ExtendedPropertyDefinition pidTagTaskStatus = new ExtendedPropertyDefinition( DefaultExtendedPropertySet.Task, 0x8101, MapiPropertyType.Integer );
+                                SearchFilter SetComplete = new SearchFilter.IsEqualTo( pidTagTaskStatus, 2 );
+                                sf.Add( SetComplete );
+                            }
+                            if ( launchWith.Contains( ( ( int ) ProcessEmailsBy.HasAttachments ) ) )
+                            {
+                                sf.Add( new SearchFilter.IsEqualTo( EmailMessageSchema.HasAttachments, true ) );
+                            }
                             var view = new ItemView( maxEmails );
                             view.PropertySet = findItemPropertySet;
                             view.OrderBy.Add( ItemSchema.DateTimeReceived, SortDirection.Descending );
-                            var findResults = service.FindItems( folderId, sf, view );
+                            FindItemsResults<Item> findResults = null;
+                            if ( sf.Count > 0 )
+                            {
+                                findResults = service.FindItems( folderId, sf, view );
+                            }
+                            else
+                            {
+                                findResults = service.FindItems( folderId, view );
+                            }
 
                             if ( findResults.Items.Count > 0 )
                             {
+                                var archiveItemIds = new List<ItemId>();
+
                                 var getMessagePropertySet = new PropertySet( BasePropertySet.FirstClassProperties );
                                 //getMessagePropertySet.Add( ItemSchema.Attachments ); // for future
 
@@ -255,14 +364,44 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                                         messages.Add( string.Format( "{0} workflow was appended.", existingWorkflow.Name ) );
                                     }
 
-                                    message.IsRead = true;
+                                    if ( markWith.Contains( ( ( int ) MarkEmailBy.Read ) ) )
+                                    {
+                                        message.IsRead = true;
+                                    }
+                                    if ( markWith.Contains( ( ( int ) MarkEmailBy.RemoveFlag ) ) )
+                                    {
+                                        message.Flag = new Flag { FlagStatus = ItemFlagStatus.NotFlagged };
+                                    }
+                                    if ( markWith.Contains( ( ( int ) MarkEmailBy.AddFlag ) ) )
+                                    {
+                                        message.Flag = new Flag { FlagStatus = ItemFlagStatus.Flagged };
+                                    }
+                                    if ( markWith.Contains( ( ( int ) MarkEmailBy.MarkComplete ) ) && message.Flag != null )
+                                    {
+                                        var flag = message.Flag;
+                                        flag.CompleteDate = RockDateTime.Now;
+                                        flag.FlagStatus = ItemFlagStatus.Complete;
+                                        message.Flag = flag;
+                                    }
+                                    // Most users will receive error "Archive mailbox is not enabled for this user."
+                                    // This archive is actual mailbox archiving, not just move to archive folder.
+                                    // Unable to test feature, requires Exchange Online Plan 2 or Exchange Online Archiving license, add note to documentation or remove?
+                                    //if ( markWith.Contains( ( ( int ) MarkEmailBy.Archive ) ) )
+                                    //{
+                                    //    archiveItemIds.Add( message.Id );
+                                    //}
+
                                     message.Update( ConflictResolutionMode.AlwaysOverwrite, true );
 
-                                    if ( delete )
+                                    if ( markWith.Contains( ( ( int ) MarkEmailBy.Delete ) ) )
                                     {
                                         message.Delete( DeleteMode.MoveToDeletedItems );
                                     }
                                 }
+                                //if ( archiveItemIds.Any() )
+                                //{
+                                //    service.ArchiveItems( archiveItemIds, folderId );
+                                //}
                             }
 
                             if ( workflowsStarted > 0 )
@@ -319,5 +458,22 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
             var oauthCreds = new OAuthCredentials( authResult.AccessToken );
             return oauthCreds;
         }
+    }
+
+    public enum ProcessEmailsBy
+    {
+        Unread,
+        Flagged,
+        FlaggedComplete,
+        HasAttachments
+    }
+
+    public enum MarkEmailBy
+    {
+        Read,
+        AddFlag,
+        RemoveFlag,
+        MarkComplete,
+        Delete
     }
 }
