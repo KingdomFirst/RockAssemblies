@@ -72,8 +72,8 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
         Key = AttributeKey.MaxEmails )]
 
     [EnumsField( "Launch Workflows with",
-        Description = "What emails should this job use to launch workflows? Default: Unread (When multiple options are selected these are a combined search result, i.e Unread AND Flagged)",
-        DefaultValue = "0",
+        Description = "What emails should this job use to launch workflows? If none are selected, any items within the inbox provided in the Email Address setting will be processed. Default: Unread (When multiple options are selected these are a combined search result, i.e Unread AND Flagged)",
+        IsRequired = false,
         EnumSourceType = typeof( ProcessEmailsBy ),
         Order = 7,
         Key = AttributeKey.LaunchWorkflowsWith )]
@@ -85,22 +85,16 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
         Order = 8,
         Key = AttributeKey.MarkEmailsBy )]
 
-    [BooleanField( "Delete Messages",
-        Description = "Each message will be deleted after it is processed.",
-        DefaultBooleanValue = false,
-        Order = 9,
-        Key = AttributeKey.DeleteMessages )]
-
     [BooleanField( "One Workflow Per Conversation",
         Description = "If a workflow has already been created for a message in this conversation, additional workflows be not created. For example, replies will not activate new workflows.",
         DefaultBooleanValue = true,
-        Order = 10,
+        Order = 9,
         Key = AttributeKey.OneWorkflowPerConversation )]
 
     [WorkflowTypeField( "Workflow Type",
         Description = "The workflow type to be initiated for each message.",
         IsRequired = true,
-        Order = 11,
+        Order = 10,
         Key = AttributeKey.WorkflowType )]
 
     [KeyValueListField( "Workflow Attributes",
@@ -110,7 +104,7 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
         valuePrompt: "Email Property",
         customValues: "DateReceived^Date Received,FromEmail^From Email,FromName^From Name,Subject^Subject,Body^Body",
         displayValueFirst: true,
-        order: 12,
+        order: 11,
         key: AttributeKey.WorkflowAttributes )]
 
 
@@ -129,7 +123,6 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
             public const string ImpersonateUser = "ImpersonateUser";
             public const string ServerUrl = "ServerUrl";
             public const string MaxEmails = "MaxEmails";
-            public const string DeleteMessages = "DeleteMessages";
             public const string OneWorkflowPerConversation = "OneWorkflowPerConversation";
             public const string WorkflowType = "WorkflowType";
             public const string WorkflowAttributes = "WorkflowAttributes";
@@ -179,7 +172,6 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                     }
                     var url = new Uri( dataMap.GetString( AttributeKey.ServerUrl ) );
                     var maxEmails = dataMap.GetString( AttributeKey.MaxEmails ).AsInteger();
-                    var delete = dataMap.GetString( AttributeKey.DeleteMessages ).AsBoolean();
                     var onePer = dataMap.GetString( AttributeKey.OneWorkflowPerConversation ).AsBoolean();
                     var launchWith = dataMap.GetString( AttributeKey.LaunchWorkflowsWith ).StringToIntList();
                     var markWith = dataMap.GetString( AttributeKey.MarkEmailsBy ).StringToIntList();
@@ -238,13 +230,13 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                             view.PropertySet = findItemPropertySet;
                             view.OrderBy.Add( ItemSchema.DateTimeReceived, SortDirection.Descending );
                             FindItemsResults<Item> findResults = null;
-                            if ( launchWith.Count() == 1 && launchWith.FirstOrDefault() == ( int ) ProcessEmailsBy.ExistsInFolder )
+                            if ( sf.Count > 0 )
                             {
-                                findResults = service.FindItems( folderId, view );
+                                findResults = service.FindItems( folderId, sf, view );
                             }
                             else
                             {
-                                findResults = service.FindItems( folderId, sf, view );
+                                findResults = service.FindItems( folderId, view );
                             }
 
                             if ( findResults.Items.Count > 0 )
@@ -394,26 +386,22 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
                                     // Most users will receive error "Archive mailbox is not enabled for this user."
                                     // This archive is actual mailbox archiving, not just move to archive folder.
                                     // Unable to test feature, requires Exchange Online Plan 2 or Exchange Online Archiving license, add note to documentation or remove?
-                                    if ( markWith.Contains( ( ( int ) MarkEmailBy.Archive ) ) )
-                                    {
-                                        archiveItemIds.Add( message.Id );
-                                    }
-                                    if ( markWith.Contains( ( ( int ) MarkEmailBy.Delete ) ) )
-                                    {
-                                        delete = true;
-                                    }
+                                    //if ( markWith.Contains( ( ( int ) MarkEmailBy.Archive ) ) )
+                                    //{
+                                    //    archiveItemIds.Add( message.Id );
+                                    //}
 
                                     message.Update( ConflictResolutionMode.AlwaysOverwrite, true );
 
-                                    if ( delete )
+                                    if ( markWith.Contains( ( ( int ) MarkEmailBy.Delete ) ) )
                                     {
                                         message.Delete( DeleteMode.MoveToDeletedItems );
                                     }
                                 }
-                                if ( archiveItemIds.Any() )
-                                {
-                                    service.ArchiveItems( archiveItemIds, folderId );
-                                }
+                                //if ( archiveItemIds.Any() )
+                                //{
+                                //    service.ArchiveItems( archiveItemIds, folderId );
+                                //}
                             }
 
                             if ( workflowsStarted > 0 )
@@ -477,8 +465,7 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
         Unread,
         Flagged,
         FlaggedComplete,
-        HasAttachments,
-        ExistsInFolder
+        HasAttachments
     }
 
     public enum MarkEmailBy
@@ -487,7 +474,6 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
         AddFlag,
         RemoveFlag,
         MarkComplete,
-        Archive,
         Delete
     }
 }
