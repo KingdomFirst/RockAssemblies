@@ -93,7 +93,7 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
 
     [BooleanField( "One Workflow Per Conversation",
         Description = "If a workflow has already been created for a message in this conversation, additional workflows be not created. For example, replies will not activate new workflows.",
-        DefaultBooleanValue = false,
+        DefaultBooleanValue = true,
         Order = 10,
         Key = AttributeKey.OneWorkflowPerConversation )]
 
