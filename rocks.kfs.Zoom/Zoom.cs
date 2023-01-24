@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2022 by Kingdom First Solutions
+// Copyright 2023 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,18 +32,18 @@ namespace rocks.kfs.Zoom
     {
         public static ZoomApi Api()
         {
-            return new ZoomApi( Settings.GetJwtString() );
+            return new ZoomApi( Settings.GetOauthString() );
         }
 
-        public static ZoomApi Api( string jwtString )
+        public static ZoomApi Api( string oAuthString )
         {
-            return new ZoomApi( jwtString );
+            return new ZoomApi( oAuthString );
         }
 
         public static bool ZoomAuthCheck()
         {
             var retVar = false;
-            var zmUser = new ZoomApi( Settings.GetJwtString() ).GetUser();
+            var zmUser = new ZoomApi( Settings.GetOauthString() ).GetUser();
             if ( zmUser != null && zmUser.Id.IsNotNullOrWhiteSpace() )
             {
                 retVar = true;
@@ -62,20 +62,20 @@ namespace rocks.kfs.Zoom
                 LogEvent( rockContext, "SyncZoom", "Sync Zoom Rooms Defined Type", "Started" );
             }
             var zoom = Api();
-            var zrList = zoom.GetZoomRoomList().OrderBy( r => r.Zr_Name );
+            var zrList = zoom.GetZoomRoomList( type: RoomType.ZoomRoom ).OrderBy( r => r.Name );
             if ( enableLogging )
             {
                 LogEvent( rockContext, "SyncZoom", "Get Zoom Rooms using Zoom API", string.Format( "zoom.GetZoomRoomList() found {0} rooms.", zrList.Count() ) );
             }
 
             var zoomRoomDT = new DefinedTypeService( rockContext ).Get( ZoomGuid.DefinedType.ZOOM_ROOM.AsGuid() );
+            var dvService = new DefinedValueService( rockContext );
+            var zoomRoomDV = dvService.Queryable().Where( v => v.DefinedTypeId == zoomRoomDT.Id );
 
             // Delete DefinedValue for any rooms that no longer exist
-            var zoomRoomsToDelete = zoomRoomDT.DefinedValues.Where( v => !zrList.Select( zr => zr.Zr_Id ).Contains( v.Value ) );
-            foreach ( var zrDV in zoomRoomsToDelete )
-            {
-                zoomRoomDT.DefinedValues.Remove( zrDV );
-            }
+            var zrIds = zrList.Select( zr => zr.Id ).ToList();
+            var zoomRoomsToDelete = zoomRoomDV.Where( v => !zrIds.Contains( v.Value ) );
+            dvService.DeleteRange( zoomRoomsToDelete );
 
             if ( enableLogging )
             {
@@ -83,11 +83,11 @@ namespace rocks.kfs.Zoom
             }
 
             // Add DefinedValue for any new Zoom Rooms
-            var newZoomRooms = zrList.Where( r => !zoomRoomDT.DefinedValues.Select( v => v.Value ).Contains( r.Zr_Id ) )
+            var newZoomRooms = zrList.Where( r => !zoomRoomDT.DefinedValues.Select( v => v.Value ).Contains( r.Id ) )
                                         .Select( r => new DefinedValue
                                         {
-                                            Value = r.Zr_Id,
-                                            Description = r.Zr_Name
+                                            Value = r.Id,
+                                            Description = r.Name
                                         } );
             foreach ( var roomDV in newZoomRooms )
             {
