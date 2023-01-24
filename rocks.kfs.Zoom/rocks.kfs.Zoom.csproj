@@ -103,6 +103,7 @@
     <Compile Include="Enums\ZoomMeetingRequestStatus.cs" />
     <Compile Include="Jobs\ZoomMeetingGroupReminder.cs" />
     <Compile Include="Jobs\ZoomRoomSchedulingAndMaintenance.cs" />
+    <Compile Include="Migrations\009_UpdateApiAttributesForOauth.cs" />
     <Compile Include="Migrations\008_MakeCommunicationsEditable.cs" />
     <Compile Include="Migrations\007_DataViewsAndReports.cs" />
     <Compile Include="Migrations\006_PageAndBlocks.cs" />

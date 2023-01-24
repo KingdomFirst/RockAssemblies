@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2021 by Kingdom First Solutions
+// Copyright 2023 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,24 +14,19 @@
 // limitations under the License.
 // </copyright>
 //
-using ZoomDotNetFramework.Enums;
+using System.Collections.Generic;
 
-namespace ZoomDotNetFramework.Entities
+
+namespace ZoomDotNetFramework.Responses
 {
-    public class ZoomRoom
+    public class OauthTokenResponse
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public RoomType Type { get; set; }
-        public string Activation_Code { get; set; }
-        public RoomStatus Status { get; set; }
-        public string Room_Id { get; set; }
-        public string Location_Id { get; set; }
-    }
+        public string Access_Token { get; set; }
 
-    public class ZRRoom
-    {
-        public string Zr_Name { get; set; }
-        public string Zr_Id { get; set; }
+        public string Token_Type { get; set; }
+
+        public long Expire_In { get; set; }
+
+        public string Scope { get; set; }
     }
 }

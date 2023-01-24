@@ -47,5 +47,7 @@ namespace ZoomDotNetFramework.Entities
         public MeetingSetting Settings { get; set; }
         public Recurrence Recurrence { get; set; }
         public string Template_Id { get; set; }
+        public bool Join_Before_Host { get; set; }
+        public int JBH_Time { get; set; }
     }
 }
