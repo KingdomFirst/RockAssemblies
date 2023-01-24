@@ -238,7 +238,7 @@ namespace ZoomDotNetFramework
             if ( pageSize.HasValue && pageSize.Value > 0 )
             {
                 var pageSizeInt = pageSize.Value < 300 ? pageSize.Value : 300;  // Max for api is 300
-                request.AddParameter( "unassigned_rooms", pageSizeInt );
+                request.AddParameter( "page_size", pageSizeInt );
             }
             if ( !string.IsNullOrWhiteSpace( nextPageToken ) )
             {
