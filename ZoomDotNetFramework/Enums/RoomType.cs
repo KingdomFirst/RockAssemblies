@@ -19,7 +19,9 @@ namespace ZoomDotNetFramework.Enums
 {
     public enum RoomType
     {
+        Kiosk,
         ZoomRoom,
+        StandaloneWhiteboard,
         SchedulingDisplayOnly,
         DigitalSignageOnly
     }

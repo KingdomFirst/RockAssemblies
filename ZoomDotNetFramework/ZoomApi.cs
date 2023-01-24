@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2021 by Kingdom First Solutions
+// Copyright 2023 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,20 +22,57 @@ namespace ZoomDotNetFramework
     using RestSharp;
     using System;
     using System.Collections.Generic;
+    using System.Text;
     using ZoomDotNetFramework.Enums;
     using ZoomDotNetFramework.Responses;
 
     public class ZoomApi
     {
         private const string BaseUrl = "https://api.zoom.us/v2/";
-        private string _jwtToken;
+        private string _oAuthToken;
         private string _jsonRpc = string.Empty;
 
         //Initializer
-        public ZoomApi( string jwtToken, string jsonRpcVersion = "" )
+        public ZoomApi( string oAuthToken, string jsonRpcVersion = "" )
         {
-            _jwtToken = jwtToken;
+            _oAuthToken = oAuthToken;
             _jsonRpc = jsonRpcVersion;
+        }
+
+        /// <summary>
+        /// Gets an Oauth token for a Zoom app.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetOauthToken( string zoomAppAccountId, string zoomAppClientId, string zoomAppClientSecret )
+        {
+            string tokenString = null;
+            var client = new RestClient
+            {
+                BaseUrl = new System.Uri( string.Format( "https://zoom.us/oauth/token?grant_type=account_credentials&account_id={0}", zoomAppAccountId ) )
+            };
+            var request = new RestRequest
+            {
+                Method = Method.POST
+            };
+            request.AddHeader( "Authorization", "Basic " + Convert.ToBase64String( Encoding.ASCII.GetBytes( string.Format( "{0}:{1}", zoomAppClientId, zoomAppClientSecret ) ) ) );
+            request.AddHeader( "Host", "zoom.us" );
+            var response = client.Execute<OauthTokenResponse>( request );
+
+            if ( response.ErrorException != null )
+            {
+                const string message = "Error retrieving Oauth token.  Check inner details for more info.";
+                var ZoomException = new ApplicationException( message, response.ErrorException );
+                throw ZoomException;
+            }
+            else if ( response.Content.Contains( "error" ) )
+            {
+                var errorResponse = JsonConvert.DeserializeObject<OauthErrorResponse>( response.Content );
+                var message = string.Format( "Error retrieving Oauth token. {0}: {1}", errorResponse.Error, errorResponse.Reason );
+                var exception = new ApplicationException( message );
+                throw exception;
+            }
+            tokenString = response.Data.Access_Token;
+            return tokenString;
         }
 
         //Base Execute
@@ -46,7 +83,7 @@ namespace ZoomDotNetFramework
                 BaseUrl = new System.Uri( BaseUrl )
             };
             request.AddHeader( "content-type", "application/json" );
-            request.AddHeader( "authorization", "Bearer " + _jwtToken ); // used on every request
+            request.AddHeader( "authorization", "Bearer " + _oAuthToken );
             var response = client.Execute<T>( request );
 
             if ( response.ErrorException != null )
@@ -71,8 +108,6 @@ namespace ZoomDotNetFramework
             }
             return response.Data;
         }
-
-        #region Pure Rest Calls
 
         #region Zoom API
 
@@ -172,26 +207,51 @@ namespace ZoomDotNetFramework
             return result != null;
         }
 
-        #endregion Zoom API
-
-        #region Zoom Room API
-
-        public List<ZRRoom> GetZoomRoomList()
+        public List<ZoomRoom> GetZoomRoomList( RoomStatus? status = null, RoomType? type = null, string locationId = null, string roomName = null, bool unassignedOnly = false, int? pageSize = null, string nextPageToken = null )
         {
             var request = new RestRequest
             {
-                Resource = "rooms/zrlist",
-                Method = Method.POST
+                Resource = "rooms",
+                Method = Method.GET
             };
-            var reqBody = new ZRRequestBodyBase
+
+            if ( status.HasValue )
             {
-                Method = "list",
-                JsonRPC = _jsonRpc
-            };
-            AddRequestJsonBody( request, reqBody );
-            var result = Execute<ZRListResponse>( request );
-            return result.Result.Data;
+                request.AddParameter( "status", status.ToString() );
+            }
+            if ( type.HasValue )
+            {
+                request.AddParameter( "type", type.ToString() );
+            }
+            if ( !string.IsNullOrWhiteSpace( locationId ) )
+            {
+                request.AddParameter( "location_id", locationId );
+            }
+            if ( !string.IsNullOrWhiteSpace( roomName ) )
+            {
+                request.AddParameter( "query_name", roomName );
+            }
+            if ( unassignedOnly )
+            {
+                request.AddParameter( "unassigned_rooms", bool.TrueString );
+            }
+            if ( pageSize.HasValue && pageSize.Value > 0 )
+            {
+                var pageSizeInt = pageSize.Value < 300 ? pageSize.Value : 300;  // Max for api is 300
+                request.AddParameter( "page_size", pageSizeInt );
+            }
+            if ( !string.IsNullOrWhiteSpace( nextPageToken ) )
+            {
+                request.AddParameter( "next_page_token", nextPageToken );
+            }
+
+            var result = Execute<ListRoomsResponse>( request );
+            return result.Rooms;
         }
+
+        #endregion Zoom API
+
+        #region Zoom Room API
 
         public bool ScheduleZoomRoomMeeting( string roomId, string password, string callbackUrl, string topic, DateTimeOffset startTime, string timezone, int duration, bool joinBeforeHost = false )
         {
@@ -258,8 +318,6 @@ namespace ZoomDotNetFramework
         }
 
         #endregion Zoom Room API
-
-        #endregion Pure Rest Calls
 
         public RestRequest AddRequestJsonBody( RestRequest request, object bodyObject )
         {
