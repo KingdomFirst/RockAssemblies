@@ -7,8 +7,8 @@
     <ProjectGuid>{EEFCBE3D-6F6C-4C9B-8A19-B9FA04B4D6BF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>rocks.kfs.WorkflowFromEWS</RootNamespace>
-    <AssemblyName>rocks.kfs.WorkflowFromEWS</AssemblyName>
+    <RootNamespace>rocks.kfs.Microsoft365Utilities</RootNamespace>
+    <AssemblyName>rocks.kfs.Microsoft365Utilities</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
