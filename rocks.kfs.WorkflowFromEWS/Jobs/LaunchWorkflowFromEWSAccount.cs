@@ -33,7 +33,7 @@ using Rock.Model;
 using Rock.Security;
 using Rock.Web.Cache;
 
-namespace rocks.kfs.WorkflowFromEWS.Jobs
+namespace rocks.kfs.Microsoft365Utilities.Jobs
 {
     [EncryptedTextField( "Application Id",
         Description = "The Application (client) ID in Microsoft Azure for the registered application that has access to the target Email Address.",
