@@ -71,7 +71,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Jobs\LaunchWorkflowFromEWSAccount.cs" />
+    <Compile Include="Migrations\001_CreateAttribute.cs" />
+    <Compile Include="Migrations\002_CreateAzureAppAttributes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shortcodes\CalendarItems.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
