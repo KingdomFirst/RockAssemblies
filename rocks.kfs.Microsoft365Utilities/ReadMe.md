@@ -1,4 +1,4 @@
-![Kingdom First Solutions](Images/KFSBanner.jpg)
+![Kingdom First Solutions](../.screenshots/KFSBanner.jpg)
 
 # Microsoft 365 Utilities
 <div style="background-color:#ffc107;padding:10px">Our Exchange Online integrations work with Microsoft's EWS api. The current process for utilizing this api requires setup and configuration of specific api credentials. See the <a href="#setup-ews-api-credentials">Setup EWS API Credentials</a> section for details.</div><br/>
@@ -29,7 +29,7 @@ This shortcode can pull calendar items from any configured Microsoft 365 Online 
 
 ### Installation
 The new shortcode is automatically added to existing shortcodes and ready to use once the plugin is installed.
-![Shortcode List](Images/ShortcodeInList.png)
+![Shortcode List](../.screenshots/Microsoft365Utilities/ShortcodeInList.png)
 
 ### Usage
 The shortcode is called using the name "ewscalendaritems" with 9 possible parameters. It returns a CalendarItems object that contains a list of calendar items retrieved from the calendarmailbox.
@@ -80,7 +80,7 @@ Launch workflows by polling a Microsoft Exchange Online mailbox.
 
 ### Configuration
 
-![JobSettings](Images/LaunchEWSWorkflowJobSettings.png)
+![JobSettings](../.screenshots/Microsoft365Utilities/LaunchEWSWorkflowJobSettings.png)
 <div style="page-break-after: always;"></div>
 <style>
   table {
