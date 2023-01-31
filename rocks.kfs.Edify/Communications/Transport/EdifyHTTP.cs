@@ -99,18 +99,21 @@ namespace rocks.kfs.Edify.Communications.Transport
             }
 
             var toEmail = rockEmailMessage.GetRecipients();
-            toEmail.ForEach( r => toEmailList.Add( r.To ) );
+            toEmail
+                .Where( r => r.To.Trim() != string.Empty )
+                .ToList()
+                .ForEach( r => toEmailList.Add( r.To.Trim() ) );
 
             ccEmailList = rockEmailMessage
                 .CCEmails
-                .Where( cc => cc != string.Empty )
-                .Where( cc => !toEmail.Any( te => te.To == cc ) )
+                .Where( cc => cc.Trim() != string.Empty )
+                .Where( cc => !toEmailList.Contains( cc ) )
                 .ToList();
 
             bccEmailList = rockEmailMessage
                 .BCCEmails
-                .Where( bcc => bcc != string.Empty )
-                .Where( bcc => !toEmail.Any( te => te.To == bcc ) )
+                .Where( bcc => bcc.Trim() != string.Empty )
+                .Where( bcc => !toEmailList.Contains( bcc ) )
                 .Where( bcc => !ccEmailList.Contains( bcc ) )
                 .ToList();
 
