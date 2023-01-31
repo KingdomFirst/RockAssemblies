@@ -33,7 +33,7 @@ using Rock.Model;
 using Rock.Security;
 using Rock.Web.Cache;
 
-namespace rocks.kfs.WorkflowFromEWS.Jobs
+namespace rocks.kfs.Microsoft365Utilities.Jobs
 {
     [EncryptedTextField( "Application Id",
         Description = "The Application (client) ID in Microsoft Azure for the registered application that has access to the target Email Address.",
@@ -72,7 +72,7 @@ namespace rocks.kfs.WorkflowFromEWS.Jobs
         Key = AttributeKey.MaxEmails )]
 
     [EnumsField( "Launch Workflows with",
-        Description = "What emails should this job use to launch workflows? If none are selected, any items within the inbox provided in the Email Address setting will be processed. Default: Unread (When multiple options are selected these are a combined search result, i.e Unread AND Flagged)",
+        Description = "What emails should this job use to launch workflows? If none are selected, any items within the inbox provided in the Email Address setting will be processed. When multiple options are selected these are a combined search result, i.e Unread AND Flagged.",
         IsRequired = false,
         EnumSourceType = typeof( ProcessEmailsBy ),
         Order = 7,
