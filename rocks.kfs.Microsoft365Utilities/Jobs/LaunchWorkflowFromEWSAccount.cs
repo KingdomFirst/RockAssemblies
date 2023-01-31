@@ -72,7 +72,7 @@ namespace rocks.kfs.Microsoft365Utilities.Jobs
         Key = AttributeKey.MaxEmails )]
 
     [EnumsField( "Launch Workflows with",
-        Description = "What emails should this job use to launch workflows? If none are selected, any items within the inbox provided in the Email Address setting will be processed. Default: Unread (When multiple options are selected these are a combined search result, i.e Unread AND Flagged)",
+        Description = "What emails should this job use to launch workflows? If none are selected, any items within the inbox provided in the Email Address setting will be processed. When multiple options are selected these are a combined search result, i.e Unread AND Flagged.",
         IsRequired = false,
         EnumSourceType = typeof( ProcessEmailsBy ),
         Order = 7,
