@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2020 by Kingdom First Solutions
+// Copyright 2023 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,10 +42,12 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
 
     [GroupTypesField( "Group Types",
         Description = "Use this setting to send the fundraising participant summary email to entire GroupType(s).",
+        IsRequired = false,
         Key = AttributeKey.GroupTypes )]
 
     [GroupField( "Group",
-        Description = "Use this setting to send the fundraising participant summary email to a specific Group and its child Groups.",
+        Description = "Use this setting to send the fundraising participant summary email to a specific Group and its child Groups. (If both settings are set, Group and its child groups will override Group Types).",
+        IsRequired = false,
         Key = AttributeKey.Group )]
 
     [BooleanField( "Show Address",
@@ -71,7 +73,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
     [IntegerField( "Command Timeout Override",
         Description = "Command Timeout value (in seconds) to use instead of default database connection timeout.",
         IsRequired = false,
-        Key = AttributeKey.CommandTimeoutOverride ) ]
+        Key = AttributeKey.CommandTimeoutOverride )]
     [DisallowConcurrentExecution]
     public class FundraisingParticipantSummary : IJob
     {
@@ -157,7 +159,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
 
                 var groupGuid = dataMap.GetString( AttributeKey.Group ).AsGuidOrNull();
 
-                if ( ( groupTypes.IsNull() || groupTypes.Count == 0 ) && !groupGuid.HasValue )
+                if ( ( groupTypes == null || groupTypes.Count == 0 ) && !groupGuid.HasValue )
                 {
                     context.Result = "Job failed. Unable to find group type or selected group. Check your settings.";
                     throw new Exception( "No group type found or group found." );
