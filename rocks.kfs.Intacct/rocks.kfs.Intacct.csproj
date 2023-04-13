@@ -78,6 +78,7 @@
     <Compile Include="IntacctOtherReceipt.cs" />
     <Compile Include="IntacctJournal.cs" />
     <Compile Include="IntacctModels.cs" />
+    <Compile Include="Migrations\003_AddBatchesToIntacct.cs" />
     <Compile Include="Migrations\002_AddTransactionFeeAttributes.cs" />
     <Compile Include="Migrations\001_AddSystemData.cs" />
     <Compile Include="IntacctEndpoint.cs" />
