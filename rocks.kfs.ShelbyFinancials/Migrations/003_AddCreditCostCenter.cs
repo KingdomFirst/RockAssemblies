@@ -32,7 +32,7 @@ namespace rocks.kfs.ShelbyFinancials.Migrations
         public override void Up()
         {
             // Relabel Cost Center attribute
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Cost Center Default/Debit", "Cost Center Default will be used on both Credit/Debit lines if Cost Center Credit does not contain a value, to preserve existing functionality.", 11, "", "CD925E61-F87D-461F-9EFA-C1E14397FC4D", "rocks.kfs.ShelbyFinancials.CostCenter" );
+            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Cost Center Default/Debit", "Cost Center Default will be used on both Credit/Debit lines if Cost Center Credit does not contain a value.", 11, "", "CD925E61-F87D-461F-9EFA-C1E14397FC4D", "rocks.kfs.ShelbyFinancials.CostCenter" );
 
             // New Cost Center Credit attribute
             RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Cost Center Credit", "", 12, "", "94D96FEB-73AD-4A07-9F03-257A988994D4", "rocks.kfs.ShelbyFinancials.CostCenterCredit" );
