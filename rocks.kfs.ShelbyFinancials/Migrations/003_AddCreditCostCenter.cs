@@ -23,7 +23,7 @@ using Rock.Plugin;
 
 namespace rocks.kfs.ShelbyFinancials.Migrations
 {
-    [MigrationNumber( 3, "1.13.0" )]
+    [MigrationNumber( 3, "1.12.0" )]
     public class AddCreditCostCenter : Migration
     {
         /// <summary>
