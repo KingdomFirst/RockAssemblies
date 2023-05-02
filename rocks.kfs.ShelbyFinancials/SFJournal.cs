@@ -176,7 +176,8 @@ namespace rocks.kfs.ShelbyFinancials
                     SuperFundNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.SuperFund" ),
                     FundNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Fund" ),
                     LocationNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Location" ),
-                    CostCenterNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.CostCenter" ),
+                    CostCenterDebitNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.CostCenter" ),
+                    CostCenterCreditNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.CostCenterCredit" ),
                     DepartmentNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Department" ),
                     CreditAccountNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.CreditAccount" ),
                     DebitAccountNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.DebitAccount" ),
@@ -213,7 +214,7 @@ namespace rocks.kfs.ShelbyFinancials
                     SuperFundNumber = transaction.SuperFundNumber,
                     FundNumber = transaction.FundNumber,
                     LocationNumber = transaction.LocationNumber,
-                    CostCenterNumber = transaction.CostCenterNumber,
+                    CostCenterNumber = transaction.CostCenterCreditNumber.IsNotNullOrWhiteSpace() ? transaction.CostCenterCreditNumber : transaction.CostCenterDebitNumber,
                     DepartmentNumber = transaction.DepartmentNumber,
                     AccountNumber = transaction.CreditAccountNumber,
                     AccountSub = transaction.RevenueAccountSub,
@@ -234,7 +235,7 @@ namespace rocks.kfs.ShelbyFinancials
                     SuperFundNumber = transaction.SuperFundNumber,
                     FundNumber = transaction.FundNumber,
                     LocationNumber = transaction.LocationNumber,
-                    CostCenterNumber = transaction.CostCenterNumber,
+                    CostCenterNumber = transaction.CostCenterDebitNumber,
                     DepartmentNumber = "0",
                     AccountNumber = transaction.DebitAccountNumber,
                     AccountSub = transaction.DebitAccountSub,
@@ -710,7 +711,8 @@ namespace rocks.kfs.ShelbyFinancials
             public string SuperFundNumber;
             public string FundNumber;
             public string LocationNumber;
-            public string CostCenterNumber;
+            public string CostCenterDebitNumber;
+            public string CostCenterCreditNumber;
             public string DepartmentNumber;
             public string CreditAccountNumber;
             public string DebitAccountNumber;
