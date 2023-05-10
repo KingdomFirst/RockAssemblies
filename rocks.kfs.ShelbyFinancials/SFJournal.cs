@@ -31,6 +31,8 @@ using System.Data;
 using System.ComponentModel;
 using System.Data.Entity;
 
+using KFSConst = rocks.kfs.ShelbyFinancials.SystemGuid;
+
 namespace rocks.kfs.ShelbyFinancials
 {
     public class SFJournal
@@ -80,6 +82,20 @@ namespace rocks.kfs.ShelbyFinancials
             foreach ( var transaction in financialBatch.Transactions )
             {
                 transaction.LoadAttributes();
+                var gateway = transaction.FinancialGateway;
+                var gatewayDefaultFeeAccount = string.Empty;
+                var processTransactionFees = 0;
+                if ( gateway != null )
+                {
+                    gateway.LoadAttributes();
+                    gatewayDefaultFeeAccount = transaction.FinancialGateway.GetAttributeValue( "rocks.kfs.ShelbyFinancials.DEFAULTFEEACCOUNTNO" );
+                    var gatewayFeeProcessing = transaction.FinancialGateway.GetAttributeValue( "rocks.kfs.ShelbyFinancials.FEEPROCESSING" ).AsIntegerOrNull();
+                    if ( gatewayFeeProcessing != null )
+                    {
+                        processTransactionFees = gatewayFeeProcessing.Value;
+                    }
+                }
+
                 foreach ( var transactionDetail in transaction.TransactionDetails )
                 {
                     transactionDetail.LoadAttributes();
@@ -88,6 +104,12 @@ namespace rocks.kfs.ShelbyFinancials
                     var detailProject = transactionDetail.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Project" ).AsGuidOrNull();
                     var transactionProject = transaction.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Project" ).AsGuidOrNull();
                     var accountProject = transactionDetail.Account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Project" ).AsGuidOrNull();
+                    var transactionFeeAccount = transactionDetail.Account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.FEEACCOUNTNO" );
+
+                    if ( string.IsNullOrWhiteSpace( transactionFeeAccount ) )
+                    {
+                        transactionFeeAccount = gatewayDefaultFeeAccount;
+                    }
 
                     var projectCode = string.Empty;
                     if ( detailProject != null )
@@ -137,7 +159,10 @@ namespace rocks.kfs.ShelbyFinancials
                     {
                         Amount = transactionDetail.Amount,
                         FinancialAccountId = transactionDetail.AccountId,
-                        Project = projectCode
+                        Project = projectCode,
+                        TransactionFeeAmount = transactionDetail.FeeAmount != null && transactionDetail.FeeAmount.Value > 0 ? transactionDetail.FeeAmount.Value : 0.0M,
+                        TransactionFeeAccount = transactionFeeAccount,
+                        ProcessTransactionFees = processTransactionFees
                     };
 
                     batchTransactions.Add( transactionItem );
@@ -145,12 +170,15 @@ namespace rocks.kfs.ShelbyFinancials
             }
 
             var batchTransactionsSummary = batchTransactions
-                .GroupBy( d => new { d.FinancialAccountId, d.Project } )
+                .GroupBy( d => new { d.FinancialAccountId, d.Project, d.TransactionFeeAccount, d.ProcessTransactionFees } )
                 .Select( s => new GLTransaction
                 {
                     FinancialAccountId = s.Key.FinancialAccountId,
                     Project = s.Key.Project,
-                    Amount = s.Sum( f => ( decimal? ) f.Amount ) ?? 0.0M
+                    Amount = s.Sum( f => ( decimal? ) f.Amount ) ?? 0.0M,
+                    TransactionFeeAmount = s.Sum( f => ( decimal? ) f.TransactionFeeAmount ) ?? 0.0M,
+                    TransactionFeeAccount = s.Key.TransactionFeeAccount,
+                    ProcessTransactionFees = s.Key.ProcessTransactionFees
                 } )
                 .ToList();
 
@@ -188,7 +216,10 @@ namespace rocks.kfs.ShelbyFinancials
                     JournalNumber = financialBatch.Id,
                     JournalDescription = DescriptionLava.ResolveMergeFields( mergeFields ),
                     Date = financialBatch.BatchStartDateTime ?? RockDateTime.Now,
-                    Note = financialBatch.Note
+                    Note = financialBatch.Note,
+                    TransactionFeeAmount = summary.TransactionFeeAmount,
+                    TransactionFeeAccount = summary.TransactionFeeAccount,
+                    ProcessTransactionFees = summary.ProcessTransactionFees
                 };
 
                 if ( debugLava.Length < 6 && debugLava.AsBoolean() )
@@ -207,6 +238,11 @@ namespace rocks.kfs.ShelbyFinancials
             var returnList = new List<JournalEntryLine>();
             foreach ( var transaction in transactionItems )
             {
+                var processTransactionFees = 0;
+                if ( transaction.ProcessTransactionFees > 0 && !string.IsNullOrWhiteSpace( transaction.TransactionFeeAccount ) && transaction.TransactionFeeAmount > 0 )
+                {
+                    processTransactionFees = transaction.ProcessTransactionFees;
+                }
                 var creditLine = new JournalEntryLine()
                 {
                     CompanyNumber = transaction.CompanyNumber,
@@ -239,7 +275,7 @@ namespace rocks.kfs.ShelbyFinancials
                     DepartmentNumber = "0",
                     AccountNumber = transaction.DebitAccountNumber,
                     AccountSub = transaction.DebitAccountSub,
-                    Amount = transaction.Amount,
+                    Amount = processTransactionFees == 1 ? transaction.Amount - transaction.TransactionFeeAmount : transaction.Amount,
                     Project = transaction.Project,
                     JournalNumber = transaction.JournalNumber,
                     JournalDescription = transaction.JournalDescription,
@@ -248,6 +284,53 @@ namespace rocks.kfs.ShelbyFinancials
                 };
 
                 returnList.Add( debitLine );
+
+                if ( processTransactionFees == 2 )
+                {
+                    var feeCreditLine = new JournalEntryLine()
+                    {
+                        CompanyNumber = transaction.CompanyNumber,
+                        RegionNumber = transaction.RegionNumber,
+                        SuperFundNumber = transaction.SuperFundNumber,
+                        FundNumber = transaction.FundNumber,
+                        LocationNumber = transaction.LocationNumber,
+                        CostCenterNumber = transaction.CostCenterCreditNumber.IsNotNullOrWhiteSpace() ? transaction.CostCenterCreditNumber : transaction.CostCenterDebitNumber,
+                        DepartmentNumber = transaction.DepartmentNumber,
+                        AccountNumber = transaction.DebitAccountNumber,  // Credit the Bank Account (DebitAccount)
+                        AccountSub = transaction.DebitAccountSub,
+                        Amount = transaction.TransactionFeeAmount * -1,
+                        Project = transaction.Project,
+                        JournalNumber = transaction.JournalNumber,
+                        JournalDescription = transaction.JournalDescription,
+                        Date = transaction.Date,
+                        Note = transaction.Note + " Transaction Fees"
+                    };
+
+                    returnList.Add( feeCreditLine );
+                }
+
+                if ( processTransactionFees > 0 )
+                {
+                    var feeDebitLine = new JournalEntryLine()
+                    {
+                        CompanyNumber = transaction.CompanyNumber,
+                        RegionNumber = transaction.RegionNumber,
+                        SuperFundNumber = transaction.SuperFundNumber,
+                        FundNumber = transaction.FundNumber,
+                        LocationNumber = transaction.LocationNumber,
+                        CostCenterNumber = transaction.CostCenterDebitNumber,
+                        DepartmentNumber = "0",
+                        AccountNumber = transaction.TransactionFeeAccount,
+                        Amount = transaction.TransactionFeeAmount,
+                        Project = transaction.Project,
+                        JournalNumber = transaction.JournalNumber,
+                        JournalDescription = transaction.JournalDescription,
+                        Date = transaction.Date,
+                        Note = transaction.Note + " Transaction Fees"
+                    };
+
+                    returnList.Add( feeDebitLine );
+                }
             }
 
             return returnList;
@@ -613,6 +696,15 @@ namespace rocks.kfs.ShelbyFinancials
             [LavaInclude]
             public string Project { get; set; }
 
+            [LavaInclude]
+            public decimal TransactionFeeAmount;
+
+            [LavaInclude]
+            public string TransactionFeeAccount;
+
+            [LavaInclude]
+            public int ProcessTransactionFees;
+
             #region ILiquidizable
 
             /// <summary>
@@ -724,6 +816,9 @@ namespace rocks.kfs.ShelbyFinancials
             public string JournalDescription;
             public DateTime Date;
             public string Note;
+            public string TransactionFeeAccount;
+            public decimal TransactionFeeAmount;
+            public int ProcessTransactionFees;
         }
 
         public class JournalEntryLine
