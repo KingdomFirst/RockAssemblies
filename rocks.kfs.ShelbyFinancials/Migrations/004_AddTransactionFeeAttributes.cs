@@ -51,8 +51,6 @@ namespace rocks.kfs.ShelbyFinancials.Migrations
             RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialGateway", Rock.SystemGuid.FieldType.SINGLE_SELECT, "", "", "Gateway Fee Processing", "How should the Shelby Financials Export plugin process transaction fees? DEFAULT: No special handling of transaction fees will be performed. NET DEBIT: Add credit entries for any transaction fees and use net amount (amount - transaction fees) for debit account entries. GROSS DEBIT: Debit account entries are left untouched (gross) and new debit and credit entries will be added for any transaction fees. NOTE: Both Net Debit and Gross Debit require a Fee Account attribute be set on either the financial gateway or financial account.", 0, "0", KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_PROCESSING, "rocks.kfs.ShelbyFinancials.FEEPROCESSING", true );
             RockMigrationHelper.AddAttributeQualifier( KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_PROCESSING, "values", "0^Default,1^Net Debit,2^Gross Debit", "EDD83B29-78ED-40DC-B8F9-9664EDB14884" );
             RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialGateway", Rock.SystemGuid.FieldType.TEXT, "", "", "Default Fee Account", "Default account number for transaction fees.", 1, "", KFSConst.Attribute.FINANCIAL_GATEWAY_DEFAULT_FEE_ACCOUNT, "rocks.kfs.ShelbyFinancials.DEFAULTFEEACCOUNTNO" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialGateway", Rock.SystemGuid.FieldType.SINGLE_SELECT, "", "", "Gateway Fee Calculation", "The method in which transaction fees are calculated.", 0, "0", KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_CALCULATION, "rocks.kfs.ShelbyFinancials.FEECALCULATION", true );
-            RockMigrationHelper.AddAttributeQualifier( KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_CALCULATION, "values", "0^Fixed Amount,1^Percentage", "5027B9CD-4366-4CC8-917B-418025D9C158" );
 
             RockMigrationHelper.UpdateCategory( Rock.SystemGuid.EntityType.ATTRIBUTE, "Shelby Financials Export", "fa fa-calculator", "", KFSConst.Attribute.FINANCIAL_GATEWAY_ATTRIBUTE_CATEGORY );
 
@@ -84,16 +82,7 @@ namespace rocks.kfs.ShelbyFinancials.Migrations
                     INSERT INTO [AttributeCategory]
                     SELECT @GatewayFeeProcessingAttributeId, @GatewayCategoryId
                 END
-
-                DECLARE @GatewayFeeCalculationAttributeId int = ( SELECT [Id] FROM [Attribute] WHERE [Guid] = '{3}' )
-
-                IF NOT EXISTS ( SELECT [AttributeId], [CategoryId] FROM [AttributeCategory] WHERE [AttributeId] = @GatewayFeeCalculationAttributeId AND [CategoryId] = @GatewayCategoryId )
-
-                BEGIN
-                    INSERT INTO [AttributeCategory]
-                    SELECT @GatewayFeeCalculationAttributeId, @GatewayCategoryId
-                END
-            ", KFSConst.Attribute.FINANCIAL_GATEWAY_ATTRIBUTE_CATEGORY, KFSConst.Attribute.FINANCIAL_GATEWAY_DEFAULT_FEE_ACCOUNT, KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_PROCESSING, KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_CALCULATION ) );
+            ", KFSConst.Attribute.FINANCIAL_GATEWAY_ATTRIBUTE_CATEGORY, KFSConst.Attribute.FINANCIAL_GATEWAY_DEFAULT_FEE_ACCOUNT, KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_PROCESSING ) );
 
         }
 
@@ -106,7 +95,6 @@ namespace rocks.kfs.ShelbyFinancials.Migrations
             RockMigrationHelper.DeleteAttribute( KFSConst.Attribute.FINANCIAL_ACCOUNT_FEE_ACCOUNT );
             RockMigrationHelper.DeleteAttribute( KFSConst.Attribute.FINANCIAL_GATEWAY_DEFAULT_FEE_ACCOUNT );
             RockMigrationHelper.DeleteAttribute( KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_PROCESSING );
-            RockMigrationHelper.DeleteAttribute( KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_CALCULATION );
 
             // remove category
             RockMigrationHelper.DeleteCategory( KFSConst.Attribute.FINANCIAL_GATEWAY_ATTRIBUTE_CATEGORY );

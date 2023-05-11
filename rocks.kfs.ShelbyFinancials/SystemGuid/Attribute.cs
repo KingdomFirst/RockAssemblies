@@ -52,11 +52,6 @@ namespace rocks.kfs.ShelbyFinancials.SystemGuid
         /// </summary>
         public const string FINANCIAL_GATEWAY_FEE_PROCESSING = "055FEEBC-B5D8-4138-B161-058A19DF7125";
 
-        /// <summary>
-        /// The gateway fee calculation attribute.
-        /// </summary>
-        public const string FINANCIAL_GATEWAY_FEE_CALCULATION = "D2302708-DD11-44EB-A56F-8ABD04B86295";
-
         #endregion
     }
 }
