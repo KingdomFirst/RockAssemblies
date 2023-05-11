@@ -37,10 +37,10 @@ namespace rocks.kfs.ShelbyFinancials
 {
     public class SFJournal
     {
-        public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava, string DescriptionLava = "" )
+        public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava, string DescriptionLava = "", GLEntryGroupingMode groupingMode = GLEntryGroupingMode.FinancialAccount )
         {
             var glExcelLines = new List<GLExcelLine>();
-            var glEntries = GetGlEntries( rockContext, financialBatch, journalCode, period, ref debugLava, DescriptionLava );
+            var glEntries = GetGlEntries( rockContext, financialBatch, journalCode, period, ref debugLava, DescriptionLava, groupingMode: groupingMode  );
             foreach ( var entry in glEntries )
             {
                 glExcelLines.Add( new GLExcelLine()
@@ -67,7 +67,8 @@ namespace rocks.kfs.ShelbyFinancials
 
             return glExcelLines;
         }
-        private List<JournalEntryLine> GetGlEntries( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava, string DescriptionLava = "" )
+
+        private List<JournalEntryLine> GetGlEntries( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava, string DescriptionLava, GLEntryGroupingMode groupingMode )
         {
             if ( string.IsNullOrWhiteSpace( DescriptionLava ) )
             {
@@ -169,18 +170,27 @@ namespace rocks.kfs.ShelbyFinancials
                 }
             }
 
-            var batchTransactionsSummary = batchTransactions
-                .GroupBy( d => new { d.FinancialAccountId, d.Project, d.TransactionFeeAccount, d.ProcessTransactionFees } )
-                .Select( s => new GLTransaction
-                {
-                    FinancialAccountId = s.Key.FinancialAccountId,
-                    Project = s.Key.Project,
-                    Amount = s.Sum( f => ( decimal? ) f.Amount ) ?? 0.0M,
-                    TransactionFeeAmount = s.Sum( f => ( decimal? ) f.TransactionFeeAmount ) ?? 0.0M,
-                    TransactionFeeAccount = s.Key.TransactionFeeAccount,
-                    ProcessTransactionFees = s.Key.ProcessTransactionFees
-                } )
-                .ToList();
+            var batchTransactionsSummary = new List<GLTransaction>();
+
+            if ( groupingMode == GLEntryGroupingMode.FinancialAccount )
+            {
+                batchTransactionsSummary = batchTransactions
+                    .GroupBy( d => new { d.FinancialAccountId, d.Project, d.TransactionFeeAccount, d.ProcessTransactionFees } )
+                    .Select( s => new GLTransaction
+                    {
+                        FinancialAccountId = s.Key.FinancialAccountId,
+                        Project = s.Key.Project,
+                        Amount = s.Sum( f => ( decimal? ) f.Amount ) ?? 0.0M,
+                        TransactionFeeAmount = s.Sum( f => ( decimal? ) f.TransactionFeeAmount ) ?? 0.0M,
+                        TransactionFeeAccount = s.Key.TransactionFeeAccount,
+                        ProcessTransactionFees = s.Key.ProcessTransactionFees
+                    } )
+                    .ToList();
+            }
+            else
+            {
+                batchTransactionsSummary = batchTransactions;
+            }
 
             var batchSummary = new List<GLBatchTotals>();
             foreach ( var summary in batchTransactionsSummary )
@@ -197,6 +207,9 @@ namespace rocks.kfs.ShelbyFinancials
                 mergeFields.Add( "JournalCode", journalCode );
                 mergeFields.Add( "Period", period );
 
+                var costCenterDebitNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.CostCenter" );
+                var costCenterCreditNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.CostCenterCredit" );
+
                 var batchSummaryItem = new GLBatchTotals()
                 {
                     CompanyNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Company" ),
@@ -204,8 +217,8 @@ namespace rocks.kfs.ShelbyFinancials
                     SuperFundNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.SuperFund" ),
                     FundNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Fund" ),
                     LocationNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Location" ),
-                    CostCenterDebitNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.CostCenter" ),
-                    CostCenterCreditNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.CostCenterCredit" ),
+                    CostCenterDebitNumber = costCenterDebitNumber,
+                    CostCenterCreditNumber = costCenterCreditNumber.IsNotNullOrWhiteSpace() ? costCenterCreditNumber : costCenterDebitNumber,
                     DepartmentNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Department" ),
                     CreditAccountNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.CreditAccount" ),
                     DebitAccountNumber = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.DebitAccount" ),
@@ -230,107 +243,187 @@ namespace rocks.kfs.ShelbyFinancials
                 batchSummary.Add( batchSummaryItem );
             }
 
-            return GenerateLineItems( batchSummary );
+            return GenerateLineItems( batchSummary, groupingMode );
         }
 
-        private List<JournalEntryLine> GenerateLineItems( List<GLBatchTotals> transactionItems )
+        private List<JournalEntryLine> GenerateLineItems( List<GLBatchTotals> transactionItems, GLEntryGroupingMode groupingMode = GLEntryGroupingMode.FinancialAccount )
         {
             var returnList = new List<JournalEntryLine>();
-            foreach ( var transaction in transactionItems )
+            var debitTransactions = transactionItems.Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
+            var creditTransactions = transactionItems.Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
+            var feeDebitTransactions = transactionItems.Where( f => f.TransactionFeeAmount > 0.0M && !string.IsNullOrWhiteSpace( f.TransactionFeeAccount ) && f.ProcessTransactionFees > 0 ).Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
+            var feeCreditTransactions = transactionItems.Where( f => f.TransactionFeeAmount > 0.0M && !string.IsNullOrWhiteSpace( f.TransactionFeeAccount ) && f.ProcessTransactionFees == 2 ).Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
+
+            // Condition and prepare debit entries
+            foreach ( var t in debitTransactions )
             {
-                var processTransactionFees = 0;
-                if ( transaction.ProcessTransactionFees > 0 && !string.IsNullOrWhiteSpace( transaction.TransactionFeeAccount ) && transaction.TransactionFeeAmount > 0 )
-                {
-                    processTransactionFees = transaction.ProcessTransactionFees;
-                }
-                var creditLine = new JournalEntryLine()
-                {
-                    CompanyNumber = transaction.CompanyNumber,
-                    RegionNumber = transaction.RegionNumber,
-                    SuperFundNumber = transaction.SuperFundNumber,
-                    FundNumber = transaction.FundNumber,
-                    LocationNumber = transaction.LocationNumber,
-                    CostCenterNumber = transaction.CostCenterCreditNumber.IsNotNullOrWhiteSpace() ? transaction.CostCenterCreditNumber : transaction.CostCenterDebitNumber,
-                    DepartmentNumber = transaction.DepartmentNumber,
-                    AccountNumber = transaction.CreditAccountNumber,
-                    AccountSub = transaction.RevenueAccountSub,
-                    Amount = transaction.Amount * -1,
-                    Project = transaction.Project,
-                    JournalNumber = transaction.JournalNumber,
-                    JournalDescription = transaction.JournalDescription,
-                    Date = transaction.Date,
-                    Note = transaction.Note
-                };
+                t.Amount = ( ( decimal? ) t.Amount ?? 0.0M ) - ( t.ProcessTransactionFees == 1 ? t.TransactionFeeAmount : 0.0M );
+                t.DepartmentNumber = "0";
+            }
 
-                returnList.Add( creditLine );
+            foreach ( var t in feeDebitTransactions )
+            {
+                t.Amount = ( decimal? ) t.TransactionFeeAmount ?? 0.0M;
+                t.DepartmentNumber = "0";
+                t.DebitAccountNumber = t.TransactionFeeAccount;
+                t.Note += " Transaction Fees";
+            }
 
+            if ( groupingMode == GLEntryGroupingMode.DebitAndCreditAccount || groupingMode == GLEntryGroupingMode.DebitAccountOnly )
+            {
+                debitTransactions = debitTransactions
+                    .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.SuperFundNumber, d.CostCenterDebitNumber, d.DebitAccountNumber, d.DebitAccountSub, d.FundNumber, d.Project, d.LocationNumber, d.ProcessTransactionFees } )
+                    .Select( s => new GLBatchTotals
+                    {
+                        CompanyNumber = s.Key.CompanyNumber,
+                        RegionNumber = s.Key.RegionNumber,
+                        SuperFundNumber = s.Key.SuperFundNumber,
+                        FundNumber = s.Key.FundNumber,
+                        LocationNumber = s.Key.LocationNumber,
+                        CostCenterDebitNumber = s.Key.CostCenterDebitNumber,
+                        DepartmentNumber = s.First().DepartmentNumber,
+                        DebitAccountNumber = s.Key.DebitAccountNumber,
+                        DebitAccountSub = s.Key.DebitAccountSub,
+                        Amount = s.Sum( f => f.Amount ),
+                        Project = s.Key.Project,
+                        JournalNumber = s.First().JournalNumber,
+                        JournalDescription = s.First().JournalDescription,
+                        Date = s.First().Date,
+                        Note = s.First().Note
+                    } )
+                    .ToList();
+
+                feeDebitTransactions = feeDebitTransactions
+                    .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.SuperFundNumber, d.CostCenterDebitNumber, d.DebitAccountNumber, d.FundNumber, d.Project, d.LocationNumber, d.TransactionFeeAccount } )
+                    .Select( s => new GLBatchTotals
+                    {
+                        CompanyNumber = s.Key.CompanyNumber,
+                        RegionNumber = s.Key.RegionNumber,
+                        SuperFundNumber = s.Key.SuperFundNumber,
+                        FundNumber = s.Key.FundNumber,
+                        LocationNumber = s.Key.LocationNumber,
+                        CostCenterDebitNumber = s.Key.CostCenterDebitNumber,
+                        DebitAccountNumber = s.Key.DebitAccountNumber,
+                        DepartmentNumber = s.First().DepartmentNumber,
+                        Amount = s.Sum( f => f.Amount ),
+                        Project = s.Key.Project,
+                        JournalNumber = s.First().JournalNumber,
+                        JournalDescription = s.First().JournalDescription,
+                        Date = s.First().Date,
+                        Note = s.First().Note
+                    } )
+                    .ToList();
+            }
+
+            // Condition and prepare credit entries
+            foreach ( var t in creditTransactions )
+            {
+                t.Amount = ( ( decimal? ) t.Amount ?? 0.0M ) * -1;
+            }
+            foreach ( var t in feeCreditTransactions )
+            {
+                t.Amount = ( ( decimal? ) t.TransactionFeeAmount ?? 0.0M ) * -1;
+                t.CreditAccountNumber = t.DebitAccountNumber;
+                t.RevenueAccountSub = t.DebitAccountSub;
+                t.Note += " Transaction Fees";
+            }
+
+            if ( groupingMode == GLEntryGroupingMode.DebitAndCreditAccount || groupingMode == GLEntryGroupingMode.CreditAccountOnly )
+            {
+                creditTransactions = creditTransactions
+                    .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.DepartmentNumber, d.CreditAccountNumber, d.RevenueAccountSub, d.SuperFundNumber, d.CostCenterCreditNumber, d.FundNumber, d.Project, d.LocationNumber } )
+                    .Select( s => new GLBatchTotals
+                    {
+                        CompanyNumber = s.Key.CompanyNumber,
+                        RegionNumber = s.Key.RegionNumber,
+                        SuperFundNumber = s.Key.SuperFundNumber,
+                        FundNumber = s.Key.FundNumber,
+                        LocationNumber = s.Key.LocationNumber,
+                        CostCenterCreditNumber = s.Key.CostCenterCreditNumber,
+                        DepartmentNumber = s.Key.DepartmentNumber,
+                        CreditAccountNumber = s.Key.CreditAccountNumber,
+                        RevenueAccountSub = s.Key.RevenueAccountSub,
+                        Amount = s.Sum( f => f.Amount ),
+                        Project = s.Key.Project,
+                        JournalNumber = s.First().JournalNumber,
+                        JournalDescription = s.First().JournalDescription,
+                        Date = s.First().Date,
+                        Note = s.First().Note
+                    } )
+                    .ToList();
+
+                feeCreditTransactions = feeCreditTransactions
+                    .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.DepartmentNumber, d.CreditAccountNumber, d.RevenueAccountSub, d.SuperFundNumber, d.CostCenterCreditNumber, d.FundNumber, d.Project, d.LocationNumber } )
+                    .Select( s => new GLBatchTotals
+                    {
+                        CompanyNumber = s.Key.CompanyNumber,
+                        RegionNumber = s.Key.RegionNumber,
+                        SuperFundNumber = s.Key.SuperFundNumber,
+                        FundNumber = s.Key.FundNumber,
+                        LocationNumber = s.Key.LocationNumber,
+                        CostCenterCreditNumber = s.Key.CostCenterCreditNumber,
+                        DepartmentNumber = s.Key.DepartmentNumber,
+                        CreditAccountNumber = s.Key.CreditAccountNumber,
+                        RevenueAccountSub = s.Key.RevenueAccountSub,
+                        Amount = s.Sum( f => f.Amount ),
+                        Project = s.Key.Project,
+                        JournalNumber = s.First().JournalNumber,
+                        JournalDescription = s.First().JournalDescription,
+                        Date = s.First().Date,
+                        Note = s.First().Note
+                    } )
+                    .ToList();
+            }
+
+            var allCreditTransactions = creditTransactions.Concat( feeCreditTransactions ).ToList();
+            var allDebitTransactions = debitTransactions.Concat( feeDebitTransactions ).ToList();
+
+            foreach ( var debitTransaction in allDebitTransactions )
+            {
                 var debitLine = new JournalEntryLine()
                 {
-                    CompanyNumber = transaction.CompanyNumber,
-                    RegionNumber = transaction.RegionNumber,
-                    SuperFundNumber = transaction.SuperFundNumber,
-                    FundNumber = transaction.FundNumber,
-                    LocationNumber = transaction.LocationNumber,
-                    CostCenterNumber = transaction.CostCenterDebitNumber,
-                    DepartmentNumber = "0",
-                    AccountNumber = transaction.DebitAccountNumber,
-                    AccountSub = transaction.DebitAccountSub,
-                    Amount = processTransactionFees == 1 ? transaction.Amount - transaction.TransactionFeeAmount : transaction.Amount,
-                    Project = transaction.Project,
-                    JournalNumber = transaction.JournalNumber,
-                    JournalDescription = transaction.JournalDescription,
-                    Date = transaction.Date,
-                    Note = transaction.Note
+                    CompanyNumber = debitTransaction.CompanyNumber,
+                    RegionNumber = debitTransaction.RegionNumber,
+                    SuperFundNumber = debitTransaction.SuperFundNumber,
+                    FundNumber = debitTransaction.FundNumber,
+                    LocationNumber = debitTransaction.LocationNumber,
+                    CostCenterNumber = debitTransaction.CostCenterDebitNumber,
+                    DepartmentNumber = debitTransaction.DepartmentNumber,
+                    AccountNumber = debitTransaction.DebitAccountNumber,
+                    AccountSub = debitTransaction.DebitAccountSub,
+                    Amount = debitTransaction.Amount,
+                    Project = debitTransaction.Project,
+                    JournalNumber = debitTransaction.JournalNumber,
+                    JournalDescription = debitTransaction.JournalDescription,
+                    Date = debitTransaction.Date,
+                    Note = debitTransaction.Note
                 };
 
                 returnList.Add( debitLine );
+            }
 
-                if ( processTransactionFees == 2 )
+            foreach ( var creditTransaction in allCreditTransactions )
+            {
+                var creditLine = new JournalEntryLine()
                 {
-                    var feeCreditLine = new JournalEntryLine()
-                    {
-                        CompanyNumber = transaction.CompanyNumber,
-                        RegionNumber = transaction.RegionNumber,
-                        SuperFundNumber = transaction.SuperFundNumber,
-                        FundNumber = transaction.FundNumber,
-                        LocationNumber = transaction.LocationNumber,
-                        CostCenterNumber = transaction.CostCenterCreditNumber.IsNotNullOrWhiteSpace() ? transaction.CostCenterCreditNumber : transaction.CostCenterDebitNumber,
-                        DepartmentNumber = transaction.DepartmentNumber,
-                        AccountNumber = transaction.DebitAccountNumber,  // Credit the Bank Account (DebitAccount)
-                        AccountSub = transaction.DebitAccountSub,
-                        Amount = transaction.TransactionFeeAmount * -1,
-                        Project = transaction.Project,
-                        JournalNumber = transaction.JournalNumber,
-                        JournalDescription = transaction.JournalDescription,
-                        Date = transaction.Date,
-                        Note = transaction.Note + " Transaction Fees"
-                    };
+                    CompanyNumber = creditTransaction.CompanyNumber,
+                    RegionNumber = creditTransaction.RegionNumber,
+                    SuperFundNumber = creditTransaction.SuperFundNumber,
+                    FundNumber = creditTransaction.FundNumber,
+                    LocationNumber = creditTransaction.LocationNumber,
+                    CostCenterNumber = creditTransaction.CostCenterCreditNumber,
+                    DepartmentNumber = creditTransaction.DepartmentNumber,
+                    AccountNumber = creditTransaction.CreditAccountNumber,
+                    AccountSub = creditTransaction.RevenueAccountSub,
+                    Amount = creditTransaction.Amount,
+                    Project = creditTransaction.Project,
+                    JournalNumber = creditTransaction.JournalNumber,
+                    JournalDescription = creditTransaction.JournalDescription,
+                    Date = creditTransaction.Date,
+                    Note = creditTransaction.Note
+                };
 
-                    returnList.Add( feeCreditLine );
-                }
-
-                if ( processTransactionFees > 0 )
-                {
-                    var feeDebitLine = new JournalEntryLine()
-                    {
-                        CompanyNumber = transaction.CompanyNumber,
-                        RegionNumber = transaction.RegionNumber,
-                        SuperFundNumber = transaction.SuperFundNumber,
-                        FundNumber = transaction.FundNumber,
-                        LocationNumber = transaction.LocationNumber,
-                        CostCenterNumber = transaction.CostCenterDebitNumber,
-                        DepartmentNumber = "0",
-                        AccountNumber = transaction.TransactionFeeAccount,
-                        Amount = transaction.TransactionFeeAmount,
-                        Project = transaction.Project,
-                        JournalNumber = transaction.JournalNumber,
-                        JournalDescription = transaction.JournalDescription,
-                        Date = transaction.Date,
-                        Note = transaction.Note + " Transaction Fees"
-                    };
-
-                    returnList.Add( feeDebitLine );
-                }
+                returnList.Add( creditLine );
             }
 
             return returnList;
@@ -796,7 +889,7 @@ namespace rocks.kfs.ShelbyFinancials
             #endregion
         }
 
-        public class GLBatchTotals
+        public class GLBatchTotals : ICloneable
         {
             public string CompanyNumber;
             public string RegionNumber;
@@ -819,6 +912,11 @@ namespace rocks.kfs.ShelbyFinancials
             public string TransactionFeeAccount;
             public decimal TransactionFeeAmount;
             public int ProcessTransactionFees;
+
+            public object Clone()
+            {
+                return ( GLBatchTotals ) MemberwiseClone();
+            }
         }
 
         public class JournalEntryLine
@@ -875,5 +973,14 @@ namespace rocks.kfs.ShelbyFinancials
             public bool Project;
             public bool Note;
         }
+    }
+
+    public enum GLEntryGroupingMode
+    {
+        DebitAndCreditAccount = 0,
+        DebitAccountOnly = 1,
+        CreditAccountOnly = 2,
+        FinancialAccount = 3,
+        NoGrouping = 4
     }
 }
