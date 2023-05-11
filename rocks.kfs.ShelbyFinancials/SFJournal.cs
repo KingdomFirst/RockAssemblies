@@ -37,7 +37,7 @@ namespace rocks.kfs.ShelbyFinancials
 {
     public class SFJournal
     {
-        public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava, string DescriptionLava = "", GLEntryGroupingMode groupingMode = GLEntryGroupingMode.FinancialAccount )
+        public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava, string DescriptionLava = "", GLEntryGroupingMode groupingMode = GLEntryGroupingMode.DebitAndCreditByFinancialAccount )
         {
             var glExcelLines = new List<GLExcelLine>();
             var glEntries = GetGlEntries( rockContext, financialBatch, journalCode, period, ref debugLava, DescriptionLava, groupingMode: groupingMode  );
@@ -172,7 +172,7 @@ namespace rocks.kfs.ShelbyFinancials
 
             var batchTransactionsSummary = new List<GLTransaction>();
 
-            if ( groupingMode == GLEntryGroupingMode.FinancialAccount )
+            if ( groupingMode == GLEntryGroupingMode.DebitAndCreditByFinancialAccount )
             {
                 batchTransactionsSummary = batchTransactions
                     .GroupBy( d => new { d.FinancialAccountId, d.Project, d.TransactionFeeAccount, d.ProcessTransactionFees } )
@@ -246,7 +246,7 @@ namespace rocks.kfs.ShelbyFinancials
             return GenerateLineItems( batchSummary, groupingMode );
         }
 
-        private List<JournalEntryLine> GenerateLineItems( List<GLBatchTotals> transactionItems, GLEntryGroupingMode groupingMode = GLEntryGroupingMode.FinancialAccount )
+        private List<JournalEntryLine> GenerateLineItems( List<GLBatchTotals> transactionItems, GLEntryGroupingMode groupingMode = GLEntryGroupingMode.DebitAndCreditByFinancialAccount )
         {
             var returnList = new List<JournalEntryLine>();
             var debitTransactions = transactionItems.Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
@@ -269,7 +269,7 @@ namespace rocks.kfs.ShelbyFinancials
                 t.Note += " Transaction Fees";
             }
 
-            if ( groupingMode == GLEntryGroupingMode.DebitAndCreditAccount || groupingMode == GLEntryGroupingMode.DebitAccountOnly )
+            if ( groupingMode == GLEntryGroupingMode.DebitAndCreditLines || groupingMode == GLEntryGroupingMode.DebitLinesOnly )
             {
                 debitTransactions = debitTransactions
                     .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.SuperFundNumber, d.CostCenterDebitNumber, d.DebitAccountNumber, d.DebitAccountSub, d.FundNumber, d.Project, d.LocationNumber, d.ProcessTransactionFees } )
@@ -328,7 +328,7 @@ namespace rocks.kfs.ShelbyFinancials
                 t.Note += " Transaction Fees";
             }
 
-            if ( groupingMode == GLEntryGroupingMode.DebitAndCreditAccount || groupingMode == GLEntryGroupingMode.CreditAccountOnly )
+            if ( groupingMode == GLEntryGroupingMode.DebitAndCreditLines || groupingMode == GLEntryGroupingMode.CreditLinesOnly )
             {
                 creditTransactions = creditTransactions
                     .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.DepartmentNumber, d.CreditAccountNumber, d.RevenueAccountSub, d.SuperFundNumber, d.CostCenterCreditNumber, d.FundNumber, d.Project, d.LocationNumber } )
@@ -977,10 +977,10 @@ namespace rocks.kfs.ShelbyFinancials
 
     public enum GLEntryGroupingMode
     {
-        DebitAndCreditAccount = 0,
-        DebitAccountOnly = 1,
-        CreditAccountOnly = 2,
-        FinancialAccount = 3,
+        DebitAndCreditLines = 0,
+        DebitLinesOnly = 1,
+        CreditLinesOnly = 2,
+        DebitAndCreditByFinancialAccount = 3,
         NoGrouping = 4
     }
 }
