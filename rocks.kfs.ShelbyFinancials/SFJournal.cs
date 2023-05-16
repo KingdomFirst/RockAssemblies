@@ -294,7 +294,7 @@ namespace rocks.kfs.ShelbyFinancials
                     .ToList();
 
                 feeDebitTransactions = feeDebitTransactions
-                    .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.SuperFundNumber, d.CostCenterDebitNumber, d.DebitAccountNumber, d.FundNumber, d.Project, d.LocationNumber, d.TransactionFeeAccount } )
+                    .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.SuperFundNumber, d.CostCenterDebitNumber, d.DebitAccountNumber, d.FundNumber, d.Project, d.LocationNumber } )
                     .Select( s => new GLBatchTotals
                     {
                         CompanyNumber = s.Key.CompanyNumber,
