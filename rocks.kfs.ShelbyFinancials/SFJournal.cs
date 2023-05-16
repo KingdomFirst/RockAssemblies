@@ -37,7 +37,7 @@ namespace rocks.kfs.ShelbyFinancials
 {
     public class SFJournal
     {
-        public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava, string DescriptionLava = "", GLEntryGroupingMode groupingMode = GLEntryGroupingMode.DebitAndCreditByFinancialAccount )
+        public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava, string DescriptionLava, GLEntryGroupingMode groupingMode )
         {
             var glExcelLines = new List<GLExcelLine>();
             var glEntries = GetGlEntries( rockContext, financialBatch, journalCode, period, ref debugLava, DescriptionLava, groupingMode: groupingMode  );
@@ -246,7 +246,7 @@ namespace rocks.kfs.ShelbyFinancials
             return GenerateLineItems( batchSummary, groupingMode );
         }
 
-        private List<JournalEntryLine> GenerateLineItems( List<GLBatchTotals> transactionItems, GLEntryGroupingMode groupingMode = GLEntryGroupingMode.DebitAndCreditByFinancialAccount )
+        private List<JournalEntryLine> GenerateLineItems( List<GLBatchTotals> transactionItems, GLEntryGroupingMode groupingMode )
         {
             var returnList = new List<JournalEntryLine>();
             var debitTransactions = transactionItems.Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
