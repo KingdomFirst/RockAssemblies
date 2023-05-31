@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="Jobs\SendScheduledGroupEmail.cs" />
     <Compile Include="Jobs\SendScheduledGroupSMS.cs" />
+    <Compile Include="Migrations\004_SystemPhoneSupport.cs" />
     <Compile Include="Migrations\001_AddSystemData.cs" />
     <Compile Include="Migrations\003_AddDailyRecurrence.cs" />
     <Compile Include="Migrations\002_AddRecurrenceAttribute.cs" />
