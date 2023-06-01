@@ -73,7 +73,7 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
             var smsMediumType = EntityTypeCache.Get( "Rock.Communication.Medium.Sms" );
             var dateAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_SEND_DATE.AsGuid() ).Id;
             var recurrenceAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_SEND_RECURRENCE.AsGuid() ).Id;
-            var fromNumberAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_FROM_NUMBER.AsGuid() ).Id;
+            var fromNumberAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_FROM_NUMBER_SYSTEM_PHONE.AsGuid() ).Id;
             var messageAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_MESSAGE.AsGuid() ).Id;
 
             try
@@ -141,7 +141,7 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
                         var fromNumberGuid = new AttributeValueService( rockContext )
                             .GetByAttributeIdAndEntityId( fromNumberAttributeId, attributeMatrixItemAndGroupId.Key )
                             .Value;
-                        var fromNumber = DefinedValueCache.Get( fromNumberGuid.AsGuid() );
+                        var fromNumber = SystemPhoneNumberCache.Get( fromNumberGuid.AsGuid() );
 
                         var message = new AttributeValueService( rockContext )
                             .GetByAttributeIdAndEntityId( messageAttributeId, attributeMatrixItemAndGroupId.Key )
@@ -207,7 +207,7 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
                                 }
 
                                 communication.SMSMessage = message;
-                                communication.SMSFromDefinedValueId = fromNumber.Id;
+                                communication.SmsFromSystemPhoneNumberId = fromNumber.Id;
                                 communication.Subject = string.Empty;
                                 communication.Status = CommunicationStatus.Approved;
 
