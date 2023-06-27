@@ -182,7 +182,7 @@ namespace rocks.kfs.Intacct
                             var xDataXml = xResultXml.Elements( "data" ).FirstOrDefault();
                             if ( xDataXml != null )
                             {
-                                var xCheckingAccountsXml = xDataXml.Elements( "checkingaccount" );
+                                var xCheckingAccountsXml = xDataXml.Elements( "CHECKINGACCOUNT" );
                                 if ( xCheckingAccountsXml != null )
                                 {
                                     foreach ( var xAcctXml in xCheckingAccountsXml )
