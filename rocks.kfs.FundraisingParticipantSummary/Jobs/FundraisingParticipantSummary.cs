@@ -177,7 +177,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                 }
                 else
                 {
-                    LogEvent( null, "GroupInfo", string.Format( "Selected Group: {0}", groupGuid.Value ), "Get Groups from group type setting.", enableLogging );
+                    LogEvent( null, "GroupInfo", string.Format( "Selected GroupTypes Count: {0}", groupTypes.Count ), "Get Groups from group type setting.", enableLogging );
                     groups = groupService.Queryable( "Members" ).AsNoTracking().Where( g => groupTypes.Contains( g.GroupTypeId ) ).ToList();
                     LogEvent( null, "GroupInfo", string.Format( "Groups: {0}", groups.Count() ), "Finished getting Groups from group type setting.", enableLogging );
                 }
