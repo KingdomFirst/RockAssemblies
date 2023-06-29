@@ -234,7 +234,7 @@ namespace rocks.kfs.Intacct
         #endregion
     }
 
-    public class GLBatchTotals
+    public class GLBatchTotals : ICloneable
     {
         public decimal Amount;
         public string CreditAccount;
@@ -248,6 +248,11 @@ namespace rocks.kfs.Intacct
         public string Description;
         public Dictionary<string, dynamic> CustomDimensions;
         public int ProcessTransactionFees;
+
+        public object Clone()
+        {
+            return ( GLBatchTotals ) MemberwiseClone();
+        }
     }
 
     public class CheckingAccount
