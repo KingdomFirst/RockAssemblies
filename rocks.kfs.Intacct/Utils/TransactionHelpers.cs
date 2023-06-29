@@ -28,7 +28,7 @@ namespace rocks.kfs.Intacct.Utils
 {
     public class TransactionHelpers
     {
-        public static List<GLTransaction> GetTransactionSummary( FinancialBatch financialBatch, RockContext rockContext, out List<RegistrationInstance> registrationLinks, out List<GroupMember> groupMemberLinks )
+        public static List<GLTransaction> GetTransactionSummary( FinancialBatch financialBatch, RockContext rockContext, out List<RegistrationInstance> registrationLinks, out List<GroupMember> groupMemberLinks, GLAccountGroupingMode groupingMode )
         {
             //
             // Group/Sum Transactions by Debit/Bank Account and Project since Project can come from Account or Transaction Details
@@ -122,19 +122,28 @@ namespace rocks.kfs.Intacct.Utils
                 }
             }
 
-            var batchTransactionList = batchTransactions
-            .GroupBy( d => new { d.FinancialAccountId, d.Project, d.TransactionFeeAccount, d.ProcessTransactionFees } )
-            .Select( s => new GLTransaction
+            var batchTransactionList = new List<GLTransaction>();
+
+            if ( groupingMode == GLAccountGroupingMode.DebitAndCreditByFinancialAccount )
             {
-                Payer = "Rock Import",
-                FinancialAccountId = s.Key.FinancialAccountId,
-                Project = s.Key.Project,
-                Amount = s.Sum( f => ( decimal? ) f.Amount ) ?? 0.0M,
-                TransactionFeeAmount = s.Sum( f => ( decimal? ) f.TransactionFeeAmount ) ?? 0.0M,
-                TransactionFeeAccount = s.Key.TransactionFeeAccount,
-                ProcessTransactionFees = s.Key.ProcessTransactionFees
-            } )
-            .ToList();
+                batchTransactionList = batchTransactions
+                    .GroupBy( d => new { d.FinancialAccountId, d.Project, d.TransactionFeeAccount, d.ProcessTransactionFees } )
+                    .Select( s => new GLTransaction
+                    {
+                        Payer = "Rock Import",
+                        FinancialAccountId = s.Key.FinancialAccountId,
+                        Project = s.Key.Project,
+                        Amount = s.Sum( f => ( decimal? ) f.Amount ) ?? 0.0M,
+                        TransactionFeeAmount = s.Sum( f => ( decimal? ) f.TransactionFeeAmount ) ?? 0.0M,
+                        TransactionFeeAccount = s.Key.TransactionFeeAccount,
+                        ProcessTransactionFees = s.Key.ProcessTransactionFees
+                    } )
+                    .ToList();
+            }
+            else
+            {
+                batchTransactionList = batchTransactions;
+            }
 
             return batchTransactionList;
         }
@@ -154,7 +163,6 @@ namespace rocks.kfs.Intacct.Utils
 
             var rockContext = new RockContext();
             var accountCategoryId = new CategoryService( rockContext ).Queryable().FirstOrDefault( c => c.Guid.Equals( new System.Guid( KFSConst.Attribute.FINANCIAL_ACCOUNT_ATTRIBUTE_CATEGORY ) ) ).Id;
-            var gatewayCategoryId = new CategoryService( rockContext ).Queryable().FirstOrDefault( c => c.Guid.Equals( new System.Guid( KFSConst.Attribute.FINANCIAL_GATEWAY_ATTRIBUTE_CATEGORY ) ) ).Id;
             var attributeService = new AttributeService( rockContext );
             var accountAttributes = attributeService.Queryable().Where( a => a.Categories.Select( c => c.Id ).Contains( accountCategoryId ) ).ToList();
 
