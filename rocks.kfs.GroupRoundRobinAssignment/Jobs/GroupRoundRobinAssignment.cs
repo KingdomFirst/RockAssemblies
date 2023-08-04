@@ -35,7 +35,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
     ///
     [DataViewField(
         "People Data View",
-        Description = "Select the data view you wish to use as your source for people to add to the round robin group assignment. For speed purposes we recommend it filter out people already assigned to groups.",
+        Description = "Select the data view you wish to use as your source for people to add to the round robin group assignment.",
         IsRequired = true,
         EntityTypeName = "Rock.Model.Person",
         Key = AttributeKey.PeopleToAddDataView )]
@@ -96,6 +96,25 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
         ListSource = "All^All Family Members,Adults^Adults Only,None",
         Key = AttributeKey.IncludeFamilyMembers )]
 
+    [BooleanField(
+        "Output Errors to History",
+        Description = "Should the job output all errors to job history? Default: Yes",
+        DefaultBooleanValue = true,
+        Key = AttributeKey.OutputErrors )]
+
+    [BooleanField(
+        "Use Group Campus",
+        Description = "Should the job use Group Campus to match groups to person campus when assigning people to groups? Default: Yes",
+        DefaultBooleanValue = true,
+        Key = AttributeKey.UseGroupCampus )]
+
+    [BooleanField(
+        "Remove Members not in Data View",
+        Description = "Should the job automatically remove group members not in the Data View? (Note: if you 'Include Family Members' your Data View should include them to prevent them from being removed with this setting.) Default: No",
+        DefaultBooleanValue = false,
+        Key = AttributeKey.RemoveMembers )]
+
+
     [DisallowConcurrentExecution]
     public class GroupRoundRobinAssignment : IJob
     {
@@ -110,6 +129,9 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
             public const string DefaultGroup = "DefaultGroup";
             public const string IncludeSelectedGroups = "IncludeSelectedGroups";
             public const string IncludeFamilyMembers = "IncludeFamilyMembers";
+            public const string OutputErrors = "OutputErrors";
+            public const string UseGroupCampus = "UseGroupCampus";
+            public const string RemoveMembers = "RemoveMembers";
         }
 
         private List<string> errorMessages = new List<string>();
@@ -135,7 +157,11 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
             var defaultCampusGuid = dataMap.GetString( AttributeKey.DefaultCampus ).AsGuidOrNull();
             var includeSelectedGroups = dataMap.GetBooleanFromString( AttributeKey.IncludeSelectedGroups );
             var includeFamilyMembers = dataMap.GetString( AttributeKey.IncludeFamilyMembers );
+            var outputErrors = dataMap.GetBooleanFromString( AttributeKey.OutputErrors );
+            var useGroupCampus = dataMap.GetBooleanFromString( AttributeKey.UseGroupCampus );
+            var removeMembers = dataMap.GetBooleanFromString( AttributeKey.RemoveMembers );
             var addedCount = 0;
+            var peopleRemoved = 0;
 
             using ( var rockContext = new RockContext() )
             {
@@ -157,7 +183,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                     // Filter people by dataview
                     var paramExpression = personService.ParameterExpression;
                     var whereExpression = dataView.GetExpression( personService, paramExpression );
-                    var personQry = personService
+                    var dataViewPersonQry = personService
                         .Queryable( false, false ).AsNoTracking()
                         .Where( paramExpression, whereExpression, null );
 
@@ -183,29 +209,33 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
 
                     var allGroupIds = groups.Select( g => g.Id ).ToList();
                     var groupMemberServiceQry = groupMemberService.Queryable( true ).Where( gm => allGroupIds.Contains( gm.GroupId ) );
-                    personQry = personQry.Where( p => !groupMemberServiceQry.Any( gm => gm.PersonId == p.Id ) );
+                    var peopleToAddQry = dataViewPersonQry.Where( p => !groupMemberServiceQry.Any( gm => gm.PersonId == p.Id ) );
 
                     var addedPeopleIds = new List<int>();
 
-                    foreach ( var person in personQry )
+                    foreach ( var person in peopleToAddQry )
                     {
                         var personCampusId = person.PrimaryCampusId;
                         Group groupToAddTo = null;
 
                         // If both Default Campus and Default Group are set, only the Default Group will be used
-                        if ( personCampusId == null && defaultCampus != null && defaultGroup == null )
+                        if ( useGroupCampus && personCampusId == null && defaultCampus != null && defaultGroup == null )
                         {
                             personCampusId = defaultCampus.Id;
                             errorMessages.Add( string.Format( "Campus not found for {0} ({1}), setting to Default Campus for group search.", person.FullName, person.Id ) );
                         }
 
-                        if ( personCampusId != null )
+                        if ( personCampusId != null && useGroupCampus )
                         {
                             var groupsForCampus = groups
                                 .Where( g => g.Campus != null && g.CampusId.Equals( personCampusId ) )
                                 .OrderBy( g => g.ActiveMembers().Count() );
 
                             groupToAddTo = groupsForCampus.FirstOrDefault();
+                        }
+                        else
+                        {
+                            groupToAddTo = groups.OrderBy( g => g.ActiveMembers().Count() ).FirstOrDefault();
                         }
 
                         // If Person campus is not set and Default Group is set or a matching group to Person's campus is not found use Default Group
@@ -237,7 +267,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                                     {
                                         var fPerson = familyMember.Person;
 
-                                        if ( includeFamilyMembers != "Adults" || fPerson.GetFamilyRole( rockContext ).Guid == Rock.SystemGuid.GroupRole.GROUPROLE_FAMILY_MEMBER_ADULT.AsGuid() )
+                                        if ( !groupMemberServiceQry.Any( gm => gm.PersonId == fPerson.Id ) && ( includeFamilyMembers != "Adults" || fPerson.GetFamilyRole( rockContext ).Guid == Rock.SystemGuid.GroupRole.GROUPROLE_FAMILY_MEMBER_ADULT.AsGuid() ) )
                                         {
                                             try
                                             {
@@ -260,6 +290,10 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                                             {
                                                 errorMessages.Add( string.Format( "There was an error adding family member {0} ({1}) to {2} group. Exception: {3}", fPerson.FullName, fPerson.Id, groupToAddTo.Name, e.Message ) );
                                             }
+                                        }
+                                        else if ( groupMemberServiceQry.Any( gm => gm.PersonId == fPerson.Id ) )
+                                        {
+                                            errorMessages.Add( string.Format( "This family member, {0} ({1}), already exists in a group. Skipping addition, you may want to double check group assignment.", fPerson.FullName, fPerson.Id ) );
                                         }
                                     }
                                 }
@@ -284,9 +318,29 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
 
                     rockContext.SaveChanges();
 
+                    if ( removeMembers )
+                    {
+                        // Reload group Members and people in data view after save.
+                        dataViewPersonQry = personService.Queryable( false, false ).AsNoTracking().Where( paramExpression, whereExpression, null );
+                        var reloadedGroupMemberQry = groupMemberService.Queryable( true ).Where( gm => allGroupIds.Contains( gm.GroupId ) );
+                        var peopleToRemove = reloadedGroupMemberQry.Where( gm => !dataViewPersonQry.Any( p => p.Id == gm.PersonId ) );
+
+                        foreach ( var groupMember in peopleToRemove )
+                        {
+                            groupMemberService.Delete( groupMember );
+                            peopleRemoved++;
+                        }
+
+                        rockContext.SaveChanges();
+
+                    }
                 }
             }
-            context.Result += string.Format( "{0} people added to groups.", addedCount );
+            context.Result += string.Format( "{0} {1} added to groups.", addedCount, "person".PluralizeIf( addedCount > 1 ) );
+            if ( removeMembers )
+            {
+                context.Result += string.Format( "<br>{0} {1} removed from groups.", peopleRemoved, "person".PluralizeIf( peopleRemoved > 1 ) );
+            }
 
             if ( errorMessages.Any() )
             {
@@ -296,8 +350,12 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
                 sb.Append( string.Format( "{0} Errors: ", errorMessages.Count ) );
                 errorMessages.ForEach( e => { sb.AppendLine(); sb.Append( e ); } );
                 string errors = sb.ToString();
-                context.Result += errors;
-                if ( addedCount == 0 )
+                if ( outputErrors )
+                {
+                    context.Result += errors;
+                }
+                // Log errors as exceptions if addedCount == 0 or errors are not output to Job history.
+                if ( addedCount == 0 || !outputErrors )
                 {
                     var exception = new Exception( errors );
                     HttpContext context2 = HttpContext.Current;
