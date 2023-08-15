@@ -104,8 +104,8 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
 
     [BooleanField(
         "Use Group Campus",
-        Description = "Should the job use Group Campus to match groups to person campus when assigning people to groups? Default: Yes",
-        DefaultBooleanValue = true,
+        Description = "Should the job use Group Campus to match groups to person campus when assigning people to groups? Default: No",
+        DefaultBooleanValue = false,
         Key = AttributeKey.UseGroupCampus )]
 
     [BooleanField(
