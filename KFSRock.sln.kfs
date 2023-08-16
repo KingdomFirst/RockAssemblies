@@ -64,7 +64,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{585C34CC-D99C-4E21-9957-FDCB364DD275}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		Rock.sln.vsspell = Rock.sln.vsspell
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rock.Tests.Integration", "Rock.Tests.Integration\Rock.Tests.Integration.csproj", "{9BB83636-1C9C-4A3F-9C18-5CFDB1EC720A}"
@@ -131,8 +130,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Reach", "KFSRockA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.ScheduledGroupCommunication", "KFSRockAssemblies\rocks.kfs.ScheduledGroupCommunication\rocks.kfs.ScheduledGroupCommunication.csproj", "{CD71A013-E46E-4A34-AF7C-B13544EF2B23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.ShelbyBatchExport", "KFSRockAssemblies\rocks.kfs.ShelbyBatchExport\rocks.kfs.ShelbyBatchExport.csproj", "{CED42A55-1DDA-4014-8EAC-A47CED5DB236}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.ShelbyFinancials", "KFSRockAssemblies\rocks.kfs.ShelbyFinancials\rocks.kfs.ShelbyFinancials.csproj", "{B291E488-3383-4CA3-8F53-3ED88B2EC8C9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Storage.Provider.FTP", "KFSRockAssemblies\rocks.kfs.Storage.Provider.FTP\rocks.kfs.Storage.Provider.FTP.csproj", "{69909880-CBCA-4505-8A03-14B55E8CABBE}"
@@ -151,8 +148,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Workflow.Action.P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Workflow.Action.WorkflowAttributes", "KFSRockAssemblies\rocks.kfs.Workflow.Action.WorkflowAttributes\rocks.kfs.Workflow.Action.WorkflowAttributes.csproj", "{9AC85805-0C97-424C-9506-DA6B281DB0CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.WorkflowFromEWS", "KFSRockAssemblies\rocks.kfs.WorkflowFromEWS\rocks.kfs.WorkflowFromEWS.csproj", "{EEFCBE3D-6F6C-4C9B-8A19-B9FA04B4D6BF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventBriteDotNetFramework", "KFSRockAssemblies\EventBriteDotNetFramework\EventBriteDotNetFramework.csproj", "{517F4358-D6F2-4A0C-9992-2DD06AE1A003}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Eventbrite", "KFSRockAssemblies\rocks.kfs.EventBrite\rocks.kfs.Eventbrite.csproj", "{03F6895A-ADF6-4C18-89CC-71ED605B4AFB}"
@@ -163,8 +158,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Workflow.Action.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.StepsToCare", "KFSRockAssemblies\rocks.kfs.StepsToCare\rocks.kfs.StepsToCare.csproj", "{44B89D21-5AF4-4E89-A49D-31B60EC4AB4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Shortcodes", "KFSRockAssemblies\rocks.kfs.Shortcodes\rocks.kfs.Shortcodes.csproj", "{EA104634-0BAA-402F-B901-E2016990237E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Checkin.PagerEntry", "KFSRockAssemblies\rocks.kfs.Checkin.PagerEntry\rocks.kfs.Checkin.PagerEntry.csproj", "{86F7A34A-D1AF-444D-9245-75760F97D469}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Zoom", "KFSRockAssemblies\rocks.kfs.Zoom\rocks.kfs.Zoom.csproj", "{2E6CA020-205D-4FB8-AD08-91866D653C4B}"
@@ -183,25 +176,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Edify", "KFSRockA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.SimpleTexting", "KFSRockAssemblies\rocks.kfs.SimpleTexting\rocks.kfs.SimpleTexting.csproj", "{63F45FC6-C6C8-4D27-8C5C-67C7563E85A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Shortcodes", "KFSRockAssemblies\rocks.kfs.Shortcodes\rocks.kfs.Shortcodes.csproj", "{EA104634-0BAA-402F-B901-E2016990237E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.DashboardsAndMetrics", "KFSRockAssemblies\rocks.kfs.DashboardsAndMetrics\rocks.kfs.DashboardsAndMetrics.csproj", "{A9533BAE-C7B6-4222-9120-6EB49511F8D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Checkin.PagerEntry", "KFSRockAssemblies\rocks.kfs.Checkin.PagerEntry\rocks.kfs.Checkin.PagerEntry.csproj", "{86F7A34A-D1AF-444D-9245-75760F97D469}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Zoom", "KFSRockAssemblies\rocks.kfs.Zoom\rocks.kfs.Zoom.csproj", "{2E6CA020-205D-4FB8-AD08-91866D653C4B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZoomDotNetFramework", "KFSRockAssemblies\ZoomDotNetFramework\ZoomDotNetFramework.csproj", "{99DA9675-2596-43B9-A623-0AD3C742FD3C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.GroupRoundRobinAssignment", "KFSRockAssemblies\rocks.kfs.GroupRoundRobinAssignment\rocks.kfs.GroupRoundRobinAssignment.csproj", "{E2040E07-572B-4629-8B9F-6B53EC7C077C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.CustomGroupCommunication", "KFSRockAssemblies\rocks.kfs.CustomGroupCommunication\rocks.kfs.CustomGroupCommunication.csproj", "{CB69A1A9-DFD2-40D0-829B-AF9558DEBFD2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Workflow.Action.Communication", "KFSRockAssemblies\rocks.kfs.Workflow.Action.Communication\rocks.kfs.Workflow.Action.Communication.csproj", "{1832B422-27F0-11ED-A261-0242AC120002}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.PostalServer", "KFSRockAssemblies\rocks.kfs.PostalServer\rocks.kfs.PostalServer.csproj", "{0D13E326-BBB8-4834-A5A8-EC0448F0F232}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Edify", "KFSRockAssemblies\rocks.kfs.Edify\rocks.kfs.Edify.csproj", "{9FD4BFBA-B6F2-47CD-A68A-4048687362DF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.SimpleTexting", "KFSRockAssemblies\rocks.kfs.SimpleTexting\rocks.kfs.SimpleTexting.csproj", "{63F45FC6-C6C8-4D27-8C5C-67C7563E85A6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Microsoft365Utilities", "KFSRockAssemblies\rocks.kfs.Microsoft365Utilities\rocks.kfs.Microsoft365Utilities.csproj", "{EEFCBE3D-6F6C-4C9B-8A19-B9FA04B4D6BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -413,10 +390,6 @@ Global
 		{CD71A013-E46E-4A34-AF7C-B13544EF2B23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD71A013-E46E-4A34-AF7C-B13544EF2B23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD71A013-E46E-4A34-AF7C-B13544EF2B23}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CED42A55-1DDA-4014-8EAC-A47CED5DB236}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CED42A55-1DDA-4014-8EAC-A47CED5DB236}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CED42A55-1DDA-4014-8EAC-A47CED5DB236}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CED42A55-1DDA-4014-8EAC-A47CED5DB236}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B291E488-3383-4CA3-8F53-3ED88B2EC8C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B291E488-3383-4CA3-8F53-3ED88B2EC8C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B291E488-3383-4CA3-8F53-3ED88B2EC8C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -453,10 +426,6 @@ Global
 		{9AC85805-0C97-424C-9506-DA6B281DB0CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AC85805-0C97-424C-9506-DA6B281DB0CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AC85805-0C97-424C-9506-DA6B281DB0CD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EEFCBE3D-6F6C-4C9B-8A19-B9FA04B4D6BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EEFCBE3D-6F6C-4C9B-8A19-B9FA04B4D6BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EEFCBE3D-6F6C-4C9B-8A19-B9FA04B4D6BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EEFCBE3D-6F6C-4C9B-8A19-B9FA04B4D6BF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{517F4358-D6F2-4A0C-9992-2DD06AE1A003}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{517F4358-D6F2-4A0C-9992-2DD06AE1A003}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{517F4358-D6F2-4A0C-9992-2DD06AE1A003}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -477,10 +446,6 @@ Global
 		{44B89D21-5AF4-4E89-A49D-31B60EC4AB4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44B89D21-5AF4-4E89-A49D-31B60EC4AB4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44B89D21-5AF4-4E89-A49D-31B60EC4AB4D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EA104634-0BAA-402F-B901-E2016990237E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EA104634-0BAA-402F-B901-E2016990237E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EA104634-0BAA-402F-B901-E2016990237E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EA104634-0BAA-402F-B901-E2016990237E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{86F7A34A-D1AF-444D-9245-75760F97D469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{86F7A34A-D1AF-444D-9245-75760F97D469}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86F7A34A-D1AF-444D-9245-75760F97D469}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -517,6 +482,14 @@ Global
 		{63F45FC6-C6C8-4D27-8C5C-67C7563E85A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63F45FC6-C6C8-4D27-8C5C-67C7563E85A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63F45FC6-C6C8-4D27-8C5C-67C7563E85A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9533BAE-C7B6-4222-9120-6EB49511F8D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9533BAE-C7B6-4222-9120-6EB49511F8D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9533BAE-C7B6-4222-9120-6EB49511F8D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9533BAE-C7B6-4222-9120-6EB49511F8D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEFCBE3D-6F6C-4C9B-8A19-B9FA04B4D6BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEFCBE3D-6F6C-4C9B-8A19-B9FA04B4D6BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEFCBE3D-6F6C-4C9B-8A19-B9FA04B4D6BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEFCBE3D-6F6C-4C9B-8A19-B9FA04B4D6BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
