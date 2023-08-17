@@ -235,13 +235,15 @@ namespace rocks.kfs.Intacct.Utils
 
             foreach ( var dimension in customDimenesionValues )
             {
+                var custFieldName = dimension.Key;
                 if ( suffixRemove.IsNotNullOrWhiteSpace() && dimension.Key.ToLower().EndsWith( suffixRemove.ToLower() ) )
                 {
-                    filteredDimensions.Add( dimension.Key.Remove( dimension.Key.Length - suffixRemove.Length ), dimension.Value );
+                    custFieldName = dimension.Key.Remove( dimension.Key.Length - suffixRemove.Length );
                 }
-                else
+
+                if ( !filteredDimensions.ContainsKey( custFieldName ) )
                 {
-                    filteredDimensions.Add( dimension.Key, dimension.Value );
+                    filteredDimensions.Add( custFieldName, dimension.Value );
                 }
             }
             return filteredDimensions;
