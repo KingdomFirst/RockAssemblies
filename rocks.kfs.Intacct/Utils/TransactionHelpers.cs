@@ -196,7 +196,7 @@ namespace rocks.kfs.Intacct.Utils
             return customDimensions;
         }
 
-        public static Dictionary<string, object> GetMergeFieldsAndDimensions( ref string debugLava, Dictionary<string, dynamic> customDimensionValues, MergeFieldObjects mergeFieldObjects )
+        public static Dictionary<string, object> GetMergeFieldsAndDimensions( ref string debugLava, SortedDictionary<string, dynamic> customDimensionValues, MergeFieldObjects mergeFieldObjects )
         {
             var mergeFields = new Dictionary<string, object>();
             var account = mergeFieldObjects.Account;

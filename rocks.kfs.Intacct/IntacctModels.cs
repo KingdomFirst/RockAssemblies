@@ -108,7 +108,8 @@ namespace rocks.kfs.Intacct
         public string Memo;
         public string LocationId;
         public string DepartmentId;
-        public Dictionary<string, dynamic> CustomFields = new Dictionary<string, object>();
+        public SortedDictionary<string, dynamic> CustomFields = new SortedDictionary<string, object>();
+        public string CustomFieldsString;
         public string ProjectId;
         public string TaskId;
         public string CostTypeId;
