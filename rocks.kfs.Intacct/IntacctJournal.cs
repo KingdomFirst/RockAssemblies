@@ -220,7 +220,7 @@ namespace rocks.kfs.Intacct
             foreach ( var summary in batchTransactionsSummary )
             {
                 var account = new FinancialAccountService( rockContext ).Get( summary.FinancialAccountId );
-                var customDimensionValues = new Dictionary<string, dynamic>();
+                var customDimensionValues = new SortedDictionary<string, dynamic>();
                 account.LoadAttributes();
                 var mergeFieldObjects = new MergeFieldObjects
                 {
@@ -306,7 +306,7 @@ namespace rocks.kfs.Intacct
                     .ToList();
 
                 feeDebitTransactions = feeDebitTransactions
-                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.CustomDimensionString, d.DebitAccount } )
+                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount, d.CustomDimensionString } )
                     .Select( s => new GLBatchTotals
                     {
                         Amount = s.Sum( f => f.Amount ),
