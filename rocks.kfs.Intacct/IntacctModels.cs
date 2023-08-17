@@ -59,7 +59,7 @@ namespace rocks.kfs.Intacct
         public string ContractId;
         public string WarehouseId;
         public List<AllocationLine> CustomAllocationSplits = new List<AllocationLine>();
-        public Dictionary<string, dynamic> CustomFields = new Dictionary<string, object>();
+        public SortedDictionary<string, dynamic> CustomFields = new Dictionary<string, object>();
     }
 
     public class AllocationLine
@@ -253,7 +253,8 @@ namespace rocks.kfs.Intacct
         public string DebitLocation;
         public string DebitProject;
         public string Description;
-        public Dictionary<string, dynamic> CustomDimensions;
+        public SortedDictionary<string, dynamic> CustomDimensions;
+        public string CustomDimensionString;
         public int ProcessTransactionFees;
 
         public object Clone()

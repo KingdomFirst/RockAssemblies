@@ -229,12 +229,12 @@ namespace rocks.kfs.Intacct.Utils
             return mergeFields;
         }
 
-        public static Dictionary<string, dynamic> GetFilteredDimensions( Dictionary<string, dynamic> customDimenesionValues, string suffixExclude = null, string suffixRemove = null )
+        public static SortedDictionary<string, dynamic> GetFilteredDimensions( SortedDictionary<string, dynamic> customDimenesionValues, string suffixExclude = null, string suffixRemove = null )
         {
-            var filteredDimensions = new Dictionary<string, dynamic>();
+            var filteredDimensions = new SortedDictionary<string, dynamic>();
             if ( suffixExclude.IsNotNullOrWhiteSpace() )
             {
-                customDimenesionValues = customDimenesionValues.Where( d => !d.Key.ToLower().EndsWith( suffixExclude ) ).ToDictionary( x => x.Key, x => x.Value );
+                customDimenesionValues = new SortedDictionary<string, dynamic>( customDimenesionValues.Where( d => !d.Key.ToLower().EndsWith( suffixExclude ) ).ToDictionary( x => x.Key, x => x.Value ) );
             }
 
             foreach ( var dimension in customDimenesionValues )

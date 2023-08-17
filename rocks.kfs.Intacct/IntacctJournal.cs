@@ -249,7 +249,7 @@ namespace rocks.kfs.Intacct
                     DebitLocation = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITLOCATION" ),
                     DebitProject = summary.DebitProject,
                     Description = DescriptionLava.ResolveMergeFields( mergeFields ),
-                    CustomDimensions = customDimensionValues,
+                    CustomDimensions = new SortedDictionary<string, dynamic>( customDimensionValues ),
                     ProcessTransactionFees = summary.ProcessTransactionFees
                 };
 
@@ -275,6 +275,7 @@ namespace rocks.kfs.Intacct
                 // We want to include any attribute dimensions with "debit" in the key, or neither "debit" nor "credit". It is cleanest to do this by just excluding "credit". 
                 var debitDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_credit", "_debit" );
                 t.CustomDimensions = debitDimensions;
+                t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( debitDimensions ) );
             }
             foreach ( var t in feeDebitTransactions )
             {
@@ -284,12 +285,13 @@ namespace rocks.kfs.Intacct
 
                 var debitDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_credit", "_debit" );
                 t.CustomDimensions = debitDimensions;
+                t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( debitDimensions ) );
             }
 
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.DebitLinesOnly )
             {
                 debitTransactions = debitTransactions
-                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount, d.ProcessTransactionFees } )
+                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount, d.CustomDimensionString, d.ProcessTransactionFees } )
                     .Select( s => new GLBatchTotals()
                     {
                         Amount = s.Sum( f => f.Amount ),
@@ -327,6 +329,7 @@ namespace rocks.kfs.Intacct
                 // We want to include any attribute dimensions with "_credit" in the key, or neither "_debit" nor "_credit". It is cleanest to do this by just excluding "_debit". 
                 var creditDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_debit", "_credit" );
                 t.CustomDimensions = creditDimensions;
+                t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) );
             }
             foreach ( var t in feeCreditTransactions )
             {
@@ -335,12 +338,13 @@ namespace rocks.kfs.Intacct
 
                 var creditDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_debit", "_credit" );
                 t.CustomDimensions = creditDimensions;
+                t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) );
             }
 
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.CreditLinesOnly )
             {
                 creditTransactions = creditTransactions
-                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount } )
+                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount, d.CustomDimensionString } )
                     .Select( s => new GLBatchTotals
                     {
                         Amount = s.Sum( f => f.Amount ),
