@@ -299,14 +299,14 @@ namespace rocks.kfs.Intacct
                         DebitClass = s.Key.DebitClass,
                         DebitDepartment = s.Key.DebitDepartment,
                         DebitLocation = s.Key.DebitLocation,
-                        CreditProject = s.Key.DebitProject,
+                        DebitProject = s.Key.DebitProject,
                         Description = s.First().Description,
                         CustomDimensions = s.First().CustomDimensions
                     } )
                     .ToList();
 
                 feeDebitTransactions = feeDebitTransactions
-                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount } )
+                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.CustomDimensionString, d.DebitAccount } )
                     .Select( s => new GLBatchTotals
                     {
                         Amount = s.Sum( f => f.Amount ),
@@ -359,7 +359,7 @@ namespace rocks.kfs.Intacct
                     .ToList();
 
                 feeCreditTransactions = feeCreditTransactions
-                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount } )
+                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount, d.CustomDimensionString } )
                     .Select( s => new GLBatchTotals
                     {
                         Amount = s.Sum( f => f.Amount ),

@@ -234,7 +234,7 @@ namespace rocks.kfs.Intacct.Utils
             var filteredDimensions = new SortedDictionary<string, dynamic>();
             if ( suffixExclude.IsNotNullOrWhiteSpace() )
             {
-                customDimenesionValues = new SortedDictionary<string, dynamic>( customDimenesionValues.Where( d => !d.Key.ToLower().EndsWith( suffixExclude ) ).ToDictionary( x => x.Key, x => x.Value ) );
+                customDimenesionValues = new SortedDictionary<string, dynamic>( customDimenesionValues.Where( d => !d.Key.ToLower().EndsWith( suffixExclude.ToLower() ) ).ToDictionary( x => x.Key, x => x.Value ) );
             }
 
             foreach ( var dimension in customDimenesionValues )

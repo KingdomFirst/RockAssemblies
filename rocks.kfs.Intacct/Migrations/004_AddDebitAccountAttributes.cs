@@ -4,7 +4,7 @@
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//9DF341B7-2E07-44BA-94B1-F637BE551961
+// 
 // http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -20,7 +20,7 @@ using KFSConst = rocks.kfs.Intacct.SystemGuid;
 
 namespace rocks.kfs.Intacct.Migrations
 {
-    [MigrationNumber( 4, "1.11.0" )]
+    [MigrationNumber( 4, "1.13.0" )]
     public class AddDebitAccountAttributes : Migration
     {
         /// <summary>
