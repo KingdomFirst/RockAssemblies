@@ -264,7 +264,7 @@ namespace rocks.kfs.Intacct
                     Memo = DescriptionLava.ResolveMergeFields( mergeFields ),
                     LocationId = locationId,
                     DepartmentId = departmentId,
-                    ProjectId = bTran.Project,
+                    ProjectId = bTran.CreditProject,
                     ClassId = classId,
                     CustomFields = customDimensionValues
                 };
@@ -279,7 +279,7 @@ namespace rocks.kfs.Intacct
                         Memo = "Transaction Fees",
                         LocationId = locationId,
                         DepartmentId = departmentId,
-                        ProjectId = bTran.Project,
+                        ProjectId = bTran.CreditProject,
                         ClassId = classId
                     };
                     lineItemList.Add( feeLineItem );

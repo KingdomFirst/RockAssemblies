@@ -240,10 +240,14 @@ namespace rocks.kfs.Intacct
                     DebitAccount = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITACCOUNTNO" ),
                     TransactionFeeAmount = summary.TransactionFeeAmount,
                     TransactionFeeAccount = summary.TransactionFeeAccount,
-                    Class = account.GetAttributeValue( "rocks.kfs.Intacct.CLASSID" ),
-                    Department = account.GetAttributeValue( "rocks.kfs.Intacct.DEPARTMENT" ),
-                    Location = account.GetAttributeValue( "rocks.kfs.Intacct.LOCATION" ),
-                    Project = summary.Project,
+                    CreditClass = account.GetAttributeValue( "rocks.kfs.Intacct.CLASSID" ),
+                    CreditDepartment = account.GetAttributeValue( "rocks.kfs.Intacct.DEPARTMENT" ),
+                    CreditLocation = account.GetAttributeValue( "rocks.kfs.Intacct.LOCATION" ),
+                    CreditProject = summary.CreditProject,
+                    DebitClass = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITCLASSID" ),
+                    DebitDepartment = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITDEPARTMENT" ),
+                    DebitLocation = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITLOCATION" ),
+                    DebitProject = summary.DebitProject,
                     Description = DescriptionLava.ResolveMergeFields( mergeFields ),
                     CustomDimensions = customDimensionValues,
                     ProcessTransactionFees = summary.ProcessTransactionFees
@@ -267,41 +271,48 @@ namespace rocks.kfs.Intacct
             foreach ( var t in debitTransactions )
             {
                 t.Amount = ( ( decimal? ) t.Amount ?? 0.0M ) - ( t.ProcessTransactionFees == 1 ? t.TransactionFeeAmount : 0.0M );
+
+                // We want to include any attribute dimensions with "debit" in the key, or neither "debit" nor "credit". It is cleanest to do this by just excluding "credit". 
+                var debitDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_credit", "_debit" );
+                t.CustomDimensions = debitDimensions;
             }
             foreach ( var t in feeDebitTransactions )
             {
                 t.Amount = ( decimal? ) t.TransactionFeeAmount ?? 0.0M;
                 t.DebitAccount = t.TransactionFeeAccount;
                 t.Description += " Transaction Fees";
+
+                var debitDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_credit", "_debit" );
+                t.CustomDimensions = debitDimensions;
             }
 
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.DebitLinesOnly )
             {
                 debitTransactions = debitTransactions
-                    .GroupBy( d => new { d.Class, d.Department, d.Location, d.Project, d.DebitAccount, d.ProcessTransactionFees } )
+                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount, d.ProcessTransactionFees } )
                     .Select( s => new GLBatchTotals()
                     {
                         Amount = s.Sum( f => f.Amount ),
                         DebitAccount = s.Key.DebitAccount,
-                        Class = s.Key.Class,
-                        Department = s.Key.Department,
-                        Location = s.Key.Location,
-                        Project = s.Key.Project,
+                        DebitClass = s.Key.DebitClass,
+                        DebitDepartment = s.Key.DebitDepartment,
+                        DebitLocation = s.Key.DebitLocation,
+                        CreditProject = s.Key.DebitProject,
                         Description = s.First().Description,
                         CustomDimensions = s.First().CustomDimensions
                     } )
                     .ToList();
 
                 feeDebitTransactions = feeDebitTransactions
-                    .GroupBy( d => new { d.Class, d.Department, d.Location, d.Project, d.DebitAccount } )
+                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount } )
                     .Select( s => new GLBatchTotals
                     {
                         Amount = s.Sum( f => f.Amount ),
                         DebitAccount = s.Key.DebitAccount,
-                        Class = s.Key.Class,
-                        Department = s.Key.Department,
-                        Location = s.Key.Location,
-                        Project = s.Key.Project,
+                        DebitClass = s.Key.DebitClass,
+                        DebitDepartment = s.Key.DebitDepartment,
+                        DebitLocation = s.Key.DebitLocation,
+                        DebitProject = s.Key.DebitProject,
                         Description = s.First().Description,
                         CustomDimensions = s.First().CustomDimensions
                     } )
@@ -312,41 +323,47 @@ namespace rocks.kfs.Intacct
             foreach ( var t in creditTransactions )
             {
                 t.Amount = ( ( decimal? ) t.Amount ?? 0.0M ) * -1;
+
+                // We want to include any attribute dimensions with "_credit" in the key, or neither "_debit" nor "_credit". It is cleanest to do this by just excluding "_debit". 
+                var creditDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_debit", "_credit" );
+                t.CustomDimensions = creditDimensions;
             }
             foreach ( var t in feeCreditTransactions )
             {
                 t.Amount = ( ( decimal? ) t.TransactionFeeAmount ?? 0.0M ) * -1;
                 t.CreditAccount = t.DebitAccount;
-                t.Description += " Transaction Fees";
+
+                var creditDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_debit", "_credit" );
+                t.CustomDimensions = creditDimensions;
             }
 
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.CreditLinesOnly )
             {
                 creditTransactions = creditTransactions
-                    .GroupBy( d => new { d.Class, d.Department, d.Location, d.Project, d.CreditAccount } )
+                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount } )
                     .Select( s => new GLBatchTotals
                     {
                         Amount = s.Sum( f => f.Amount ),
                         CreditAccount = s.Key.CreditAccount,
-                        Class = s.Key.Class,
-                        Department = s.Key.Department,
-                        Location = s.Key.Location,
-                        Project = s.Key.Project,
+                        CreditClass = s.Key.CreditClass,
+                        CreditDepartment = s.Key.CreditDepartment,
+                        CreditLocation = s.Key.CreditLocation,
+                        CreditProject = s.Key.CreditProject,
                         Description = s.First().Description,
                         CustomDimensions = s.First().CustomDimensions
                     } )
                     .ToList();
 
                 feeCreditTransactions = feeCreditTransactions
-                    .GroupBy( d => new { d.Class, d.Department, d.Location, d.Project, d.CreditAccount } )
+                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount } )
                     .Select( s => new GLBatchTotals
                     {
                         Amount = s.Sum( f => f.Amount ),
                         CreditAccount = s.Key.CreditAccount,
-                        Class = s.Key.Class,
-                        Department = s.Key.Department,
-                        Location = s.Key.Location,
-                        Project = s.Key.Project,
+                        CreditClass = s.Key.CreditClass,
+                        CreditDepartment = s.Key.CreditDepartment,
+                        CreditLocation = s.Key.CreditLocation,
+                        CreditProject = s.Key.CreditProject,
                         Description = s.First().Description,
                         CustomDimensions = s.First().CustomDimensions
                     } )
@@ -362,10 +379,10 @@ namespace rocks.kfs.Intacct
                 {
                     GlAccountNumber = debitTransaction.DebitAccount,
                     TransactionAmount = debitTransaction.Amount,
-                    ClassId = debitTransaction.Class,
-                    DepartmentId = debitTransaction.Department,
-                    LocationId = debitTransaction.Location,
-                    ProjectId = debitTransaction.Project,
+                    ClassId = debitTransaction.DebitClass,
+                    DepartmentId = debitTransaction.DebitDepartment,
+                    LocationId = debitTransaction.DebitLocation,
+                    ProjectId = debitTransaction.DebitProject,
                     Memo = debitTransaction.Description,
                     CustomFields = debitTransaction.CustomDimensions
                 };
@@ -379,10 +396,10 @@ namespace rocks.kfs.Intacct
                 {
                     GlAccountNumber = creditTransaction.CreditAccount,
                     TransactionAmount = creditTransaction.Amount,
-                    ClassId = creditTransaction.Class,
-                    DepartmentId = creditTransaction.Department,
-                    LocationId = creditTransaction.Location,
-                    ProjectId = creditTransaction.Project,
+                    ClassId = creditTransaction.CreditClass,
+                    DepartmentId = creditTransaction.CreditDepartment,
+                    LocationId = creditTransaction.CreditLocation,
+                    ProjectId = creditTransaction.CreditProject,
                     Memo = creditTransaction.Description,
                     CustomFields = creditTransaction.CustomDimensions
                 };

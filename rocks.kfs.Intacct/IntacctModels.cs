@@ -129,7 +129,10 @@ namespace rocks.kfs.Intacct
         public int FinancialAccountId;
 
         [LavaInclude]
-        public string Project;
+        public string CreditProject;
+
+        [LavaInclude]
+        public string DebitProject;
 
         [LavaInclude]
         public decimal TransactionFeeAmount;
@@ -241,10 +244,14 @@ namespace rocks.kfs.Intacct
         public string DebitAccount;
         public string TransactionFeeAccount;
         public decimal TransactionFeeAmount;
-        public string Class;
-        public string Department;
-        public string Location;
-        public string Project;
+        public string CreditClass;
+        public string CreditDepartment;
+        public string CreditLocation;
+        public string CreditProject;
+        public string DebitClass;
+        public string DebitDepartment;
+        public string DebitLocation;
+        public string DebitProject;
         public string Description;
         public Dictionary<string, dynamic> CustomDimensions;
         public int ProcessTransactionFees;
