@@ -59,7 +59,7 @@ namespace rocks.kfs.Intacct
         public string ContractId;
         public string WarehouseId;
         public List<AllocationLine> CustomAllocationSplits = new List<AllocationLine>();
-        public SortedDictionary<string, dynamic> CustomFields = new Dictionary<string, object>();
+        public SortedDictionary<string, dynamic> CustomFields = new SortedDictionary<string, object>();
     }
 
     public class AllocationLine
