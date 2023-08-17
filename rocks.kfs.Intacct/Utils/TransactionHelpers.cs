@@ -73,23 +73,19 @@ namespace rocks.kfs.Intacct.Utils
                     if ( detailProject != null )
                     {
                         creditProjectCode = DefinedValueCache.Get( ( Guid ) detailProject ).Value;
+                        debitProjectCode = creditProjectCode;
+                    }
+                    else
+                    {
                         if ( accountProjectDebit != null )
                         {
                             debitProjectCode = DefinedValueCache.Get( ( Guid ) accountProjectDebit ).Value;
                         }
-                        else
-                        {
-                            debitProjectCode = creditProjectCode;
-                        }
-                    }
-                    else if ( accountProjectCredit != null )
-                    {
-                        creditProjectCode = DefinedValueCache.Get( ( Guid ) accountProjectCredit ).Value;
-                    }
 
-                    if ( debitProjectCode.IsNullOrWhiteSpace() && accountProjectDebit != null )
-                    {
-                        debitProjectCode = DefinedValueCache.Get( ( Guid ) accountProjectDebit ).Value;
+                        if ( accountProjectCredit != null )
+                        {
+                            creditProjectCode = DefinedValueCache.Get( ( Guid ) accountProjectCredit ).Value;
+                        }
                     }
 
                     if ( transactionDetail.EntityTypeId.HasValue )
