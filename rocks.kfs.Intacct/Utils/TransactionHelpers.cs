@@ -232,6 +232,7 @@ namespace rocks.kfs.Intacct.Utils
         public static SortedDictionary<string, dynamic> GetFilteredDimensions( SortedDictionary<string, dynamic> customDimenesionValues, string suffixExclude = null, string suffixRemove = null )
         {
             var filteredDimensions = new SortedDictionary<string, dynamic>();
+            var glDimPrefix = "GLDIM";
             if ( suffixExclude.IsNotNullOrWhiteSpace() )
             {
                 customDimenesionValues = new SortedDictionary<string, dynamic>( customDimenesionValues.Where( d => !d.Key.ToLower().EndsWith( suffixExclude.ToLower() ) ).ToDictionary( x => x.Key, x => x.Value ) );
@@ -240,9 +241,14 @@ namespace rocks.kfs.Intacct.Utils
             foreach ( var dimension in customDimenesionValues )
             {
                 var custFieldName = dimension.Key;
-                if ( suffixRemove.IsNotNullOrWhiteSpace() && dimension.Key.ToLower().EndsWith( suffixRemove.ToLower() ) )
+                if ( suffixRemove.IsNotNullOrWhiteSpace() && custFieldName.ToLower().EndsWith( suffixRemove.ToLower() ) )
                 {
-                    custFieldName = dimension.Key.Remove( dimension.Key.Length - suffixRemove.Length );
+                    custFieldName = custFieldName.Remove( custFieldName.Length - suffixRemove.Length );
+                }
+
+                if ( !custFieldName.ToUpper().StartsWith( glDimPrefix ) )
+                {
+                    custFieldName = glDimPrefix + custFieldName;
                 }
 
                 if ( !filteredDimensions.ContainsKey( custFieldName ) )
