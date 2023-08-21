@@ -206,7 +206,11 @@ namespace rocks.kfs.Intacct.Utils
                 foreach ( var rockKey in mergeFieldObjects.CustomDimensions )
                 {
                     var dimension = rockKey.Split( '.' ).Last();
-                    customDimensionValues.Add( dimension, account.GetAttributeValue( rockKey ) );
+                    var value = account.GetAttributeValue( rockKey );
+                    if ( value.IsNotNullOrWhiteSpace() )
+                    {
+                        customDimensionValues.Add( dimension, account.GetAttributeValue( rockKey ) );
+                    }
                 }
             }
 
