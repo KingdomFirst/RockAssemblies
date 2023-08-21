@@ -171,13 +171,21 @@ namespace rocks.kfs.Intacct
                             {
                                 writer.WriteElementString( "classid", item.ClassId );
                             }
-                            if ( item.CustomFields.Count > 0 )
-                            {
-                                foreach ( KeyValuePair<string, dynamic> customField in item.CustomFields )
-                                {
-                                    writer.WriteElementString( customField.Key, customField.Value ?? string.Empty );
-                                }
-                            }
+
+                            // Intacct api documentation shows legacy support for custom fields, but we are unable to get them to work. Disabling for now.
+
+                            //if ( item.CustomFields.Count > 0 )
+                            //{
+                            //    writer.WriteStartElement( "customfields" );
+                            //    foreach ( KeyValuePair<string, dynamic> customField in item.CustomFields )
+                            //    {
+                            //        writer.WriteStartElement( "customfield" );
+                            //        writer.WriteElementString( "customfieldname", customField.Key );
+                            //        writer.WriteElementString( "customfieldvalue", customField.Value ?? string.Empty );
+                            //        writer.WriteEndElement();  // close customfield
+                            //    }
+                            //    writer.WriteEndElement();  // close customfields
+                            //}
                             writer.WriteEndElement();  // close lineitem
                         }
 
