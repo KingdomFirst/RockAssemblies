@@ -209,7 +209,7 @@ namespace rocks.kfs.Intacct.Utils
                     var value = account.GetAttributeValue( rockKey );
                     if ( value.IsNotNullOrWhiteSpace() )
                     {
-                        customDimensionValues.Add( dimension, account.GetAttributeValue( rockKey ) );
+                        customDimensionValues.Add( dimension, value );
                     }
                 }
             }
