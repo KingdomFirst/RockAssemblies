@@ -59,7 +59,7 @@ namespace rocks.kfs.Intacct
         public string ContractId;
         public string WarehouseId;
         public List<AllocationLine> CustomAllocationSplits = new List<AllocationLine>();
-        public Dictionary<string, dynamic> CustomFields = new Dictionary<string, object>();
+        public SortedDictionary<string, dynamic> CustomFields = new SortedDictionary<string, object>();
     }
 
     public class AllocationLine
@@ -108,7 +108,8 @@ namespace rocks.kfs.Intacct
         public string Memo;
         public string LocationId;
         public string DepartmentId;
-        public Dictionary<string, dynamic> CustomFields = new Dictionary<string, object>();
+        public SortedDictionary<string, dynamic> CustomFields = new SortedDictionary<string, object>();
+        public string CustomFieldsString;
         public string ProjectId;
         public string TaskId;
         public string CostTypeId;
@@ -129,7 +130,10 @@ namespace rocks.kfs.Intacct
         public int FinancialAccountId;
 
         [LavaInclude]
-        public string Project;
+        public string CreditProject;
+
+        [LavaInclude]
+        public string DebitProject;
 
         [LavaInclude]
         public decimal TransactionFeeAmount;
@@ -241,12 +245,17 @@ namespace rocks.kfs.Intacct
         public string DebitAccount;
         public string TransactionFeeAccount;
         public decimal TransactionFeeAmount;
-        public string Class;
-        public string Department;
-        public string Location;
-        public string Project;
+        public string CreditClass;
+        public string CreditDepartment;
+        public string CreditLocation;
+        public string CreditProject;
+        public string DebitClass;
+        public string DebitDepartment;
+        public string DebitLocation;
+        public string DebitProject;
         public string Description;
-        public Dictionary<string, dynamic> CustomDimensions;
+        public SortedDictionary<string, dynamic> CustomDimensions;
+        public string CustomDimensionString;
         public int ProcessTransactionFees;
 
         public object Clone()
