@@ -171,13 +171,16 @@ namespace rocks.kfs.Intacct
                             {
                                 writer.WriteElementString( "classid", item.ClassId );
                             }
-                            if ( item.CustomFields.Count > 0 )
-                            {
-                                foreach ( KeyValuePair<string, dynamic> customField in item.CustomFields )
-                                {
-                                    writer.WriteElementString( customField.Key, customField.Value ?? string.Empty );
-                                }
-                            }
+
+                            // Intacct api documentation shows support for custom fields, but we are unable to get them to work. Disabling for now.
+
+                            //if ( item.CustomFields.Count > 0 )
+                            //{
+                            //    foreach ( KeyValuePair<string, dynamic> customField in item.CustomFields )
+                            //    {
+                            //        writer.WriteElementString( customField.Key, customField.Value ?? string.Empty );
+                            //    }
+                            //}
                             writer.WriteEndElement();  // close lineitem
                         }
 
@@ -240,7 +243,7 @@ namespace rocks.kfs.Intacct
             foreach ( var bTran in receiptTransactions )
             {
                 var account = new FinancialAccountService( rockContext ).Get( bTran.FinancialAccountId );
-                var customDimensionValues = new Dictionary<string, dynamic>();
+                var customDimensionValues = new SortedDictionary<string, dynamic>();
                 account.LoadAttributes();
                 var mergeFieldObjects = new MergeFieldObjects
                 {
@@ -253,6 +256,9 @@ namespace rocks.kfs.Intacct
                 };
                 Dictionary<string, object> mergeFields = TransactionHelpers.GetMergeFieldsAndDimensions( ref debugLava, customDimensionValues, mergeFieldObjects );
 
+                // We want to include any attribute dimensions with "_credit" in the key, or neither "_debit" nor "_credit". It is cleanest to do this by just excluding "_debit". 
+                var creditDimensions = TransactionHelpers.GetFilteredDimensions( customDimensionValues, "_debit", "_credit" );
+
                 var classId = account.GetAttributeValue( "rocks.kfs.Intacct.CLASSID" );
                 var departmentId = account.GetAttributeValue( "rocks.kfs.Intacct.DEPARTMENT" );
                 var locationId = account.GetAttributeValue( "rocks.kfs.Intacct.LOCATION" );
@@ -264,9 +270,10 @@ namespace rocks.kfs.Intacct
                     Memo = DescriptionLava.ResolveMergeFields( mergeFields ),
                     LocationId = locationId,
                     DepartmentId = departmentId,
-                    ProjectId = bTran.Project,
+                    ProjectId = bTran.CreditProject,
                     ClassId = classId,
-                    CustomFields = customDimensionValues
+                    CustomFields = creditDimensions,
+                    CustomFieldsString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) )
                 };
                 lineItemList.Add( receiptItem );
 
@@ -279,8 +286,10 @@ namespace rocks.kfs.Intacct
                         Memo = "Transaction Fees",
                         LocationId = locationId,
                         DepartmentId = departmentId,
-                        ProjectId = bTran.Project,
-                        ClassId = classId
+                        ProjectId = bTran.CreditProject,
+                        ClassId = classId,
+                        CustomFields = creditDimensions,
+                        CustomFieldsString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) )
                     };
                     lineItemList.Add( feeLineItem );
                 }
@@ -289,7 +298,7 @@ namespace rocks.kfs.Intacct
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.CreditLinesOnly )
             {
                 lineItemList = lineItemList
-                    .GroupBy( d => new { d.ClassId, d.DepartmentId, d.LocationId, d.ProjectId, d.GlAccountNo } )
+                    .GroupBy( d => new { d.ClassId, d.DepartmentId, d.LocationId, d.ProjectId, d.GlAccountNo, d.CustomFieldsString } )
                     .Select( s => new ReceiptLineItem
                     {
                         Amount = s.Sum( f => f.Amount ),
@@ -298,7 +307,8 @@ namespace rocks.kfs.Intacct
                         DepartmentId = s.Key.DepartmentId,
                         LocationId = s.Key.LocationId,
                         ProjectId = s.Key.ProjectId,
-                        Memo = s.First().Memo
+                        Memo = s.First().Memo,
+                        CustomFields = s.First().CustomFields
                     } )
                     .ToList();
             }
