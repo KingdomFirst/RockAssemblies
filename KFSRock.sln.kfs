@@ -70,7 +70,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{585C34CC-D99C-4E21-9957-FDCB364DD275}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		Rock.sln.vsspell = Rock.sln.vsspell
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rock.Tests.Integration", "Rock.Tests.Integration\Rock.Tests.Integration.csproj", "{9BB83636-1C9C-4A3F-9C18-5CFDB1EC720A}"
@@ -145,8 +144,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Reach", "KFSRockAssemblies\rocks.kfs.Reach\rocks.kfs.Reach.csproj", "{E491CE70-475F-4A2E-88B9-13D0FAEF6715}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.ScheduledGroupCommunication", "KFSRockAssemblies\rocks.kfs.ScheduledGroupCommunication\rocks.kfs.ScheduledGroupCommunication.csproj", "{CD71A013-E46E-4A34-AF7C-B13544EF2B23}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.ShelbyBatchExport", "KFSRockAssemblies\rocks.kfs.ShelbyBatchExport\rocks.kfs.ShelbyBatchExport.csproj", "{CED42A55-1DDA-4014-8EAC-A47CED5DB236}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.ShelbyFinancials", "KFSRockAssemblies\rocks.kfs.ShelbyFinancials\rocks.kfs.ShelbyFinancials.csproj", "{B291E488-3383-4CA3-8F53-3ED88B2EC8C9}"
 EndProject
@@ -412,10 +409,6 @@ Global
 		{CD71A013-E46E-4A34-AF7C-B13544EF2B23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD71A013-E46E-4A34-AF7C-B13544EF2B23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD71A013-E46E-4A34-AF7C-B13544EF2B23}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CED42A55-1DDA-4014-8EAC-A47CED5DB236}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CED42A55-1DDA-4014-8EAC-A47CED5DB236}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CED42A55-1DDA-4014-8EAC-A47CED5DB236}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CED42A55-1DDA-4014-8EAC-A47CED5DB236}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B291E488-3383-4CA3-8F53-3ED88B2EC8C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B291E488-3383-4CA3-8F53-3ED88B2EC8C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B291E488-3383-4CA3-8F53-3ED88B2EC8C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
