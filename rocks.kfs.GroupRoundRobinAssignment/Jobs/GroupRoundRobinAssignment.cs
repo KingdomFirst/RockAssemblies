@@ -42,7 +42,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
 
     [CustomEnhancedListField(
         "Groups to Assign People to",
-        Description = "Select the groups and/or parent groups to cycle assigning users to based on campus group = person group.",
+        Description = "Select the groups and/or parent groups to cycle assigning users to.",
          ListSource = @"SELECT 
         CASE WHEN ggpg.Name IS NOT NULL THEN
 	        CONCAT(ggpg.name, ' > ',gpg.Name,' > ',pg.Name,' > ', g.Name)
