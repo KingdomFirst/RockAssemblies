@@ -27,10 +27,10 @@ using Rock.Attribute;
 using Rock.Data;
 using Rock.Model;
 
-namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
+namespace rocks.kfs.RoundRobinGroupAssignment.Jobs
 {
     /// <summary>
-    /// Job to process Group Round Robin Assignments
+    /// Job to process Round Robin Group Assignment
     /// </summary>
     ///
     [DataViewField(
@@ -116,7 +116,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
 
 
     [DisallowConcurrentExecution]
-    public class GroupRoundRobinAssignment : IJob
+    public class RoundRobinGroupAssignment : IJob
     {
         /// <summary>
         /// Attribute Keys
@@ -139,7 +139,7 @@ namespace rocks.kfs.GroupRoundRobinAssignment.Jobs
         /// <summary>
         /// Initializes a new instance of the <see cref="GroupRoundRobinAssignment"/> class.
         /// </summary>
-        public GroupRoundRobinAssignment()
+        public RoundRobinGroupAssignment()
         {
         }
 
