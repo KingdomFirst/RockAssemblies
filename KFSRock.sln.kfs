@@ -179,7 +179,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.Zoom", "KFSRockAs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZoomDotNetFramework", "KFSRockAssemblies\ZoomDotNetFramework\ZoomDotNetFramework.csproj", "{99DA9675-2596-43B9-A623-0AD3C742FD3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.GroupRoundRobinAssignment", "KFSRockAssemblies\rocks.kfs.GroupRoundRobinAssignment\rocks.kfs.GroupRoundRobinAssignment.csproj", "{E2040E07-572B-4629-8B9F-6B53EC7C077C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.RoundRobinGroupAssignment", "KFSRockAssemblies\rocks.kfs.RoundRobinGroupAssignment\rocks.kfs.RoundRobinGroupAssignment.csproj", "{E2040E07-572B-4629-8B9F-6B53EC7C077C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.CustomGroupCommunication", "KFSRockAssemblies\rocks.kfs.CustomGroupCommunication\rocks.kfs.CustomGroupCommunication.csproj", "{CB69A1A9-DFD2-40D0-829B-AF9558DEBFD2}"
 EndProject
