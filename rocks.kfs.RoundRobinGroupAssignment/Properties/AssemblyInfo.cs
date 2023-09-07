@@ -20,8 +20,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "rocks.kfs.GroupRoundRobinAssignment" )]
-[assembly: AssemblyProduct( "rocks.kfs.GroupRoundRobinAssignment" )]
+[assembly: AssemblyTitle( "rocks.kfs.RoundRobinGroupAssignment" )]
+[assembly: AssemblyProduct( "rocks.kfs.RoundRobinGroupAssignment" )]
 [assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2023" )]
 
 // Auto increment assembly versions
