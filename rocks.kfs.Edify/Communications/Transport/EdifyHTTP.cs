@@ -25,7 +25,6 @@ using Rock;
 using Rock.Attribute;
 using Rock.Communication;
 using Rock.Communication.Transport;
-using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
 
@@ -51,24 +50,6 @@ namespace rocks.kfs.Edify.Communications.Transport
         IsRequired = true,
         Order = 1,
         Key = AttributeKey.ApiKey )]
-    [DefinedValueField( "Base URL 2",
-        Description = "The API URL provided by Edify.",
-        DefinedTypeGuid = SystemGuid.BASE_URL_DEFINED_TYPE,
-        DisplayDescription = true,
-        IsRequired = false,
-        Order = 2,
-        Key = AttributeKey.BaseUrl2 )]
-    [TextField( "API Key 2",
-        Description = "The API Key provided by Edify API Credentials.",
-        IsRequired = false,
-        Order = 3,
-        Key = AttributeKey.ApiKey2 )]
-    [IntegerField( "Threshold",
-        Description = "The recipient count threshold for sending to server 2. If under this amount messages will be sent using Base URL 2 and API Key 2, if provided.",
-        DefaultIntegerValue = 10,
-        IsRequired = true,
-        Order = 4,
-        Key = AttributeKey.Threshold )]
     public class EdifyHTTP : EmailTransportComponent
     {
         /// <summary>
@@ -85,22 +66,6 @@ namespace rocks.kfs.Edify.Communications.Transport
             /// The base URL
             /// </summary>
             public const string BaseUrl = "BaseURL";
-
-            /// <summary>
-            /// The API key for a different server
-            /// </summary>
-            public const string ApiKey2 = "APIKey2";
-
-            /// <summary>
-            /// The base URL
-            /// </summary>
-            public const string BaseUrl2 = "BaseURL2";
-
-            /// <summary>
-            /// The threshold for sending emails to a different server.
-            /// </summary>
-            public const string Threshold = "Threshold";
-
         }
 
         /// <summary>
@@ -110,41 +75,10 @@ namespace rocks.kfs.Edify.Communications.Transport
         /// <returns></returns>
         protected override EmailSendResponse SendEmail( RockEmailMessage rockEmailMessage )
         {
-            PostalServerDotNet.v1.Client client = null;
-            var apiKey1 = GetAttributeValue( AttributeKey.ApiKey );
-            var apiKey2 = GetAttributeValue( AttributeKey.ApiKey2 );
-
             var selectedBaseUrlGuid = GetAttributeValue( AttributeKey.BaseUrl ).AsGuid();
-            var selectedBaseUrl2Guid = GetAttributeValue( AttributeKey.BaseUrl2 ).AsGuid();
             var definedValueBaseUrl = DefinedValueCache.Get( selectedBaseUrlGuid );
-            var definedValueBase2Url = DefinedValueCache.Get( selectedBaseUrl2Guid );
-
-            var thresholdCount = GetAttributeValue( AttributeKey.Threshold ).AsInteger();
-            var edifyCountKey = string.Format( "EdifyRecipientCount{0}", rockEmailMessage.Subject );
-
-            var recipientCount = RockCache.Get( edifyCountKey )?.ToString().AsInteger();
-            if ( ( recipientCount == null || recipientCount <= 0 ) && rockEmailMessage.MessageMetaData != null && rockEmailMessage.MessageMetaData.Count > 0 )
-            {
-                using ( var rockContext = new RockContext() )
-                {
-                    var communicationRecipientService = new CommunicationRecipientService( rockContext );
-                    var communicationRecipient = communicationRecipientService.Get( rockEmailMessage.MessageMetaData["communication_recipient_guid"].AsGuid() );
-                    if ( communicationRecipient != null )
-                    {
-                        recipientCount = communicationRecipient.Communication.Recipients.Count();
-                        RockCache.AddOrUpdate( edifyCountKey, recipientCount );
-                    }
-                }
-            }
-
-            if ( apiKey2.IsNotNullOrWhiteSpace() && definedValueBase2Url != null && recipientCount < thresholdCount )
-            {
-                client = new PostalServerDotNet.v1.Client( $"https://{definedValueBase2Url.Value}.edify.press/api/v1", GetAttributeValue( AttributeKey.ApiKey2 ) );
-            }
-            else
-            {
-                client = new PostalServerDotNet.v1.Client( $"https://{definedValueBaseUrl.Value}.edify.press/api/v1", GetAttributeValue( AttributeKey.ApiKey ) );
-            }
+            var baseUrl = $"https://{definedValueBaseUrl.Value}.edify.press/api/v1";
+            var client = new PostalServerDotNet.v1.Client( baseUrl, GetAttributeValue( AttributeKey.ApiKey ) );
 
             var toEmailList = new List<string>();
             var ccEmailList = new List<string>();
