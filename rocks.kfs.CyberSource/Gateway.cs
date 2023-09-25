@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-
+using System.Web.UI;
 using Newtonsoft.Json;
 using RestSharp.Authenticators;
 
@@ -43,18 +43,25 @@ namespace rocks.kfs.CyberSource
     #region Assembly Settings
 
     [TextField(
-        "API Key",
-        Key = AttributeKey.APIKey,
-        Description = "Enter the API key provided in your CyberSource Account",
+        "Organization Id",
+        Key = AttributeKey.OrganizationId,
+        Description = "Enter the Organization Id (or merchant id) provided in your CyberSource Account",
         IsRequired = true,
         Order = 1 )]
 
     [TextField(
-        "API Secret",
-        Key = AttributeKey.APISecret,
-        Description = "Enter the API secret provided in your CyberSource account",
+        "API Key",
+        Key = AttributeKey.APIKey,
+        Description = "Enter the API key (or public key) provided in your CyberSource Account",
         IsRequired = true,
         Order = 2 )]
+
+    [TextField(
+        "API Secret",
+        Key = AttributeKey.APISecret,
+        Description = "Enter the API secret (or private key) provided in your CyberSource account",
+        IsRequired = true,
+        Order = 3 )]
 
     [TextField(
         "Batch Prefix",
@@ -62,7 +69,7 @@ namespace rocks.kfs.CyberSource
         Description = "Enter a batch prefix to be used with downloading transactions. The date of the earliest transaction in the batch will be appended to the prefix.",
         IsRequired = true,
         DefaultValue = "CyberSource",
-        Order = 3 )]
+        Order = 4 )]
 
     [CustomRadioListField(
         "Mode",
@@ -71,7 +78,7 @@ namespace rocks.kfs.CyberSource
         ListSource = "Live,Test",
         IsRequired = true,
         DefaultValue = "Test",
-        Order = 4 )]
+        Order = 5 )]
 
     [DecimalField(
         "Credit Card Fee Coverage Percentage (Future)",
@@ -79,7 +86,7 @@ namespace rocks.kfs.CyberSource
         Description = @"The credit card fee percentage that will be used to determine what to add to the person's donation, if they want to cover the fee.",
         IsRequired = false,
         DefaultValue = null,
-        Order = 5 )]
+        Order = 6 )]
 
     [CurrencyField(
         "ACH Transaction Fee Coverage Amount (Future)",
@@ -87,18 +94,17 @@ namespace rocks.kfs.CyberSource
         Description = "The dollar amount to add to an ACH transaction, if they want to cover the fee.",
         IsRequired = false,
         DefaultValue = null,
-        Order = 6 )]
+        Order = 7 )]
 
     #endregion
 
     /// <summary>
     /// CyberSource Payment Gateway
     /// </summary>
-    public class Gateway : GatewayComponent
+    public class Gateway : GatewayComponent, IHostedGatewayComponent
     {
         private readonly string DemoUrl = "apitest.cybersource.com";
         private readonly string ProductionUrl = "api.cybersource.com";
-        private readonly string ApiVersion = "api/v1";
 
         private static int recordTypePersonId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() ).Id;
         private static int recordStatusPendingId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_PENDING.AsGuid() ).Id;
@@ -114,6 +120,7 @@ namespace rocks.kfs.CyberSource
         /// </summary>
         protected static class AttributeKey
         {
+            public const string OrganizationId = "OrganizationId";
             public const string APIKey = "APIKey";
             public const string APISecret = "APISecret";
             public const string BatchPrefix = "BatchPrefix";
@@ -147,6 +154,10 @@ namespace rocks.kfs.CyberSource
                 return new List<DefinedValueCache>();
             }
         }
+
+        public string ConfigureURL => throw new NotImplementedException();
+
+        public string LearnMoreURL => throw new NotImplementedException();
 
         /// <summary>
         /// Returns a boolean value indicating if 'Saved Account' functionality is supported for the given currency type.
@@ -324,6 +335,36 @@ namespace rocks.kfs.CyberSource
             return string.Empty;
         }
 
+        public Control GetHostedPaymentInfoControl( FinancialGateway financialGateway, string controlId, HostedPaymentInfoControlOptions options )
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetHostPaymentInfoSubmitScript( FinancialGateway financialGateway, Control hostedPaymentInfoControl )
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdatePaymentInfoFromPaymentControl( FinancialGateway financialGateway, Control hostedPaymentInfoControl, ReferencePaymentInfo referencePaymentInfo, out string errorMessage )
+        {
+            throw new NotImplementedException();
+        }
+
+        public string CreateCustomerAccount( FinancialGateway financialGateway, ReferencePaymentInfo paymentInfo, out string errorMessage )
+        {
+            throw new NotImplementedException();
+        }
+
+        public DateTime GetEarliestScheduledStartDate( FinancialGateway financialGateway )
+        {
+            throw new NotImplementedException();
+        }
+
+        public HostedGatewayMode[] GetSupportedHostedGatewayModes( FinancialGateway financialGateway )
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         #region Static Helpers
@@ -389,7 +430,7 @@ namespace rocks.kfs.CyberSource
         {
             errorMessage = string.Empty;
             var baseUrl = GetAttributeValue( gateway, AttributeKey.Mode ) == "Live" ? ProductionUrl : DemoUrl;
-            baseUrl = string.Format( "https://{0}/{1}/{2}", baseUrl, ApiVersion, resource );
+            baseUrl = string.Format( "https://{0}/{2}", baseUrl, resource );
 
             return baseUrl;
         }
@@ -413,7 +454,6 @@ namespace rocks.kfs.CyberSource
 
             return new HttpBasicAuthenticator( apiKey, apiSecret );
         }
-
         #endregion
     }
 }
