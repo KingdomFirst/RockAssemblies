@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2022 by Kingdom First Solutions
+// Copyright 2023 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "rocks.kfs.GroupRoundRobinAssignment" )]
-[assembly: AssemblyProduct( "rocks.kfs.GroupRoundRobinAssignment" )]
-[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2022" )]
+[assembly: AssemblyTitle( "rocks.kfs.RoundRobinGroupAssignment" )]
+[assembly: AssemblyProduct( "rocks.kfs.RoundRobinGroupAssignment" )]
+[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2023" )]
 
 // Auto increment assembly versions
-[assembly: AssemblyVersion( "1.1.*" )]
+[assembly: AssemblyVersion( "1.2.*" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from

@@ -16,11 +16,11 @@
 //
 using System;
 using Rock.Plugin;
-using KFSConst = rocks.kfs.Intacct.SystemGuid;
+using KFSConst = rocks.kfs.ShelbyFinancials.SystemGuid;
 
-namespace rocks.kfs.Intacct.Migrations
+namespace rocks.kfs.ShelbyFinancials.Migrations
 {
-    [MigrationNumber( 2, "1.11.0" )]
+    [MigrationNumber( 4, "1.12.0" )]
     public class AddTransactionFeeAttributes : Migration
     {
         /// <summary>
@@ -29,12 +29,7 @@ namespace rocks.kfs.Intacct.Migrations
         public override void Up()
         {
             // Setup Financial Account fee account attribute
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Transaction Fee Account", "Expense account number for gateway transaction fees.", 3, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_FEE_ACCOUNT, "rocks.kfs.Intacct.FEEACCOUNTNO" );
-
-            // re-order Financial Account attributes
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Class", "The Intacct dimension for Class Id.", 4, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_CLASS, "rocks.kfs.Intacct.CLASSID" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Department", "The Intacct dimension for Department Id.", 5, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT, "rocks.kfs.Intacct.DEPARTMENT" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Location", "The Intacct dimension for Location Id. Required if multi-entity enabled.", 6, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_LOCATION, "rocks.kfs.Intacct.LOCATION" );
+            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Transaction Fee Account", "Expense account number for gateway transaction fees.", 13, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_FEE_ACCOUNT, "rocks.kfs.ShelbyFinancials.FEEACCOUNTNO" );
 
             Sql( string.Format( @"
                 --
@@ -53,11 +48,11 @@ namespace rocks.kfs.Intacct.Migrations
             ", Rock.SystemGuid.EntityType.FINANCIAL_ACCOUNT, KFSConst.Attribute.FINANCIAL_ACCOUNT_ATTRIBUTE_CATEGORY, KFSConst.Attribute.FINANCIAL_ACCOUNT_FEE_ACCOUNT ) );
 
             // Setup Gateway Account fee processing attributes
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialGateway", Rock.SystemGuid.FieldType.SINGLE_SELECT, "", "", "Gateway Fee Processing", "How should the Intacct Export plugin process transaction fees? DEFAULT: No special handling of transaction fees will be performed. NET DEBIT: Add credit entries for any transaction fees and use net amount (amount - transaction fees) for debit account entries. GROSS DEBIT: Debit account entries are left untouched (gross) and new debit and credit entries will be added for any transaction fees. NOTE: Both Net Debit and Gross Debit require a Fee Account attribute be set on either the financial gateway or financial account.", 0, "0", KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_PROCESSING, "rocks.kfs.Intacct.FEEPROCESSING", true );
-            RockMigrationHelper.AddAttributeQualifier( KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_PROCESSING, "values", "0^Default,1^Net Debit,2^Gross Debit", "BA5F38C9-78D4-43D9-86ED-5248A8AADFA5" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialGateway", Rock.SystemGuid.FieldType.TEXT, "", "", "Default Fee Account", "Default account number for transaction fees.", 1, "", KFSConst.Attribute.FINANCIAL_GATEWAY_DEFAULT_FEE_ACCOUNT, "rocks.kfs.Intacct.DEFAULTFEEACCOUNTNO" );
+            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialGateway", Rock.SystemGuid.FieldType.SINGLE_SELECT, "", "", "Gateway Fee Processing", "How should the Shelby Financials Export plugin process transaction fees? DEFAULT: No special handling of transaction fees will be performed. NET DEBIT: Add credit entries for any transaction fees and use net amount (amount - transaction fees) for debit account entries. GROSS DEBIT: Debit account entries are left untouched (gross) and new debit and credit entries will be added for any transaction fees. NOTE: Both Net Debit and Gross Debit require a Fee Account attribute be set on either the financial gateway or financial account.", 0, "0", KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_PROCESSING, "rocks.kfs.ShelbyFinancials.FEEPROCESSING", true );
+            RockMigrationHelper.AddAttributeQualifier( KFSConst.Attribute.FINANCIAL_GATEWAY_FEE_PROCESSING, "values", "0^Default,1^Net Debit,2^Gross Debit", "EDD83B29-78ED-40DC-B8F9-9664EDB14884" );
+            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialGateway", Rock.SystemGuid.FieldType.TEXT, "", "", "Default Fee Account", "Default account number for transaction fees.", 1, "", KFSConst.Attribute.FINANCIAL_GATEWAY_DEFAULT_FEE_ACCOUNT, "rocks.kfs.ShelbyFinancials.DEFAULTFEEACCOUNTNO" );
 
-            RockMigrationHelper.UpdateCategory( Rock.SystemGuid.EntityType.ATTRIBUTE, "Intacct Export", "fa fa-calculator", "", KFSConst.Attribute.FINANCIAL_GATEWAY_ATTRIBUTE_CATEGORY );
+            RockMigrationHelper.UpdateCategory( Rock.SystemGuid.EntityType.ATTRIBUTE, "Shelby Financials Export", "fa fa-calculator", "", KFSConst.Attribute.FINANCIAL_GATEWAY_ATTRIBUTE_CATEGORY );
 
             Sql( string.Format( @"
                 --
@@ -103,11 +98,6 @@ namespace rocks.kfs.Intacct.Migrations
 
             // remove category
             RockMigrationHelper.DeleteCategory( KFSConst.Attribute.FINANCIAL_GATEWAY_ATTRIBUTE_CATEGORY );
-
-            // re-order Financial Account attributes
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Class", "The Intacct dimension for Class Id.", 3, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_CLASS, "rocks.kfs.Intacct.CLASSID" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Department", "The Intacct dimension for Department Id.", 4, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT, "rocks.kfs.Intacct.DEPARTMENT" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Location", "The Intacct dimension for Location Id. Required if multi-entity enabled.", 5, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_LOCATION, "rocks.kfs.Intacct.LOCATION" );
         }
     }
 }

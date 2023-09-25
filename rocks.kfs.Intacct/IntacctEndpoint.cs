@@ -112,49 +112,52 @@ namespace rocks.kfs.Intacct
 
         public bool ParseEndpointResponse( XmlDocument xmlDocument, int BatchId, bool Log = false )
         {
-            var resultX = XDocument.Load( new XmlNodeReader( xmlDocument ) );
-
-            if ( Log )
+            try
             {
-                var financialBatch = new FinancialBatchService( new RockContext() ).Get( BatchId );
-                var changes = new History.HistoryChangeList();
-                var oldValue = string.Empty;
-                var newValue = resultX.ToString();
+                var resultX = XDocument.Load( new XmlNodeReader( xmlDocument ) );
 
-                History.EvaluateChange( changes, "Intacct Response", oldValue, newValue );
-
-                var rockContext = new RockContext();
-                rockContext.WrapTransaction( () =>
+                if ( Log )
                 {
-                    if ( changes.Any() )
-                    {
-                        HistoryService.SaveChanges(
-                            rockContext,
-                            typeof( FinancialBatch ),
-                            Rock.SystemGuid.Category.HISTORY_FINANCIAL_BATCH.AsGuid(),
-                            BatchId,
-                            changes );
-                    }
-                } );
-            }
+                    var financialBatch = new FinancialBatchService( new RockContext() ).Get( BatchId );
+                    var changes = new History.HistoryChangeList();
+                    var oldValue = string.Empty;
+                    var newValue = resultX.ToString();
 
-            var xResponseXml = resultX.Elements( "response" ).FirstOrDefault();
-            if ( xResponseXml != null )
-            {
-                var xOperationXml = xResponseXml.Elements( "operation" ).FirstOrDefault();
-                if ( xOperationXml != null )
-                {
-                    var xResultXml = xOperationXml.Elements( "result" ).FirstOrDefault();
-                    if ( xResultXml != null )
+                    History.EvaluateChange( changes, "Intacct Response", oldValue, newValue );
+
+                    var rockContext = new RockContext();
+                    rockContext.WrapTransaction( () =>
                     {
-                        var xStatusXml = xResultXml.Elements( "status" ).FirstOrDefault();
-                        if ( xStatusXml != null && xStatusXml.Value == "success" )
+                        if ( changes.Any() )
                         {
-                            return true;
+                            HistoryService.SaveChanges(
+                                rockContext,
+                                typeof( FinancialBatch ),
+                                Rock.SystemGuid.Category.HISTORY_FINANCIAL_BATCH.AsGuid(),
+                                BatchId,
+                                changes );
+                        }
+                    } );
+                }
+
+                var xResponseXml = resultX.Elements( "response" ).FirstOrDefault();
+                if ( xResponseXml != null )
+                {
+                    var xOperationXml = xResponseXml.Elements( "operation" ).FirstOrDefault();
+                    if ( xOperationXml != null )
+                    {
+                        var xResultXml = xOperationXml.Elements( "result" ).FirstOrDefault();
+                        if ( xResultXml != null )
+                        {
+                            var xStatusXml = xResultXml.Elements( "status" ).FirstOrDefault();
+                            if ( xStatusXml != null && xStatusXml.Value == "success" )
+                            {
+                                return true;
+                            }
                         }
                     }
                 }
-            }
+            } catch ( Exception e ) { }
 
             return false;
         }
@@ -179,7 +182,7 @@ namespace rocks.kfs.Intacct
                             var xDataXml = xResultXml.Elements( "data" ).FirstOrDefault();
                             if ( xDataXml != null )
                             {
-                                var xCheckingAccountsXml = xDataXml.Elements( "checkingaccount" );
+                                var xCheckingAccountsXml = xDataXml.Elements( "CHECKINGACCOUNT" );
                                 if ( xCheckingAccountsXml != null )
                                 {
                                     foreach ( var xAcctXml in xCheckingAccountsXml )

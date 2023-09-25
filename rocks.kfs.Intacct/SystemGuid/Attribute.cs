@@ -39,6 +39,11 @@ namespace rocks.kfs.Intacct.SystemGuid
         public const string FINANCIAL_ACCOUNT_DEBIT_ACCOUNT = "48E1B80E-5E8D-4016-B64E-F2527F328EA7";
 
         /// <summary>
+        /// The Intacct dimension for Project.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_PROJECT = "115519C9-EDFA-4BB5-A512-102C798F17F4";
+
+        /// <summary>
         /// The account number that transaction fees will be split into.
         /// </summary>
         public const string FINANCIAL_ACCOUNT_FEE_ACCOUNT = "AB69D108-59FF-4D07-94AA-ECD14FC7B2BD";
@@ -57,6 +62,26 @@ namespace rocks.kfs.Intacct.SystemGuid
         /// The Intacct dimension for Location.
         /// </summary>
         public const string FINANCIAL_ACCOUNT_LOCATION = "CFA818F9-3163-45FE-AA03-AAF8DEDCF48D";
+
+        /// <summary>
+        /// The Intacct dimension for Projects of debit account.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_PROJECT_DEBIT = "9DF341B7-2E07-44BA-94B1-F637BE551961";
+
+        /// <summary>
+        /// The Intacct dimension for Class Id of debit account.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_CLASS_DEBIT = "58B0B754-0B1C-4E4E-B396-3F8F046267E3";
+
+        /// <summary>
+        /// The Intacct dimension for Department of debit account.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_DEPARTMENT_DEBIT = "5705FC91-0937-4F84-812F-730899E0114E";
+
+        /// <summary>
+        /// The Intacct dimension for Location of debit account.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_LOCATION_DEBIT = "0F247FC0-ECF0-407F-A042-F8E3638ED5B4";
 
         #endregion
 

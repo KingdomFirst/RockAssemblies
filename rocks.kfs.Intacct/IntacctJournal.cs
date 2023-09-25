@@ -35,17 +35,20 @@ namespace rocks.kfs.Intacct
         /// Creates the XML to submit to Intacct for a new Journal
         /// </summary>
         /// <param name="AuthCreds">The IntacctAuth object with authentication. <see cref="IntacctAuth"/></param>
-        /// <param name="Batch">The Rock FinancialBatch that a Journal Entry will be created from. <see cref="FinancialBatch"/></param>
+        /// <param name="BatchId">The BatchId of the Rock FinancialBatch that a Journal Entry will be created from.</param>
         /// <param name="JournalId">The Intacct Symbol of the Journal that the Entry should be posted to. For example: GJ</param>
+        /// <param name="debugLava">Boolean string indicating whether to display lava merge fields for debug purposes.</param>
+        /// <param name="DescriptionLava">Lava code to use for the description of each line of the journal entry.</param>
+        /// <param name="groupingMode">The mode for handling grouping of GL accounts. <see cref="GLAccountGroupingMode"/></param>
         /// <returns>Returns the XML needed to create an Intacct Journal Entry.</returns>
-        public XmlDocument CreateJournalEntryXML( IntacctAuth AuthCreds, int BatchId, string JournalId, ref string debugLava, string DescriptionLava = "" )
+        public XmlDocument CreateJournalEntryXML( IntacctAuth AuthCreds, int BatchId, string JournalId, ref string debugLava, string DescriptionLava, GLAccountGroupingMode groupingMode )
         {
             var doc = new XmlDocument();
             var financialBatch = new FinancialBatchService( new RockContext() ).Get( BatchId );
 
             if ( financialBatch.Id > 0 )
             {
-                var lines = GetGlEntries( financialBatch, ref debugLava, DescriptionLava );
+                var lines = GetGlEntries( financialBatch, ref debugLava, DescriptionLava, groupingMode );
                 if ( lines.Any() )
                 {
                     var batchDate = financialBatch.BatchStartDateTime == null ? RockDateTime.Now.ToShortDateString() : ( ( System.DateTime ) financialBatch.BatchStartDateTime ).ToShortDateString();
@@ -193,7 +196,7 @@ namespace rocks.kfs.Intacct
             return doc;
         }
 
-        private List<JournalEntryLine> GetGlEntries( FinancialBatch financialBatch, ref string debugLava, string DescriptionLava = "" )
+        private List<JournalEntryLine> GetGlEntries( FinancialBatch financialBatch, ref string debugLava, string DescriptionLava, GLAccountGroupingMode groupingMode )
         {
             if ( string.IsNullOrWhiteSpace( DescriptionLava ) )
             {
@@ -207,7 +210,7 @@ namespace rocks.kfs.Intacct
             //
             List<RegistrationInstance> registrationLinks;
             List<GroupMember> groupMemberLinks;
-            var batchTransactionsSummary = TransactionHelpers.GetTransactionSummary( financialBatch, rockContext, out registrationLinks, out groupMemberLinks );
+            var batchTransactionsSummary = TransactionHelpers.GetTransactionSummary( financialBatch, rockContext, out registrationLinks, out groupMemberLinks, groupingMode );
 
             //
             // Get the Dimensions from the Account since the Transaction Details have been Grouped already
@@ -217,7 +220,7 @@ namespace rocks.kfs.Intacct
             foreach ( var summary in batchTransactionsSummary )
             {
                 var account = new FinancialAccountService( rockContext ).Get( summary.FinancialAccountId );
-                var customDimensionValues = new Dictionary<string, dynamic>();
+                var customDimensionValues = new SortedDictionary<string, dynamic>();
                 account.LoadAttributes();
                 var mergeFieldObjects = new MergeFieldObjects
                 {
@@ -237,95 +240,187 @@ namespace rocks.kfs.Intacct
                     DebitAccount = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITACCOUNTNO" ),
                     TransactionFeeAmount = summary.TransactionFeeAmount,
                     TransactionFeeAccount = summary.TransactionFeeAccount,
-                    Class = account.GetAttributeValue( "rocks.kfs.Intacct.CLASSID" ),
-                    Department = account.GetAttributeValue( "rocks.kfs.Intacct.DEPARTMENT" ),
-                    Location = account.GetAttributeValue( "rocks.kfs.Intacct.LOCATION" ),
-                    Project = summary.Project,
+                    CreditClass = account.GetAttributeValue( "rocks.kfs.Intacct.CLASSID" ),
+                    CreditDepartment = account.GetAttributeValue( "rocks.kfs.Intacct.DEPARTMENT" ),
+                    CreditLocation = account.GetAttributeValue( "rocks.kfs.Intacct.LOCATION" ),
+                    CreditProject = summary.CreditProject,
+                    DebitClass = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITCLASSID" ),
+                    DebitDepartment = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITDEPARTMENT" ),
+                    DebitLocation = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITLOCATION" ),
+                    DebitProject = summary.DebitProject,
                     Description = DescriptionLava.ResolveMergeFields( mergeFields ),
-                    CustomDimensions = customDimensionValues,
+                    CustomDimensions = new SortedDictionary<string, dynamic>( customDimensionValues ),
                     ProcessTransactionFees = summary.ProcessTransactionFees
                 };
 
                 batchSummary.Add( batchSummaryItem );
             }
 
-            return GenerateLineItems( batchSummary );
+            return GenerateLineItems( batchSummary, groupingMode );
         }
 
-        private List<JournalEntryLine> GenerateLineItems( List<GLBatchTotals> transactionItems )
+        private List<JournalEntryLine> GenerateLineItems( List<GLBatchTotals> transactionItems, GLAccountGroupingMode groupingMode )
         {
             var returnList = new List<JournalEntryLine>();
-            foreach ( var transaction in transactionItems )
+            var debitTransactions = transactionItems.Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
+            var creditTransactions = transactionItems.Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
+            var feeDebitTransactions = transactionItems.Where( f => f.TransactionFeeAmount > 0.0M && !string.IsNullOrWhiteSpace( f.TransactionFeeAccount ) && f.ProcessTransactionFees > 0 ).Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
+            var feeCreditTransactions = transactionItems.Where( f => f.TransactionFeeAmount > 0.0M && !string.IsNullOrWhiteSpace( f.TransactionFeeAccount ) && f.ProcessTransactionFees == 2 ).Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
+
+            // Condition and prepare debit entries
+            foreach ( var t in debitTransactions )
             {
-                var processTransactionFees = 0;
-                if ( transaction.ProcessTransactionFees > 0 && !string.IsNullOrWhiteSpace( transaction.TransactionFeeAccount ) && ( transaction.TransactionFeeAmount > 0 || transaction.TransactionFeeAmount < 0 ) )
-                {
-                    processTransactionFees = transaction.ProcessTransactionFees;
-                }
-                var creditLine = new JournalEntryLine()
-                {
-                    GlAccountNumber = transaction.CreditAccount,
-                    TransactionAmount = transaction.Amount * -1,
-                    ClassId = transaction.Class,
-                    DepartmentId = transaction.Department,
-                    LocationId = transaction.Location,
-                    ProjectId = transaction.Project,
-                    Memo = transaction.Description,
-                    CustomFields = transaction.CustomDimensions
-                };
+                t.Amount = ( ( decimal? ) t.Amount ?? 0.0M ) - ( t.ProcessTransactionFees == 1 ? t.TransactionFeeAmount : 0.0M );
 
-                returnList.Add( creditLine );
+                // We want to include any attribute dimensions with "debit" in the key, or neither "debit" nor "credit". It is cleanest to do this by just excluding "credit". 
+                var debitDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_credit", "_debit" );
+                t.CustomDimensions = debitDimensions;
+                t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( debitDimensions ) );
+            }
+            foreach ( var t in feeDebitTransactions )
+            {
+                t.Amount = ( decimal? ) t.TransactionFeeAmount ?? 0.0M;
+                t.DebitAccount = t.TransactionFeeAccount;
+                t.Description += " Transaction Fees";
 
+                var debitDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_credit", "_debit" );
+                t.CustomDimensions = debitDimensions;
+                t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( debitDimensions ) );
+            }
+
+            if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.DebitLinesOnly )
+            {
+                debitTransactions = debitTransactions
+                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount, d.CustomDimensionString, d.ProcessTransactionFees } )
+                    .Select( s => new GLBatchTotals()
+                    {
+                        Amount = s.Sum( f => f.Amount ),
+                        DebitAccount = s.Key.DebitAccount,
+                        DebitClass = s.Key.DebitClass,
+                        DebitDepartment = s.Key.DebitDepartment,
+                        DebitLocation = s.Key.DebitLocation,
+                        DebitProject = s.Key.DebitProject,
+                        Description = s.First().Description,
+                        CustomDimensions = s.First().CustomDimensions
+                    } )
+                    .ToList();
+
+                feeDebitTransactions = feeDebitTransactions
+                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount, d.CustomDimensionString } )
+                    .Select( s => new GLBatchTotals
+                    {
+                        Amount = s.Sum( f => f.Amount ),
+                        DebitAccount = s.Key.DebitAccount,
+                        DebitClass = s.Key.DebitClass,
+                        DebitDepartment = s.Key.DebitDepartment,
+                        DebitLocation = s.Key.DebitLocation,
+                        DebitProject = s.Key.DebitProject,
+                        Description = s.First().Description,
+                        CustomDimensions = s.First().CustomDimensions
+                    } )
+                    .ToList();
+            }
+
+            // Condition and prepare credit entries
+            foreach ( var t in creditTransactions )
+            {
+                t.Amount = ( ( decimal? ) t.Amount ?? 0.0M ) * -1;
+
+                // We want to include any attribute dimensions with "_credit" in the key, or neither "_debit" nor "_credit". It is cleanest to do this by just excluding "_debit". 
+                var creditDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_debit", "_credit" );
+                t.CustomDimensions = creditDimensions;
+                t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) );
+            }
+            foreach ( var t in feeCreditTransactions )
+            {
+                t.Amount = ( ( decimal? ) t.TransactionFeeAmount ?? 0.0M ) * -1;
+                t.CreditAccount = t.DebitAccount;
+
+                var creditDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_debit", "_credit" );
+                t.CustomDimensions = creditDimensions;
+                t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) );
+            }
+
+            if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.CreditLinesOnly )
+            {
+                creditTransactions = creditTransactions
+                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount, d.CustomDimensionString } )
+                    .Select( s => new GLBatchTotals
+                    {
+                        Amount = s.Sum( f => f.Amount ),
+                        CreditAccount = s.Key.CreditAccount,
+                        CreditClass = s.Key.CreditClass,
+                        CreditDepartment = s.Key.CreditDepartment,
+                        CreditLocation = s.Key.CreditLocation,
+                        CreditProject = s.Key.CreditProject,
+                        Description = s.First().Description,
+                        CustomDimensions = s.First().CustomDimensions
+                    } )
+                    .ToList();
+
+                feeCreditTransactions = feeCreditTransactions
+                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount, d.CustomDimensionString } )
+                    .Select( s => new GLBatchTotals
+                    {
+                        Amount = s.Sum( f => f.Amount ),
+                        CreditAccount = s.Key.CreditAccount,
+                        CreditClass = s.Key.CreditClass,
+                        CreditDepartment = s.Key.CreditDepartment,
+                        CreditLocation = s.Key.CreditLocation,
+                        CreditProject = s.Key.CreditProject,
+                        Description = s.First().Description,
+                        CustomDimensions = s.First().CustomDimensions
+                    } )
+                    .ToList();
+            }
+
+            var allCreditTransactions = creditTransactions.Concat( feeCreditTransactions ).ToList();
+            var allDebitTransactions = debitTransactions.Concat( feeDebitTransactions ).ToList();
+
+            foreach ( var debitTransaction in allDebitTransactions )
+            {
                 var debitLine = new JournalEntryLine()
                 {
-                    GlAccountNumber = transaction.DebitAccount,
-                    TransactionAmount = processTransactionFees == 1 ? transaction.Amount - transaction.TransactionFeeAmount : transaction.Amount,
-                    ClassId = transaction.Class,
-                    DepartmentId = transaction.Department,
-                    LocationId = transaction.Location,
-                    ProjectId = transaction.Project,
-                    Memo = transaction.Description,
-                    CustomFields = transaction.CustomDimensions
+                    GlAccountNumber = debitTransaction.DebitAccount,
+                    TransactionAmount = debitTransaction.Amount,
+                    ClassId = debitTransaction.DebitClass,
+                    DepartmentId = debitTransaction.DebitDepartment,
+                    LocationId = debitTransaction.DebitLocation,
+                    ProjectId = debitTransaction.DebitProject,
+                    Memo = debitTransaction.Description,
+                    CustomFields = debitTransaction.CustomDimensions
                 };
 
                 returnList.Add( debitLine );
+            }
 
-                if ( processTransactionFees == 2 )
+            foreach ( var creditTransaction in allCreditTransactions )
+            {
+                var creditLine = new JournalEntryLine()
                 {
-                    var feeCreditLine = new JournalEntryLine()
-                    {
-                        GlAccountNumber = transaction.DebitAccount,  // Credit the Bank Account (DebitAccount)
-                        TransactionAmount = transaction.TransactionFeeAmount * -1,
-                        ClassId = transaction.Class,
-                        DepartmentId = transaction.Department,
-                        LocationId = transaction.Location,
-                        ProjectId = transaction.Project,
-                        Memo = transaction.Description + " Transaction Fees",
-                        CustomFields = transaction.CustomDimensions
-                    };
+                    GlAccountNumber = creditTransaction.CreditAccount,
+                    TransactionAmount = creditTransaction.Amount,
+                    ClassId = creditTransaction.CreditClass,
+                    DepartmentId = creditTransaction.CreditDepartment,
+                    LocationId = creditTransaction.CreditLocation,
+                    ProjectId = creditTransaction.CreditProject,
+                    Memo = creditTransaction.Description,
+                    CustomFields = creditTransaction.CustomDimensions
+                };
 
-                    returnList.Add( feeCreditLine );
-                }
-
-                if ( processTransactionFees > 0 )
-                {
-                    var feeDebitLine = new JournalEntryLine()
-                    {
-                        GlAccountNumber = transaction.TransactionFeeAccount,
-                        TransactionAmount = transaction.TransactionFeeAmount,
-                        ClassId = transaction.Class,
-                        DepartmentId = transaction.Department,
-                        LocationId = transaction.Location,
-                        ProjectId = transaction.Project,
-                        Memo = transaction.Description + " Transaction Fees",
-                        CustomFields = transaction.CustomDimensions
-                    };
-
-                    returnList.Add( feeDebitLine );
-                }
+                returnList.Add( creditLine );
             }
 
             return returnList;
         }
+    }
+
+    public enum GLAccountGroupingMode
+    {
+        DebitAndCreditLines = 0,
+        DebitLinesOnly = 1,
+        CreditLinesOnly = 2,
+        DebitAndCreditByFinancialAccount = 3,
+        NoGrouping = 4
     }
 }

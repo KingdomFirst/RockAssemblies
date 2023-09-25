@@ -65,19 +65,23 @@ namespace rocks.kfs.Intacct
                 writer.WriteStartElement( "content" );
                 writer.WriteStartElement( "function" );
                 writer.WriteAttributeString( "controlid", $"Batch_{batchId}" );
-                writer.WriteStartElement( "readByQuery" );
+                writer.WriteStartElement( "query" );
                 writer.WriteElementString( "object", "CHECKINGACCOUNT" );
+                writer.WriteStartElement( "select" );
                 if ( fields == null )
                 {
-                    writer.WriteElementString( "fields", "*" );
+                    fields = new List<string>();
+                    fields.Add( "BANKACCOUNTID" );
+                    fields.Add( "BANKNAME" );
+                    fields.Add( "BANKACCOUNTNO" );
+                    fields.Add( "GLACCOUNTNO" );
                 }
-                else
+                foreach( var field in fields )
                 {
-                    var fieldsString = string.Join( ",", fields.Select( f => f.Trim() ) );
-                    writer.WriteElementString( "fields", fieldsString );
+                    writer.WriteElementString( "field", field );
                 }
-                writer.WriteElementString( "query", null );
-                writer.WriteEndElement();  // close readByQuery
+                writer.WriteEndElement();  // close select
+                writer.WriteEndElement();  // close query
                 writer.WriteEndElement();  // close function
                 writer.WriteEndElement();  // close content
                 writer.WriteEndElement();  // close operation

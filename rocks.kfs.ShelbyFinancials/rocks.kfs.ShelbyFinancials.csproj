@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>rocks.kfs.ShelbyFinancials</RootNamespace>
     <AssemblyName>rocks.kfs.ShelbyFinancials</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,6 +55,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
     </Reference>
+    <Reference Include="Rock.Common">
+      <HintPath>..\..\RockWeb\Bin\Rock.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Rock.Lava.Shared">
+      <HintPath>..\..\RockWeb\Bin\Rock.Lava.Shared.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Caching" />
@@ -66,10 +73,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\004_AddTransactionFeeAttributes.cs" />
+    <Compile Include="Migrations\003_AddCreditCostCenter.cs" />
     <Compile Include="Migrations\002_AddDebitAccountSub.cs" />
     <Compile Include="Migrations\001_AddSystemData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SFJournal.cs" />
+    <Compile Include="SystemGuid\Attribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -28,7 +28,7 @@ namespace rocks.kfs.Intacct.Utils
 {
     public class TransactionHelpers
     {
-        public static List<GLTransaction> GetTransactionSummary( FinancialBatch financialBatch, RockContext rockContext, out List<RegistrationInstance> registrationLinks, out List<GroupMember> groupMemberLinks )
+        public static List<GLTransaction> GetTransactionSummary( FinancialBatch financialBatch, RockContext rockContext, out List<RegistrationInstance> registrationLinks, out List<GroupMember> groupMemberLinks, GLAccountGroupingMode groupingMode )
         {
             //
             // Group/Sum Transactions by Debit/Bank Account and Project since Project can come from Account or Transaction Details
@@ -59,7 +59,8 @@ namespace rocks.kfs.Intacct.Utils
                     transactionDetail.Account.LoadAttributes();
 
                     var detailProject = transactionDetail.GetAttributeValue( "rocks.kfs.Intacct.PROJECTID" ).AsGuidOrNull();
-                    var accountProject = transactionDetail.Account.GetAttributeValue( "rocks.kfs.Intacct.PROJECTID" ).AsGuidOrNull();
+                    var accountProjectCredit = transactionDetail.Account.GetAttributeValue( "rocks.kfs.Intacct.PROJECTID" ).AsGuidOrNull();
+                    var accountProjectDebit = transactionDetail.Account.GetAttributeValue( "rocks.kfs.Intacct.DEBITPROJECTID" ).AsGuidOrNull();
                     var transactionFeeAccount = transactionDetail.Account.GetAttributeValue( "rocks.kfs.Intacct.FEEACCOUNTNO" );
 
                     if ( string.IsNullOrWhiteSpace( transactionFeeAccount ) )
@@ -67,14 +68,24 @@ namespace rocks.kfs.Intacct.Utils
                         transactionFeeAccount = gatewayDefaultFeeAccount;
                     }
 
-                    var projectCode = string.Empty;
+                    var creditProjectCode = string.Empty;
+                    var debitProjectCode = string.Empty;
                     if ( detailProject != null )
                     {
-                        projectCode = DefinedValueCache.Get( ( Guid ) detailProject ).Value;
+                        creditProjectCode = DefinedValueCache.Get( ( Guid ) detailProject ).Value;
+                        debitProjectCode = creditProjectCode;
                     }
-                    else if ( accountProject != null )
+                    else
                     {
-                        projectCode = DefinedValueCache.Get( ( Guid ) accountProject ).Value;
+                        if ( accountProjectDebit != null )
+                        {
+                            debitProjectCode = DefinedValueCache.Get( ( Guid ) accountProjectDebit ).Value;
+                        }
+
+                        if ( accountProjectCredit != null )
+                        {
+                            creditProjectCode = DefinedValueCache.Get( ( Guid ) accountProjectCredit ).Value;
+                        }
                     }
 
                     if ( transactionDetail.EntityTypeId.HasValue )
@@ -112,7 +123,8 @@ namespace rocks.kfs.Intacct.Utils
                         Payer = transaction.AuthorizedPersonAlias.Person.FullName,
                         Amount = transactionDetail.Amount,
                         FinancialAccountId = transactionDetail.AccountId,
-                        Project = projectCode,
+                        CreditProject = creditProjectCode,
+                        DebitProject = debitProjectCode,
                         TransactionFeeAmount = transactionDetail.FeeAmount != null && ( transactionDetail.FeeAmount.Value > 0 || transactionDetail.FeeAmount.Value < 0 ) ? transactionDetail.FeeAmount.Value : 0.0M,
                         TransactionFeeAccount = transactionFeeAccount,
                         ProcessTransactionFees = processTransactionFees
@@ -122,19 +134,29 @@ namespace rocks.kfs.Intacct.Utils
                 }
             }
 
-            var batchTransactionList = batchTransactions
-            .GroupBy( d => new { d.FinancialAccountId, d.Project, d.TransactionFeeAccount, d.ProcessTransactionFees } )
-            .Select( s => new GLTransaction
+            var batchTransactionList = new List<GLTransaction>();
+
+            if ( groupingMode == GLAccountGroupingMode.DebitAndCreditByFinancialAccount )
             {
-                Payer = "Rock Import",
-                FinancialAccountId = s.Key.FinancialAccountId,
-                Project = s.Key.Project,
-                Amount = s.Sum( f => ( decimal? ) f.Amount ) ?? 0.0M,
-                TransactionFeeAmount = s.Sum( f => ( decimal? ) f.TransactionFeeAmount ) ?? 0.0M,
-                TransactionFeeAccount = s.Key.TransactionFeeAccount,
-                ProcessTransactionFees = s.Key.ProcessTransactionFees
-            } )
-            .ToList();
+                batchTransactionList = batchTransactions
+                    .GroupBy( d => new { d.FinancialAccountId, d.CreditProject, d.DebitProject, d.TransactionFeeAccount, d.ProcessTransactionFees } )
+                    .Select( s => new GLTransaction
+                    {
+                        Payer = "Rock Import",
+                        FinancialAccountId = s.Key.FinancialAccountId,
+                        CreditProject = s.Key.CreditProject,
+                        DebitProject = s.Key.DebitProject,
+                        Amount = s.Sum( f => ( decimal? ) f.Amount ) ?? 0.0M,
+                        TransactionFeeAmount = s.Sum( f => ( decimal? ) f.TransactionFeeAmount ) ?? 0.0M,
+                        TransactionFeeAccount = s.Key.TransactionFeeAccount,
+                        ProcessTransactionFees = s.Key.ProcessTransactionFees
+                    } )
+                    .ToList();
+            }
+            else
+            {
+                batchTransactionList = batchTransactions;
+            }
 
             return batchTransactionList;
         }
@@ -151,10 +173,13 @@ namespace rocks.kfs.Intacct.Utils
             knownDimensions.Add( "rocks.kfs.Intacct.DEPARTMENT" );
             knownDimensions.Add( "rocks.kfs.Intacct.LOCATION" );
             knownDimensions.Add( "rocks.kfs.Intacct.PROJECTID" );
+            knownDimensions.Add( "rocks.kfs.Intacct.DEBITCLASSID" );
+            knownDimensions.Add( "rocks.kfs.Intacct.DEBITDEPARTMENT" );
+            knownDimensions.Add( "rocks.kfs.Intacct.DEBITLOCATION" );
+            knownDimensions.Add( "rocks.kfs.Intacct.DEBITPROJECTID" );
 
             var rockContext = new RockContext();
             var accountCategoryId = new CategoryService( rockContext ).Queryable().FirstOrDefault( c => c.Guid.Equals( new System.Guid( KFSConst.Attribute.FINANCIAL_ACCOUNT_ATTRIBUTE_CATEGORY ) ) ).Id;
-            var gatewayCategoryId = new CategoryService( rockContext ).Queryable().FirstOrDefault( c => c.Guid.Equals( new System.Guid( KFSConst.Attribute.FINANCIAL_GATEWAY_ATTRIBUTE_CATEGORY ) ) ).Id;
             var attributeService = new AttributeService( rockContext );
             var accountAttributes = attributeService.Queryable().Where( a => a.Categories.Select( c => c.Id ).Contains( accountCategoryId ) ).ToList();
 
@@ -171,7 +196,7 @@ namespace rocks.kfs.Intacct.Utils
             return customDimensions;
         }
 
-        public static Dictionary<string, object> GetMergeFieldsAndDimensions( ref string debugLava, Dictionary<string, dynamic> customDimensionValues, MergeFieldObjects mergeFieldObjects )
+        public static Dictionary<string, object> GetMergeFieldsAndDimensions( ref string debugLava, SortedDictionary<string, dynamic> customDimensionValues, MergeFieldObjects mergeFieldObjects )
         {
             var mergeFields = new Dictionary<string, object>();
             var account = mergeFieldObjects.Account;
@@ -181,7 +206,11 @@ namespace rocks.kfs.Intacct.Utils
                 foreach ( var rockKey in mergeFieldObjects.CustomDimensions )
                 {
                     var dimension = rockKey.Split( '.' ).Last();
-                    customDimensionValues.Add( dimension, account.GetAttributeValue( rockKey ) );
+                    var value = account.GetAttributeValue( rockKey );
+                    if ( value.IsNotNullOrWhiteSpace() )
+                    {
+                        customDimensionValues.Add( dimension, value );
+                    }
                 }
             }
 
@@ -198,6 +227,36 @@ namespace rocks.kfs.Intacct.Utils
             }
 
             return mergeFields;
+        }
+
+        public static SortedDictionary<string, dynamic> GetFilteredDimensions( SortedDictionary<string, dynamic> customDimenesionValues, string suffixExclude = null, string suffixRemove = null )
+        {
+            var filteredDimensions = new SortedDictionary<string, dynamic>();
+            var glDimPrefix = "GLDIM";
+            if ( suffixExclude.IsNotNullOrWhiteSpace() )
+            {
+                customDimenesionValues = new SortedDictionary<string, dynamic>( customDimenesionValues.Where( d => !d.Key.ToLower().EndsWith( suffixExclude.ToLower() ) ).ToDictionary( x => x.Key, x => x.Value ) );
+            }
+
+            foreach ( var dimension in customDimenesionValues )
+            {
+                var custFieldName = dimension.Key;
+                if ( suffixRemove.IsNotNullOrWhiteSpace() && custFieldName.ToLower().EndsWith( suffixRemove.ToLower() ) )
+                {
+                    custFieldName = custFieldName.Remove( custFieldName.Length - suffixRemove.Length );
+                }
+
+                if ( !custFieldName.ToUpper().StartsWith( glDimPrefix ) )
+                {
+                    custFieldName = glDimPrefix + custFieldName;
+                }
+
+                if ( !filteredDimensions.ContainsKey( custFieldName ) )
+                {
+                    filteredDimensions.Add( custFieldName, dimension.Value );
+                }
+            }
+            return filteredDimensions;
         }
     }
 
