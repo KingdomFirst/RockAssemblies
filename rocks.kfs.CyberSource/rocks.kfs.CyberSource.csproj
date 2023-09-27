@@ -138,6 +138,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration.cs" />
+    <Compile Include="Controls\CyberSourceHostedPaymentControl.cs" />
     <Compile Include="Gateway.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -148,7 +150,12 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y /R "$(TargetPath)" "$(SolutionDir)RockWeb\bin"
-xcopy /Y /R "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)RockWeb\bin"</PostBuildEvent>
+xcopy /Y /R "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(TargetDir)cybersource-rest-client-dotnet.dll" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(TargetDir)AuthenticationSdk.dll" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(TargetDir)jose-jwt.dll" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(TargetDir)NLog.dll" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(TargetDir)nunit.framework.dll" "$(SolutionDir)RockWeb\bin"</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

@@ -29,6 +29,7 @@ using Rock.Data;
 using Rock.Financial;
 using Rock.Model;
 using Rock.Web.Cache;
+using rocks.kfs.CyberSource.Controls;
 
 namespace rocks.kfs.CyberSource
 {
@@ -53,6 +54,7 @@ namespace rocks.kfs.CyberSource
         "API Key",
         Key = AttributeKey.APIKey,
         Description = "Enter the API key (or public key) provided in your CyberSource Account",
+        IsPassword = true,
         IsRequired = true,
         Order = 2 )]
 
@@ -60,6 +62,7 @@ namespace rocks.kfs.CyberSource
         "API Secret",
         Key = AttributeKey.APISecret,
         Description = "Enter the API secret (or private key) provided in your CyberSource account",
+        IsPassword = true,
         IsRequired = true,
         Order = 3 )]
 
@@ -103,8 +106,8 @@ namespace rocks.kfs.CyberSource
     /// </summary>
     public class Gateway : GatewayComponent, IHostedGatewayComponent
     {
-        private readonly string DemoUrl = "apitest.cybersource.com";
-        private readonly string ProductionUrl = "api.cybersource.com";
+        private static readonly string DemoUrl = "apitest.cybersource.com";
+        private static readonly string ProductionUrl = "api.cybersource.com";
 
         private static int recordTypePersonId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() ).Id;
         private static int recordStatusPendingId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_PENDING.AsGuid() ).Id;
@@ -118,7 +121,7 @@ namespace rocks.kfs.CyberSource
         /// <summary>;
         /// Keys to use for Component Attributes
         /// </summary>
-        protected static class AttributeKey
+        public static class AttributeKey
         {
             public const string OrganizationId = "OrganizationId";
             public const string APIKey = "APIKey";
@@ -139,6 +142,26 @@ namespace rocks.kfs.CyberSource
 
         #endregion Attribute Keys
 
+        /// <summary>
+        /// Gets the gateway URL.
+        /// </summary>
+        /// <value>
+        /// The gateway URL.
+        /// </value>
+        [System.Diagnostics.DebuggerStepThrough]
+        public static string GetGatewayUrl( FinancialGateway financialGateway )
+        {
+            bool testMode = financialGateway.GetAttributeValue( AttributeKey.Mode ).Equals( "Test" );
+            if ( testMode )
+            {
+                return DemoUrl;
+            }
+            else
+            {
+                return ProductionUrl;
+            }
+        }
+
         #region Gateway Component Implementation
 
         /// <summary>
@@ -155,9 +178,21 @@ namespace rocks.kfs.CyberSource
             }
         }
 
-        public string ConfigureURL => throw new NotImplementedException();
+        /// <summary>
+        /// Gets the URL that the Gateway Information UI will navigate to when they click the 'Configure' link
+        /// </summary>
+        /// <value>
+        /// The configure URL.
+        /// </value>
+        public string ConfigureURL => "https://ubctest.cybersource.com/ebc2/";
 
-        public string LearnMoreURL => throw new NotImplementedException();
+        /// <summary>
+        /// Gets the URL that the Gateway Information UI will navigate to when they click the 'Learn More' link
+        /// </summary>
+        /// <value>
+        /// The learn more URL.
+        /// </value>
+        public string LearnMoreURL => "https://www.cybersource.com/";
 
         /// <summary>
         /// Returns a boolean value indicating if 'Saved Account' functionality is supported for the given currency type.
@@ -335,14 +370,26 @@ namespace rocks.kfs.CyberSource
             return string.Empty;
         }
 
+        /// <summary>
+        /// Gets the hosted payment information control which will be used to collect CreditCard, ACH fields
+        /// Note: A HostedPaymentInfoControl can optionally implement <seealso cref="T:Rock.Financial.IHostedGatewayPaymentControlTokenEvent" />
+        /// </summary>
+        /// <param name="financialGateway">The financial gateway.</param>
+        /// <param name="controlId">The control identifier.</param>
+        /// <param name="options">The options.</param>
+        /// <returns></returns>
         public Control GetHostedPaymentInfoControl( FinancialGateway financialGateway, string controlId, HostedPaymentInfoControlOptions options )
         {
-            throw new NotImplementedException();
+            CyberSourceHostedPaymentControl hostedPaymentControl = new CyberSourceHostedPaymentControl { ID = controlId };
+            hostedPaymentControl.CyberSourceGateway = financialGateway;
+
+            return hostedPaymentControl;
+
         }
 
         public string GetHostPaymentInfoSubmitScript( FinancialGateway financialGateway, Control hostedPaymentInfoControl )
         {
-            throw new NotImplementedException();
+            return $"submitCyberSourceMicroFormInfo();";
         }
 
         public void UpdatePaymentInfoFromPaymentControl( FinancialGateway financialGateway, Control hostedPaymentInfoControl, ReferencePaymentInfo referencePaymentInfo, out string errorMessage )
@@ -357,12 +404,12 @@ namespace rocks.kfs.CyberSource
 
         public DateTime GetEarliestScheduledStartDate( FinancialGateway financialGateway )
         {
-            throw new NotImplementedException();
+            return RockDateTime.Today.AddDays( 1 ).Date;
         }
 
         public HostedGatewayMode[] GetSupportedHostedGatewayModes( FinancialGateway financialGateway )
         {
-            throw new NotImplementedException();
+            return new HostedGatewayMode[1] { HostedGatewayMode.Hosted };
         }
 
         #endregion
@@ -429,7 +476,7 @@ namespace rocks.kfs.CyberSource
         private string GetBaseUrl( FinancialGateway gateway, string resource, out string errorMessage )
         {
             errorMessage = string.Empty;
-            var baseUrl = GetAttributeValue( gateway, AttributeKey.Mode ) == "Live" ? ProductionUrl : DemoUrl;
+            var baseUrl = GetGatewayUrl( gateway );
             baseUrl = string.Format( "https://{0}/{2}", baseUrl, resource );
 
             return baseUrl;
