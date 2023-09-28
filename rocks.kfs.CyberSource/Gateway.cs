@@ -29,7 +29,14 @@ using Rock.Data;
 using Rock.Financial;
 using Rock.Model;
 using Rock.Web.Cache;
+
+using CyberSource.Api;
+using CyberSource.Model;
+using CyberSourceSDK = CyberSource;
+
 using rocks.kfs.CyberSource.Controls;
+using System.Text;
+using System.Xml.Linq;
 
 namespace rocks.kfs.CyberSource
 {
@@ -218,16 +225,241 @@ namespace rocks.kfs.CyberSource
         }
 
         /// <summary>
-        /// Charges the specified payment info.
+        /// Charges the specified payment info using the DirectPost API
         /// </summary>
-        /// <param name="financialGateway"></param>
+        /// <param name="financialGateway">The financial gateway.</param>
         /// <param name="paymentInfo">The payment info.</param>
         /// <param name="errorMessage">The error message.</param>
         /// <returns></returns>
         public override FinancialTransaction Charge( FinancialGateway financialGateway, PaymentInfo paymentInfo, out string errorMessage )
         {
-            errorMessage = "This gateway does not support charging transactions. Transactions should be created through the CyberSource interface.";
-            return null;
+            errorMessage = string.Empty;
+            var referencedPaymentInfo = paymentInfo as ReferencePaymentInfo;
+            if ( referencedPaymentInfo == null )
+            {
+                throw new ReferencePaymentInfoRequired();
+            }
+
+            if ( financialGateway == null )
+            {
+                throw new NullFinancialGatewayException();
+            }
+
+            var customerId = referencedPaymentInfo.GatewayPersonIdentifier;
+            var tokenizerToken = referencedPaymentInfo.ReferenceNumber;
+            var amount = referencedPaymentInfo.Amount;
+
+            StringBuilder stringBuilderDescription = new StringBuilder();
+            if ( referencedPaymentInfo.Description.IsNotNullOrWhiteSpace() )
+            {
+                stringBuilderDescription.AppendLine( referencedPaymentInfo.Description );
+            }
+
+            if ( referencedPaymentInfo.Comment1.IsNotNullOrWhiteSpace() )
+            {
+                stringBuilderDescription.AppendLine( referencedPaymentInfo.Comment1 );
+            }
+
+            if ( referencedPaymentInfo.Comment2.IsNotNullOrWhiteSpace() )
+            {
+                stringBuilderDescription.AppendLine( referencedPaymentInfo.Comment2 );
+            }
+
+            var description = stringBuilderDescription.ToString().Truncate( 600 );
+
+            Ptsv2paymentsClientReferenceInformation clientReferenceInformation = new Ptsv2paymentsClientReferenceInformation(
+                //Code: clientReferenceInformationCode,
+                Comments: description
+           );
+
+            string defaultCurrency = "USD";
+            Ptsv2paymentsOrderInformationAmountDetails orderInformationAmountDetails = new Ptsv2paymentsOrderInformationAmountDetails(
+                TotalAmount: amount.ToString( "0.00" ),
+                Currency: DefinedValueCache.Get( referencedPaymentInfo.AmountCurrencyCodeValueId.ToIntSafe( -1 ) )?.Value ?? defaultCurrency
+           );
+
+            Ptsv2paymentsOrderInformationBillTo orderInformationBillTo = new Ptsv2paymentsOrderInformationBillTo(
+                FirstName: paymentInfo.FirstName,
+                LastName: paymentInfo.LastName.IsNullOrWhiteSpace() ? paymentInfo.BusinessName : paymentInfo.LastName,
+                Address1: paymentInfo.Street1,
+                Locality: paymentInfo.City,
+                AdministrativeArea: paymentInfo.State,
+                PostalCode: paymentInfo.PostalCode,
+                Country: paymentInfo.Country,
+                Email: paymentInfo.Email,
+                PhoneNumber: paymentInfo.Phone
+           );
+
+            Ptsv2paymentsOrderInformation orderInformation = new Ptsv2paymentsOrderInformation(
+                AmountDetails: orderInformationAmountDetails,
+                BillTo: orderInformationBillTo
+           );
+
+            Ptsv2paymentsTokenInformation tokenInformation = new Ptsv2paymentsTokenInformation(
+                TransientTokenJwt: tokenizerToken
+           );
+
+            if ( customerId.IsNotNullOrWhiteSpace() )
+            {
+                //queryParameters.Add( "customer_vault_id", customerId );
+                //when customers are setup do something different here
+            }
+            else
+            {
+                // queryParameters.Add( "payment_token", tokenizerToken );
+            }
+
+            Ptsv2paymentsDeviceInformation deviceInformation = new Ptsv2paymentsDeviceInformation(
+                IpAddress: paymentInfo.IPAddress
+                );
+
+            var requestObj = new CreatePaymentRequest(
+                ClientReferenceInformation: clientReferenceInformation,
+                OrderInformation: orderInformation,
+                TokenInformation: tokenInformation,
+                DeviceInformation: deviceInformation
+           );
+
+            PtsV2PaymentsPost201Response chargeResult = null;
+            try
+            {
+                var configDictionary = new Configuration().GetConfiguration( financialGateway );
+                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+
+                var apiInstance = new PaymentsApi( clientConfig );
+                chargeResult = apiInstance.CreatePayment( requestObj );
+                //return result;
+            }
+            catch ( Exception e )
+            {
+                errorMessage += "Exception on calling the API : " + e.Message;
+                //return null;
+            }
+
+            if ( chargeResult == null || chargeResult.ErrorInformation != null )
+            {
+                if ( chargeResult == null )
+                {
+                    return null;
+                }
+
+                errorMessage += string.Format( "{0} ({1})", chargeResult.ErrorInformation.Message, chargeResult.ErrorInformation.Reason );
+                ExceptionLogService.LogException( $"Error processing CyberSource transaction. Result Code:  {chargeResult.ErrorInformation.Message} ({chargeResult.ErrorInformation.Reason})." );
+            }
+
+            var transaction = new FinancialTransaction();
+            transaction.TransactionCode = chargeResult.ProcessorInformation.TransactionId;
+            transaction.ForeignKey = chargeResult.BuyerInformation?.MerchantCustomerId;
+
+            //Customer customerInfo = this.GetCustomerVaultQueryResponse( financialGateway, customerId )?.CustomerVault.Customer;
+            TssV2TransactionsGet200Response transactionDetail = GetTransactionDetailResponse( financialGateway, chargeResult.Id );
+            transaction.FinancialPaymentDetail = CreatePaymentPaymentDetail( transactionDetail );
+
+            transaction.AdditionalLavaFields = GetAdditionalLavaFields( chargeResult );
+
+            return transaction;
+        }
+
+        private TssV2TransactionsGet200Response GetTransactionDetailResponse( FinancialGateway financialGateway, string id )
+        {
+            try
+            {
+                var configDictionary = new Configuration().GetConfiguration( financialGateway );
+                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+
+                var apiInstance = new TransactionDetailsApi( clientConfig );
+                var result = apiInstance.GetTransaction( id );
+                return result;
+            }
+            catch ( Exception e )
+            {
+                var errorMessage = "Exception on calling the API : " + e.Message;
+                ExceptionLogService.LogException( errorMessage );
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Populates the payment information.
+        /// </summary>
+        /// <param name="transactionDetail">The customer information.</param>
+        /// <returns></returns>
+        private FinancialPaymentDetail CreatePaymentPaymentDetail( TssV2TransactionsGet200Response transactionDetail )
+        {
+            var financialPaymentDetail = new FinancialPaymentDetail();
+            UpdateFinancialPaymentDetail( transactionDetail, financialPaymentDetail );
+            return financialPaymentDetail;
+        }
+
+        /// <summary>
+        /// Updates the financial payment detail fields from the information in transactionDetail
+        /// </summary>
+        /// <param name="transactionDetail">The customer information.</param>
+        /// <param name="financialPaymentDetail">The financial payment detail.</param>
+        private void UpdateFinancialPaymentDetail( TssV2TransactionsGet200Response transactionDetail, FinancialPaymentDetail financialPaymentDetail )
+        {
+            financialPaymentDetail.GatewayPersonIdentifier = transactionDetail.BuyerInformation.MerchantCustomerId;
+
+            string paymentType = transactionDetail.PaymentInformation.PaymentType.Type;
+            if ( paymentType == "credit card" )
+            {
+                // cc payment
+                var curType = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.CURRENCY_TYPE_CREDIT_CARD );
+                financialPaymentDetail.NameOnCard = $"{transactionDetail.OrderInformation.BillTo.FirstName} {transactionDetail.OrderInformation.BillTo.LastName}";
+                financialPaymentDetail.CurrencyTypeValueId = curType != null ? curType.Id : ( int? ) null;
+
+                //// The gateway tells us what the CreditCardType is since it was selected using their hosted payment entry frame.
+                //// So, first see if we can determine CreditCardTypeValueId using the CardType response from the gateway
+
+                // See if we can figure it out from the CC Type (Amex, Visa, etc)
+                var creditCardTypeValue = CreditCardPaymentInfo.GetCreditCardTypeFromName( transactionDetail.ProcessingInformation.PaymentSolution );
+                if ( creditCardTypeValue == null )
+                {
+                    // GetCreditCardTypeFromName should have worked, but just in case, see if we can figure it out from the MaskedCard using RegEx
+                    creditCardTypeValue = CreditCardPaymentInfo.GetCreditCardTypeFromCreditCardNumber( transactionDetail.PaymentInformation.Card.Prefix );
+                }
+
+                financialPaymentDetail.CreditCardTypeValueId = creditCardTypeValue?.Id;
+                financialPaymentDetail.AccountNumberMasked = transactionDetail.PaymentInformation.Card.Suffix;
+
+                financialPaymentDetail.ExpirationMonth = transactionDetail.PaymentInformation.Card.ExpirationMonth.AsIntegerOrNull();
+                financialPaymentDetail.ExpirationYear = transactionDetail.PaymentInformation.Card.ExpirationYear.AsIntegerOrNull();
+            }
+            //else
+            //{
+            //    // ach payment
+            //    var curType = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.CURRENCY_TYPE_ACH );
+            //    financialPaymentDetail.CurrencyTypeValueId = curType != null ? curType.Id : ( int? ) null;
+            //    financialPaymentDetail.AccountNumberMasked = customerInfo.CheckAccount;
+            //}
+        }
+
+        /// <summary>
+        /// Gets the additional lava fields in the form of a flatted out dictionary where child properties are delimited with '_' (Billing.Street1 becomes Billing_Street1)
+        /// </summary>
+        /// <param name="xdocResult">The xdoc result.</param>
+        /// <returns></returns>
+        private static Dictionary<string, object> GetAdditionalLavaFields<T>( T obj )
+        {
+            var xdocResult = JsonConvert.DeserializeXNode( obj.ToJson(), "root" );
+            var additionalLavaFields = new Dictionary<string, object>();
+            foreach ( XElement element in xdocResult.Root.Elements() )
+            {
+                if ( element.HasElements )
+                {
+                    string prefix = element.Name.LocalName;
+                    foreach ( XElement childElement in element.Elements() )
+                    {
+                        additionalLavaFields.AddOrIgnore( prefix + "_" + childElement.Name.LocalName, childElement.Value.Trim() );
+                    }
+                }
+                else
+                {
+                    additionalLavaFields.AddOrIgnore( element.Name.LocalName, element.Value.Trim() );
+                }
+            }
+
+            return additionalLavaFields;
         }
 
         /// <summary>
@@ -392,14 +624,36 @@ namespace rocks.kfs.CyberSource
             return $"submitCyberSourceMicroFormInfo();";
         }
 
+        /// <summary>
+        /// Populates the properties of the referencePaymentInfo from this gateway's <seealso cref="M:Rock.Financial.IHostedGatewayComponent.GetHostedPaymentInfoControl(Rock.Model.FinancialGateway,System.String)" >hostedPaymentInfoControl</seealso>
+        /// This includes the ReferenceNumber, plus any other fields that the gateway wants to set
+        /// </summary>
+        /// <param name="financialGateway">The financial gateway.</param>
+        /// <param name="hostedPaymentInfoControl">The hosted payment information control.</param>
+        /// <param name="referencePaymentInfo">The reference payment information.</param>
+        /// <param name="errorMessage">The error message.</param>
         public void UpdatePaymentInfoFromPaymentControl( FinancialGateway financialGateway, Control hostedPaymentInfoControl, ReferencePaymentInfo referencePaymentInfo, out string errorMessage )
         {
-            throw new NotImplementedException();
+            var cyberSourcePaymentControl = hostedPaymentInfoControl as CyberSourceHostedPaymentControl;
+            errorMessage = null;
+
+            if ( cyberSourcePaymentControl.PaymentInfoToken.IsNullOrWhiteSpace() )
+            {
+                errorMessage = "null response from GetHostedPaymentInfoToken";
+                referencePaymentInfo.ReferenceNumber = cyberSourcePaymentControl.PaymentInfoToken;
+                // referencePaymentInfo.InitialCurrencyTypeValue = cyberSourcePaymentControl.CurrencyTypeValue;
+            }
+            else
+            {
+                referencePaymentInfo.ReferenceNumber = cyberSourcePaymentControl.PaymentInfoToken;
+                //referencePaymentInfo.InitialCurrencyTypeValue = cyberSourcePaymentControl.CurrencyTypeValue;
+            }
         }
 
         public string CreateCustomerAccount( FinancialGateway financialGateway, ReferencePaymentInfo paymentInfo, out string errorMessage )
         {
-            throw new NotImplementedException();
+            errorMessage = "";
+            return "12345";
         }
 
         public DateTime GetEarliestScheduledStartDate( FinancialGateway financialGateway )
@@ -501,6 +755,40 @@ namespace rocks.kfs.CyberSource
 
             return new HttpBasicAuthenticator( apiKey, apiSecret );
         }
+        #endregion
+
+        #region Exceptions
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <seealso cref="System.Exception" />
+        public class ReferencePaymentInfoRequired : Exception
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ReferencePaymentInfoRequired"/> class.
+            /// </summary>
+            public ReferencePaymentInfoRequired()
+                : base( "CyberSource gateway requires a token or customer reference" )
+            {
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <seealso cref="System.ArgumentNullException" />
+        public class NullFinancialGatewayException : ArgumentNullException
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="NullFinancialGatewayException"/> class.
+            /// </summary>
+            public NullFinancialGatewayException()
+                : base( "Unable to determine financial gateway" )
+            {
+            }
+        }
+
         #endregion
     }
 }
