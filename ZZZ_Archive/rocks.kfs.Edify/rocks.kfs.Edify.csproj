@@ -31,6 +31,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
     <Reference Include="PostalServerDotNet, Version=1.1.8319.31316, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\PostalServerDotNet.1.1.8319.31316\lib\net452\PostalServerDotNet.dll</HintPath>
     </Reference>
@@ -68,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Communications\Transport\EdifyHTTP.cs" />
+    <Compile Include="Migrations\002_AddDefinedValue.cs" />
     <Compile Include="Migrations\001_CreateDefinedTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SystemGuid.cs" />
