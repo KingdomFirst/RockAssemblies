@@ -24,26 +24,25 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 
-using DotLiquid;
-using DotLiquid.Util;
 using Microsoft.Exchange.WebServices.Data;
 using Microsoft.Identity.Client;
 using Rock;
 using Rock.Data;
+using Rock.Lava;
 using Rock.Lava.Shortcodes;
 using Rock.Model;
 using Rock.Security;
 
-namespace rocks.kfs.Shortcodes.EWS
+namespace rocks.kfs.Microsoft365Utilities.Shortcodes
 {
     /// <summary>
     /// Lava shortcode for displaying calendar items from a Microsoft Exchange mailbox.
     /// </summary>
     [LavaShortcodeMetadata(
-        "KFS - EWS Calendar Items",
-        "ewscalendaritems",
-        "Retrieves a list of calendar items from a specified Microsoft Exchange shared calendar mailbox.",
-        @"<p>The KFS - EWS calendar items shortcode allows you to access calendar items from a specified Microsoft Exchange shared mailbox using the EWS managed API. Below is an example of how to use it.
+        Name = "KFS - EWS Calendar Items",
+        TagName = "ewscalendaritems",
+        Description = "Retrieves a list of calendar items from a specified Microsoft Exchange shared calendar mailbox.",
+        Documentation = @"<p>The KFS - EWS calendar items shortcode allows you to access calendar items from a specified Microsoft Exchange shared mailbox using the EWS managed API. Below is an example of how to use it.
             </p>
             <pre>{% assign applicationid = 'Global' | Attribute:'rocks.kfs.EWSAppApplicationId' %}
 {% assign tenantid = 'Global' | Attribute:'rocks.kfs.EWSAppTenantId' %}
@@ -82,9 +81,10 @@ namespace rocks.kfs.Shortcodes.EWS
             <li><strong>DisplayCc</strong> - A text summarization of the CC recipients.</li>
             <li><strong>IsRecurring</strong> - A boolean indicating if the calendar item is part of a recurring series.</li>
         </ul>",
-        "applicationid,tenantid,appsecret,calendarmailbox,impersonate,serverurl,order,daysback,daysforward",
-        "" )]
-    public class EWSCalendarItemsShortcode : RockLavaShortcodeBlockBase
+        Parameters = "applicationid,tenantid,appsecret,calendarmailbox,impersonate,serverurl,order,daysback,daysforward"
+    )]
+    public class EWSCalendarItemsShortcode : LavaShortcodeBase, ILavaBlock
+
     {
         private static readonly Regex Syntax = new Regex( @"(\w+)" );
 
@@ -105,11 +105,14 @@ namespace rocks.kfs.Shortcodes.EWS
         const string DAYS_FORWARD = "daysforward";
 
         /// <summary>
-        /// Method that will be run at Rock startup
+        /// Specifies the type of Liquid element for this shortcode.
         /// </summary>
-        public override void OnStartup()
+        public override LavaShortcodeTypeSpecifier ElementType
         {
-            Template.RegisterShortcode<EWSCalendarItemsShortcode>( _tagName );
+            get
+            {
+                return LavaShortcodeTypeSpecifier.Block;
+            }
         }
 
         /// <summary>
@@ -119,18 +122,11 @@ namespace rocks.kfs.Shortcodes.EWS
         /// <param name="markup">The markup.</param>
         /// <param name="tokens">The tokens.</param>
         /// <exception cref="System.Exception">Could not find the variable to place results in.</exception>
-        public override void Initialize( string tagName, string markup, List<string> tokens )
+        public override void OnInitialize( string tagName, string markup, List<string> tokens )
         {
             _markup = markup;
-            base.Initialize( tagName, markup, tokens );
-        }
+            base.OnInitialize( tagName, markup, tokens );
 
-        /// <summary>
-        /// Parses the specified tokens.
-        /// </summary>
-        /// <param name="tokens">The tokens.</param>
-        protected override void Parse( List<string> tokens )
-        {
             // Get the block markup. The list of tokens contains all of the lava from the start tag to
             // the end of the template. This will pull out just the internals of the block.
 
@@ -145,9 +141,6 @@ namespace rocks.kfs.Shortcodes.EWS
 
             Regex regExStart = new Regex( startTag );
             Regex regExEnd = new Regex( endTag );
-
-            NodeList = NodeList ?? new List<object>();
-            NodeList.Clear();
 
             string token;
             while ( ( token = tokens.Shift() ) != null )
@@ -194,22 +187,19 @@ namespace rocks.kfs.Shortcodes.EWS
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="result">The result.</param>
-        public override void Render( Context context, TextWriter result )
+        public override void OnRender( ILavaRenderContext context, TextWriter result )
         {
-            var rockContext = new RockContext();
+            var rockContext = LavaHelper.GetRockContextFromLavaContext( context );
             ExchangeCredentials oauthCreds = null;
 
             // Get enabled security commands
-            if ( context.Registers.ContainsKey( "EnabledCommands" ) )
-            {
-                _enabledSecurityCommands = context.Registers["EnabledCommands"].ToString();
-            }
+            _enabledSecurityCommands = context.GetEnabledCommands().JoinStrings( "," );
 
             using ( TextWriter writer = new StringWriter() )
             {
                 var now = RockDateTime.Now;
 
-                base.Render( context, writer );
+                base.OnRender( context, writer );
 
                 var parms = ParseMarkup( _markup, context );
                 var mailbox = parms[CALENDAR_MAILBOX];
@@ -332,12 +322,12 @@ namespace rocks.kfs.Shortcodes.EWS
                     calendarItems = calendarItems.OrderByDescending( ci => ci.Start ).ToList();
                 }
 
-                var mergeFields = LoadBlockMergeFields( context );
+                var mergeFields = context.GetMergeFields();
                 mergeFields.Add( "CalendarItems", calendarItems );
 
                 var results = _blockMarkup.ToString().ResolveMergeFields( mergeFields, _enabledSecurityCommands );
                 result.Write( results.Trim() );
-                base.Render( context, result );
+                base.OnRender( context, result );
             }
         }
 
@@ -375,28 +365,11 @@ namespace rocks.kfs.Shortcodes.EWS
         /// <param name="markup">The markup.</param>
         /// <param name="context">The context.</param>
         /// <returns></returns>
-        private Dictionary<string, string> ParseMarkup( string markup, Context context )
+        private Dictionary<string, string> ParseMarkup( string markup, ILavaRenderContext context )
         {
             // first run lava across the inputted markup
-            var internalMergeFields = new Dictionary<string, object>();
+            var internalMergeFields = context.GetMergeFields();
 
-            // get variables defined in the lava source
-            foreach ( var scope in context.Scopes )
-            {
-                foreach ( var item in scope )
-                {
-                    internalMergeFields.AddOrReplace( item.Key, item.Value );
-                }
-            }
-
-            // get merge fields loaded by the block or container
-            if ( context.Environments.Count > 0 )
-            {
-                foreach ( var item in context.Environments[0] )
-                {
-                    internalMergeFields.AddOrReplace( item.Key, item.Value );
-                }
-            }
             var resolvedMarkup = markup.ResolveMergeFields( internalMergeFields );
 
             var parms = new Dictionary<string, string>();
@@ -425,55 +398,33 @@ namespace rocks.kfs.Shortcodes.EWS
             return parms;
         }
 
-
-        /// <summary>
-        /// Loads the block merge fields.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <returns></returns>
-        private Dictionary<string, object> LoadBlockMergeFields( Context context )
-        {
-            var _internalMergeFields = new Dictionary<string, object>();
-
-            // Get merge fields loaded by the block or container
-            if ( context.Environments.Count > 0 )
-            {
-                foreach ( var item in context.Environments[0] )
-                {
-                    _internalMergeFields.AddOrReplace( item.Key, item.Value );
-                }
-            }
-
-            return _internalMergeFields;
-        }
-
         private class CalendarItemResult : Model<CalendarItemResult>
         {
-            [LavaInclude]
+            [LavaVisible]
             public string Subject { get; set; }
 
-            [LavaInclude]
+            [LavaVisible]
             public string Body { get; set; }
 
-            [LavaInclude]
+            [LavaVisible]
             public string TextBody { get; set; }
 
-            [LavaInclude]
+            [LavaVisible]
             public DateTime Start { get; set; }
 
-            [LavaInclude]
+            [LavaVisible]
             public DateTime End { get; set; }
 
-            [LavaInclude]
+            [LavaVisible]
             public string Location { get; set; }
 
-            [LavaInclude]
+            [LavaVisible]
             public string DisplayTo { get; set; }
 
-            [LavaInclude]
+            [LavaVisible]
             public string DisplayCc { get; set; }
 
-            [LavaInclude]
+            [LavaVisible]
             public bool IsRecurring { get; set; }
         }
     }
