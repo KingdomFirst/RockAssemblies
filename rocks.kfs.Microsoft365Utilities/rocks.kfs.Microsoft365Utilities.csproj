@@ -61,6 +61,10 @@
     <Reference Include="Rock.Common">
       <HintPath>..\..\RockWeb\Bin\Rock.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Rock.Lava">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\Rock.Lava.dll</HintPath>
+    </Reference>
     <Reference Include="Rock.Lava.Shared">
       <HintPath>..\..\RockWeb\Bin\Rock.Lava.Shared.dll</HintPath>
     </Reference>
@@ -80,6 +84,7 @@
     <Compile Include="Migrations\001_CreateEWSAttributes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shortcodes\CalendarItems.cs" />
+    <Compile Include="Shortcodes\CalendarItemsShortcode.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
