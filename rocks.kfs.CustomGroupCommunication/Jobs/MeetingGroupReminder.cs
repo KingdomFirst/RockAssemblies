@@ -139,7 +139,7 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
                             .Where( g =>
                                 g.IsActive &&
                                 g.Schedule != null )
-                            .WhereAttributeValue( rockContext, av => av.Attribute.Guid.Equals( groupAttributeSetting ) );
+                            .WhereAttributeValue( rockContext, av => av.Attribute.Guid.Equals( groupAttributeSetting ) && av.ValueAsBoolean == true );
 
             foreach ( var group in groupQuery.ToList() )
             {
