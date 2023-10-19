@@ -83,10 +83,6 @@
     <Compile Include="Migrations\001_CreateDefinedType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reporting\Api.cs" />
-    <Compile Include="Reporting\Project.cs" />
-    <Compile Include="Reporting\Category.cs" />
-    <Compile Include="Reporting\Donation.cs" />
-    <Compile Include="Reporting\Supporter.cs" />
     <Compile Include="Reporting\SalesResponse.cs" />
     <Compile Include="Reporting\Sale.cs" />
   </ItemGroup>
