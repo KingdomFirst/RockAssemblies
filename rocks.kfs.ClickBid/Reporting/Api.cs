@@ -41,7 +41,7 @@ namespace rocks.kfs.ClickBid.Reporting
         private static int searchKeyValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_SEARCH_KEYS_ALTERNATE_ID.AsGuid() ).Id;
         private static int contributionTypeId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_TYPE_CONTRIBUTION ).Id;
 
-        #region Reach API
+        #region ClickBid API
 
         /// <summary>
         /// Posts the request to the gateway endpoint.
@@ -54,18 +54,16 @@ namespace rocks.kfs.ClickBid.Reporting
         /// <exception cref="Exception">
         /// </exception>
         /// <exception cref="System.Exception"></exception>
-        public static object PostRequest( string url, HttpBasicAuthenticator authenticator, Dictionary<string, string> parameters, out string errorMessage )
+        public static object PostRequest( string url, string token, Dictionary<string, string> parameters, out string errorMessage )
         {
             errorMessage = string.Empty;
-            var restClient = new RestClient( url )
-            {
-                Authenticator = authenticator
-            };
+            var restClient = new RestClient( url );
 
             var restRequest = new RestRequest( Method.GET )
             {
                 RequestFormat = DataFormat.Json
             };
+            restRequest.AddHeader( "Authorization", "Bearer " + token ); // used on every request
 
             if ( parameters != null )
             {
@@ -138,7 +136,7 @@ namespace rocks.kfs.ClickBid.Reporting
         /// <param name="connectionStatusId">The connection status identifier.</param>
         /// <param name="updatePrimaryEmail">Whether or not this method should update the primary email address on the person.</param>
         /// <returns></returns>
-        public static Task<int?> FindPersonAsync( RockContext lookupContext, Donation donation, int connectionStatusId, bool updatePrimaryEmail )
+        public static Task<int?> FindPersonAsync( RockContext lookupContext, Sale sale, int connectionStatusId, bool updatePrimaryEmail )
         {
             // specifically using Task.Run instead of Task.Factory.StartNew( longRunning)
             // see https://blog.stephencleary.com/2013/08/startnew-is-dangerous.html
@@ -146,12 +144,13 @@ namespace rocks.kfs.ClickBid.Reporting
             {
                 // look for a single existing person by person fields
                 int? primaryAliasId = null;
-                var reachSearchKey = string.Format( "{0}_{1}", donation.supporter_id, "reach" );
-                var person = new PersonService( lookupContext ).FindPerson( donation.first_name, donation.last_name, donation.email, updatePrimaryEmail, true );
+                var clickbidSearchKey = string.Format( "{0}_{1}", sale.bidder_number, "clickbid" );
+                var personMatchQry = new PersonService.PersonMatchQuery( sale.first_name, sale.last_name, sale.emails, sale.phones );
+                var person = new PersonService( lookupContext ).FindPerson( personMatchQry, updatePrimaryEmail, true );
                 if ( person == null )
                 {
                     // check by the search key
-                    var existingSearchKey = new PersonSearchKeyService( lookupContext ).Queryable().FirstOrDefault( k => k.SearchValue.Equals( reachSearchKey, StringComparison.InvariantCultureIgnoreCase ) );
+                    var existingSearchKey = new PersonSearchKeyService( lookupContext ).Queryable().FirstOrDefault( k => k.SearchValue.Equals( clickbidSearchKey, StringComparison.InvariantCultureIgnoreCase ) );
                     if ( existingSearchKey != null )
                     {
                         primaryAliasId = existingSearchKey.PersonAlias.Person.PrimaryAliasId;
@@ -165,51 +164,53 @@ namespace rocks.kfs.ClickBid.Reporting
                             {
                                 Guid = Guid.NewGuid(),
                                 Gender = Gender.Unknown,
-                                FirstName = donation.first_name,
-                                LastName = donation.last_name,
-                                Email = donation.email,
+                                FirstName = sale.first_name,
+                                LastName = sale.last_name,
+                                Email = sale.emails,
                                 IsEmailActive = true,
                                 EmailPreference = EmailPreference.EmailAllowed,
                                 RecordStatusValueId = recordStatusPendingId,
                                 RecordTypeValueId = recordTypePersonId,
                                 ConnectionStatusValueId = connectionStatusId,
-                                ForeignId = donation.supporter_id
+                                ForeignId = sale.bidder_number
                             };
 
                             // save so the person alias is attributed for the search key
                             PersonService.SaveNewPerson( person, rockContext );
 
                             // add the person phone number
-                            if ( donation.phone.IsNotNullOrWhiteSpace() )
+                            if ( sale.phones.IsNotNullOrWhiteSpace() )
                             {
                                 person.PhoneNumbers.Add( new PhoneNumber
                                 {
-                                    Number = donation.phone,
+                                    Number = sale.phones,
                                     NumberTypeValueId = homePhoneValueId,
                                     Guid = Guid.NewGuid(),
-                                    CreatedDateTime = donation.date,
-                                    ModifiedDateTime = donation.updated_at
+                                    CreatedDateTime = sale.checkout_time,
+                                    ModifiedDateTime = sale.checkout_time
                                 } );
                             }
 
                             // add the person address
-                            if ( donation.address1.IsNotNullOrWhiteSpace() )
+                            if ( sale.address.IsNotNullOrWhiteSpace() )
                             {
                                 var familyGroup = person.GetFamily( rockContext );
-                                var countryValue = donation.country;
+
+                                // current API does not support countries, so hard code to US for now.
+                                var countryValue = "US";
                                 var countryDV = DefinedTypeCache.Get( Rock.SystemGuid.DefinedType.LOCATION_COUNTRIES.AsGuid() )
                                                 .GetDefinedValueFromValue( countryValue );
-                                if ( countryDV == null )
-                                {
-                                    var countriesDT = DefinedTypeCache.Get( Rock.SystemGuid.DefinedType.LOCATION_COUNTRIES.AsGuid() );
-                                    countryDV = countriesDT.DefinedValues.FirstOrDefault( dv => dv.Description.Contains( countryValue ) );
-                                    if ( countryDV != null && countryDV.Value.IsNotNullOrWhiteSpace() )
-                                    {
-                                        countryValue = countryDV.Value;
-                                    }
-                                }
+                                //if ( countryDV == null )
+                                //{
+                                //    var countriesDT = DefinedTypeCache.Get( Rock.SystemGuid.DefinedType.LOCATION_COUNTRIES.AsGuid() );
+                                //    countryDV = countriesDT.DefinedValues.FirstOrDefault( dv => dv.Description.Contains( countryValue ) );
+                                //    if ( countryDV != null && countryDV.Value.IsNotNullOrWhiteSpace() )
+                                //    {
+                                //        countryValue = countryDV.Value;
+                                //    }
+                                //}
 
-                                var location = new LocationService( rockContext ).Get( donation.address1, donation.address2, donation.city, donation.state, donation.postal, countryValue );
+                                var location = new LocationService( rockContext ).Get( sale.address, sale.address2, sale.city, sale.state, sale.zip, countryValue );
                                 if ( familyGroup != null && location != null )
                                 {
                                     familyGroup.GroupLocations.Add( new GroupLocation
@@ -226,7 +227,7 @@ namespace rocks.kfs.ClickBid.Reporting
                             new PersonSearchKeyService( rockContext ).Add( new PersonSearchKey
                             {
                                 SearchTypeValueId = searchKeyValueId,
-                                SearchValue = reachSearchKey,
+                                SearchValue = clickbidSearchKey,
                                 PersonAliasId = person.PrimaryAliasId
                             } );
                             rockContext.SaveChanges();
