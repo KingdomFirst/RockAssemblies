@@ -361,6 +361,20 @@ namespace rocks.kfs.ClickBid
                                     continue;
                                 }
 
+                                var currencyTypes = DefinedTypeCache.Get( Rock.SystemGuid.DefinedType.FINANCIAL_CURRENCY_TYPE ).DefinedValues;
+                                var selectedCurrencyType = currencyTypes.FirstOrDefault( dv => dv.Value.Equals( sale.pay_type, StringComparison.CurrentCultureIgnoreCase ) );
+                                if ( selectedCurrencyType == null )
+                                {
+                                    switch ( sale.pay_type )
+                                    {
+                                        case "CREDIT":
+                                            selectedCurrencyType = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.CURRENCY_TYPE_CREDIT_CARD );
+                                            break;
+                                        default:
+                                            selectedCurrencyType = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.CURRENCY_TYPE_UNKNOWN );
+                                            break;
+                                    }
+                                }
                                 // create the transaction
                                 var summary = string.Format( "ClickBid {0} for {1} from {2} {3} using {4} on {5}",
                                     sale.won_by, sale.item_name, sale.first_name, sale.last_name, sale.pay_type, sale.checkout_time_display );
@@ -377,7 +391,10 @@ namespace rocks.kfs.ClickBid
                                     ModifiedDateTime = today,
                                     AuthorizedPersonAliasId = personAlias.Result.Value,
                                     FinancialGatewayId = gateway.Id,
-                                    FinancialPaymentDetail = new FinancialPaymentDetail(),
+                                    FinancialPaymentDetail = new FinancialPaymentDetail
+                                    {
+                                        CurrencyTypeValueId = selectedCurrencyType.Id
+                                    },
                                     TransactionDetails = new List<FinancialTransactionDetail>
                                 {
                                     new FinancialTransactionDetail
