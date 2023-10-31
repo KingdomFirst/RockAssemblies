@@ -184,7 +184,7 @@ namespace rocks.kfs.CyberSource.Controls
     }}
 //# sourceURL=CyberSourceMicroformJS.js
 ";
-        private string microformJWK = "{\"kid\":\"HKJHKJ\"}";
+        private string microformJWK = "{'kid':'HKJHKJ'}";
 
         private void InitializeCyberSourceAPI()
         {
@@ -228,6 +228,7 @@ namespace rocks.kfs.CyberSource.Controls
             catch ( Exception e )
             {
                 ExceptionLogService.LogException( "Exception on calling the CyberSource API : " + e.Message );
+                throw e;
             }
         }
 

@@ -353,6 +353,12 @@ namespace rocks.kfs.CyberSource
 
             //Customer customerInfo = this.GetCustomerVaultQueryResponse( financialGateway, customerId )?.CustomerVault.Customer;
             TssV2TransactionsGet200Response transactionDetail = GetTransactionDetailResponse( financialGateway, chargeResult.Id );
+            var requestCount = 0;
+            while ( transactionDetail == null && requestCount < 10 )
+            {
+                transactionDetail = GetTransactionDetailResponse( financialGateway, chargeResult.Id );
+                requestCount += 1;
+            }
             transaction.FinancialPaymentDetail = CreatePaymentPaymentDetail( transactionDetail );
 
             transaction.AdditionalLavaFields = GetAdditionalLavaFields( chargeResult );
