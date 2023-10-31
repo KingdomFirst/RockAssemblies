@@ -307,6 +307,7 @@ namespace rocks.kfs.ClickBid
                 var queryHasResults = true;
                 var eventId = eventValue.Value;
                 var eventAccounts = eventValue.GetAttributeValue( "Accounts" ).ToKeyValuePairList();
+                var eventGroupMemberIds = eventValue.GetAttributeValue( "GroupMemberMap" ).ToKeyValuePairList();
 
                 while ( queryHasResults )
                 {
@@ -336,6 +337,7 @@ namespace rocks.kfs.ClickBid
                                 var personAlias = Api.FindPersonAsync( lookupContext, sale, connectionStatus.Id, updatePrimaryEmail );
 
                                 int? rockAccountId = defaultAccount.Id;
+                                GroupMember groupMember = null;
                                 var accountMapping = eventAccounts.FirstOrDefault( kvp => kvp.Key.Equals( sale.item_type, StringComparison.CurrentCultureIgnoreCase ) );
                                 if ( accountMapping.Key.IsNotNullOrWhiteSpace() )
                                 {
@@ -346,6 +348,21 @@ namespace rocks.kfs.ClickBid
                                         if ( accountIdInt != 0 )
                                         {
                                             rockAccountId = accountIdInt;
+                                        }
+
+                                    }
+                                }
+
+                                var groupMemberMapping = eventGroupMemberIds.FirstOrDefault( kvp => kvp.Key.Equals( sale.item_type, StringComparison.CurrentCultureIgnoreCase ) );
+                                if ( groupMemberMapping.Key.IsNotNullOrWhiteSpace() )
+                                {
+                                    var groupMemberId = groupMemberMapping.Value;
+                                    if ( groupMemberId != null )
+                                    {
+                                        var groupMemberIdInt = groupMemberId.ToIntSafe( 0 );
+                                        if ( groupMemberIdInt != 0 )
+                                        {
+                                            groupMember = new GroupMemberService( lookupContext ).Get( groupMemberIdInt );
                                         }
 
                                     }
@@ -404,7 +421,9 @@ namespace rocks.kfs.ClickBid
                                         Summary = summary,
                                         Guid = Guid.NewGuid(),
                                         CreatedDateTime = today,
-                                        ModifiedDateTime = today
+                                        ModifiedDateTime = today,
+                                        EntityTypeId = (groupMember != null) ? EntityTypeCache.GetId<GroupMember>() : null,
+                                        EntityId = groupMember?.Id
                                     }
                                 }
                                 };
