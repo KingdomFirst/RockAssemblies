@@ -21,6 +21,6 @@ namespace rocks.kfs.ClickBid.Guids
         /// <summary>
         /// ClickBid Account Map Defined Type
         /// </summary>
-        public const string ACCOUNT_MAP = "72BAD268-1C92-4FC3-A7B6-D2CD996E28DE";
+        public const string ACCOUNT_MAP = "DFDF3182-729E-45BA-967A-D5F116390449";
     }
 }
