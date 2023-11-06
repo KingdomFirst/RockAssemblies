@@ -38,10 +38,12 @@
       <HintPath>..\..\packages\CyberSource.Authentication.0.0.0.17\lib\AuthenticationSdk.dll</HintPath>
     </Reference>
     <Reference Include="BouncyCastle.Crypto, Version=1.9.0.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Portable.BouncyCastle.1.9.0\lib\net40\BouncyCastle.Crypto.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\BouncyCastle.1.8.5\lib\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="cybersource-rest-client-dotnet, Version=0.0.1.35, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CyberSource.Rest.Client.0.0.1.35\lib\cybersource-rest-client-dotnet.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\libs\cybersource-rest-client-dotnet.dll</HintPath>
     </Reference>
     <Reference Include="DotLiquid">
       <SpecificVersion>False</SpecificVersion>
@@ -155,10 +157,12 @@
     <PostBuildEvent>xcopy /Y /R "$(TargetPath)" "$(SolutionDir)RockWeb\bin"
 xcopy /Y /R "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)RockWeb\bin"
 xcopy /Y /R "$(TargetDir)cybersource-rest-client-dotnet.dll" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(TargetDir)cybersource-rest-client-dotnet.pdb" "$(SolutionDir)RockWeb\bin"
 xcopy /Y /R "$(TargetDir)AuthenticationSdk.dll" "$(SolutionDir)RockWeb\bin"
 xcopy /Y /R "$(TargetDir)jose-jwt.dll" "$(SolutionDir)RockWeb\bin"
 xcopy /Y /R "$(TargetDir)NLog.dll" "$(SolutionDir)RockWeb\bin"
-xcopy /Y /R "$(TargetDir)nunit.framework.dll" "$(SolutionDir)RockWeb\bin"</PostBuildEvent>
+xcopy /Y /R "$(TargetDir)nunit.framework.dll" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(TargetDir)BouncyCastle.Crypto.dll" "$(SolutionDir)RockWeb\bin"</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
