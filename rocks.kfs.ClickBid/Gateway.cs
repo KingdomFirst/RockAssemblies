@@ -371,7 +371,7 @@ namespace rocks.kfs.ClickBid
                                 if ( !personAlias.Result.HasValue )
                                 {
                                     var infoMessage = string.Format( "{0} ClickBid import skipped {1} {2}'s donation {3} for {4} because their record could not be found or created",
-                                        endDate.ToString( "d" ), sale.first_name, sale.last_name, generatedConfirmation, sale.item_name );
+                                        endDate.ToString( "d" ), sale.first_name, sale.last_name, generatedTransactionCode, sale.item_name );
                                     ExceptionLogService.LogException( new Exception( infoMessage ), null );
                                     continue;
                                 }
@@ -411,19 +411,19 @@ namespace rocks.kfs.ClickBid
                                         CurrencyTypeValueId = selectedCurrencyType.Id
                                     },
                                     TransactionDetails = new List<FinancialTransactionDetail>
-                                {
-                                    new FinancialTransactionDetail
                                     {
-                                        AccountId = (int)rockAccountId,
-                                        Amount = (decimal)sale.purchase_amount,
-                                        Summary = summary,
-                                        Guid = Guid.NewGuid(),
-                                        CreatedDateTime = today,
-                                        ModifiedDateTime = today,
-                                        EntityTypeId = (groupMember != null) ? EntityTypeCache.GetId<GroupMember>() : null,
-                                        EntityId = groupMember?.Id
+                                        new FinancialTransactionDetail
+                                        {
+                                            AccountId = (int)rockAccountId,
+                                            Amount = (decimal)sale.purchase_amount,
+                                            Summary = summary,
+                                            Guid = Guid.NewGuid(),
+                                            CreatedDateTime = today,
+                                            ModifiedDateTime = today,
+                                            EntityTypeId = (groupMember != null) ? EntityTypeCache.GetId<GroupMember>() : null,
+                                            EntityId = groupMember?.Id
+                                        }
                                     }
-                                }
                                 };
 
                                 newTransactions.Add( transaction );
@@ -441,12 +441,6 @@ namespace rocks.kfs.ClickBid
 
                     currentPage++;
                 }
-            }
-
-            if ( skippedTransactionCount > 0 )
-            {
-                ExceptionLogService.LogException( new Exception( string.Format( "{0} ClickBid import skipped downloading {1} transactions because they already exist",
-                    endDate.ToString( "d" ), skippedTransactionCount ) ), null );
             }
 
             if ( newTransactions.Any() )
@@ -479,6 +473,14 @@ namespace rocks.kfs.ClickBid
                     // by default Rock associates with the current person
                     rockContext.SaveChanges( disablePrePostProcessing: true );
                 }
+            }
+
+            if ( skippedTransactionCount > 0 )
+            {
+                var errorStr = string.Format( "{0} ClickBid import skipped downloading {1} transactions because they already exist. {2} transactions were downloaded.",
+                    ( startDate.ToString( "d" ) != endDate.ToString( "d" ) ) ? startDate.ToString( "d" ) + " - " + endDate.ToString( "d" ) : startDate.ToString( "d" ), skippedTransactionCount, newTransactions.Count );
+                ExceptionLogService.LogException( new Exception( errorStr ), null );
+                errorMessages.Add( errorStr );
             }
 
             if ( errorMessages.Any() )
