@@ -38,7 +38,7 @@ namespace rocks.kfs.ClickBid.Reporting
         private static int recordStatusPendingId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_PENDING.AsGuid() ).Id;
         private static int homePhoneValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_PHONE_TYPE_HOME ).Id;
         private static int homeLocationValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.GROUP_LOCATION_TYPE_HOME ).Id;
-        private static int searchKeyValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_SEARCH_KEYS_ALTERNATE_ID.AsGuid() ).Id;
+        private static int searchTypeAltIdValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_SEARCH_KEYS_ALTERNATE_ID.AsGuid() ).Id;
         private static int contributionTypeId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_TYPE_CONTRIBUTION ).Id;
 
         #region ClickBid API
@@ -132,7 +132,7 @@ namespace rocks.kfs.ClickBid.Reporting
         /// Finds or Creates the Rock person asynchronously.
         /// </summary>
         /// <param name="lookupContext">The lookup context.</param>
-        /// <param name="donation">The donation.</param>
+        /// <param name="sale">The Sale object from ClickBid.</param>
         /// <param name="connectionStatusId">The connection status identifier.</param>
         /// <param name="updatePrimaryEmail">Whether or not this method should update the primary email address on the person.</param>
         /// <returns></returns>
@@ -226,7 +226,7 @@ namespace rocks.kfs.ClickBid.Reporting
                             // add the search key
                             new PersonSearchKeyService( rockContext ).Add( new PersonSearchKey
                             {
-                                SearchTypeValueId = searchKeyValueId,
+                                SearchTypeValueId = searchTypeAltIdValueId,
                                 SearchValue = clickbidSearchKey,
                                 PersonAliasId = person.PrimaryAliasId
                             } );

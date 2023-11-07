@@ -254,7 +254,7 @@ namespace rocks.kfs.ClickBid
         }
 
         /// <summary>
-        /// Gets the payments that have been processed for any scheduled transactions
+        /// Gets the payments that have been processed for any ClickBid Sales
         /// </summary>
         /// <param name="gateway">The gateway.</param>
         /// <param name="startDate">The start date.</param>
@@ -269,6 +269,7 @@ namespace rocks.kfs.ClickBid
             var transactionLookup = new FinancialTransactionService( lookupContext );
             var eventsUrl = GetBaseUrl( gateway, "events", out errorMessage );
             var salesReportUrl = $"{eventsUrl}/##eventId##/sales-report";
+            // Other endpoints for future expansion possibility
             //var categoryUrl = $"{eventsUrl}/##eventId##/categories";
             //var bidderUrl = $"{eventsUrl}/##eventId##/bidders";
             //var itemUrl = $"{eventsUrl}/##eventId##/items";
@@ -323,14 +324,13 @@ namespace rocks.kfs.ClickBid
                     var salesResponse = JsonConvert.DeserializeObject<SalesResponse>( salesResult.ToStringSafe() );
                     if ( salesResponse != null && salesResponse.data.Any() && errorMessage.IsNullOrWhiteSpace() )
                     {
-                        // only process completed transactions with confirmation codes and within the date range
-                        foreach ( var sale in salesResponse.data.Where( d => d.won_by.Equals( "Donation" ) || d.won_by.Equals( "Top Bid" ) || d.won_by.Equals( "Qty" ) ) )
+                        foreach ( var sale in salesResponse.data )
                         {
-                            var generatedConfirmation = $"bidder_{sale.bidder_number}_item_{sale.item_number}_amt_{sale.purchase_amount}".Left( 50 );
+                            var generatedTransactionCode = $"bidder_{sale.bidder_number}_item_{sale.item_number}_amt_{sale.purchase_amount}".Left( 50 );
                             var transaction = transactionLookup.Queryable()
                                 .FirstOrDefault( t => t.FinancialGatewayId.HasValue &&
                                     t.FinancialGatewayId.Value == gateway.Id &&
-                                    t.TransactionCode == generatedConfirmation );
+                                    t.TransactionCode == generatedTransactionCode );
                             if ( transaction == null )
                             {
                                 // find or create this person asynchronously for performance
@@ -349,7 +349,6 @@ namespace rocks.kfs.ClickBid
                                         {
                                             rockAccountId = accountIdInt;
                                         }
-
                                     }
                                 }
 
@@ -364,7 +363,6 @@ namespace rocks.kfs.ClickBid
                                         {
                                             groupMember = new GroupMemberService( lookupContext ).Get( groupMemberIdInt );
                                         }
-
                                     }
                                 }
 
@@ -399,7 +397,7 @@ namespace rocks.kfs.ClickBid
                                 {
                                     TransactionDateTime = sale.checkout_time,
                                     ProcessedDateTime = sale.checkout_time,
-                                    TransactionCode = generatedConfirmation,
+                                    TransactionCode = generatedTransactionCode,
                                     Summary = summary,
                                     SourceTypeValueId = clickbidSourceType.Id,
                                     TransactionTypeValueId = contributionTypeId,
