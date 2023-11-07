@@ -36,11 +36,11 @@ namespace rocks.kfs.ClickBid.Migrations
             RockMigrationHelper.AddAttributeQualifier( "320FDA10-2118-4351-AD51-816AFE75AFDD", "valueprompt", "Group Member Id", "4E89CD23-11C7-475F-93F6-EA34DB6F0DEF" );
             RockMigrationHelper.AddAttributeQualifier( "441B3C84-FE8D-4C6C-8437-1B8036AC4A89", "allowhtml", "False", "67309A58-C044-495C-9469-A421EEE5D5F6" );
             RockMigrationHelper.AddAttributeQualifier( "441B3C84-FE8D-4C6C-8437-1B8036AC4A89", "customvalues", @"SELECT fa.Id as Value, CASE WHEN ggpa.Name IS NOT NULL THEN
-	        CONCAT(ggpa.name, ' > ',gpa.Name,' > ',pa.Name,' > ', fa.Name)
+	        CONCAT(ggpa.name, '' > '',gpa.Name,'' > '',pa.Name,'' > '', fa.Name)
         WHEN gpa.Name IS NOT NULL THEN
-	        CONCAT(gpa.Name,' > ',pa.Name,' > ', fa.Name)
+	        CONCAT(gpa.Name,'' > '',pa.Name,'' > '', fa.Name)
         WHEN pa.Name IS NOT NULL THEN
-	        CONCAT(pa.Name,' > ', fa.Name)
+	        CONCAT(pa.Name,'' > '', fa.Name)
         ELSE
 	        fa.Name 
         END as Text 
@@ -49,11 +49,11 @@ FROM FinancialAccount fa
 	LEFT JOIN FinancialAccount gpa ON pa.ParentAccountId = gpa.Id 
 	LEFT JOIN FinancialAccount ggpa ON gpa.ParentAccountId = ggpa.Id
 ORDER BY CASE WHEN ggpa.Name IS NOT NULL THEN
-	        CONCAT(ggpa.name, ' > ',gpa.Name,' > ',pa.Name,' > ', fa.Name)
+	        CONCAT(ggpa.name, '' > '',gpa.Name,'' > '',pa.Name,'' > '', fa.Name)
         WHEN gpa.Name IS NOT NULL THEN
-	        CONCAT(gpa.Name,' > ',pa.Name,' > ', fa.Name)
+	        CONCAT(gpa.Name,'' > '',pa.Name,'' > '', fa.Name)
         WHEN pa.Name IS NOT NULL THEN
-	        CONCAT(pa.Name,' > ', fa.Name)
+	        CONCAT(pa.Name,'' > '', fa.Name)
         ELSE
 	        fa.Name 
         END", "471EFB41-142C-4092-BCDC-670B22649804" );
