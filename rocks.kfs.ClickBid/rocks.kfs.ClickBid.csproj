@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E491CE70-475F-4A2E-88B9-13D0FAEF6715}</ProjectGuid>
+    <ProjectGuid>{84237621-CC75-45A7-B633-D0C7B4CC476B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>rocks.kfs.Reach</RootNamespace>
-    <AssemblyName>rocks.kfs.Reach</AssemblyName>
+    <RootNamespace>rocks.kfs.ClickBid</RootNamespace>
+    <AssemblyName>rocks.kfs.ClickBid</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -62,9 +62,6 @@
     <Reference Include="Rock.Common">
       <HintPath>..\..\RockWeb\Bin\Rock.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Rock.Enums">
-      <HintPath>..\..\RockWeb\Bin\Rock.Enums.dll</HintPath>
-    </Reference>
     <Reference Include="Rock.Lava.Shared">
       <HintPath>..\..\RockWeb\Bin\Rock.Lava.Shared.dll</HintPath>
     </Reference>
@@ -82,12 +79,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gateway.cs" />
+    <Compile Include="Guids\SystemGuid.cs" />
+    <Compile Include="Migrations\001_CreateDefinedType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reporting\Api.cs" />
-    <Compile Include="Reporting\Project.cs" />
-    <Compile Include="Reporting\Category.cs" />
-    <Compile Include="Reporting\Donation.cs" />
-    <Compile Include="Reporting\Supporter.cs" />
+    <Compile Include="Reporting\SalesResponse.cs" />
+    <Compile Include="Reporting\Sale.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

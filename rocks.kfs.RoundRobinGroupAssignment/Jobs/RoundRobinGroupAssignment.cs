@@ -301,13 +301,13 @@ namespace rocks.kfs.RoundRobinGroupAssignment.Jobs
                         }
                         else
                         {
-                            if ( person.PrimaryCampusId == null )
+                            if ( useGroupCampus && personCampusId == null )
                             {
                                 errorMessages.Add( string.Format( "{0} ({1}) does not have a campus set and there are no defaults set on the job. Please try again.", person.FullName, person.Id ) );
                             }
                             else if ( groupToAddTo != null )
                             {
-                                errorMessages.Add( string.Format( "{0} ({1}) was added with a family member or is already in a group assignment. You may ignore this error or consider refining your data view to single members of household. ", person.FullName, person.Id ) );
+                                errorMessages.Add( string.Format( "{0} ({1}) is already in a group assignment or was added with a family member. You may ignore this error or consider refining your data view to single members of household. ", person.FullName, person.Id ) );
                             }
                             else
                             {

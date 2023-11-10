@@ -20,12 +20,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "rocks.kfs.CustomGroupCommunication" )]
-[assembly: AssemblyProduct( "rocks.kfs.CustomGroupCommunication" )]
+[assembly: AssemblyTitle( "rocks.kfs.ClickBid" )]
+[assembly: AssemblyProduct( "rocks.kfs.ClickBid" )]
 [assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2023" )]
 
 // Auto increment assembly versions
-[assembly: AssemblyVersion( "1.1.*" )]
+[assembly: AssemblyVersion( "1.0.*" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
@@ -33,4 +33,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible( false )]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid( "CB69A1A9-DFD2-40D0-829B-AF9558DEBFD2" )]
+[assembly: Guid("83932F69-DB1B-43DC-AADA-716485198794")]
