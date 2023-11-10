@@ -99,6 +99,7 @@ namespace rocks.kfs.Edify.Communications.Transport
             }
 
             var toEmail = rockEmailMessage.GetRecipients();
+            
             toEmail
                 .Where( r => r.To.Trim() != string.Empty )
                 .ToList()

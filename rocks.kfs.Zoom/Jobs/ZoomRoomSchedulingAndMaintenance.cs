@@ -15,28 +15,29 @@
 // </copyright>
 //
 using Ical.Net;
+using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
-using Ical.Net.Serialization.iCalendar.Serializers;
+using Ical.Net.Serialization;
 using Quartz;
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
+using Rock.Jobs;
 using Rock.Model;
 using Rock.Web.Cache;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Text;
 
 using com.bemaservices.RoomManagement.Model;
+using rocks.kfs.Zoom.Enums;
 using rocks.kfs.Zoom.Model;
 using rocks.kfs.Zoom.ZoomGuid;
+using ZoomDotNetFramework;
 using ZoomDotNetFramework.Entities;
 using ZoomDotNetFramework.Enums;
-using rocks.kfs.Zoom.Enums;
-using System.Text;
-using Rock.Jobs;
-using ZoomDotNetFramework;
 
 namespace rocks.kfs.Zoom.Jobs
 {
@@ -258,7 +259,7 @@ namespace rocks.kfs.Zoom.Jobs
                             {
                                 // Build the iCal string as it is a required property on the Schedule for Room Reservation block to display the Reservation
                                 var meetingLocalTime = meeting.Start_Time.UtcDateTime.ToLocalTime();
-                                var calendarEvent = new Event
+                                var calendarEvent = new CalendarEvent
                                 {
                                     DtStart = new CalDateTime( meetingLocalTime ),
                                     DtEnd = new CalDateTime( meetingLocalTime.AddMinutes( meeting.Duration ) ),

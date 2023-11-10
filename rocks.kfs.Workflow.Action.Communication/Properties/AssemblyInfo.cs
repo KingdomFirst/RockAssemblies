@@ -1,4 +1,4 @@
-﻿// <copyright>
+// <copyright>
 // Copyright 2022 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
