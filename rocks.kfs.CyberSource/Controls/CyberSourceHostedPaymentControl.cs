@@ -134,22 +134,58 @@ namespace rocks.kfs.CyberSource.Controls
         'invalid': {{ 'color': '#a94442' }}
     }};
 
+    var cardIcons = {{
+      visa: 'fab fa-cc-visa', 
+      mastercard: 'fab fa-cc-mastercard', 
+      amex: 'fab fa-cc-amex',
+      //maestro: 'fab fa-cc-maestro',
+      discover: 'fab fa-cc-discover',
+      dinersclub: 'fab fa-cc-diners-club',
+      jcb: 'fab fa-cc-jcb'
+    }};
+
     // setup
     var flex = new Flex(captureContext);
     var microform = flex.microform({{ styles: myStyles }});
 
+    var number, securityCode;
+
     function initCyberSourceMicroFormFields() {{
         if ($('.cybersource-payment-inputs .js-credit-card-input').length == 0) {{
             // control hasn't been rendered so skip
+            if (number != undefined && securityCode != undefined) {{
+                number.unload();
+                securityCode.unload();
+            }}
             return;
         }}
-
-
-        var number = microform.createField('number', {{ placeholder: '0000 0000 0000 0000' }});
-        var securityCode = microform.createField('securityCode', {{ placeholder: 'CVV' }});
+        if (number == undefined && securityCode == undefined) {{
+            number = microform.createField('number', {{ placeholder: '0000 0000 0000 0000' }});
+            securityCode = microform.createField('securityCode');
+        }}
 
         number.load('.cybersource-payment-inputs .js-credit-card-input');
         securityCode.load('.cybersource-payment-inputs .js-credit-card-cvv-input');
+
+        number.on('error', function(data) {{
+            var $errorsOutput = $('.js-validation-message');
+
+            console.error(data);
+            $errorsOutput.text(data.message)
+            $errorsOutput.parent().show();
+        }});
+
+        var cardIcon = document.querySelector('#cardDisplay');
+        var cardSecurityCodeLabel = document.querySelector('label.credit-card-cvv-label');
+
+        number.on('change', function(data) {{
+          if (data.card.length === 1) {{
+            cardIcon.className = 'fa-2x ' + cardIcons[data.card[0].name];
+            cardSecurityCodeLabel.textContent = data.card[0].securityCode.name;
+          }} else {{
+            cardIcon.className = 'fa-2x fas fa-credit-card';
+          }}
+        }});
     }}
 
     function submitCyberSourceMicroFormInfo() {{
@@ -204,7 +240,8 @@ namespace rocks.kfs.CyberSource.Controls
                 "DINERSCLUB",
                 "JCB",
                 "CUP",
-                "CARTESBANCAIRES"
+                "CARTESBANCAIRES",
+                "CARNET"
             };
 
             string clientVersion = "v2.0";
@@ -358,23 +395,62 @@ namespace rocks.kfs.CyberSource.Controls
             _gatewayCreditCardContainer = new Panel() { ID = "_gatewayCreditCardContainer", CssClass = "gateway-creditcard-container gateway-payment-container js-gateway-creditcard-container" };
             pnlPaymentInputs.Controls.Add( _gatewayCreditCardContainer );
 
+            var divFormGroupCC = new HtmlGenericControl( "div" );
+            divFormGroupCC.AddCssClass( "form-group position-relative" );
+            _gatewayCreditCardContainer.Controls.Add( divFormGroupCC );
+
+            var lblCreditCardNumber = new HtmlGenericControl( "label" );
+            lblCreditCardNumber.InnerText = "Card Number";
+            lblCreditCardNumber.AddCssClass( "control-label" );
+            divFormGroupCC.Controls.Add( lblCreditCardNumber );
+
             _divCreditCardNumber = new HtmlGenericControl( "div" );
+            _divCreditCardNumber.ID = "divCC";
             _divCreditCardNumber.AddCssClass( "form-control js-credit-card-input iframe-input credit-card-input" );
-            _gatewayCreditCardContainer.Controls.Add( _divCreditCardNumber );
+            divFormGroupCC.Controls.Add( _divCreditCardNumber );
+
+            var iconHtml = new HtmlGenericControl( "i" );
+            iconHtml.ID = "cardDisplay";
+            iconHtml.ClientIDMode = ClientIDMode.Static;
+            iconHtml.EnableViewState = false;
+            iconHtml.Attributes["style"] = "position: absolute; right: 10px; bottom: 3px;";
+            divFormGroupCC.Controls.Add( iconHtml );
 
             _divCreditCardBreak = new HtmlGenericControl( "div" );
             _divCreditCardBreak.AddCssClass( "break" );
             _gatewayCreditCardContainer.Controls.Add( _divCreditCardBreak );
 
+            var divRow = new HtmlGenericControl( "div" );
+            divRow.AddCssClass( "row" );
+            _gatewayCreditCardContainer.Controls.Add( divRow );
+
+            var divRowCol1 = new HtmlGenericControl( "div" );
+            divRowCol1.AddCssClass( "col-xs-6 exp-col" );
+            divRow.Controls.Add( divRowCol1 );
+
             _mypCreditCardExp = new MonthYearPicker();
             _mypCreditCardExp.MinimumYear = RockDateTime.Now.Year;
             _mypCreditCardExp.MaximumYear = _mypCreditCardExp.MinimumYear + 15;
-            //_mypCreditCardExp.Label = "Expiration Date";
-            _gatewayCreditCardContainer.Controls.Add( _mypCreditCardExp );
+            _mypCreditCardExp.Label = "Expiration Date";
+            divRowCol1.Controls.Add( _mypCreditCardExp );
+
+            var divRowCol2 = new HtmlGenericControl( "div" );
+            divRowCol2.AddCssClass( "col-xs-6 cvv-col" );
+            divRow.Controls.Add( divRowCol2 );
+
+            var divFormGroupCVV = new HtmlGenericControl( "div" );
+            divFormGroupCVV.AddCssClass( "form-group" );
+            divRowCol2.Controls.Add( divFormGroupCVV );
+
+            var lblCreditCardCvv = new HtmlGenericControl( "label" );
+            lblCreditCardCvv.InnerText = "Security Code";
+            lblCreditCardCvv.AddCssClass( "control-label credit-card-cvv-label" );
+            divFormGroupCVV.Controls.Add( lblCreditCardCvv );
 
             _divCreditCardCVV = new HtmlGenericControl( "div" );
-            _divCreditCardCVV.AddCssClass( "form-control js-credit-card-cvv-input iframe-input credit-card-cvv-input" );
-            _gatewayCreditCardContainer.Controls.Add( _divCreditCardCVV );
+            _divCreditCardCVV.ID = "divCVV";
+            _divCreditCardCVV.AddCssClass( "form-control js-credit-card-cvv-input iframe-input credit-card-cvv-input input-width-sm" );
+            divFormGroupCVV.Controls.Add( _divCreditCardCVV );
 
             Controls.Add( pnlPaymentInputs );
 
