@@ -106,6 +106,14 @@ namespace rocks.kfs.CyberSource
         DefaultValue = null,
         Order = 7 )]
 
+    [BooleanField(
+        "Capture Payment",
+        Key = AttributeKey.CapturePayment,
+        Description = "Indicates whether to also include a capture in the submitted authorization request or not. If not, transactions will have to be settled.",
+        IsRequired = true,
+        DefaultBooleanValue = false,
+        Order = 8 )]
+
     #endregion
 
     /// <summary>
@@ -135,6 +143,7 @@ namespace rocks.kfs.CyberSource
             public const string APISecret = "APISecret";
             public const string BatchPrefix = "BatchPrefix";
             public const string Mode = "Mode";
+            public const string CapturePayment = "CapturePayment";
 
             /// <summary>
             /// The credit card fee coverage percentage
@@ -313,8 +322,14 @@ namespace rocks.kfs.CyberSource
                 IpAddress: paymentInfo.IPAddress
                 );
 
+            bool processingInformationCapture = financialGateway.GetAttributeValue( AttributeKey.CapturePayment ).AsBoolean();
+            Ptsv2paymentsProcessingInformation processingInformation = new Ptsv2paymentsProcessingInformation(
+                Capture: processingInformationCapture
+           );
+
             var requestObj = new CreatePaymentRequest(
                 ClientReferenceInformation: clientReferenceInformation,
+                ProcessingInformation: processingInformation,
                 OrderInformation: orderInformation,
                 TokenInformation: tokenInformation,
                 DeviceInformation: deviceInformation
@@ -348,7 +363,7 @@ namespace rocks.kfs.CyberSource
             }
 
             var transaction = new FinancialTransaction();
-            transaction.TransactionCode = chargeResult.ProcessorInformation.TransactionId;
+            transaction.TransactionCode = chargeResult.Id;
             transaction.ForeignKey = chargeResult.BuyerInformation?.MerchantCustomerId;
 
             //Customer customerInfo = this.GetCustomerVaultQueryResponse( financialGateway, customerId )?.CustomerVault.Customer;
@@ -478,8 +493,127 @@ namespace rocks.kfs.CyberSource
         /// <returns></returns>
         public override FinancialTransaction Credit( FinancialTransaction origTransaction, decimal amount, string comment, out string errorMessage )
         {
-            errorMessage = "This gateway does not support crediting new transactions. Transactions should be credited through the CyberSource interface.";
-            return null;
+            errorMessage = string.Empty;
+
+            var financialGateway = origTransaction?.FinancialGateway ?? new FinancialGatewayService( new RockContext() ).Get( origTransaction.FinancialGatewayId ?? 0 );
+
+            if ( financialGateway == null )
+            {
+                throw new NullFinancialGatewayException();
+            }
+
+            if ( origTransaction.TransactionCode.IsNullOrWhiteSpace() )
+            {
+                errorMessage = "Invalid transaction code";
+                return null;
+            }
+
+            string orderInformationAmountDetailsCurrency = "USD";
+            Ptsv2paymentsidcapturesOrderInformationAmountDetails orderInformationAmountDetails = new Ptsv2paymentsidcapturesOrderInformationAmountDetails(
+                TotalAmount: amount.ToString(),
+                Currency: orderInformationAmountDetailsCurrency
+           );
+
+            Ptsv2paymentsidrefundsOrderInformation orderInformation = new Ptsv2paymentsidrefundsOrderInformation(
+                AmountDetails: orderInformationAmountDetails
+           );
+
+            var refundRequestObj = new RefundPaymentRequest(
+                OrderInformation: orderInformation
+           );
+
+            Ptsv2paymentsidreversalsReversalInformationAmountDetails reversalInformationAmountDetails = new Ptsv2paymentsidreversalsReversalInformationAmountDetails(
+                TotalAmount: origTransaction.TotalAmount.ToString(),
+                Currency: orderInformationAmountDetailsCurrency
+            );
+
+            Ptsv2paymentsidreversalsReversalInformation reversalInformation = new Ptsv2paymentsidreversalsReversalInformation(
+                AmountDetails: reversalInformationAmountDetails,
+                Reason: comment
+           );
+
+            var reversalRequestObj = new AuthReversalRequest(
+                ReversalInformation: reversalInformation
+           );
+
+            var applications = new List<TssV2TransactionsGet200ResponseApplicationInformationApplications>();
+            PtsV2PaymentsRefundPost201Response refundResponse = null;
+            PtsV2PaymentsReversalsPost201Response reversalResponse = null;
+            TssV2TransactionsGet200Response transactionDetail = GetTransactionDetailResponse( financialGateway, origTransaction.TransactionCode );
+            var configDictionary = new Configuration().GetConfiguration( financialGateway );
+            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            if ( transactionDetail != null && transactionDetail.ApplicationInformation != null )
+            {
+                applications.AddRange( transactionDetail.ApplicationInformation.Applications );
+                if ( transactionDetail.Links != null && transactionDetail.Links.RelatedTransactions != null && transactionDetail.Links.RelatedTransactions.Any() )
+                {
+                    foreach ( var relatedTransactionLink in transactionDetail.Links.RelatedTransactions )
+                    {
+                        var relatedTransaction = GetTransactionDetailResponse( financialGateway, relatedTransactionLink.Href.Substring( relatedTransactionLink.Href.LastIndexOf( "/" ) + 1 ) );
+                        if ( relatedTransaction != null && relatedTransaction.ApplicationInformation != null )
+                        {
+                            applications.AddRange( relatedTransaction.ApplicationInformation.Applications );
+                        }
+                    }
+                }
+            }
+            var attemptType = "Refund";
+            try
+            {
+                if ( applications.Any( a => a.Name == "ics_bill" && a.ReasonCode == "100" ) )
+                {
+                    var apiInstance = new RefundApi( clientConfig );
+                    refundResponse = apiInstance.RefundPayment( refundRequestObj, origTransaction.TransactionCode );
+                }
+                else
+                {
+                    attemptType = "Reversal";
+                    var apiInstance = new ReversalApi( clientConfig );
+                    reversalResponse = apiInstance.AuthReversal( origTransaction.TransactionCode, reversalRequestObj );
+                }
+            }
+            catch ( Exception e )
+            {
+                errorMessage += "Exception on calling the API : " + e.Message;
+
+                try
+                {
+                    if ( attemptType == "Refund" )
+                    {
+                        attemptType = "Reversal";
+                        var apiInstance = new ReversalApi( clientConfig );
+                        reversalResponse = apiInstance.AuthReversal( origTransaction.TransactionCode, reversalRequestObj );
+                    }
+                    else
+                    {
+                        attemptType = "Refund";
+                        var apiInstance = new RefundApi( clientConfig );
+                        refundResponse = apiInstance.RefundPayment( refundRequestObj, origTransaction.TransactionCode );
+                    }
+                }
+                catch ( Exception ie )
+                {
+                    errorMessage += "Exception on calling the API : " + ie.Message;
+                }
+            }
+
+            if ( reversalResponse == null && ( refundResponse == null || refundResponse.Status != "PENDING" ) || refundResponse == null && ( reversalResponse == null || ( reversalResponse.Status != "REVERSED" && reversalResponse.Status != "PARTIALLY_REVERSED" ) ) )
+            {
+                if ( refundResponse == null && reversalResponse == null )
+                {
+                    return null;
+                }
+                ExceptionLogService.LogException( $"Error processing CyberSource transaction. Result Code:  {refundResponse?.Status ?? reversalResponse?.Status})." );
+            }
+
+            // return a refund transaction
+            var transaction = new FinancialTransaction();
+            transaction.TransactionCode = refundResponse?.Id ?? reversalResponse?.Id;
+            if ( attemptType == "Reversal" && origTransaction.TotalAmount != amount )
+            {
+                transaction.Summary += "Due to Authorization Reversal partial amounts are not supported.";
+            }
+            return transaction;
         }
 
         /// <summary>
