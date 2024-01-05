@@ -279,38 +279,13 @@ namespace rocks.kfs.CyberSource
             Ptsv2paymentsClientReferenceInformation clientReferenceInformation = new Ptsv2paymentsClientReferenceInformation(
                 //Code: clientReferenceInformationCode,
                 Comments: description
-            );
-
-            Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator paymentProcessingInformationOptionsInitiator = new Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator(
-                CredentialStoredOnFile: true
-            );
-
-            Ptsv2paymentsProcessingInformationAuthorizationOptions paymentProcessingInformationAuthorization = new Ptsv2paymentsProcessingInformationAuthorizationOptions(
-                Initiator: paymentProcessingInformationOptionsInitiator,
-                IgnoreAvsResult: true
-            );
-
-            Ptsv2paymentsPaymentInformationCustomer paymentInformationCustomer = new Ptsv2paymentsPaymentInformationCustomer(
-                Id: customerId
-            );
-
-            Ptsv2paymentsPaymentInformation paymentInformation = new Ptsv2paymentsPaymentInformation(
-                Customer: paymentInformationCustomer
-            );
+           );
 
             string defaultCurrency = "USD";
             Ptsv2paymentsOrderInformationAmountDetails orderInformationAmountDetails = new Ptsv2paymentsOrderInformationAmountDetails(
                 TotalAmount: amount.ToString( "0.00" ),
                 Currency: DefinedValueCache.Get( referencedPaymentInfo.AmountCurrencyCodeValueId.ToIntSafe( -1 ) )?.Value ?? defaultCurrency
-            );
-
-            bool processingInformationCapture = financialGateway.GetAttributeValue( AttributeKey.CapturePayment ).AsBoolean();
-            Ptsv2paymentsProcessingInformation paymentProcessingInformation = new Ptsv2paymentsProcessingInformation(
-                 ActionList: new List<string> { "TOKEN_CREATE" },
-                 ActionTokenTypes: new List<string> { "customer", "paymentInstrument" },
-                 Capture: processingInformationCapture, //Capture: amount > 0,
-                 AuthorizationOptions: paymentProcessingInformationAuthorization
-             );
+           );
 
             Ptsv2paymentsOrderInformationBillTo orderInformationBillTo = new Ptsv2paymentsOrderInformationBillTo(
                 FirstName: paymentInfo.FirstName,
@@ -322,48 +297,43 @@ namespace rocks.kfs.CyberSource
                 Country: paymentInfo.Country,
                 Email: paymentInfo.Email,
                 PhoneNumber: paymentInfo.Phone
-            );
+           );
 
             Ptsv2paymentsOrderInformation orderInformation = new Ptsv2paymentsOrderInformation(
                 AmountDetails: orderInformationAmountDetails,
                 BillTo: orderInformationBillTo
-            );
+           );
 
             Ptsv2paymentsTokenInformation tokenInformation = new Ptsv2paymentsTokenInformation(
                 TransientTokenJwt: tokenizerToken
-            );
+           );
 
+            if ( customerId.IsNotNullOrWhiteSpace() )
+            {
+                //queryParameters.Add( "customer_vault_id", customerId );
+                //when customers are setup do something different here
+            }
+            else
+            {
+                // queryParameters.Add( "payment_token", tokenizerToken );
+            }
 
             Ptsv2paymentsDeviceInformation deviceInformation = new Ptsv2paymentsDeviceInformation(
                 IpAddress: paymentInfo.IPAddress
-            );
+                );
 
-            CreatePaymentRequest requestObj = null;
+            bool processingInformationCapture = financialGateway.GetAttributeValue( AttributeKey.CapturePayment ).AsBoolean();
+            Ptsv2paymentsProcessingInformation processingInformation = new Ptsv2paymentsProcessingInformation(
+                Capture: processingInformationCapture
+           );
 
-            //if ( customerId.IsNotNullOrWhiteSpace() )
-            //{
-            //    paymentProcessingInformation.ActionTokenTypes = new List<string> { "paymentInstrument" };
-
-            //    requestObj = new CreatePaymentRequest(
-            //        ProcessingInformation: paymentProcessingInformation,
-            //        PaymentInformation: paymentInformation,
-            //        ClientReferenceInformation: clientReferenceInformation,
-            //        OrderInformation: orderInformation,
-            //        TokenInformation: tokenInformation,
-            //        DeviceInformation: deviceInformation
-            //    );
-            //}
-            //else
-            //{
-            //queryParameters.Add( "payment_token", tokenizerToken );
-            requestObj = new CreatePaymentRequest(
-                ProcessingInformation: paymentProcessingInformation,
+            var requestObj = new CreatePaymentRequest(
                 ClientReferenceInformation: clientReferenceInformation,
+                ProcessingInformation: processingInformation,
                 OrderInformation: orderInformation,
                 TokenInformation: tokenInformation,
                 DeviceInformation: deviceInformation
-            );
-            //}
+           );
 
             PtsV2PaymentsPost201Response chargeResult = null;
             try
@@ -394,11 +364,7 @@ namespace rocks.kfs.CyberSource
 
             var transaction = new FinancialTransaction();
             transaction.TransactionCode = chargeResult.Id;
-            transaction.ForeignKey = chargeResult.PaymentInformation?.Customer?.Id;
-            if ( transaction.ForeignKey == null )
-            {
-                transaction.ForeignKey = chargeResult.TokenInformation?.Customer?.Id;
-            }
+            transaction.ForeignKey = chargeResult.BuyerInformation?.MerchantCustomerId;
 
             //Customer customerInfo = this.GetCustomerVaultQueryResponse( financialGateway, customerId )?.CustomerVault.Customer;
             TssV2TransactionsGet200Response transactionDetail = GetTransactionDetailResponse( financialGateway, chargeResult.Id );
@@ -453,7 +419,7 @@ namespace rocks.kfs.CyberSource
         /// <param name="financialPaymentDetail">The financial payment detail.</param>
         private void UpdateFinancialPaymentDetail( TssV2TransactionsGet200Response transactionDetail, FinancialPaymentDetail financialPaymentDetail )
         {
-            financialPaymentDetail.GatewayPersonIdentifier = transactionDetail.TokenInformation?.Customer?.Id;
+            financialPaymentDetail.GatewayPersonIdentifier = transactionDetail.BuyerInformation.MerchantCustomerId;
 
             string paymentType = transactionDetail.PaymentInformation.PaymentType.Type;
             if ( paymentType == "credit card" )
@@ -822,42 +788,12 @@ namespace rocks.kfs.CyberSource
                 referencePaymentInfo.ReferenceNumber = cyberSourcePaymentControl.PaymentInfoToken;
                 //referencePaymentInfo.InitialCurrencyTypeValue = cyberSourcePaymentControl.CurrencyTypeValue;
             }
-            // no ach support for now, so hard coded to CC instead of from control.
-            referencePaymentInfo.InitialCurrencyTypeValue = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.CURRENCY_TYPE_CREDIT_CARD );
         }
 
         public string CreateCustomerAccount( FinancialGateway financialGateway, ReferencePaymentInfo paymentInfo, out string errorMessage )
         {
-            errorMessage = string.Empty;
-
-            if ( financialGateway == null )
-            {
-                throw new NullFinancialGatewayException();
-            }
-
-            Tmsv2customersBuyerInformation buyerInformation = new Tmsv2customersBuyerInformation(
-                MerchantCustomerID: paymentInfo.FinancialPersonSavedAccountId?.ToString(),
-                Email: paymentInfo.Email
-           );
-
-            var requestObj = new PostCustomerRequest(
-                BuyerInformation: buyerInformation
-           );
-
-            try
-            {
-                var configDictionary = new Configuration().GetConfiguration( financialGateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
-
-                var apiInstance = new CustomerApi( clientConfig );
-                TmsV2CustomersResponse result = apiInstance.PostCustomer( requestObj );
-                return result.Id;
-            }
-            catch ( Exception e )
-            {
-                errorMessage += "Exception on calling the API : " + e.Message;
-                return null;
-            }
+            errorMessage = "";
+            return "12345";
         }
 
         public DateTime GetEarliestScheduledStartDate( FinancialGateway financialGateway )
