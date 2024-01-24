@@ -22,6 +22,11 @@ namespace rocks.kfs.StepsToCare
     {
         public static void AutoAssignWorkers( CareNeed careNeed, bool roundRobinOnly = false, bool childAssignment = false, bool autoAssignWorker = false, bool autoAssignWorkerGeofence = false, string loadBalanceType = "Exclusive", Guid leaderRoleGuid = new Guid(), bool enableLogging = false )
         {
+            AutoAssignWorkers( careNeed, roundRobinOnly, childAssignment, autoAssignWorker, autoAssignWorkerGeofence, loadBalanceType, new List<Guid> { leaderRoleGuid }, enableLogging );
+        }
+
+        public static void AutoAssignWorkers( CareNeed careNeed, bool roundRobinOnly = false, bool childAssignment = false, bool autoAssignWorker = false, bool autoAssignWorkerGeofence = false, string loadBalanceType = "Exclusive", List<Guid> leaderRoleGuids = null, bool enableLogging = false )
+        {
             var rockContext = new RockContext();
 
             var careNeedService = new CareNeedService( rockContext );
@@ -367,42 +372,44 @@ namespace rocks.kfs.StepsToCare
             }
 
             // auto assign Small Group Leader by Role
-            //var leaderRoleGuid = GetAttributeValue( AttributeKey.GroupTypeAndRole ).AsGuidOrNull() ?? Guid.Empty;
-            var leaderRole = new GroupTypeRoleService( rockContext ).Get( leaderRoleGuid );
-            if ( enableLogging )
+            foreach ( var leaderRoleGuid in leaderRoleGuids )
             {
-                LogEvent( null, "AutoAssignWorkers", string.Format( "Care Need Guid: {0}, Leader Role Guid: {1}, Leader Role: {2}", careNeed.Guid, leaderRoleGuid, leaderRole.Id ), "Get Leader Role" );
-            }
-
-            if ( leaderRole != null && !roundRobinOnly )
-            {
-                var groupMemberService = new GroupMemberService( rockContext );
-                var inGroups = groupMemberService.GetByPersonId( careNeed.PersonAlias.PersonId ).Where( gm => gm.Group != null && gm.Group.IsActive && !gm.Group.IsArchived && gm.Group.GroupTypeId == leaderRole.GroupTypeId && !gm.IsArchived && gm.GroupMemberStatus == GroupMemberStatus.Active ).Select( gm => gm.GroupId );
-
-                if ( inGroups.Any() )
+                var leaderRole = new GroupTypeRoleService( rockContext ).Get( leaderRoleGuid );
+                if ( enableLogging )
                 {
-                    if ( enableLogging )
+                    LogEvent( null, "AutoAssignWorkers", string.Format( "Care Need Guid: {0}, Leader Role Guid: {1}, Leader Role: {2}", careNeed.Guid, leaderRoleGuid, leaderRole.Id ), "Get Leader Role" );
+                }
+
+                if ( leaderRole != null && !roundRobinOnly )
+                {
+                    var groupMemberService = new GroupMemberService( rockContext );
+                    var inGroups = groupMemberService.GetByPersonId( careNeed.PersonAlias.PersonId ).Where( gm => gm.Group != null && gm.Group.IsActive && !gm.Group.IsArchived && gm.Group.GroupTypeId == leaderRole.GroupTypeId && !gm.IsArchived && gm.GroupMemberStatus == GroupMemberStatus.Active ).Select( gm => gm.GroupId );
+
+                    if ( inGroups.Any() )
                     {
-                        LogEvent( null, "AutoAssignWorkers", string.Format( "Care Need Guid: {0}, In Groups Count: {1}, leaderRole.GroupTypeId: {2}", careNeed.Guid, inGroups.Count(), leaderRole.GroupTypeId ), "In Small Groups" );
-                    }
-                    var groupLeaders = groupMemberService.GetByGroupRoleId( leaderRole.Id ).Where( gm => inGroups.Contains( gm.GroupId ) && !gm.IsArchived && gm.GroupMemberStatus == GroupMemberStatus.Active );
-                    foreach ( var member in groupLeaders )
-                    {
-                        if ( !addedWorkerAliasIds.Contains( member.Person.PrimaryAliasId ) && careAssigneeService.GetByPersonAliasAndCareNeed( member.Person.PrimaryAliasId, careNeed.Id ) == null && member.PersonId != careNeed.PersonAlias.Person.Id )
+                        if ( enableLogging )
                         {
-                            var careAssignee = new AssignedPerson { Id = 0 };
-                            careAssignee.CareNeed = careNeed;
-                            careAssignee.PersonAliasId = member.Person.PrimaryAliasId;
-
-                            careAssigneeService.Add( careAssignee );
-                            addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
+                            LogEvent( null, "AutoAssignWorkers", string.Format( "Care Need Guid: {0}, In Groups Count: {1}, leaderRole.GroupTypeId: {2}", careNeed.Guid, inGroups.Count(), leaderRole.GroupTypeId ), "In Small Groups" );
                         }
-                    }
-                    if ( enableLogging )
-                    {
-                        LogEvent( null, "AutoAssignWorkers", string.Format( "Care Need Guid: {0}, groupLeaders Count: {1} addedWorkerAliasIds Count: {2}", careNeed.Guid, groupLeaders.Count(), addedWorkerAliasIds.Count() ), "In Small Groups, Leader Count" );
-                    }
+                        var groupLeaders = groupMemberService.GetByGroupRoleId( leaderRole.Id ).Where( gm => inGroups.Contains( gm.GroupId ) && !gm.IsArchived && gm.GroupMemberStatus == GroupMemberStatus.Active );
+                        foreach ( var member in groupLeaders )
+                        {
+                            if ( !addedWorkerAliasIds.Contains( member.Person.PrimaryAliasId ) && careAssigneeService.GetByPersonAliasAndCareNeed( member.Person.PrimaryAliasId, careNeed.Id ) == null && member.PersonId != careNeed.PersonAlias.Person.Id )
+                            {
+                                var careAssignee = new AssignedPerson { Id = 0 };
+                                careAssignee.CareNeed = careNeed;
+                                careAssignee.PersonAliasId = member.Person.PrimaryAliasId;
 
+                                careAssigneeService.Add( careAssignee );
+                                addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
+                            }
+                        }
+                        if ( enableLogging )
+                        {
+                            LogEvent( null, "AutoAssignWorkers", string.Format( "Care Need Guid: {0}, groupLeaders Count: {1} addedWorkerAliasIds Count: {2}", careNeed.Guid, groupLeaders.Count(), addedWorkerAliasIds.Count() ), "In Small Groups, Leader Count" );
+                        }
+
+                    }
                 }
             }
             rockContext.SaveChanges();

@@ -78,9 +78,10 @@ namespace rocks.kfs.StepsToCare.Jobs
         Description = "Page used to populate 'LinkedPages.CareDetail' lava field in notification.",
         Key = AttributeKey.CareDetailPage )]
 
-    [GroupRoleField( null, "Group Type and Role",
-        Description = "Select the group Type and Role of the leader you would like auto assigned to care need. If none are selected it will not auto assign the small group member to the need. ",
+    [CustomEnhancedListField( "Group Type Roles",
+        Description = "Select the Group Type Roles of the leaders you would like auto assigned to care need when the Person is a member of this type of group. If none are selected it will not auto assign the small group member with the appropriate role to the need. ",
         IsRequired = false,
+        ListSource = "SELECT gtr.[Guid] as [Value], CONCAT(gt.[Name],' > ',gtr.[Name]) as [Text] FROM GroupTypeRole gtr JOIN GroupType gt ON gtr.GroupTypeId = gt.Id ORDER BY gt.[Name], gtr.[Order]",
         Key = AttributeKey.GroupTypeAndRole,
         Category = CategoryKey.FutureNeedAssignments )]
 
@@ -530,7 +531,7 @@ namespace rocks.kfs.StepsToCare.Jobs
             var autoAssignWorkerGeofence = dataMap.GetBooleanFromString( AttributeKey.AutoAssignWorkerGeofence );
             var loadBalanceType = dataMap.GetString( AttributeKey.LoadBalanceWorkersType );
             var enableLogging = dataMap.GetBooleanFromString( AttributeKey.VerboseLogging );
-            var leaderRoleGuid = dataMap.GetString( AttributeKey.GroupTypeAndRole ).AsGuidOrNull() ?? Guid.Empty;
+            var leaderRoleGuids = dataMap.GetString( AttributeKey.GroupTypeAndRole ).SplitDelimitedValues().AsGuidList();
             var futureThresholdDays = dataMap.GetDoubleFromString( AttributeKey.FutureThresholdDays );
             var assignmentEmailTemplateGuid = dataMap.GetString( AttributeKey.NewAssignmentNotification ).AsGuidOrNull();
             var adultFamilyWorkers = dataMap.GetString( AttributeKey.AdultFamilyWorkers );
@@ -542,7 +543,7 @@ namespace rocks.kfs.StepsToCare.Jobs
 
             foreach ( var careNeed in unassignedCareNeeds )
             {
-                CareUtilities.AutoAssignWorkers( careNeed, careNeed.WorkersOnly, autoAssignWorker: autoAssignWorker, autoAssignWorkerGeofence: autoAssignWorkerGeofence, loadBalanceType: loadBalanceType, enableLogging: enableLogging, leaderRoleGuid: leaderRoleGuid );
+                CareUtilities.AutoAssignWorkers( careNeed, careNeed.WorkersOnly, autoAssignWorker: autoAssignWorker, autoAssignWorkerGeofence: autoAssignWorkerGeofence, loadBalanceType: loadBalanceType, enableLogging: enableLogging, leaderRoleGuids: leaderRoleGuids );
 
                 if ( careNeed.ChildNeeds != null && careNeed.ChildNeeds.Any() )
                 {
@@ -552,11 +553,11 @@ namespace rocks.kfs.StepsToCare.Jobs
                     {
                         if ( need.PersonAlias != null && need.PersonAlias.Person.GetFamilyRole().Id != adultRoleId )
                         {
-                            CareUtilities.AutoAssignWorkers( need, true, true, autoAssignWorker: autoAssignWorker, autoAssignWorkerGeofence: autoAssignWorkerGeofence, loadBalanceType: loadBalanceType, enableLogging: enableLogging, leaderRoleGuid: leaderRoleGuid );
+                            CareUtilities.AutoAssignWorkers( need, true, true, autoAssignWorker: autoAssignWorker, autoAssignWorkerGeofence: autoAssignWorkerGeofence, loadBalanceType: loadBalanceType, enableLogging: enableLogging, leaderRoleGuids: leaderRoleGuids );
                         }
                         else
                         {
-                            CareUtilities.AutoAssignWorkers( need, adultFamilyWorkers == "Workers Only" || careNeed.WorkersOnly, autoAssignWorker: autoAssignWorker, autoAssignWorkerGeofence: autoAssignWorkerGeofence, loadBalanceType: loadBalanceType, enableLogging: enableLogging, leaderRoleGuid: leaderRoleGuid );
+                            CareUtilities.AutoAssignWorkers( need, adultFamilyWorkers == "Workers Only" || careNeed.WorkersOnly, autoAssignWorker: autoAssignWorker, autoAssignWorkerGeofence: autoAssignWorkerGeofence, loadBalanceType: loadBalanceType, enableLogging: enableLogging, leaderRoleGuids: leaderRoleGuids );
                         }
                     }
                 }
