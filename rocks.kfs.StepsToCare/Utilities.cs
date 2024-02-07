@@ -359,6 +359,7 @@ namespace rocks.kfs.StepsToCare
                         careAssignee.WorkerId = worker.Id;
                         careAssignee.FollowUpWorker = true;
                         careAssignee.Type = AssignedType.Worker;
+                        careAssignee.TypeQualifier = $"{workerCount.Count}^{workerCount.HasAgeRange}^{workerCount.HasCampus}^{workerCount.HasCategory}^{workerCount.HasGender}";
 
                         assignedPeople.Add( careAssignee );
                         addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
@@ -402,6 +403,7 @@ namespace rocks.kfs.StepsToCare
                                 careAssignee.CareNeed = careNeed;
                                 careAssignee.PersonAliasId = member.Person.PrimaryAliasId;
                                 careAssignee.Type = AssignedType.GroupRole;
+                                careAssignee.TypeQualifier = $"{member.GroupRoleId}^{member.GroupTypeId}^{member.Group.GroupType.Name} > {member.GroupRole.Name}";
 
                                 assignedPeople.Add( careAssignee );
                                 addedWorkerAliasIds.Add( careAssignee.PersonAliasId );

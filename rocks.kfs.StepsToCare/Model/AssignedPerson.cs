@@ -49,6 +49,9 @@ namespace rocks.kfs.StepsToCare.Model
         [DataMember]
         public AssignedType? Type { get; set; }
 
+        [DataMember]
+        public string TypeQualifier { get; set; }
+
         #endregion Entity Properties
 
         #region Virtual Properties

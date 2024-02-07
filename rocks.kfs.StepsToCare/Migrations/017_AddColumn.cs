@@ -27,6 +27,10 @@ namespace rocks.kfs.StepsToCare.Migrations
             Sql( @"IF COL_LENGTH('_rocks_kfs_StepsToCare_AssignedPerson', 'Type') IS NULL
                 BEGIN
 	                ALTER TABLE _rocks_kfs_StepsToCare_AssignedPerson ADD [Type] int NULL 
+                END
+                IF COL_LENGTH('_rocks_kfs_StepsToCare_AssignedPerson', 'TypeQualifier') IS NULL
+                BEGIN
+	                ALTER TABLE _rocks_kfs_StepsToCare_AssignedPerson ADD [TypeQualifier] [nvarchar](200) NULL
                 END" );
         }
 
@@ -35,6 +39,10 @@ namespace rocks.kfs.StepsToCare.Migrations
             Sql( @"IF COL_LENGTH('_rocks_kfs_StepsToCare_AssignedPerson', 'Type') IS NOT NULL
                 BEGIN
 	                ALTER TABLE _rocks_kfs_StepsToCare_AssignedPerson DROP COLUMN [Type]
+                END
+                IF COL_LENGTH('_rocks_kfs_StepsToCare_AssignedPerson', 'TypeQualifier') IS NOT NULL
+                BEGIN
+	                ALTER TABLE _rocks_kfs_StepsToCare_AssignedPerson DROP COLUMN [TypeQualifier]
                 END" );
         }
     }
