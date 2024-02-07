@@ -16,6 +16,7 @@
 //
 namespace rocks.kfs.StepsToCare.Model
 {
+    using System.ComponentModel;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.ModelConfiguration;
@@ -45,6 +46,9 @@ namespace rocks.kfs.StepsToCare.Model
         [DataMember]
         public bool? FollowUpWorker { get; set; }
 
+        [DataMember]
+        public AssignedType? Type { get; set; }
+
         #endregion Entity Properties
 
         #region Virtual Properties
@@ -59,6 +63,15 @@ namespace rocks.kfs.StepsToCare.Model
         public virtual CareWorker CareWorker { get; set; }
 
         #endregion Virtual Properties
+    }
+
+    public enum AssignedType
+    {
+        Worker,
+        [Description("Group Role")]
+        GroupRole,
+        Geofence,
+        Manual
     }
 
     #region Entity Configuration

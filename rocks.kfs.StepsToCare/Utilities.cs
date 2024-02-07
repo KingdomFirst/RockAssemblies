@@ -74,6 +74,7 @@ namespace rocks.kfs.StepsToCare
                             careAssignee.PersonAliasId = worker.PersonAliasId;
                             careAssignee.WorkerId = worker.Id;
                             //careAssignee.FollowUpWorker = true;
+                            careAssignee.Type = AssignedType.Geofence;
 
                             assignedPeople.Add( careAssignee );
                             addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
@@ -357,6 +358,7 @@ namespace rocks.kfs.StepsToCare
                         careAssignee.PersonAliasId = worker.PersonAliasId;
                         careAssignee.WorkerId = worker.Id;
                         careAssignee.FollowUpWorker = true;
+                        careAssignee.Type = AssignedType.Worker;
 
                         assignedPeople.Add( careAssignee );
                         addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
@@ -399,6 +401,7 @@ namespace rocks.kfs.StepsToCare
                                 var careAssignee = new AssignedPerson { Id = 0 };
                                 careAssignee.CareNeed = careNeed;
                                 careAssignee.PersonAliasId = member.Person.PrimaryAliasId;
+                                careAssignee.Type = AssignedType.GroupRole;
 
                                 assignedPeople.Add( careAssignee );
                                 addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
