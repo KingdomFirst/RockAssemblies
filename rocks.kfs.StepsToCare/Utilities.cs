@@ -20,13 +20,10 @@ namespace rocks.kfs.StepsToCare
 {
     public class CareUtilities
     {
-        public static void AutoAssignWorkers( CareNeed careNeed, bool roundRobinOnly = false, bool childAssignment = false, bool autoAssignWorker = false, bool autoAssignWorkerGeofence = false, string loadBalanceType = "Exclusive", Guid leaderRoleGuid = new Guid(), bool enableLogging = false )
+        public static List<AssignedPerson> AutoAssignWorkers( CareNeed careNeed, bool roundRobinOnly = false, bool childAssignment = false, bool autoAssignWorker = false, bool autoAssignWorkerGeofence = false, string loadBalanceType = "Exclusive", List<Guid> leaderRoleGuids = null, bool enableLogging = false, bool previewAssigned = false )
         {
-            AutoAssignWorkers( careNeed, roundRobinOnly, childAssignment, autoAssignWorker, autoAssignWorkerGeofence, loadBalanceType, new List<Guid> { leaderRoleGuid }, enableLogging );
-        }
+            var assignedPeople = new List<AssignedPerson>();
 
-        public static void AutoAssignWorkers( CareNeed careNeed, bool roundRobinOnly = false, bool childAssignment = false, bool autoAssignWorker = false, bool autoAssignWorkerGeofence = false, string loadBalanceType = "Exclusive", List<Guid> leaderRoleGuids = null, bool enableLogging = false )
-        {
             var rockContext = new RockContext();
 
             var careNeedService = new CareNeedService( rockContext );
@@ -34,7 +31,10 @@ namespace rocks.kfs.StepsToCare
             var careAssigneeService = new AssignedPersonService( rockContext );
 
             // reload careNeed to fully populate child properties
-            careNeed = careNeedService.Get( careNeed.Guid );
+            if ( !previewAssigned )
+            {
+                careNeed = careNeedService.Get( careNeed.Guid );
+            }
 
             var careWorkers = careWorkerService.Queryable().AsNoTracking().Where( cw => cw.IsActive );
 
@@ -75,7 +75,7 @@ namespace rocks.kfs.StepsToCare
                             careAssignee.WorkerId = worker.Id;
                             //careAssignee.FollowUpWorker = true;
 
-                            careAssigneeService.Add( careAssignee );
+                            assignedPeople.Add( careAssignee );
                             addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
                         }
                     }
@@ -350,7 +350,7 @@ namespace rocks.kfs.StepsToCare
                 foreach ( var workerCount in careWorkerCounts )
                 {
                     var worker = workerCount.Worker;
-                    if ( !workerAssigned && !addedWorkerAliasIds.Contains( worker.PersonAliasId ) && worker.PersonAlias != null && careAssigneeService.GetByPersonAliasAndCareNeed( worker.PersonAlias.Id, careNeed.Id ) == null )
+                    if ( !workerAssigned && !addedWorkerAliasIds.Contains( worker.PersonAliasId ) && worker.PersonAlias != null && worker.PersonAliasId != careNeed.PersonAliasId && careAssigneeService.GetByPersonAliasAndCareNeed( worker.PersonAlias.Id, careNeed.Id ) == null )
                     {
                         var careAssignee = new AssignedPerson { Id = 0 };
                         careAssignee.CareNeed = careNeed;
@@ -358,7 +358,7 @@ namespace rocks.kfs.StepsToCare
                         careAssignee.WorkerId = worker.Id;
                         careAssignee.FollowUpWorker = true;
 
-                        careAssigneeService.Add( careAssignee );
+                        assignedPeople.Add( careAssignee );
                         addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
 
                         workerAssigned = true;
@@ -400,7 +400,7 @@ namespace rocks.kfs.StepsToCare
                                 careAssignee.CareNeed = careNeed;
                                 careAssignee.PersonAliasId = member.Person.PrimaryAliasId;
 
-                                careAssigneeService.Add( careAssignee );
+                                assignedPeople.Add( careAssignee );
                                 addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
                             }
                         }
@@ -412,7 +412,12 @@ namespace rocks.kfs.StepsToCare
                     }
                 }
             }
-            rockContext.SaveChanges();
+            if ( !previewAssigned )
+            {
+                careAssigneeService.AddRange( assignedPeople );
+                rockContext.SaveChanges();
+            }
+            return assignedPeople;
         }
 
         public static void SendWorkerNotification( RockContext rockContext, CareNeed careNeed, bool isNew, List<AssignedPerson> newlyAssignedPersons, Guid? assignmentEmailTemplateGuid, RockPage rockPage = null, string detailPagePath = "", string dashboardPagePath = "", Person person = null )
@@ -601,7 +606,7 @@ namespace rocks.kfs.StepsToCare
             }
             return new PageReference( pageCache.Guid.ToString() );
         }
-        private static ServiceLog LogEvent( RockContext rockContext, string type, string input, string result )
+        public static ServiceLog LogEvent( RockContext rockContext, string type, string input, string result )
         {
             if ( rockContext == null )
             {

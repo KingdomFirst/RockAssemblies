@@ -32,7 +32,6 @@ namespace rocks.kfs.StepsToCare.Model
     {
         #region Entity Properties
 
-        [Required]
         [DataMember]
         public int? NeedId { get; set; }
 
