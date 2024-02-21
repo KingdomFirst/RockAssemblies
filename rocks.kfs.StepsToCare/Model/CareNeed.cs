@@ -82,6 +82,21 @@ namespace rocks.kfs.StepsToCare.Model
         [DataMember]
         public int? ParentNeedId { get; set; }
 
+        [DataMember]
+        public bool EnableRecurrence { get; set; }
+
+        [DataMember]
+        public int? RenewPeriodDays { get; set; }
+
+        [DataMember]
+        public int? RenewMaxCount { get; set; }
+
+        [DataMember]
+        public int? RenewCurrentCount { get; set; }
+
+        [DataMember]
+        public DateTime? SnoozeDate { get; set; }
+
         #endregion Entity Properties
 
         #region Virtual Properties

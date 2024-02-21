@@ -31,5 +31,10 @@ namespace rocks.kfs.StepsToCare.SystemGuid
         /// </summary>
         public const string CARE_NEED_STATUS_LONGTERMCARE = "989A3B33-8230-4167-99F6-E1C21EE6950E";
 
+        /// <summary>
+        /// The Care Need status defined value snoozed.
+        /// </summary>
+        public const string CARE_NEED_STATUS_SNOOZED = "6A5890DE-D784-47A7-B83E-98EE70BFFA91";
+
     }
 }

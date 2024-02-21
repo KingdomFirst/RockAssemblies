@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2021 by Kingdom First Solutions
+// Copyright 2023 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -223,13 +223,29 @@ namespace rocks.kfs.StepsToCare.Jobs
                 var closedValueId = DefinedValueCache.Get( SystemGuid.DefinedValue.CARE_NEED_STATUS_CLOSED.AsGuid() ).Id;
                 var followUpValue = DefinedValueCache.Get( SystemGuid.DefinedValue.CARE_NEED_STATUS_FOLLOWUP.AsGuid() );
                 var openValueId = DefinedValueCache.Get( SystemGuid.DefinedValue.CARE_NEED_STATUS_OPEN.AsGuid() ).Id;
+                var snoozedValueId = DefinedValueCache.Get( SystemGuid.DefinedValue.CARE_NEED_STATUS_SNOOZED.AsGuid() ).Id;
 
                 var careNeeds = careNeedService.Queryable( "PersonAlias,SubmitterPersonAlias" ).Where( n => n.StatusValueId != closedValueId );
-                var careAssigned = assignedPersonService.Queryable().Where( ap => ap.PersonAliasId != null && ap.NeedId != null && ap.CareNeed.StatusValueId != closedValueId ).DistinctBy( ap => ap.PersonAliasId );
+                var careAssigned = assignedPersonService.Queryable()
+                    .Where( ap => ap.PersonAliasId != null && ap.NeedId != null && ap.CareNeed.StatusValueId != closedValueId )
+                    .DistinctBy( ap => ap.PersonAliasId );
 
-                var careNeedFollowUp = careNeeds.Where( n => n.StatusValueId == openValueId && n.DateEntered <= DbFunctions.AddDays( RockDateTime.Now, -followUpDays ) );
+                var careNeedFollowUp = careNeeds
+                    .Where( n =>
+                        ( n.StatusValueId == openValueId && n.DateEntered <= DbFunctions.AddDays( RockDateTime.Now, -followUpDays ) )
+                        ||
+                        ( n.EnableRecurrence && n.StatusValueId == snoozedValueId
+                            && ( n.RenewMaxCount == null || n.RenewCurrentCount <= n.RenewMaxCount )
+                            && (
+                                ( n.SnoozeDate != null && n.SnoozeDate <= DbFunctions.AddDays( RockDateTime.Now, -n.RenewPeriodDays ) )
+                                ||
+                                ( n.SnoozeDate == null && n.DateEntered <= DbFunctions.AddDays( RockDateTime.Now, -n.RenewPeriodDays ) )
+                            )
+                        )
+                    );
 
-                var careNeed24Hrs = careNeeds.Where( n => n.StatusValueId == openValueId && DbFunctions.DiffHours( n.DateEntered.Value, RockDateTime.Now ) >= minimumCareTouchesHours );
+                var careNeed24Hrs = careNeeds
+                    .Where( n => n.StatusValueId == openValueId && DbFunctions.DiffHours( n.DateEntered.Value, RockDateTime.Now ) >= minimumCareTouchesHours );
                 var careNeedFlagged = careNeed24Hrs
                     .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && cn.AssignedPersons.Any( ap => ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value && ap.PersonAliasId == n.CreatedByPersonAliasId ) ).DefaultIfEmpty(),
                     ( cn, n ) => new
@@ -259,6 +275,11 @@ namespace rocks.kfs.StepsToCare.Jobs
                 foreach ( var careNeed in careNeedFollowUp )
                 {
                     careNeed.StatusValueId = followUpValue.Id;
+                    careNeed.FollowUpDate = RockDateTime.Now;
+                    if ( careNeed.EnableRecurrence )
+                    {
+                        careNeed.RenewCurrentCount++;
+                    }
                     careNeed.LoadAttributes();
 
                     if ( !followUpSystemCommunicationGuid.IsEmpty() )

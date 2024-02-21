@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Jobs\CareNeedAutomatedProcesses.cs" />
+    <Compile Include="Migrations\018_AddDefinedValueAndProperty.cs" />
     <Compile Include="Migrations\017_AddColumn.cs" />
     <Compile Include="Migrations\016_NewAttribute.cs" />
     <Compile Include="Migrations\015_UpdateJob.cs" />

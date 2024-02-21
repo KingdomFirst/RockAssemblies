@@ -58,10 +58,10 @@ namespace rocks.kfs.StepsToCare.Migrations
             RockMigrationHelper.DeleteDefinedValue( "EA93B6A9-F151-475D-89B4-C7C24AE603B8" ); // Birth
             RockMigrationHelper.DeleteDefinedType( SystemGuid.DefinedType.CARE_NEED_CATEGORY ); // Category
 
-            RockMigrationHelper.DeleteDefinedValue( "811ECA2D-2B74-469A-9CFB-AB47B9643A02" ); // Open
-            RockMigrationHelper.DeleteDefinedValue( "989A3B33-8230-4167-99F6-E1C21EE6950E" ); // Long Term Care
-            RockMigrationHelper.DeleteDefinedValue( "1B48E766-3B9B-4A32-AB1A-80DC0C2DCC63" ); // Follow Up
-            RockMigrationHelper.DeleteDefinedValue( "3613946D-9788-47E1-BFD3-5FD75B59F986" ); // Closed
+            RockMigrationHelper.DeleteDefinedValue( SystemGuid.DefinedValue.CARE_NEED_STATUS_OPEN ); // Open
+            RockMigrationHelper.DeleteDefinedValue( SystemGuid.DefinedValue.CARE_NEED_STATUS_LONGTERMCARE ); // Long Term Care
+            RockMigrationHelper.DeleteDefinedValue( SystemGuid.DefinedValue.CARE_NEED_STATUS_FOLLOWUP ); // Follow Up
+            RockMigrationHelper.DeleteDefinedValue( SystemGuid.DefinedValue.CARE_NEED_STATUS_CLOSED ); // Closed
             RockMigrationHelper.DeleteDefinedType( SystemGuid.DefinedType.CARE_NEED_STATUS ); // Status
         }
     }
