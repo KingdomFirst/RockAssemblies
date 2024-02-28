@@ -92,7 +92,7 @@ namespace rocks.kfs.StepsToCare.Model
         public int? RenewMaxCount { get; set; }
 
         [DataMember]
-        public int? RenewCurrentCount { get; set; }
+        public int RenewCurrentCount { get; set; } = 0;
 
         [DataMember]
         public DateTime? SnoozeDate { get; set; }
@@ -161,7 +161,7 @@ namespace rocks.kfs.StepsToCare.Model
                         {
                             var careNeedNotes = new NoteService( rockContext )
                                 .GetByNoteTypeId( noteType.Id ).AsNoTracking()
-                                .Where( n => n.EntityId == Id );
+                                .Where( n => n.EntityId == Id && n.Caption != "Action" );
 
                             _touchCount = careNeedNotes.Count();
                         }

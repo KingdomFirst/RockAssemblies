@@ -232,14 +232,13 @@ namespace rocks.kfs.StepsToCare.Jobs
 
                 var careNeedFollowUp = careNeeds
                     .Where( n =>
-                        ( n.StatusValueId == openValueId && n.DateEntered <= DbFunctions.AddDays( RockDateTime.Now, -followUpDays ) )
+                        ( !n.EnableRecurrence && n.StatusValueId == openValueId && n.DateEntered <= DbFunctions.AddDays( RockDateTime.Now, -followUpDays ) )
                         ||
-                        ( n.EnableRecurrence && n.StatusValueId == snoozedValueId
-                            && ( n.RenewMaxCount == null || n.RenewCurrentCount <= n.RenewMaxCount )
+                        ( n.EnableRecurrence && ( n.RenewMaxCount == null || n.RenewCurrentCount <= n.RenewMaxCount )
                             && (
-                                ( n.SnoozeDate != null && n.SnoozeDate <= DbFunctions.AddDays( RockDateTime.Now, -n.RenewPeriodDays ) )
-                                ||
                                 ( n.SnoozeDate == null && n.DateEntered <= DbFunctions.AddDays( RockDateTime.Now, -n.RenewPeriodDays ) )
+                                ||
+                                ( n.SnoozeDate != null && n.SnoozeDate <= DbFunctions.AddDays( RockDateTime.Now, -n.RenewPeriodDays ) )
                             )
                         )
                     );
