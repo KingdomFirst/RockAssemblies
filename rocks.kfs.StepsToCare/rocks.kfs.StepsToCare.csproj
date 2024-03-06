@@ -79,7 +79,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Field\Types\CareNeedFieldType.cs" />
+    <Compile Include="Field\Types\NoteTemplateFieldType.cs" />
     <Compile Include="Jobs\CareNeedAutomatedProcesses.cs" />
+    <Compile Include="Migrations\019_AddFieldTypeAndAttributeMatrix.cs" />
     <Compile Include="Migrations\018_AddDefinedValueAndProperty.cs" />
     <Compile Include="Migrations\017_AddColumn.cs" />
     <Compile Include="Migrations\016_NewAttribute.cs" />
@@ -104,10 +107,14 @@
     <Compile Include="Model\CareNeedService.cs" />
     <Compile Include="Model\CareWorker.cs" />
     <Compile Include="Model\CareWorkerService.cs" />
+    <Compile Include="Model\FlaggedNeed.cs" />
     <Compile Include="Model\NoteTemplate.cs" />
     <Compile Include="Model\NoteTemplateService.cs" />
+    <Compile Include="Model\TouchTemplate.cs" />
     <Compile Include="Model\WorkerResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SystemGuid\FieldType.cs" />
+    <Compile Include="SystemGuid\Attribute.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="SystemGuid\PersonAttribute.cs" />
     <Compile Include="SystemGuid\SystemCommunication.cs" />

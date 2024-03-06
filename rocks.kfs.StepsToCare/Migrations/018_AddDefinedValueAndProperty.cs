@@ -30,7 +30,7 @@ namespace rocks.kfs.StepsToCare.Migrations
             RockMigrationHelper.AddDefinedTypeAttribute( SystemGuid.DefinedType.CARE_NEED_CATEGORY, "A75DFC58-7A1B-4799-BF31-451B2BBE38FF", "Repeat Every", "RepeatEvery", "Will repeat the notification and change to follow up status the provided number of days after the snooze. If you have a value set in this attribute, by default when this category is selected it will \"Enable Recurrence\" and set the Repeat Every value to this on the Care Need.", 6563, "", "CF59CDFF-8C98-487B-B2E7-A2CA496ACB87" );
             Sql( @"IF COL_LENGTH('_rocks_kfs_StepsToCare_CareNeed', 'EnableRecurrence') IS NULL
                 BEGIN
-	                ALTER TABLE _rocks_kfs_StepsToCare_CareNeed ADD [EnableRecurrence] bit NOT NULL DEFAULT (0), [RenewPeriodDays] int NULL, [RenewMaxCount] int NULL, [RenewCurrentCount] int NULL, [SnoozeDate] [datetime] NULL
+	                ALTER TABLE _rocks_kfs_StepsToCare_CareNeed ADD [EnableRecurrence] bit NOT NULL DEFAULT (0), [RenewPeriodDays] int NULL, [RenewMaxCount] int NULL, [RenewCurrentCount] int NOT NULL DEFAULT (0), [SnoozeDate] [datetime] NULL
                 END" );
         }
 

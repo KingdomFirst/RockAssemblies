@@ -225,6 +225,39 @@ namespace rocks.kfs.StepsToCare.Jobs
                 var openValueId = DefinedValueCache.Get( SystemGuid.DefinedValue.CARE_NEED_STATUS_OPEN.AsGuid() ).Id;
                 var snoozedValueId = DefinedValueCache.Get( SystemGuid.DefinedValue.CARE_NEED_STATUS_SNOOZED.AsGuid() ).Id;
 
+                var categoryDefinedType = DefinedTypeCache.Get( SystemGuid.DefinedType.CARE_NEED_CATEGORY );
+                var allTouchTemplates = new Dictionary<int, List<TouchTemplate>>();
+
+                foreach ( var needCategory in categoryDefinedType.DefinedValues )
+                {
+                    var matrixGuid = needCategory.GetAttributeValue( "CareTouchTemplates" ).AsGuid();
+                    var touchTemplates = new List<TouchTemplate>();
+                    if ( matrixGuid != Guid.Empty )
+                    {
+                        var matrix = new AttributeMatrixService( rockContext ).Get( matrixGuid );
+                        if ( matrix != null )
+                        {
+                            foreach ( var matrixItem in matrix.AttributeMatrixItems )
+                            {
+                                matrixItem.LoadAttributes();
+
+                                var noteTemplateGuid = matrixItem.GetAttributeValue( "NoteTemplate" ).AsGuid();
+                                var noteTemplate = new NoteTemplateService( rockContext ).Get( noteTemplateGuid );
+
+                                var touchTemplate = new TouchTemplate();
+                                touchTemplate.NoteTemplate = noteTemplate;
+                                touchTemplate.MinimumCareTouches = matrixItem.GetAttributeValue( "MinimumCareTouches" ).AsInteger();
+                                touchTemplate.MinimumCareTouchHours = matrixItem.GetAttributeValue( "MinimumCareTouchHours" ).AsInteger();
+                                touchTemplate.NotifyAll = matrixItem.GetAttributeValue( "NotifyAllAssigned" ).AsBoolean();
+                                touchTemplate.Recurring = matrixItem.GetAttributeValue( "Recurring" ).AsBoolean();
+
+                                touchTemplates.Add( touchTemplate );
+                            }
+                            allTouchTemplates.AddOrIgnore( needCategory.Id, touchTemplates );
+                        }
+                    }
+                }
+
                 var careNeeds = careNeedService.Queryable( "PersonAlias,SubmitterPersonAlias" ).Where( n => n.StatusValueId != closedValueId );
                 var careAssigned = assignedPersonService.Queryable()
                     .Where( ap => ap.PersonAliasId != null && ap.NeedId != null && ap.CareNeed.StatusValueId != closedValueId )
@@ -247,7 +280,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                     .Where( n => n.StatusValueId == openValueId && DbFunctions.DiffHours( n.DateEntered.Value, RockDateTime.Now ) >= minimumCareTouchesHours );
                 var careNeedFlagged = careNeed24Hrs
                     .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && cn.AssignedPersons.Any( ap => ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value && ap.PersonAliasId == n.CreatedByPersonAliasId ) ).DefaultIfEmpty(),
-                    ( cn, n ) => new
+                    ( cn, n ) => new FlaggedNeed
                     {
                         CareNeed = cn,
                         HasFollowUpWorkerNote = n != null,
@@ -255,6 +288,35 @@ namespace rocks.kfs.StepsToCare.Jobs
                     } )
                     .Where( f => !f.HasFollowUpWorkerNote || f.TouchCount <= minimumCareTouches )
                     .ToList();
+
+                if ( allTouchTemplates.Count() > 0 )
+                {
+                    foreach ( var catTemplate in allTouchTemplates )
+                    {
+                        var careNeedsInCategory = careNeeds.Where( n => n.CategoryValueId.HasValue && n.CategoryValueId == catTemplate.Key );
+                        var careNeedsInCategoryList = careNeedsInCategory.ToList();
+                        foreach ( var template in catTemplate.Value )
+                        {
+                            var currentFlaggedTemplatesQry = careNeedsInCategory
+                                .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && ( ( n.Text == template.NoteTemplate.Note && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ) || DbFunctions.DiffHours( cn.DateEntered, RockDateTime.Now ) >= template.MinimumCareTouchHours ) ),
+                                    ( cn, n ) => new FlaggedNeed
+                                    {
+                                        CareNeed = cn,
+                                        Note = n,
+                                        HasNoteOlderThenHours = ( n.Text == template.NoteTemplate.Note && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ),
+                                        NoteTouchCount = careNeedNotesQry.Count( note => note.EntityId == cn.Id && ( note.Text == template.NoteTemplate.Note && DbFunctions.DiffHours( note.CreatedDateTime, RockDateTime.Now ) <= template.MinimumCareTouchHours ) )
+                                    } )
+                                .Where( f => ( !f.HasNoteOlderThenHours && f.NoteTouchCount < template.MinimumCareTouches ) || ( f.HasNoteOlderThenHours && template.Recurring && f.NoteTouchCount < template.MinimumCareTouches ) );
+                            var currentFlaggedTemplates = currentFlaggedTemplatesQry.ToList();
+                            foreach ( var temp in currentFlaggedTemplates )
+                            {
+                                temp.TouchTemplate = template;
+                            }
+
+                            careNeedFlagged.AddRange( currentFlaggedTemplates.DistinctBy( f => f.CareNeed.Id ) );
+                        }
+                    }
+                }
 
                 var followUpSystemCommunicationGuid = dataMap.GetString( AttributeKey.FollowUpSystemCommunication ).AsGuid();
                 var careTouchNeededCommunicationGuid = dataMap.GetString( AttributeKey.CareTouchNeededCommunication ).AsGuid();
@@ -364,7 +426,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                 // Send notification about "Flagged" messages (any messages without a care touch by the follow up worker or minimum care touches within the set minimum Care Touches Hours.
                 if ( careTouchNeededCommunication != null && careTouchNeededCommunication.Id > 0 )
                 {
-                    foreach ( var flagNeed in careNeedFlagged )
+                    foreach ( var flagNeed in careNeedFlagged.OrderByDescending( f => f.TouchTemplate != null ).DistinctBy( f => f.CareNeed.Id ) )
                     {
                         var careNeed = flagNeed.CareNeed;
                         careNeed.LoadAttributes();
@@ -373,7 +435,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                         //var pushMessage = new RockPushMessage( careTouchNeededCommunication );
                         var recipients = new List<RockMessageRecipient>();
 
-                        foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value ) )
+                        foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ( ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value ) || ( flagNeed.TouchTemplate != null && flagNeed.TouchTemplate.NotifyAll ) ) )
                         {
                             assignee.PersonAlias.Person.LoadAttributes();
 
@@ -385,11 +447,15 @@ namespace rocks.kfs.StepsToCare.Jobs
 
                             var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, assignee.PersonAlias.Person );
                             mergeFields.Add( "CareNeed", careNeed );
+                            mergeFields.Add( "Note", flagNeed.Note );
+                            mergeFields.Add( "TouchTemplate", flagNeed.TouchTemplate );
                             mergeFields.Add( "LinkedPages", linkedPages );
                             mergeFields.Add( "AssignedPerson", assignee );
                             mergeFields.Add( "Person", assignee.PersonAlias.Person );
                             mergeFields.Add( "TouchCount", flagNeed.TouchCount );
+                            mergeFields.Add( "NoteTouchCount", flagNeed.NoteTouchCount );
                             mergeFields.Add( "HasFollowUpWorkerNote", flagNeed.HasFollowUpWorkerNote );
+                            mergeFields.Add( "HasNoteOlderThenHours", flagNeed.HasNoteOlderThenHours );
 
                             var notificationType = assignee.PersonAlias.Person.GetAttributeValue( SystemGuid.PersonAttribute.NOTIFICATION.AsGuid() );
 
