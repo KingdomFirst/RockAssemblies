@@ -31,5 +31,15 @@ namespace rocks.kfs.StepsToCare.SystemGuid
         /// </summary>
         public const string CARE_NEED_OUTSTANDING_NEEDS = "AAC45C95-5EB0-4FD9-B564-6554FE2C19CE";
 
+        /// <summary>
+        /// The Care Need Follow Up System Communication.
+        /// </summary>
+        public const string CARE_NEED_FOLLOWUP_WITH_ACTIONS = "7C7B09AE-3E24-41DF-9940-F02C366D7E28";
+
+        /// <summary>
+        /// The Care Need Touch Needed System Communication.
+        /// </summary>
+        public const string CARE_NEED_TOUCH_NEEDED_WITH_ACTIONS = "464A2112-80D2-4891-A4C1-F7DA01A0FB79";
+
     }
 }

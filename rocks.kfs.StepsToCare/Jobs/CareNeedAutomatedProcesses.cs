@@ -215,6 +215,7 @@ namespace rocks.kfs.StepsToCare.Jobs
 
                 var careNeedService = new CareNeedService( rockContext );
                 var assignedPersonService = new AssignedPersonService( rockContext );
+                var noteTemplateService = new NoteTemplateService( rockContext );
 
                 var noteType = NoteTypeCache.GetByEntity( EntityTypeCache.Get( typeof( CareNeed ) ).Id, "", "", true ).FirstOrDefault();
                 var careNeedNotesQry = new NoteService( rockContext )
@@ -226,6 +227,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                 var snoozedValueId = DefinedValueCache.Get( SystemGuid.DefinedValue.CARE_NEED_STATUS_SNOOZED.AsGuid() ).Id;
 
                 var categoryDefinedType = DefinedTypeCache.Get( SystemGuid.DefinedType.CARE_NEED_CATEGORY );
+                var noteTemplates = noteTemplateService.Queryable().AsNoTracking().Where( n => n.IsActive ).OrderBy( nt => nt.Order );
                 var allTouchTemplates = new Dictionary<int, List<TouchTemplate>>();
 
                 foreach ( var needCategory in categoryDefinedType.DefinedValues )
@@ -284,7 +286,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                     {
                         CareNeed = cn,
                         HasFollowUpWorkerNote = n != null,
-                        TouchCount = careNeedNotesQry.Where( note => note.EntityId == cn.Id ).Count()
+                        TouchCount = careNeedNotesQry.Where( note => note.EntityId == cn.Id && n.Caption != "Action" ).Count()
                     } )
                     .Where( f => !f.HasFollowUpWorkerNote || f.TouchCount <= minimumCareTouches )
                     .ToList();
@@ -304,7 +306,8 @@ namespace rocks.kfs.StepsToCare.Jobs
                                         CareNeed = cn,
                                         Note = n,
                                         HasNoteOlderThenHours = ( n.Text == template.NoteTemplate.Note && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ),
-                                        NoteTouchCount = careNeedNotesQry.Count( note => note.EntityId == cn.Id && ( note.Text == template.NoteTemplate.Note && DbFunctions.DiffHours( note.CreatedDateTime, RockDateTime.Now ) <= template.MinimumCareTouchHours ) )
+                                        NoteTouchCount = careNeedNotesQry.Count( note => note.EntityId == cn.Id && ( note.Text == template.NoteTemplate.Note && DbFunctions.DiffHours( note.CreatedDateTime, RockDateTime.Now ) <= template.MinimumCareTouchHours ) ),
+                                        TouchCount = careNeedNotesQry.Where( note => note.EntityId == cn.Id && n.Caption != "Action" ).Count()
                                     } )
                                 .Where( f => ( !f.HasNoteOlderThenHours && f.NoteTouchCount < template.MinimumCareTouches ) || ( f.HasNoteOlderThenHours && template.Recurring && f.NoteTouchCount < template.MinimumCareTouches ) );
                             var currentFlaggedTemplates = currentFlaggedTemplatesQry.ToList();
@@ -362,6 +365,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                             mergeFields.Add( "LinkedPages", linkedPages );
                             mergeFields.Add( "AssignedPerson", assignee );
                             mergeFields.Add( "Person", assignee.PersonAlias.Person );
+                            mergeFields.Add( "NoteTemplates", noteTemplates );
 
                             var recipients = new List<RockMessageRecipient>();
                             recipients.Add( new RockEmailMessageRecipient( assignee.PersonAlias.Person, mergeFields ) );
@@ -456,6 +460,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                             mergeFields.Add( "NoteTouchCount", flagNeed.NoteTouchCount );
                             mergeFields.Add( "HasFollowUpWorkerNote", flagNeed.HasFollowUpWorkerNote );
                             mergeFields.Add( "HasNoteOlderThenHours", flagNeed.HasNoteOlderThenHours );
+                            mergeFields.Add( "NoteTemplates", noteTemplates );
 
                             var notificationType = assignee.PersonAlias.Person.GetAttributeValue( SystemGuid.PersonAttribute.NOTIFICATION.AsGuid() );
 
@@ -538,6 +543,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                         mergeFields.Add( "LinkedPages", linkedPages );
                         mergeFields.Add( "AssignedPerson", assigned );
                         mergeFields.Add( "Person", assigned.PersonAlias.Person );
+                        mergeFields.Add( "NoteTemplates", noteTemplates );
 
                         var notificationType = assigned.PersonAlias.Person.GetAttributeValue( SystemGuid.PersonAttribute.NOTIFICATION.AsGuid() );
 
