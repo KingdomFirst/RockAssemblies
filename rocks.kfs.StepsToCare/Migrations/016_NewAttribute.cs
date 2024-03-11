@@ -60,10 +60,13 @@ namespace rocks.kfs.StepsToCare.Migrations
 
             RockMigrationHelper.AddAttributeValue( "D3F19DE8-B8A0-4B87-AB4D-DE827D79C780", 1079, @"", "D3F19DE8-B8A0-4B87-AB4D-DE827D79C780" ); // Care Need Automated Processes: Group Type Roles
 
+            RockMigrationHelper.UpdatePageLayout( "ABA4CE73-28DC-42DE-BE70-33F09287C116", "6AD84AFC-B3A1-4E30-B53B-C6E57B513839" );
         }
 
         public override void Down()
         {
+            RockMigrationHelper.UpdatePageLayout( "ABA4CE73-28DC-42DE-BE70-33F09287C116", "F66758C6-3E3D-4598-AF4C-B317047B5987" );
+
             // Attribute: rocks.kfs.StepsToCare.Jobs.CareNeedAutomatedNotifications: Group Type and Role
             RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.ServiceJob", "3BB25568-E793-4D12-AE80-AC3FDA6FD8A8", "Class", "rocks.kfs.StepsToCare.Jobs.CareNeedAutomatedProcesses", "Group Type and Role", "Group Type and Role", @"Select the group Type and Role of the leader you would like auto assigned to care need. If none are selected it will not auto assign the small group member to the need. ", 0, @"", "D3F19DE8-B8A0-4B87-AB4D-DE827D79C780", "GroupTypeAndRole" );
 
