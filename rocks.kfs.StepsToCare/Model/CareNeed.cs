@@ -83,7 +83,7 @@ namespace rocks.kfs.StepsToCare.Model
         public int? ParentNeedId { get; set; }
 
         [DataMember]
-        public bool EnableRecurrence { get; set; }
+        public bool CustomFollowUp { get; set; }
 
         [DataMember]
         public int? RenewPeriodDays { get; set; }
