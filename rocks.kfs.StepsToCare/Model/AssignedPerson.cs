@@ -21,7 +21,7 @@ namespace rocks.kfs.StepsToCare.Model
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.ModelConfiguration;
     using System.Runtime.Serialization;
-    using Rock.Data;
+    using Rock.Lava;
     using Rock.Model;
 
     /// <summary>
@@ -56,13 +56,13 @@ namespace rocks.kfs.StepsToCare.Model
 
         #region Virtual Properties
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual CareNeed CareNeed { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual PersonAlias PersonAlias { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual CareWorker CareWorker { get; set; }
 
         #endregion Virtual Properties

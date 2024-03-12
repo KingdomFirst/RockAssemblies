@@ -23,6 +23,7 @@ namespace rocks.kfs.StepsToCare.Model
     using System.Runtime.Serialization;
     using System.Data.Entity.ModelConfiguration;
     using Rock.Data;
+    using Rock.Lava;
     using Rock.Model;
     using Rock.Web.Cache;
     using System.Linq;
@@ -101,16 +102,16 @@ namespace rocks.kfs.StepsToCare.Model
 
         #region Virtual Properties
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual PersonAlias PersonAlias { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual PersonAlias SubmitterPersonAlias { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual DefinedValue Status { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual DefinedValue Category { get; set; }
 
         /// <summary>
@@ -122,13 +123,13 @@ namespace rocks.kfs.StepsToCare.Model
         [DataMember]
         public virtual Campus Campus { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual CareNeed ParentNeed { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual ICollection<AssignedPerson> AssignedPersons { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual ICollection<CareNeed> ChildNeeds { get; set; }
 
         #endregion Virtual Properties
@@ -147,7 +148,7 @@ namespace rocks.kfs.StepsToCare.Model
         /// <summary>
         /// Returns a <see cref="System.Int32"/> count of <see cref="Note"/>'s attached to Care Need as Care Touches.
         /// </summary>
-        [LavaInclude]
+        [LavaVisible]
         public int TouchCount
         {
             get
