@@ -295,7 +295,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                 {
                     foreach ( var catTemplate in allTouchTemplates )
                     {
-                        var careNeedsInCategory = careNeeds.Where( n => n.CategoryValueId.HasValue && n.CategoryValueId == catTemplate.Key );
+                        var careNeedsInCategory = careNeeds.Where( n => n.StatusValueId != closedValueId && n.CategoryValueId.HasValue && n.CategoryValueId == catTemplate.Key );
                         var careNeedsInCategoryList = careNeedsInCategory.ToList();
                         foreach ( var template in catTemplate.Value )
                         {

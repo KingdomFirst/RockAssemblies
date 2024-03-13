@@ -41,7 +41,7 @@ namespace rocks.kfs.StepsToCare.Migrations
                   ,'Care Need Automated Notifications'
                   ,''
                   ,'rocks.kfs.StepsToCare.Jobs.CareNeedAutomatedNotifications'
-                  ,'0 15 2 1/1 * ? *'
+                  ,'0 15 8 1/1 * ? *'
                   ,1
                   ,'895C301C-02D1-4D9C-9FC4-DA7257368208'
                   );

@@ -474,6 +474,8 @@ namespace rocks.kfs.StepsToCare
                 linkedPages.Add( "CareDetail", ( rockPage != null ) ? rockPage.PageReference.BuildUrl() : detailPagePath );
                 linkedPages.Add( "CareDashboard", ( rockPage != null ) ? GetParentPage( rockPage.PageId ).BuildUrl() : dashboardPagePath );
 
+                var noteTemplates = new NoteTemplateService( rockContext ).Queryable().AsNoTracking().Where( n => n.IsActive ).OrderBy( nt => nt.Order );
+
                 var systemCommunication = new SystemCommunicationService( rockContext ).Get( assignmentEmailTemplateGuid.Value );
                 var emailMessage = new RockEmailMessage( systemCommunication );
                 var smsMessage = new RockSMSMessage( systemCommunication );
@@ -496,6 +498,7 @@ namespace rocks.kfs.StepsToCare
                     mergeFields.Add( "LinkedPages", linkedPages );
                     mergeFields.Add( "AssignedPerson", assignee );
                     mergeFields.Add( "Person", assignee.PersonAlias.Person );
+                    mergeFields.Add( "NoteTemplates", noteTemplates );
 
                     var notificationType = assignee.PersonAlias.Person.GetAttributeValue( rocks.kfs.StepsToCare.SystemGuid.PersonAttribute.NOTIFICATION.AsGuid() );
 
