@@ -448,7 +448,7 @@ namespace rocks.kfs.StepsToCare
             }
 
             var assignedPersons = careNeed.AssignedPersons;
-            if ( newlyAssignedPersons.Any() )
+            if ( newlyAssignedPersons.Any() && !isNew )
             {
                 assignedPersons = newlyAssignedPersons;
             }
