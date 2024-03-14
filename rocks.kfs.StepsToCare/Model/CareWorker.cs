@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2022 by Kingdom First Solutions
+// Copyright 2024 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ namespace rocks.kfs.StepsToCare.Model
     using System.Data.Entity.ModelConfiguration;
     using System.Runtime.Serialization;
     using Rock.Data;
+    using Rock.Lava;
     using Rock.Model;
 
     [Table( "_rocks_kfs_StepsToCare_CareWorker" )]
@@ -79,10 +80,10 @@ namespace rocks.kfs.StepsToCare.Model
 
         #region Virtual Properties
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual PersonAlias PersonAlias { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual ICollection<AssignedPerson> AssignedPersons { get; set; }
 
         #endregion Virtual Properties

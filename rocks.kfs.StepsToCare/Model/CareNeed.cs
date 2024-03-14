@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2022 by Kingdom First Solutions
+// Copyright 2024 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ namespace rocks.kfs.StepsToCare.Model
     using System.Runtime.Serialization;
     using System.Data.Entity.ModelConfiguration;
     using Rock.Data;
+    using Rock.Lava;
     using Rock.Model;
     using Rock.Web.Cache;
     using System.Linq;
@@ -82,20 +83,35 @@ namespace rocks.kfs.StepsToCare.Model
         [DataMember]
         public int? ParentNeedId { get; set; }
 
+        [DataMember]
+        public bool CustomFollowUp { get; set; }
+
+        [DataMember]
+        public int? RenewPeriodDays { get; set; }
+
+        [DataMember]
+        public int? RenewMaxCount { get; set; }
+
+        [DataMember]
+        public int RenewCurrentCount { get; set; } = 0;
+
+        [DataMember]
+        public DateTime? SnoozeDate { get; set; }
+
         #endregion Entity Properties
 
         #region Virtual Properties
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual PersonAlias PersonAlias { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual PersonAlias SubmitterPersonAlias { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual DefinedValue Status { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual DefinedValue Category { get; set; }
 
         /// <summary>
@@ -107,13 +123,13 @@ namespace rocks.kfs.StepsToCare.Model
         [DataMember]
         public virtual Campus Campus { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual CareNeed ParentNeed { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual ICollection<AssignedPerson> AssignedPersons { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual ICollection<CareNeed> ChildNeeds { get; set; }
 
         #endregion Virtual Properties
@@ -132,7 +148,7 @@ namespace rocks.kfs.StepsToCare.Model
         /// <summary>
         /// Returns a <see cref="System.Int32"/> count of <see cref="Note"/>'s attached to Care Need as Care Touches.
         /// </summary>
-        [LavaInclude]
+        [LavaVisible]
         public int TouchCount
         {
             get
@@ -146,7 +162,7 @@ namespace rocks.kfs.StepsToCare.Model
                         {
                             var careNeedNotes = new NoteService( rockContext )
                                 .GetByNoteTypeId( noteType.Id ).AsNoTracking()
-                                .Where( n => n.EntityId == Id );
+                                .Where( n => n.EntityId == Id && n.Caption != "Action" );
 
                             _touchCount = careNeedNotes.Count();
                         }
