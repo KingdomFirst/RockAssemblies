@@ -17,13 +17,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Web.UI;
+using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using EventbriteDotNetFramework;
 using Rock;
 using Rock.Data;
 using Rock.Field;
+using Rock.Reporting;
 using Rock.Web.UI.Controls;
 using rocks.kfs.Eventbrite.Utility.ExtensionMethods;
 
@@ -152,6 +155,99 @@ namespace rocks.kfs.Eventbrite.Field.Types
                 {
                     editControl.Text = value;
                 }
+            }
+        }
+
+        #endregion
+
+        #region Filter Control
+
+        /// <summary>
+        /// Creates the control needed to filter (query) values using this field type.
+        /// </summary>
+        /// <param name="configurationValues">The configuration values.</param>
+        /// <param name="id">The identifier.</param>
+        /// <param name="required">if set to <c>true</c> [required].</param>
+        /// <param name="filterMode">The filter mode.</param>
+        /// <returns></returns>
+        public override Control FilterControl( Dictionary<string, ConfigurationValue> configurationValues, string id, bool required, FilterMode filterMode )
+        {
+            HtmlGenericControl row = new HtmlGenericControl( "div" );
+            row.ID = id;
+            row.AddCssClass( "row" );
+            row.AddCssClass( "form-row" );
+
+            var valueControl = FilterValueControl( configurationValues, id, required, filterMode );
+
+            HtmlGenericControl col2 = new HtmlGenericControl( "div" );
+            col2.ID = string.Format( "{0}_col", id );
+            row.Controls.Add( col2 );
+            if ( valueControl != null )
+            {
+                col2.Controls.Add( valueControl );
+            }
+
+            return row;
+        }
+
+        /// <summary>
+        /// Gets the filter value control.
+        /// </summary>
+        /// <param name="configurationValues">The configuration values.</param>
+        /// <param name="id">The identifier.</param>
+        /// <param name="required">if set to <c>true</c> [required].</param>
+        /// <param name="filterMode">The filter mode.</param>
+        /// <returns>Control.</returns>
+        public override Control FilterValueControl( Dictionary<string, ConfigurationValue> configurationValues, string id, bool required, FilterMode filterMode )
+        {
+            var control = new Rock.Web.UI.Controls.RockTextBox { ID = string.Format( "{0}_tb", id ) };
+
+            if ( control is WebControl )
+            {
+                ( ( WebControl ) control ).AddCssClass( "js-filter-control" );
+            }
+
+            return control;
+        }
+
+        /// <summary>
+        /// Gets the filter value value.
+        /// </summary>
+        /// <param name="control">The control.</param>
+        /// <param name="configurationValues">The configuration values.</param>
+        /// <returns>System.String.</returns>
+        public override string GetFilterValueValue( Control control, Dictionary<string, ConfigurationValue> configurationValues )
+        {
+            if ( control != null && control is TextBox )
+            {
+                return ( ( TextBox ) control ).Text;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the filter compare value (int or string version of <seealso cref="Rock.Model.ComparisonType"/> as a string)
+        /// </summary>
+        /// <param name="control">The control that has the comparison options (or null if this fieldtype doesn't have one).</param>
+        /// <param name="filterMode">The filter mode.</param>
+        /// <returns></returns>
+        public override string GetFilterCompareValue( Control control, FilterMode filterMode )
+        {
+            return Rock.Model.ComparisonType.Contains.ConvertToInt().ToString();
+        }
+
+        /// <summary>
+        /// Sets the filter value value.
+        /// </summary>
+        /// <param name="control">The control.</param>
+        /// <param name="configurationValues">The configuration values.</param>
+        /// <param name="value">The value.</param>
+        public override void SetFilterValueValue( Control control, Dictionary<string, ConfigurationValue> configurationValues, string value )
+        {
+            if ( control != null && control is TextBox )
+            {
+                ( ( TextBox ) control ).Text = value;
             }
         }
 
