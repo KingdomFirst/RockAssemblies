@@ -230,12 +230,13 @@ namespace rocks.kfs.Eventbrite
             {
                 LogEvent( rockContext, "SyncEvent", string.Format( "GroupId: {0} Evntid: {1}", groupid, evntid ), "Begin For each order in ebOrders" );
             }
+            var addedMembers = new List<string>();
             foreach ( var order in ebOrders.OrderBy( o => o.Created ) )
             {
                 foreach ( var attendee in order.Attendees )
                 {
                     HttpContext.Current.Server.ScriptTimeout = HttpContext.Current.Server.ScriptTimeout + 2;
-                    SyncAttendee( rockContext, attendee, order, group, groupMemberService, personAliasService, occ, evntid, IsRSVPEvent, gmPersonAttributeKey, updatePrimaryEmail, recordStatusId, connectionStatusId, EnableLogging );
+                    SyncAttendee( rockContext, attendee, order, group, groupMemberService, personAliasService, occ, evntid, IsRSVPEvent, gmPersonAttributeKey, updatePrimaryEmail, recordStatusId, connectionStatusId, EnableLogging, addedMembers );
                 }
             }
 
@@ -268,7 +269,6 @@ namespace rocks.kfs.Eventbrite
                 var personAliasService = new PersonAliasService( rockContext );
 
                 AttendanceOccurrence occ = GetOrAddOccurrence( rockContext, group, ebEvent );
-
                 foreach ( var attendee in order.Attendees )
                 {
                     SyncAttendee( rockContext, attendee, order, group, groupMemberService, personAliasService, occ, order.Event_Id, ebEvent.IsRSVPEvent( eb ), gmPersonAttributeKey, false );
@@ -313,8 +313,14 @@ namespace rocks.kfs.Eventbrite
 
         }
 
-        private static void SyncAttendee( RockContext rockContext, Attendee attendee, Order order, Group group, GroupMemberService groupMemberService, PersonAliasService personAliasService, AttendanceOccurrence occ, long evntid, bool IsRSVPEvent, string gmPersonAttributeKey, bool updatePrimaryEmail, int recordStatusId = 5, int connectionStatusId = 66, bool EnableLogging = false )
+        private static void SyncAttendee( RockContext rockContext, Attendee attendee, Order order, Group group, GroupMemberService groupMemberService, PersonAliasService personAliasService, AttendanceOccurrence occ, long evntid, bool IsRSVPEvent, string gmPersonAttributeKey, bool updatePrimaryEmail, int recordStatusId = 5, int connectionStatusId = 66, bool EnableLogging = false, List<string> groupMembersAdded = null )
         {
+            if ( groupMembersAdded == null )
+            {
+                groupMembersAdded = new List<string>();
+                groupMembersAdded.Add( "nullList" );
+            }
+
             if ( string.IsNullOrWhiteSpace( attendee.Profile.Email ) )
             {
                 attendee.Profile.Email = order.Email;
@@ -346,7 +352,8 @@ namespace rocks.kfs.Eventbrite
 
                     groupMemberService.Add( member );
 
-                    SetPersonData( rockContext, person, attendee, group, IsRSVPEvent && order.Attendees != null ? order.Attendees.Count : attendee.Quantity, EnableLogging );
+                    SetPersonData( rockContext, person, attendee, group, IsRSVPEvent && order.Attendees != null ? 1 : attendee.Quantity, EnableLogging );
+                    groupMembersAdded.Add( $"{member.PersonId}|{attendee.Ticket_Class_Id}" );
                 }
                 else if ( matchedGroupMember != null && order.Status == "deleted" )
                 {
@@ -373,6 +380,11 @@ namespace rocks.kfs.Eventbrite
                         var splitVal = attributeVal.SplitDelimitedValues( "^" );
                         var ticketClasses = splitVal[1].SplitDelimitedValues( "||" );
                         var orderId = splitVal[2].ToLong( -1 );
+                        var ticketClassStr = $"{matchedGroupMember.PersonId}|{attendee.Ticket_Class_Id}";
+                        if ( groupMembersAdded.Contains( "nullList" ) )
+                        {
+                            groupMembersAdded.Add( ticketClassStr );
+                        }
                         if ( splitVal.Length < 4 )
                         {
                             attributeVal += "^";
@@ -382,21 +394,27 @@ namespace rocks.kfs.Eventbrite
                         if ( !ticketClasses.Contains( attendee.Ticket_Class_Name ) )
                         {
                             splitVal[1] += "||" + attendee.Ticket_Class_Name;
-                            splitVal[3] += "||" + order.Attendees?.Count( a => a.Profile.First_Name == attendee.Profile.First_Name && a.Profile.Last_Name == attendee.Profile.Last_Name && a.Profile.Email == attendee.Profile.Email && a.Ticket_Class_Id == attendee.Ticket_Class_Id ).ToString();
+                            splitVal[3] += "||1";
+                            groupMembersAdded.Add( ticketClassStr );
                         }
                         else
                         {
-                            var countVal = order.Attendees?.Count( a => a.Profile.First_Name == attendee.Profile.First_Name && a.Profile.Last_Name == attendee.Profile.Last_Name && a.Profile.Email == attendee.Profile.Email && a.Ticket_Class_Id == attendee.Ticket_Class_Id );
-                            if ( orderId != order.Id )
+                            if ( groupMembersAdded.Contains( ticketClassStr ) )
                             {
                                 var addTo = ticketQtys[Array.IndexOf( ticketClasses, attendee.Ticket_Class_Name )].AsInteger();
-                                countVal = addTo + countVal;
+                                var addCount = addTo + 1;
+                                ticketQtys[Array.IndexOf( ticketClasses, attendee.Ticket_Class_Name )] = addCount.ToString();
                             }
-                            ticketQtys[Array.IndexOf( ticketClasses, attendee.Ticket_Class_Name )] = countVal.ToString();
+                            else
+                            {
+                                ticketQtys[Array.IndexOf( ticketClasses, attendee.Ticket_Class_Name )] = "1";
+                                groupMembersAdded.Add( ticketClassStr );
+                            }
                             splitVal[3] = ticketQtys.JoinStrings( "||" );
                         }
                         matchedGroupMember.SetAttributeValue( gmPersonAttributeKey, splitVal.JoinStrings( "^" ) );
                         matchedGroupMember.SaveAttributeValue( gmPersonAttributeKey );
+
                     }
                 }
 
@@ -731,6 +749,10 @@ namespace rocks.kfs.Eventbrite
             if ( ebPersonFieldType != null )
             {
                 var groupMember = group.Members.FirstOrDefault();
+                if ( groupMember == null )
+                {
+                    groupMember = new GroupMember { Id = 0, Group = group, GroupTypeId = group.GroupTypeId, GroupRoleId = group.GroupType.DefaultGroupRoleId ?? 0 };
+                }
                 if ( groupMember != null )
                 {
                     groupMember.LoadAttributes( rockContext );
