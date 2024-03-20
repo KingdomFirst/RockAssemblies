@@ -178,13 +178,9 @@ namespace rocks.kfs.Eventbrite.Field.Types
             row.AddCssClass( "form-row" );
 
             var valueControl = FilterValueControl( configurationValues, id, required, filterMode );
-
-            HtmlGenericControl col2 = new HtmlGenericControl( "div" );
-            col2.ID = string.Format( "{0}_col", id );
-            row.Controls.Add( col2 );
             if ( valueControl != null )
             {
-                col2.Controls.Add( valueControl );
+                row.Controls.Add( valueControl );
             }
 
             return row;
@@ -208,6 +204,52 @@ namespace rocks.kfs.Eventbrite.Field.Types
             }
 
             return control;
+        }
+
+        /// <summary>
+        /// Gets the filter value.
+        /// </summary>
+        /// <param name="filterControl">The filter control.</param>
+        /// <param name="configurationValues">The configuration values.</param>
+        /// <param name="filterMode">The filter mode.</param>
+        /// <returns></returns>
+        public override List<string> GetFilterValues( Control filterControl, Dictionary<string, ConfigurationValue> configurationValues, FilterMode filterMode )
+        {
+            var values = new List<string>();
+
+            if ( filterControl != null )
+            {
+                try
+                {
+                    string compare = GetFilterCompareValue( filterControl.Controls[0].Controls[0], filterMode );
+                    if ( compare != null )
+                    {
+                        values.Add( compare );
+                    }
+
+                    Rock.Model.ComparisonType? comparisonType = compare.ConvertToEnumOrNull<Rock.Model.ComparisonType>();
+                    if ( comparisonType.HasValue && ( Rock.Model.ComparisonType.IsBlank | Rock.Model.ComparisonType.IsNotBlank ).HasFlag( comparisonType.Value ) )
+                    {
+                        // if using IsBlank or IsNotBlank, we don't care about the value, so don't try to grab it from the UI
+                        values.Add( string.Empty );
+                    }
+                    else
+                    {
+                        string value = GetFilterValueValue( filterControl.Controls[0], configurationValues );
+                        if ( value != null )
+                        {
+                            values.Add( value );
+                        }
+                    }
+
+                }
+                catch
+                {
+                    // intentionally ignore error
+                }
+            }
+
+            return values;
         }
 
         /// <summary>
