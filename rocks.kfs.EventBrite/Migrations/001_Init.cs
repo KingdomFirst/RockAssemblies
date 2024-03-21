@@ -36,8 +36,8 @@ namespace rocks.kfs.Eventbrite.Migrations
             RockMigrationHelper.UpdateFieldType( "Eventbrite Event", "", "rocks.kfs.Eventbrite", "rocks.kfs.Eventbrite.Field.Types.EventbriteEventFieldType", EBGuid.FieldType.EVENTBRITE_EVENT );
             RockMigrationHelper.UpdateFieldType( "Eventbrite Person", "", "rocks.kfs.Eventbrite", "rocks.kfs.Eventbrite.Field.Types.EventbritePersonFieldType", EBGuid.FieldType.EVENTBRITE_PERSON );
 
-            RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Eventbrite.Eventbrite", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "EB Access Token", "", "Eventbrite Access Token", 0, "", "BC105CFA-A663-47E3-9B5B-47591D0BC668", "EBAccessToken" );
-            RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Eventbrite.Eventbrite", Rock.SystemGuid.FieldType.INTEGER, "", "", "EB Organization Id", "", "Eventbrite Organization id", 0, "", "8C3D6321-B6D3-42FA-ABA2-36ECC4C21D9D", "EBOrganizationId" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "rocks.kfs.Eventbrite.Eventbrite", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "EB Access Token", "", "Eventbrite Access Token", 0, "", "BC105CFA-A663-47E3-9B5B-47591D0BC668", "EBAccessToken" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "rocks.kfs.Eventbrite.Eventbrite", Rock.SystemGuid.FieldType.INTEGER, "", "", "EB Organization Id", "", "Eventbrite Organization id", 0, "", "8C3D6321-B6D3-42FA-ABA2-36ECC4C21D9D", "EBOrganizationId" );
         }
 
         /// <summary>
