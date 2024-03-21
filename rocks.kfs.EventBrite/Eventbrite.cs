@@ -269,6 +269,7 @@ namespace rocks.kfs.Eventbrite
                 var personAliasService = new PersonAliasService( rockContext );
 
                 AttendanceOccurrence occ = GetOrAddOccurrence( rockContext, group, ebEvent );
+
                 foreach ( var attendee in order.Attendees )
                 {
                     SyncAttendee( rockContext, attendee, order, group, groupMemberService, personAliasService, occ, order.Event_Id, ebEvent.IsRSVPEvent( eb ), gmPersonAttributeKey, false );
@@ -315,6 +316,7 @@ namespace rocks.kfs.Eventbrite
 
         private static void SyncAttendee( RockContext rockContext, Attendee attendee, Order order, Group group, GroupMemberService groupMemberService, PersonAliasService personAliasService, AttendanceOccurrence occ, long evntid, bool IsRSVPEvent, string gmPersonAttributeKey, bool updatePrimaryEmail, int recordStatusId = 5, int connectionStatusId = 66, bool EnableLogging = false, List<string> groupMembersAdded = null )
         {
+            // If the groupMembersAdded list comes in as null we need to be able to identify it did, as in the case of a webhook call with an individual order. 
             if ( groupMembersAdded == null )
             {
                 groupMembersAdded = new List<string>();
