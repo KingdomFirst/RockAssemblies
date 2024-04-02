@@ -14,8 +14,7 @@ namespace rocks.kfs.StepsToCare.Model
         public Note Note { get; set; }
         public int NoteTouchCount { get; set; } = 0;
         public int TouchCount { get; set; } = 0;
-        public bool HasNoteOlderThenHours { get; set; } = false;
+        public bool HasNoteOlderThanHours { get; set; } = false;
         public bool HasFollowUpWorkerNote { get; set; } = false;
-
     }
 }

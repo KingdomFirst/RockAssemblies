@@ -15,5 +15,6 @@ namespace rocks.kfs.StepsToCare.Model
         public int MinimumCareTouchHours { get; set; }
         public bool NotifyAll { get; set; }
         public bool Recurring { get; set; }
+        public int Order { get; set; } = 0;
     }
 }

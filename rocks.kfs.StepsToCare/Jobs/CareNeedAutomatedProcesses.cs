@@ -252,6 +252,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                                 touchTemplate.MinimumCareTouchHours = matrixItem.GetAttributeValue( "MinimumCareTouchHours" ).AsInteger();
                                 touchTemplate.NotifyAll = matrixItem.GetAttributeValue( "NotifyAllAssigned" ).AsBoolean();
                                 touchTemplate.Recurring = matrixItem.GetAttributeValue( "Recurring" ).AsBoolean();
+                                touchTemplate.Order = matrixItem.Order;
 
                                 touchTemplates.Add( touchTemplate );
                             }
@@ -296,21 +297,26 @@ namespace rocks.kfs.StepsToCare.Jobs
                     foreach ( var catTemplate in allTouchTemplates )
                     {
                         var careNeedsInCategory = careNeeds.Where( n => n.StatusValueId != closedValueId && n.CategoryValueId.HasValue && n.CategoryValueId == catTemplate.Key );
-                        var careNeedsInCategoryList = careNeedsInCategory.ToList();
                         foreach ( var template in catTemplate.Value )
                         {
                             var currentFlaggedTemplatesQry = careNeedsInCategory
-                                .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && ( ( n.Text == template.NoteTemplate.Note && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ) || DbFunctions.DiffHours( cn.DateEntered, RockDateTime.Now ) >= template.MinimumCareTouchHours ) ),
+                                .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && ( ( n.Text == template.NoteTemplate.Note && template.Recurring && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ) || DbFunctions.DiffHours( cn.DateEntered, RockDateTime.Now ) >= template.MinimumCareTouchHours ) ),
                                     ( cn, n ) => new FlaggedNeed
                                     {
                                         CareNeed = cn,
                                         Note = n,
-                                        HasNoteOlderThenHours = ( n.Text == template.NoteTemplate.Note && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ),
-                                        NoteTouchCount = careNeedNotesQry.Count( note => note.EntityId == cn.Id && ( note.Text == template.NoteTemplate.Note && DbFunctions.DiffHours( note.CreatedDateTime, RockDateTime.Now ) <= template.MinimumCareTouchHours ) ),
+                                        HasNoteOlderThanHours = ( n.Text == template.NoteTemplate.Note && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ),
+                                        NoteTouchCount = careNeedNotesQry.Count( note => note.EntityId == cn.Id && ( note.Text == template.NoteTemplate.Note && ( !template.Recurring || ( template.Recurring && DbFunctions.DiffHours( note.CreatedDateTime, RockDateTime.Now ) <= template.MinimumCareTouchHours ) ) ) ),
                                         TouchCount = careNeedNotesQry.Where( note => note.EntityId == cn.Id && n.Caption != "Action" ).Count()
-                                    } )
-                                .Where( f => ( !f.HasNoteOlderThenHours && f.NoteTouchCount < template.MinimumCareTouches ) || ( f.HasNoteOlderThenHours && template.Recurring && f.NoteTouchCount < template.MinimumCareTouches ) );
+                                    } );
+                            currentFlaggedTemplatesQry = currentFlaggedTemplatesQry.Where( f => f.NoteTouchCount < template.MinimumCareTouches );
                             var currentFlaggedTemplates = currentFlaggedTemplatesQry.ToList();
+                            var currentFlaggedIds = currentFlaggedTemplates.Select( cft => cft.CareNeed.Id ).AsEnumerable();
+                            var nonNoteNeeds = careNeedsInCategory
+                                .Where( cn => !currentFlaggedIds.Contains( cn.Id ) && !careNeedNotesQry.Any( n => n.EntityId == cn.Id ) && DbFunctions.DiffHours( cn.DateEntered, RockDateTime.Now ) >= template.MinimumCareTouchHours )
+                                .Select( cn => new FlaggedNeed { CareNeed = cn, HasNoteOlderThanHours = false, NoteTouchCount = 0, TouchCount = 0 } )
+                                .ToList();
+                            currentFlaggedTemplates.AddRange( nonNoteNeeds );
                             foreach ( var temp in currentFlaggedTemplates )
                             {
                                 temp.TouchTemplate = template;
@@ -430,8 +436,11 @@ namespace rocks.kfs.StepsToCare.Jobs
                 // Send notification about "Flagged" messages (any messages without a care touch by the follow up worker or minimum care touches within the set minimum Care Touches Hours.
                 if ( careTouchNeededCommunication != null && careTouchNeededCommunication.Id > 0 )
                 {
-                    var flaggedOrdered = careNeedFlagged.OrderByDescending( f => f.TouchTemplate != null );
-                    foreach ( var flagNeed in flaggedOrdered.DistinctBy( f => f.CareNeed.Id ) )
+                    var flaggedOrdered = careNeedFlagged
+                        .OrderByDescending( f => f.TouchTemplate != null )
+                        .ThenBy( f => f.TouchTemplate?.Order )
+                        .DistinctBy( f => f.CareNeed.Id );
+                    foreach ( var flagNeed in flaggedOrdered )
                     {
                         var careNeed = flagNeed.CareNeed;
                         careNeed.LoadAttributes();
@@ -460,7 +469,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                             mergeFields.Add( "TouchCount", flagNeed.TouchCount );
                             mergeFields.Add( "NoteTouchCount", flagNeed.NoteTouchCount );
                             mergeFields.Add( "HasFollowUpWorkerNote", flagNeed.HasFollowUpWorkerNote );
-                            mergeFields.Add( "HasNoteOlderThenHours", flagNeed.HasNoteOlderThenHours );
+                            mergeFields.Add( "HasNoteOlderThanHours", flagNeed.HasNoteOlderThanHours );
                             mergeFields.Add( "NoteTemplates", noteTemplates );
 
                             var notificationType = assignee.PersonAlias.Person.GetAttributeValue( SystemGuid.PersonAttribute.NOTIFICATION.AsGuid() );
