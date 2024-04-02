@@ -30,8 +30,8 @@ using rocks.kfs.StepsToCare.Model;
 namespace rocks.kfs.StepsToCare.Field.Types
 {
     /// <summary>
-    /// Field Type used to display a dropdown list of Note Templates
-    /// Stored as NoteTemplate.Guid
+    /// Field Type used to display a dropdown list of Care Needs
+    /// Stored as CareNeed.Guid
     /// </summary>
     [Rock.SystemGuid.FieldTypeGuid( SystemGuid.FieldType.CARE_NEED )]
     public class CareNeedFieldType : Rock.Field.FieldType, IEntityFieldType

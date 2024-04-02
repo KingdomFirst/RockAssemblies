@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2022 by Kingdom First Solutions
+// Copyright 2024 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace rocks.kfs.StepsToCare.Migrations
             //   BlockType: Care Entry
             //   Category: KFS > Steps To Care
             //   Attribute: Group Type Roles
-            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE", "BD0D9B57-2A41-4490-89FF-F01DAB7D4904", "Group Type Roles", "GroupTypeAndRole", "Group Type and Role", @"Select the Group Type Roles of the leaders you would like auto assigned to care need when the Person is a member of this type of group. If none are selected it will not auto assign the small group member with the appropriate role to the need. ", 0, @"", "664F6632-A438-4249-ADB0-D94B891BF089" );
+            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE", "BD0D9B57-2A41-4490-89FF-F01DAB7D4904", "Group Type Roles", "GroupTypeAndRole", "Group Type and Role", @"Select the Group Type Roles of the leaders you would like auto assigned to care need when the Person is a member of this type of group. If none are selected it will not auto assign the group member with the appropriate role to the need. ", 0, @"", "664F6632-A438-4249-ADB0-D94B891BF089" );
 
             // Add Block Attribute Value
             //   Block: Care Dashboard
@@ -56,7 +56,7 @@ namespace rocks.kfs.StepsToCare.Migrations
             RockMigrationHelper.AddBlockAttributeValue( "F953C5EF-6504-45F9-81A8-063518B7AB61", "664F6632-A438-4249-ADB0-D94B891BF089", @"f6cecb48-52c1-4d25-9411-f1465755eb70,6d798efa-0110-41d5-bce4-30acefe4317e" );
 
             // Attribute: rocks.kfs.StepsToCare.Jobs.CareNeedAutomatedProcesses: Group Type Roles
-            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.ServiceJob", "BD0D9B57-2A41-4490-89FF-F01DAB7D4904", "Class", "rocks.kfs.StepsToCare.Jobs.CareNeedAutomatedProcesses", "Group Type Roles", "Group Type Roles", @"Select the Group Type Roles of the leaders you would like auto assigned to care need when the Person is a member of this type of group. If none are selected it will not auto assign the small group member with the appropriate role to the need. ", 0, @"", "D3F19DE8-B8A0-4B87-AB4D-DE827D79C780", "GroupTypeAndRole" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.ServiceJob", "BD0D9B57-2A41-4490-89FF-F01DAB7D4904", "Class", "rocks.kfs.StepsToCare.Jobs.CareNeedAutomatedProcesses", "Group Type Roles", "Group Type Roles", @"Select the Group Type Roles of the leaders you would like auto assigned to care need when the Person is a member of this type of group. If none are selected it will not auto assign the group member with the appropriate role to the need. ", 0, @"", "D3F19DE8-B8A0-4B87-AB4D-DE827D79C780", "GroupTypeAndRole" );
 
             RockMigrationHelper.AddAttributeValue( "D3F19DE8-B8A0-4B87-AB4D-DE827D79C780", 1079, @"", "D3F19DE8-B8A0-4B87-AB4D-DE827D79C780" ); // Care Need Automated Processes: Group Type Roles
 

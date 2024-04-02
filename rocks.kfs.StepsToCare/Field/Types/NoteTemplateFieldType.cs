@@ -86,7 +86,7 @@ namespace rocks.kfs.StepsToCare.Field.Types
             {
                 var noteTemplate = new NoteTemplateService( new RockContext() ).Get( guid.Value );
 
-                // sort by Order then Name (using a padded string)
+                // sort by Order then Note (using a padded string)
                 var sortValue = noteTemplate.Order.ToString().PadLeft( 10 ) + "," + noteTemplate.Note;
                 return sortValue;
             }

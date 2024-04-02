@@ -88,7 +88,6 @@ namespace rocks.kfs.StepsToCare
                             careAssignee.CareNeed = careNeed;
                             careAssignee.PersonAliasId = worker.PersonAliasId;
                             careAssignee.WorkerId = worker.Id;
-                            //careAssignee.FollowUpWorker = true;
                             careAssignee.Type = AssignedType.Geofence;
 
                             assignedPeople.Add( careAssignee );

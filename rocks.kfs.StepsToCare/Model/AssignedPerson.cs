@@ -71,7 +71,6 @@ namespace rocks.kfs.StepsToCare.Model
     public enum AssignedType
     {
         Worker,
-        [Description("Group Role")]
         GroupRole,
         Geofence,
         Manual
