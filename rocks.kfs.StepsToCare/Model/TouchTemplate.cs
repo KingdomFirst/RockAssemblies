@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Rock.Lava;
 
 namespace rocks.kfs.StepsToCare.Model
 {
     // used to map Attribute Matrix Values to object for easier use.
-    public class TouchTemplate
+    public class TouchTemplate : LavaDataObject
     {
         public NoteTemplate NoteTemplate { get; set; }
         public int MinimumCareTouches { get; set; }

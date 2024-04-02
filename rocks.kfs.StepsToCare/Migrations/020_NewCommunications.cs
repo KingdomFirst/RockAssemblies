@@ -91,12 +91,13 @@ Quick Notes:
 
             RockMigrationHelper.UpdateSystemCommunication( "Plugins", "Care Touch Needed with Actions", "", "", "", "", "", "Your assigned Care Need requires attention", @"{{ 'Global' | Attribute:'EmailHeader' }}
     <p>{{ Person.FullName }},</p>
-    <p>Your assigned Care Need requires attention{% if Note and Note != empty and Note.Text != '' %}, specifically there are not enough ""{{ Note.Text }}"" Care Touches{% endif %}:</p>
+    <p>Your assigned Care Need requires attention{% if TouchTemplate and TouchTemplate.NoteTemplate.Note != '' %}, specifically there are not enough ""{{ TouchTemplate.NoteTemplate.Note }}"" Care Touches{% endif %}:</p>
     <blockquote><b>Care Need ({{ CareNeed.Id }})</b><br>
     <b>Date:</b> {{ CareNeed.DateEntered }}<br>
     <b>Name:</b> {{ CareNeed.PersonAlias.Person.FullName }}<br>
+    <b>Category:</b> {{ CareNeed.Category.Value }}<br>
     <b>Details:</b> {{ CareNeed.Details }}<br>
-    {% if Note and Note != empty and Note.Text != '' %}<b>""{{ Note.Text }}"" Care Touches:</b> {{ NoteTouchCount }}<br>{% endif %}
+    {% if TouchTemplate and TouchTemplate.NoteTemplate.Note != '' %}<b>""{{ TouchTemplate.NoteTemplate.Note }}"" Care Touches:</b> {{ NoteTouchCount }}<br>{% endif %}
     <b>Total Care Touches:</b> {{ TouchCount }}</blockquote>
 <table width=""100%"">
 <tr>

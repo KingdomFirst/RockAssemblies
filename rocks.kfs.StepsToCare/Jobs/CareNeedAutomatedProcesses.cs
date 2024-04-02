@@ -430,7 +430,8 @@ namespace rocks.kfs.StepsToCare.Jobs
                 // Send notification about "Flagged" messages (any messages without a care touch by the follow up worker or minimum care touches within the set minimum Care Touches Hours.
                 if ( careTouchNeededCommunication != null && careTouchNeededCommunication.Id > 0 )
                 {
-                    foreach ( var flagNeed in careNeedFlagged.OrderByDescending( f => f.TouchTemplate != null ).DistinctBy( f => f.CareNeed.Id ) )
+                    var flaggedOrdered = careNeedFlagged.OrderByDescending( f => f.TouchTemplate != null );
+                    foreach ( var flagNeed in flaggedOrdered.DistinctBy( f => f.CareNeed.Id ) )
                     {
                         var careNeed = flagNeed.CareNeed;
                         careNeed.LoadAttributes();
