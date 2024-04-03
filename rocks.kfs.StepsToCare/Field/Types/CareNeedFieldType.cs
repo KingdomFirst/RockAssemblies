@@ -70,7 +70,7 @@ namespace rocks.kfs.StepsToCare.Field.Types
                 : GetCondensedTextValue( value, configurationValues.ToDictionary( cv => cv.Key, cv => cv.Value.Value ) );
         }
 
-        #endregion
+        #endregion Formatting
 
         #region Edit Control
 
@@ -135,7 +135,7 @@ namespace rocks.kfs.StepsToCare.Field.Types
             }
         }
 
-        #endregion
+        #endregion Edit Control
 
         #region Entity Methods
 
@@ -197,7 +197,6 @@ namespace rocks.kfs.StepsToCare.Field.Types
             return null;
         }
 
-        #endregion
-
+        #endregion Entity Methods
     }
 }

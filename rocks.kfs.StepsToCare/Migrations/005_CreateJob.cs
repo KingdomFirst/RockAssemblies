@@ -14,7 +14,6 @@
 // limitations under the License.
 // </copyright>
 //
-using Rock;
 using Rock.Plugin;
 
 namespace rocks.kfs.StepsToCare.Migrations
@@ -35,7 +34,7 @@ namespace rocks.kfs.StepsToCare.Migrations
                   ,[CronExpression]
                   ,[NotificationStatus]
                   ,[Guid] )
-               VALUES ( 
+               VALUES (
                   0
                   ,1
                   ,'Care Need Automated Notifications'
@@ -81,12 +80,10 @@ namespace rocks.kfs.StepsToCare.Migrations
                  UPDATE [AttributeValue] SET EntityId = @JobId WHERE [Guid] = 'F7218A61-0324-467B-AD5B-C9C58030EA95'
                  UPDATE [AttributeValue] SET EntityId = @JobId WHERE [Guid] = '78C13C31-23A4-46F4-B9B1-1815E78A5016'
                  UPDATE [AttributeValue] SET EntityId = @JobId WHERE [Guid] = '79A2352F-D7FB-4BDA-957B-F32D1A10D1D1'" ); // Set EntityId to proper Job id
-
         }
 
         public override void Down()
         {
-
             // Code Generated using Rock\Dev Tools\Sql\CodeGen_ServiceJobWithAttributes_ForAJob.sql
             RockMigrationHelper.DeleteAttribute( "125F5EB3-8223-40B9-8FD6-4EED93602D72" ); // rocks.kfs.StepsToCare.Jobs.CareNeedAutomatedNotifications: Follow Up Notification Template
             RockMigrationHelper.DeleteAttribute( "8D050C0F-105B-4A8B-8879-A15F78F5913E" ); // rocks.kfs.StepsToCare.Jobs.CareNeedAutomatedNotifications: Care Touch Needed Notification Template
@@ -102,7 +99,6 @@ namespace rocks.kfs.StepsToCare.Migrations
             BEGIN
                DELETE [ServiceJob]  WHERE [Guid] = '895C301C-02D1-4D9C-9FC4-DA7257368208';
             END" );
-
         }
     }
 }

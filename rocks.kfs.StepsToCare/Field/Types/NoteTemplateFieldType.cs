@@ -94,7 +94,7 @@ namespace rocks.kfs.StepsToCare.Field.Types
             return base.SortValue( parentControl, value, configurationValues );
         }
 
-        #endregion
+        #endregion Formatting
 
         #region Edit Control
 
@@ -159,7 +159,7 @@ namespace rocks.kfs.StepsToCare.Field.Types
             }
         }
 
-        #endregion
+        #endregion Edit Control
 
         #region Entity Methods
 
@@ -221,7 +221,6 @@ namespace rocks.kfs.StepsToCare.Field.Types
             return null;
         }
 
-        #endregion
-
+        #endregion Entity Methods
     }
 }

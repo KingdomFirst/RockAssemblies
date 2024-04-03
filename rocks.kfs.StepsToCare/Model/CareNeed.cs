@@ -14,21 +14,21 @@
 // limitations under the License.
 // </copyright>
 //
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration;
+using System.Linq;
+using System.Runtime.Serialization;
+using Rock.Data;
+using Rock.Lava;
+using Rock.Model;
+using Rock.Web.Cache;
+
 namespace rocks.kfs.StepsToCare.Model
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Runtime.Serialization;
-    using System.Data.Entity.ModelConfiguration;
-    using Rock.Data;
-    using Rock.Lava;
-    using Rock.Model;
-    using Rock.Web.Cache;
-    using System.Linq;
-    using System.Data.Entity;
-
     /// <summary>
     /// A Care Need
     /// </summary>
@@ -183,7 +183,7 @@ namespace rocks.kfs.StepsToCare.Model
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CareNeedConfiguration"/> class.
-        /// </summary> 
+        /// </summary>
         public CareNeedConfiguration()
         {
             this.HasRequired( cn => cn.PersonAlias ).WithMany().HasForeignKey( cn => cn.PersonAliasId ).WillCascadeOnDelete( false );
@@ -199,6 +199,5 @@ namespace rocks.kfs.StepsToCare.Model
         }
     }
 
-    #endregion
-
+    #endregion Entity Configuration
 }

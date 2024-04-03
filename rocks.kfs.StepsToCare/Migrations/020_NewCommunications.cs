@@ -14,9 +14,6 @@
 // limitations under the License.
 // </copyright>
 //
-using Rock;
-using Rock.Data;
-using Rock.Model;
 using Rock.Plugin;
 
 namespace rocks.kfs.StepsToCare.Migrations
@@ -41,7 +38,7 @@ namespace rocks.kfs.StepsToCare.Migrations
     <table style=""width: 29%; min-width: 190px; margin-bottom: 12px;"" cellpadding=""0"" cellspacing=""0"">
      <tr>
        <td>
-    
+
     		<div><!--[if mso]>
     		  <v:roundrect xmlns:v=""urn:schemas-microsoft-com:vml"" xmlns:w=""urn:schemas-microsoft-com:office:word"" href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}"" style=""height:38px;v-text-anchor:middle;width:175px;"" arcsize=""11%"" strokecolor=""#269abc"" fillcolor=""#31b0d5"">
     			<w:anchorlock/>
@@ -49,7 +46,7 @@ namespace rocks.kfs.StepsToCare.Migrations
     		  </v:roundrect>
     		<![endif]--><a href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}""
     		style=""background-color:#31b0d5;border:1px solid #269abc;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:14px;font-weight:normal;line-height:38px;text-align:center;text-decoration:none;width:175px;-webkit-text-size-adjust:none;mso-hide:all;"">View Care Dashboard</a></div>
-    
+
     	</td>
      </tr>
     </table>
@@ -105,7 +102,7 @@ Quick Notes:
     <table style=""width: 29%; min-width: 190px; margin-bottom: 12px;"" cellpadding=""0"" cellspacing=""0"">
      <tr>
        <td>
-    
+
     		<div><!--[if mso]>
     		  <v:roundrect xmlns:v=""urn:schemas-microsoft-com:vml"" xmlns:w=""urn:schemas-microsoft-com:office:word"" href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}"" style=""height:38px;v-text-anchor:middle;width:175px;"" arcsize=""11%"" strokecolor=""#269abc"" fillcolor=""#31b0d5"">
     			<w:anchorlock/>
@@ -113,7 +110,7 @@ Quick Notes:
     		  </v:roundrect>
     		<![endif]--><a href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}""
     		style=""background-color:#31b0d5;border:1px solid #269abc;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:14px;font-weight:normal;line-height:38px;text-align:center;text-decoration:none;width:175px;-webkit-text-size-adjust:none;mso-hide:all;"">View Care Dashboard</a></div>
-    
+
     	</td>
      </tr>
     </table>
@@ -145,21 +142,19 @@ Quick Notes:
  </tr>
 </table>
 {{ 'Global' | Attribute:'EmailFooter' }}
-", SystemGuid.SystemCommunication.CARE_NEED_TOUCH_NEEDED_WITH_ACTIONS, true, @"Your assigned Care Need requires attention: 
-""{{ CareNeed.Details | Truncate:20,'...' }}"" 
+", SystemGuid.SystemCommunication.CARE_NEED_TOUCH_NEEDED_WITH_ACTIONS, true, @"Your assigned Care Need requires attention:
+""{{ CareNeed.Details | Truncate:20,'...' }}""
 {% capture dashboardLink %}{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}{% endcapture -%}{{ dashboardLink }}
 
 Quick Notes:
 {% for template in NoteTemplates %} {{ template.Note }}: {% capture templateLink %}{{ dashboardLink }}?QuickNote={{ template.Id }}&CareNeed={{ CareNeed.Id }}&rckipid={{ Person | PersonTokenCreate:2880,2 }}{% endcapture %}{{ templateLink | CreateShortLink }}
 {% endfor %}" );
-
         }
 
         public override void Down()
         {
             RockMigrationHelper.DeleteSystemCommunication( SystemGuid.SystemCommunication.CARE_NEED_FOLLOWUP_WITH_ACTIONS );
             RockMigrationHelper.DeleteSystemCommunication( SystemGuid.SystemCommunication.CARE_NEED_TOUCH_NEEDED_WITH_ACTIONS );
-
         }
     }
 }

@@ -14,7 +14,6 @@
 // limitations under the License.
 // </copyright>
 //
-using Rock;
 using Rock.Plugin;
 
 namespace rocks.kfs.StepsToCare.Migrations

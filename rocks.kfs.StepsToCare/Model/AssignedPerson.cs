@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2021 by Kingdom First Solutions
+// Copyright 2024 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,16 +14,15 @@
 // limitations under the License.
 // </copyright>
 //
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity.ModelConfiguration;
+using System.Runtime.Serialization;
+using Rock.Lava;
+using Rock.Model;
+
 namespace rocks.kfs.StepsToCare.Model
 {
-    using System.ComponentModel;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data.Entity.ModelConfiguration;
-    using System.Runtime.Serialization;
-    using Rock.Lava;
-    using Rock.Model;
-
     /// <summary>
     /// Assigned Persons for Care Needs
     /// </summary>
@@ -82,7 +81,7 @@ namespace rocks.kfs.StepsToCare.Model
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AssignedPersonConfiguration"/> class.
-        /// </summary> 
+        /// </summary>
         public AssignedPersonConfiguration()
         {
             this.HasRequired( ap => ap.CareNeed ).WithMany( cn => cn.AssignedPersons ).HasForeignKey( ap => ap.NeedId ).WillCascadeOnDelete( true );
@@ -94,5 +93,5 @@ namespace rocks.kfs.StepsToCare.Model
         }
     }
 
-    #endregion
+    #endregion Entity Configuration
 }

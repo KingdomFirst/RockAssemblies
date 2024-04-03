@@ -14,7 +14,6 @@
 // limitations under the License.
 // </copyright>
 //
-using Rock;
 using Rock.Plugin;
 
 namespace rocks.kfs.StepsToCare.Migrations
@@ -78,7 +77,6 @@ namespace rocks.kfs.StepsToCare.Migrations
                  UPDATE [AttributeValue] SET EntityId = @JobId WHERE [Guid] = '33649C3E-F221-4562-BCA1-B775127097C8'
                  UPDATE [AttributeValue] SET EntityId = @JobId WHERE [Guid] = 'D98AECCE-07D9-46A6-8401-6DE8615143F2'
                  UPDATE [AttributeValue] SET EntityId = @JobId WHERE [Guid] = '37CEC870-6B09-4231-ACC8-DEE0CAB55466'" ); // Set EntityId to proper Job id
-
         }
 
         public override void Down()

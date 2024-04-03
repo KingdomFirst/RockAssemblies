@@ -14,7 +14,6 @@
 // limitations under the License.
 // </copyright>
 //
-using System.Collections.Generic;
 using Rock;
 using Rock.Plugin;
 
@@ -50,7 +49,7 @@ namespace rocks.kfs.StepsToCare.Migrations
             RockMigrationHelper.AddDefinedValueAttributeValue( "811ECA2D-2B74-469A-9CFB-AB47B9643A02", "D7727F70-10B3-471E-86AE-5A2176ABCD0F", @"label label-success" );
             RockMigrationHelper.AddDefinedValueAttributeValue( "989A3B33-8230-4167-99F6-E1C21EE6950E", "D7727F70-10B3-471E-86AE-5A2176ABCD0F", @"label label-info" );
 
-            // Add Page 
+            // Add Page
             //  Internal Name: Care Needs
             //  Site: Rock RMS
             RockMigrationHelper.AddPage( true, "BF04BB7E-BE3A-4A38-A37C-386B55496303", "F66758C6-3E3D-4598-AF4C-B317047B5987", "Care Needs", "", "ABA4CE73-28DC-42DE-BE70-33F09287C116", "" );
@@ -58,7 +57,7 @@ namespace rocks.kfs.StepsToCare.Migrations
             //   Page:Care Needs
             //   Route:Person/{PersonId}/CareNeeds
             RockMigrationHelper.AddPageRoute( "ABA4CE73-28DC-42DE-BE70-33F09287C116", "Person/{PersonId}/CareNeeds", "A243DDEE-1B40-4DAD-8A70-35116558E47F" );
-            // Add Block 
+            // Add Block
             //  Block Name: Care Dashboard
             //  Page Name: Care Needs
             //  Layout: -
@@ -269,7 +268,7 @@ namespace rocks.kfs.StepsToCare.Migrations
             RockMigrationHelper.DeleteBlock( "6AC9740A-EFAA-42E4-BD9B-D131FE4AE442" );
 
             RockMigrationHelper.DeletePageRoute( "A243DDEE-1B40-4DAD-8A70-35116558E47F" );
-            // Delete Page 
+            // Delete Page
             //  Internal Name: Care Needs
             //  Site: Rock RMS
             //  Layout: PersonDetail

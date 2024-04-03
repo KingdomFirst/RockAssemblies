@@ -45,6 +45,5 @@ namespace rocks.kfs.StepsToCare.SystemGuid
         /// The Care Need status defined value snoozed.
         /// </summary>
         public const string CARE_NEED_STATUS_SNOOZED = "6A5890DE-D784-47A7-B83E-98EE70BFFA91";
-
     }
 }

@@ -202,7 +202,7 @@ namespace rocks.kfs.StepsToCare
                     // AgeRange
                     careWorkersCountChild12 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, false, false, false );
 
-                    // Gender 
+                    // Gender
                     careWorkersCountChild13 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, true, false, false );
 
                     // Category
@@ -213,7 +213,6 @@ namespace rocks.kfs.StepsToCare
 
                     // None
                     careWorkersCountChild16 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, false, false );
-
                 }
 
                 var careWorkerCounts = careWorkerCount1;
@@ -427,7 +426,6 @@ namespace rocks.kfs.StepsToCare
                         {
                             LogEvent( null, "AutoAssignWorkers", string.Format( "Care Need Guid: {0}, groupLeaders Count: {1} addedWorkerAliasIds Count: {2}", careNeed.Guid, groupLeaders.Count(), addedWorkerAliasIds.Count() ), "In Small Groups, Leader Count" );
                         }
-
                     }
                 }
             }
@@ -615,6 +613,7 @@ namespace rocks.kfs.StepsToCare
                                     .ThenBy( cw => cw.Worker.CategoryValues.Contains( careNeed.CategoryValueId.ToString() ) )
                                     .ThenBy( cw => cw.Worker.Campuses.Contains( careNeed.CampusId.ToString() ) );
         }
+
         private static PageReference GetParentPage( int pageId )
         {
             var pageCache = PageCache.Get( pageId );
@@ -628,6 +627,7 @@ namespace rocks.kfs.StepsToCare
             }
             return new PageReference( pageCache.Guid.ToString() );
         }
+
         public static ServiceLog LogEvent( RockContext rockContext, string type, string input, string result )
         {
             if ( rockContext == null )

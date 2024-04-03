@@ -14,7 +14,6 @@
 // limitations under the License.
 // </copyright>
 //
-using Rock;
 using Rock.Plugin;
 
 namespace rocks.kfs.StepsToCare.Migrations
@@ -26,7 +25,7 @@ namespace rocks.kfs.StepsToCare.Migrations
         {
             Sql( @"IF COL_LENGTH('_rocks_kfs_StepsToCare_AssignedPerson', 'Type') IS NULL
                 BEGIN
-	                ALTER TABLE _rocks_kfs_StepsToCare_AssignedPerson ADD [Type] int NULL 
+	                ALTER TABLE _rocks_kfs_StepsToCare_AssignedPerson ADD [Type] int NULL
                 END
                 IF COL_LENGTH('_rocks_kfs_StepsToCare_AssignedPerson', 'TypeQualifier') IS NULL
                 BEGIN
@@ -35,7 +34,7 @@ namespace rocks.kfs.StepsToCare.Migrations
 
             Sql( @"IF NOT EXISTS (SELECT Id FROM [_rocks_kfs_StepsToCare_NoteTemplate])
                 BEGIN
-                INSERT [_rocks_kfs_StepsToCare_NoteTemplate] ([Icon], [Note], [IsActive], [Order], [Guid], [CreatedDateTime], [ModifiedDateTime]) 
+                INSERT [_rocks_kfs_StepsToCare_NoteTemplate] ([Icon], [Note], [IsActive], [Order], [Guid], [CreatedDateTime], [ModifiedDateTime])
                 VALUES
                 (N'fas fa-phone-square', N'Called', 1, 0, NEWID(), GETDATE(), GETDATE())
                 ,(N'far fa-comment', N'Text Message Sent', 1, 1, NEWID(), GETDATE(), GETDATE())

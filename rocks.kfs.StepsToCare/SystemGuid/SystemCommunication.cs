@@ -50,6 +50,5 @@ namespace rocks.kfs.StepsToCare.SystemGuid
         /// The Care Need Touch Needed System Communication.
         /// </summary>
         public const string CARE_NEED_TOUCH_NEEDED_WITH_ACTIONS = "464A2112-80D2-4891-A4C1-F7DA01A0FB79";
-
     }
 }
