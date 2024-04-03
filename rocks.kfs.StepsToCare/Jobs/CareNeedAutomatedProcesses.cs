@@ -246,15 +246,18 @@ namespace rocks.kfs.StepsToCare.Jobs
                                 var noteTemplateGuid = matrixItem.GetAttributeValue( "NoteTemplate" ).AsGuid();
                                 var noteTemplate = new NoteTemplateService( rockContext ).Get( noteTemplateGuid );
 
-                                var touchTemplate = new TouchTemplate();
-                                touchTemplate.NoteTemplate = noteTemplate;
-                                touchTemplate.MinimumCareTouches = matrixItem.GetAttributeValue( "MinimumCareTouches" ).AsInteger();
-                                touchTemplate.MinimumCareTouchHours = matrixItem.GetAttributeValue( "MinimumCareTouchHours" ).AsInteger();
-                                touchTemplate.NotifyAll = matrixItem.GetAttributeValue( "NotifyAllAssigned" ).AsBoolean();
-                                touchTemplate.Recurring = matrixItem.GetAttributeValue( "Recurring" ).AsBoolean();
-                                touchTemplate.Order = matrixItem.Order;
+                                if ( noteTemplate != null )
+                                {
+                                    var touchTemplate = new TouchTemplate();
+                                    touchTemplate.NoteTemplate = noteTemplate;
+                                    touchTemplate.MinimumCareTouches = matrixItem.GetAttributeValue( "MinimumCareTouches" ).AsInteger();
+                                    touchTemplate.MinimumCareTouchHours = matrixItem.GetAttributeValue( "MinimumCareTouchHours" ).AsInteger();
+                                    touchTemplate.NotifyAll = matrixItem.GetAttributeValue( "NotifyAllAssigned" ).AsBoolean();
+                                    touchTemplate.Recurring = matrixItem.GetAttributeValue( "Recurring" ).AsBoolean();
+                                    touchTemplate.Order = matrixItem.Order;
 
-                                touchTemplates.Add( touchTemplate );
+                                    touchTemplates.Add( touchTemplate );
+                                }
                             }
                             allTouchTemplates.AddOrIgnore( needCategory.Id, touchTemplates );
                         }
