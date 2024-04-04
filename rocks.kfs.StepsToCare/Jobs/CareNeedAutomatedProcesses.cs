@@ -311,8 +311,8 @@ namespace rocks.kfs.StepsToCare.Jobs
                                         HasNoteOlderThanHours = ( n.Text == template.NoteTemplate.Note && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ),
                                         NoteTouchCount = careNeedNotesQry.Count( note => note.EntityId == cn.Id && ( note.Text == template.NoteTemplate.Note && ( !template.Recurring || ( template.Recurring && DbFunctions.DiffHours( note.CreatedDateTime, RockDateTime.Now ) <= template.MinimumCareTouchHours ) ) ) ),
                                         TouchCount = careNeedNotesQry.Where( note => note.EntityId == cn.Id && n.Caption != "Action" ).Count()
-                                    } );
-                            currentFlaggedTemplatesQry = currentFlaggedTemplatesQry.Where( f => f.NoteTouchCount < template.MinimumCareTouches );
+                                    } )
+                                .Where( f => f.NoteTouchCount < template.MinimumCareTouches );
                             var currentFlaggedTemplates = currentFlaggedTemplatesQry.ToList();
                             var currentFlaggedIds = currentFlaggedTemplates.Select( cft => cft.CareNeed.Id ).AsEnumerable();
                             var nonNoteNeeds = careNeedsInCategory
