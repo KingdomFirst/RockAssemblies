@@ -79,7 +79,7 @@ namespace rocks.kfs.StepsToCare.Jobs
         Key = AttributeKey.CareDetailPage )]
 
     [CustomEnhancedListField( "Group Type Roles",
-        Description = "Select the Group Type Roles of the leaders you would like auto assigned to care need when the Person is a member of this type of group. If none are selected it will not auto assign the group member with the appropriate role to the need. ",
+        Description = "Select the Group Type > Roles for the group members you would like auto assigned to Care Needs created for people who are in groups of these types. If none are selected it will not auto assign the group member with the appropriate role to the need. ",
         IsRequired = false,
         ListSource = "SELECT gtr.[Guid] as [Value], CONCAT(gt.[Name],' > ',gtr.[Name]) as [Text] FROM GroupTypeRole gtr JOIN GroupType gt ON gtr.GroupTypeId = gt.Id ORDER BY gt.[Name], gtr.[Order]",
         Key = AttributeKey.GroupTypeAndRole,
