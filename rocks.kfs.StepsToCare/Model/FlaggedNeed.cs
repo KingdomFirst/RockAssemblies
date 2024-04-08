@@ -14,16 +14,18 @@
 // limitations under the License.
 // </copyright>
 //
-using Rock.Data;
+using Rock.Model;
 
 namespace rocks.kfs.StepsToCare.Model
 {
-    public class CareWorkerService : Service<CareWorker>
+    public class FlaggedNeed
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CareWorkerService"/> class.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        public CareWorkerService( RockContext context ) : base( context ) { }
+        public CareNeed CareNeed { get; set; }
+        public TouchTemplate TouchTemplate { get; set; }
+        public Note Note { get; set; }
+        public int NoteTouchCount { get; set; } = 0;
+        public int TouchCount { get; set; } = 0;
+        public bool HasNoteOlderThanHours { get; set; } = false;
+        public bool HasFollowUpWorkerNote { get; set; } = false;
     }
 }
