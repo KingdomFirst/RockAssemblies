@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2021 by Kingdom First Solutions
+// Copyright 2024 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
 // limitations under the License.
 // </copyright>
 //
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
+using Rock.Data;
+
 namespace rocks.kfs.StepsToCare.Model
 {
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Runtime.Serialization;
-    using Rock.Data;
-
     [Table( "_rocks_kfs_StepsToCare_NoteTemplate" )]
     [DataContract]
     public partial class NoteTemplate : Model<NoteTemplate>, IRockEntity, IOrdered

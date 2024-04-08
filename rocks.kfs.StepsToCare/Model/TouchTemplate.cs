@@ -14,16 +14,18 @@
 // limitations under the License.
 // </copyright>
 //
-using Rock.Data;
+using Rock.Lava;
 
 namespace rocks.kfs.StepsToCare.Model
 {
-    public class CareWorkerService : Service<CareWorker>
+    // used to map Attribute Matrix Values to object for easier use.
+    public class TouchTemplate : LavaDataObject
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CareWorkerService"/> class.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        public CareWorkerService( RockContext context ) : base( context ) { }
+        public NoteTemplate NoteTemplate { get; set; }
+        public int MinimumCareTouches { get; set; }
+        public int MinimumCareTouchHours { get; set; }
+        public bool NotifyAll { get; set; }
+        public bool Recurring { get; set; }
+        public int Order { get; set; } = 0;
     }
 }
