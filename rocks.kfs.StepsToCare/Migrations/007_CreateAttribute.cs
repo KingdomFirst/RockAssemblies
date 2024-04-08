@@ -15,7 +15,6 @@
 // </copyright>
 //
 using System.Collections.Generic;
-using Rock;
 using Rock.Plugin;
 
 namespace rocks.kfs.StepsToCare.Migrations
