@@ -14,16 +14,21 @@
 // limitations under the License.
 // </copyright>
 //
-using Rock.Data;
-
-namespace rocks.kfs.StepsToCare.Model
+namespace rocks.kfs.StepsToCare.SystemGuid
 {
-    public class CareWorkerService : Service<CareWorker>
+    /// <summary>
+    /// Custom KFS Field Types for Steps to Care plugin
+    /// </summary>
+    public class FieldType
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CareWorkerService"/> class.
+        /// The Steps to Care Note Template.
         /// </summary>
-        /// <param name="context">The context.</param>
-        public CareWorkerService( RockContext context ) : base( context ) { }
+        public const string NOTE_TEMPLATE = "725E38F2-8BB1-4EC1-8EFA-E8720939252A";
+
+        /// <summary>
+        /// The Steps to Care Need.
+        /// </summary>
+        public const string CARE_NEED = "1D0D2F1E-35C5-453A-81D3-63E1C4A60CC8";
     }
 }

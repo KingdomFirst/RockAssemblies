@@ -150,7 +150,7 @@ View them at {{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/'
     <b>Care Touches:</b> {{ TouchCount }}</blockquote>
     <p><a href='{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}'>View Care Dashboard</a></p>
 {{ 'Global' | Attribute:'EmailFooter' }}
-", SystemGuid.SystemCommunication.CARE_NEED_TOUCH_NEEDED, true, @"Your assigned Care Need requires attention: 
+", SystemGuid.SystemCommunication.CARE_NEED_TOUCH_NEEDED, true, @"Your assigned Care Need requires attention:
 ""{{ CareNeed.Details | Truncate:20,'...' }}""
 {{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}" );
 

@@ -34,16 +34,16 @@ namespace rocks.kfs.StepsToCare.Migrations
 
             Sql( @"
                -- Due to error of 'may cause cycles or multiple cascade paths.'
-                CREATE TRIGGER SetParentNeedNull 
-                   ON  _rocks_kfs_StepsToCare_CareNeed 
+                CREATE TRIGGER SetParentNeedNull
+                   ON  _rocks_kfs_StepsToCare_CareNeed
                    INSTEAD OF DELETE
-                AS 
+                AS
                 BEGIN
 	                SET NOCOUNT ON;
 	                DECLARE @Id int;
                     SELECT @Id = Id FROM deleted;
-	
-	                IF EXISTS (SELECT Id FROM _rocks_kfs_StepsToCare_CareNeed WHERE ParentNeedId = @Id) 
+
+	                IF EXISTS (SELECT Id FROM _rocks_kfs_StepsToCare_CareNeed WHERE ParentNeedId = @Id)
 	                BEGIN
 		                UPDATE _rocks_kfs_StepsToCare_CareNeed SET ParentNeedId = null WHERE ParentNeedId = @Id;
 	                END
@@ -53,7 +53,7 @@ namespace rocks.kfs.StepsToCare.Migrations
             " );
 
             Sql( @"
-                -- Fix to add Delete cascade on CareWorker/AssignedPerson constraint 
+                -- Fix to add Delete cascade on CareWorker/AssignedPerson constraint
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] DROP CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_Worker]
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson_Worker] FOREIGN KEY([WorkerId])
