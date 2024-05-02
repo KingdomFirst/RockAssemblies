@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -73,7 +74,7 @@ namespace rocks.kfs.Intacct
             return this.Url;
         }
 
-        public XmlDocument PostToIntacct( XmlDocument xmlDoc )
+        public XmlDocument PostToIntacct( XmlDocument xmlDoc, bool Log = false )
         {
             var response = new XmlDocument();
 
@@ -86,6 +87,11 @@ namespace rocks.kfs.Intacct
                 req.Method = "POST";
                 req.ContentType = "application/xml; charset=utf-8";
 
+                if ( Log )
+                {
+                    ExceptionLogService.LogException( $"Intacct Request: {Regex.Replace( Regex.Replace( xmlDoc.InnerXml, "<login>.*</login>", "<login>HIDDEN</login>" ), "<password>.*</password>", "<password>HIDDEN</password>" )}" );
+                }
+
                 string sXml = xmlDoc.InnerXml;
                 req.ContentLength = sXml.Length;
                 var sw = new StreamWriter( req.GetRequestStream() );
@@ -95,16 +101,28 @@ namespace rocks.kfs.Intacct
                 res = ( HttpWebResponse ) req.GetResponse();
                 Stream responseStream = res.GetResponseStream();
                 var streamReader = new StreamReader( responseStream );
+                var responseString = streamReader.ReadToEnd();
 
                 //Read the response into an xml document
                 var xml = new XmlDocument();
-                xml.LoadXml( streamReader.ReadToEnd() );
+                xml.LoadXml( responseString );
 
                 //return only the xml representing the response details (inner request)
                 response = xml;
+
+                if ( Log )
+                {
+                    ExceptionLogService.LogException( $"Intacct Response: {responseString}" );
+                }
             }
             catch ( Exception ex )
             {
+                ExceptionLogService.LogException( ex );
+
+                if ( Log )
+                {
+                    ExceptionLogService.LogException( $"Intacct Exception generated with this request: {xmlDoc.InnerXml}" );
+                }
             }
 
             return response;
@@ -157,7 +175,11 @@ namespace rocks.kfs.Intacct
                         }
                     }
                 }
-            } catch ( Exception e ) { }
+            }
+            catch ( Exception e )
+            {
+                ExceptionLogService.LogException( e );
+            }
 
             return false;
         }
