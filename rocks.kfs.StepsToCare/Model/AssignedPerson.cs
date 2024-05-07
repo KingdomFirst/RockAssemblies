@@ -43,7 +43,7 @@ namespace rocks.kfs.StepsToCare.Model
         public int? WorkerId { get; set; }
 
         [DataMember]
-        public bool? FollowUpWorker { get; set; }
+        public bool FollowUpWorker { get; set; } = false;
 
         [DataMember]
         public AssignedType? Type { get; set; }
