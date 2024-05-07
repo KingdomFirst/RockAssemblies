@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2021 by Kingdom First Solutions
+// Copyright 2024 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
 // limitations under the License.
 // </copyright>
 //
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity.ModelConfiguration;
+using System.Runtime.Serialization;
+using Rock.Lava;
+using Rock.Model;
+
 namespace rocks.kfs.StepsToCare.Model
 {
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data.Entity.ModelConfiguration;
-    using System.Runtime.Serialization;
-    using Rock.Data;
-    using Rock.Model;
-
     /// <summary>
     /// Assigned Persons for Care Needs
     /// </summary>
@@ -32,7 +32,6 @@ namespace rocks.kfs.StepsToCare.Model
     {
         #region Entity Properties
 
-        [Required]
         [DataMember]
         public int? NeedId { get; set; }
 
@@ -44,22 +43,36 @@ namespace rocks.kfs.StepsToCare.Model
         public int? WorkerId { get; set; }
 
         [DataMember]
-        public bool? FollowUpWorker { get; set; }
+        public bool FollowUpWorker { get; set; } = false;
+
+        [DataMember]
+        public AssignedType? Type { get; set; }
+
+        [DataMember]
+        public string TypeQualifier { get; set; }
 
         #endregion Entity Properties
 
         #region Virtual Properties
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual CareNeed CareNeed { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual PersonAlias PersonAlias { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual CareWorker CareWorker { get; set; }
 
         #endregion Virtual Properties
+    }
+
+    public enum AssignedType
+    {
+        Worker,
+        GroupRole,
+        Geofence,
+        Manual
     }
 
     #region Entity Configuration
@@ -68,7 +81,7 @@ namespace rocks.kfs.StepsToCare.Model
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AssignedPersonConfiguration"/> class.
-        /// </summary> 
+        /// </summary>
         public AssignedPersonConfiguration()
         {
             this.HasRequired( ap => ap.CareNeed ).WithMany( cn => cn.AssignedPersons ).HasForeignKey( ap => ap.NeedId ).WillCascadeOnDelete( true );
@@ -80,5 +93,5 @@ namespace rocks.kfs.StepsToCare.Model
         }
     }
 
-    #endregion
+    #endregion Entity Configuration
 }

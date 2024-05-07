@@ -200,7 +200,7 @@ namespace rocks.kfs.StepsToCare.Migrations
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson]  WITH CHECK ADD  CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson__rocks_kfs_StepsToCare_CareNeed] FOREIGN KEY([NeedId])
                 REFERENCES [dbo].[_rocks_kfs_StepsToCare_CareNeed] ([Id])
-                ON DELETE CASCADE 
+                ON DELETE CASCADE
 
                 ALTER TABLE [dbo].[_rocks_kfs_StepsToCare_AssignedPerson] CHECK CONSTRAINT [FK__rocks_kfs_StepsToCare_AssignedPerson__rocks_kfs_StepsToCare_CareNeed]
 

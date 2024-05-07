@@ -1,9 +1,24 @@
-﻿using System;
+﻿// <copyright>
+// Copyright 2024 by Kingdom First Solutions
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 using NuGet;
 using Rock;
@@ -20,8 +35,10 @@ namespace rocks.kfs.StepsToCare
 {
     public class CareUtilities
     {
-        public static void AutoAssignWorkers( CareNeed careNeed, bool roundRobinOnly = false, bool childAssignment = false, bool autoAssignWorker = false, bool autoAssignWorkerGeofence = false, string loadBalanceType = "Exclusive", Guid leaderRoleGuid = new Guid(), bool enableLogging = false )
+        public static List<AssignedPerson> AutoAssignWorkers( CareNeed careNeed, bool roundRobinOnly = false, bool childAssignment = false, bool autoAssignWorker = false, bool autoAssignWorkerGeofence = false, string loadBalanceType = "Exclusive", List<Guid> leaderRoleGuids = null, bool enableLogging = false, bool previewAssigned = false )
         {
+            var assignedPeople = new List<AssignedPerson>();
+
             var rockContext = new RockContext();
 
             var careNeedService = new CareNeedService( rockContext );
@@ -29,7 +46,10 @@ namespace rocks.kfs.StepsToCare
             var careAssigneeService = new AssignedPersonService( rockContext );
 
             // reload careNeed to fully populate child properties
-            careNeed = careNeedService.Get( careNeed.Guid );
+            if ( !previewAssigned )
+            {
+                careNeed = careNeedService.Get( careNeed.Guid );
+            }
 
             var careWorkers = careWorkerService.Queryable().AsNoTracking().Where( cw => cw.IsActive );
 
@@ -68,9 +88,10 @@ namespace rocks.kfs.StepsToCare
                             careAssignee.CareNeed = careNeed;
                             careAssignee.PersonAliasId = worker.PersonAliasId;
                             careAssignee.WorkerId = worker.Id;
-                            //careAssignee.FollowUpWorker = true;
+                            careAssignee.Type = AssignedType.Geofence;
+                            careAssignee.FollowUpWorker = false;
 
-                            careAssigneeService.Add( careAssignee );
+                            assignedPeople.Add( careAssignee );
                             addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
                         }
                     }
@@ -182,7 +203,7 @@ namespace rocks.kfs.StepsToCare
                     // AgeRange
                     careWorkersCountChild12 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, false, false, false );
 
-                    // Gender 
+                    // Gender
                     careWorkersCountChild13 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, true, false, false );
 
                     // Category
@@ -193,7 +214,6 @@ namespace rocks.kfs.StepsToCare
 
                     // None
                     careWorkersCountChild16 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, false, false );
-
                 }
 
                 var careWorkerCounts = careWorkerCount1;
@@ -345,15 +365,17 @@ namespace rocks.kfs.StepsToCare
                 foreach ( var workerCount in careWorkerCounts )
                 {
                     var worker = workerCount.Worker;
-                    if ( !workerAssigned && !addedWorkerAliasIds.Contains( worker.PersonAliasId ) && worker.PersonAlias != null && careAssigneeService.GetByPersonAliasAndCareNeed( worker.PersonAlias.Id, careNeed.Id ) == null )
+                    if ( !workerAssigned && !addedWorkerAliasIds.Contains( worker.PersonAliasId ) && worker.PersonAlias != null && worker.PersonAliasId != careNeed.PersonAliasId && careAssigneeService.GetByPersonAliasAndCareNeed( worker.PersonAlias.Id, careNeed.Id ) == null )
                     {
                         var careAssignee = new AssignedPerson { Id = 0 };
                         careAssignee.CareNeed = careNeed;
                         careAssignee.PersonAliasId = worker.PersonAliasId;
                         careAssignee.WorkerId = worker.Id;
                         careAssignee.FollowUpWorker = true;
+                        careAssignee.Type = AssignedType.Worker;
+                        careAssignee.TypeQualifier = $"{workerCount.Count}^{workerCount.HasAgeRange}^{workerCount.HasCampus}^{workerCount.HasCategory}^{workerCount.HasGender}";
 
-                        careAssigneeService.Add( careAssignee );
+                        assignedPeople.Add( careAssignee );
                         addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
 
                         workerAssigned = true;
@@ -367,45 +389,54 @@ namespace rocks.kfs.StepsToCare
             }
 
             // auto assign Small Group Leader by Role
-            //var leaderRoleGuid = GetAttributeValue( AttributeKey.GroupTypeAndRole ).AsGuidOrNull() ?? Guid.Empty;
-            var leaderRole = new GroupTypeRoleService( rockContext ).Get( leaderRoleGuid );
-            if ( enableLogging )
+            foreach ( var leaderRoleGuid in leaderRoleGuids )
             {
-                LogEvent( null, "AutoAssignWorkers", string.Format( "Care Need Guid: {0}, Leader Role Guid: {1}, Leader Role: {2}", careNeed.Guid, leaderRoleGuid, leaderRole.Id ), "Get Leader Role" );
-            }
-
-            if ( leaderRole != null && !roundRobinOnly )
-            {
-                var groupMemberService = new GroupMemberService( rockContext );
-                var inGroups = groupMemberService.GetByPersonId( careNeed.PersonAlias.PersonId ).Where( gm => gm.Group != null && gm.Group.IsActive && !gm.Group.IsArchived && gm.Group.GroupTypeId == leaderRole.GroupTypeId && !gm.IsArchived && gm.GroupMemberStatus == GroupMemberStatus.Active ).Select( gm => gm.GroupId );
-
-                if ( inGroups.Any() )
+                var leaderRole = new GroupTypeRoleService( rockContext ).Get( leaderRoleGuid );
+                if ( enableLogging )
                 {
-                    if ( enableLogging )
-                    {
-                        LogEvent( null, "AutoAssignWorkers", string.Format( "Care Need Guid: {0}, In Groups Count: {1}, leaderRole.GroupTypeId: {2}", careNeed.Guid, inGroups.Count(), leaderRole.GroupTypeId ), "In Small Groups" );
-                    }
-                    var groupLeaders = groupMemberService.GetByGroupRoleId( leaderRole.Id ).Where( gm => inGroups.Contains( gm.GroupId ) && !gm.IsArchived && gm.GroupMemberStatus == GroupMemberStatus.Active );
-                    foreach ( var member in groupLeaders )
-                    {
-                        if ( !addedWorkerAliasIds.Contains( member.Person.PrimaryAliasId ) && careAssigneeService.GetByPersonAliasAndCareNeed( member.Person.PrimaryAliasId, careNeed.Id ) == null && member.PersonId != careNeed.PersonAlias.Person.Id )
-                        {
-                            var careAssignee = new AssignedPerson { Id = 0 };
-                            careAssignee.CareNeed = careNeed;
-                            careAssignee.PersonAliasId = member.Person.PrimaryAliasId;
+                    LogEvent( null, "AutoAssignWorkers", string.Format( "Care Need Guid: {0}, Leader Role Guid: {1}, Leader Role: {2}", careNeed.Guid, leaderRoleGuid, leaderRole.Id ), "Get Leader Role" );
+                }
 
-                            careAssigneeService.Add( careAssignee );
-                            addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
+                if ( leaderRole != null && !roundRobinOnly )
+                {
+                    var groupMemberService = new GroupMemberService( rockContext );
+                    var inGroups = groupMemberService.GetByPersonId( careNeed.PersonAlias.PersonId ).Where( gm => gm.Group != null && gm.Group.IsActive && !gm.Group.IsArchived && gm.Group.GroupTypeId == leaderRole.GroupTypeId && !gm.IsArchived && gm.GroupMemberStatus == GroupMemberStatus.Active ).Select( gm => gm.GroupId );
+
+                    if ( inGroups.Any() )
+                    {
+                        if ( enableLogging )
+                        {
+                            LogEvent( null, "AutoAssignWorkers", string.Format( "Care Need Guid: {0}, In Groups Count: {1}, leaderRole.GroupTypeId: {2}", careNeed.Guid, inGroups.Count(), leaderRole.GroupTypeId ), "In Small Groups" );
+                        }
+                        var groupLeaders = groupMemberService.GetByGroupRoleId( leaderRole.Id ).Where( gm => inGroups.Contains( gm.GroupId ) && !gm.IsArchived && gm.GroupMemberStatus == GroupMemberStatus.Active );
+                        foreach ( var member in groupLeaders )
+                        {
+                            if ( !addedWorkerAliasIds.Contains( member.Person.PrimaryAliasId ) && careAssigneeService.GetByPersonAliasAndCareNeed( member.Person.PrimaryAliasId, careNeed.Id ) == null && member.PersonId != careNeed.PersonAlias.Person.Id )
+                            {
+                                var careAssignee = new AssignedPerson { Id = 0 };
+                                careAssignee.CareNeed = careNeed;
+                                careAssignee.PersonAliasId = member.Person.PrimaryAliasId;
+                                careAssignee.Type = AssignedType.GroupRole;
+                                careAssignee.TypeQualifier = $"{member.GroupRoleId}^{member.GroupTypeId}^{member.Group.GroupType.Name} > {member.GroupRole.Name}";
+                                careAssignee.FollowUpWorker = false;
+
+                                assignedPeople.Add( careAssignee );
+                                addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
+                            }
+                        }
+                        if ( enableLogging )
+                        {
+                            LogEvent( null, "AutoAssignWorkers", string.Format( "Care Need Guid: {0}, groupLeaders Count: {1} addedWorkerAliasIds Count: {2}", careNeed.Guid, groupLeaders.Count(), addedWorkerAliasIds.Count() ), "In Small Groups, Leader Count" );
                         }
                     }
-                    if ( enableLogging )
-                    {
-                        LogEvent( null, "AutoAssignWorkers", string.Format( "Care Need Guid: {0}, groupLeaders Count: {1} addedWorkerAliasIds Count: {2}", careNeed.Guid, groupLeaders.Count(), addedWorkerAliasIds.Count() ), "In Small Groups, Leader Count" );
-                    }
-
                 }
             }
-            rockContext.SaveChanges();
+            if ( !previewAssigned )
+            {
+                careAssigneeService.AddRange( assignedPeople );
+                rockContext.SaveChanges();
+            }
+            return assignedPeople;
         }
 
         public static void SendWorkerNotification( RockContext rockContext, CareNeed careNeed, bool isNew, List<AssignedPerson> newlyAssignedPersons, Guid? assignmentEmailTemplateGuid, RockPage rockPage = null, string detailPagePath = "", string dashboardPagePath = "", Person person = null )
@@ -416,7 +447,7 @@ namespace rocks.kfs.StepsToCare
             }
 
             var assignedPersons = careNeed.AssignedPersons;
-            if ( newlyAssignedPersons.Any() )
+            if ( newlyAssignedPersons.Any() && !isNew )
             {
                 assignedPersons = newlyAssignedPersons;
             }
@@ -442,6 +473,8 @@ namespace rocks.kfs.StepsToCare
                 linkedPages.Add( "CareDetail", ( rockPage != null ) ? rockPage.PageReference.BuildUrl() : detailPagePath );
                 linkedPages.Add( "CareDashboard", ( rockPage != null ) ? GetParentPage( rockPage.PageId ).BuildUrl() : dashboardPagePath );
 
+                var noteTemplates = new NoteTemplateService( rockContext ).Queryable().AsNoTracking().Where( n => n.IsActive ).OrderBy( nt => nt.Order );
+
                 var systemCommunication = new SystemCommunicationService( rockContext ).Get( assignmentEmailTemplateGuid.Value );
                 var emailMessage = new RockEmailMessage( systemCommunication );
                 var smsMessage = new RockSMSMessage( systemCommunication );
@@ -464,6 +497,7 @@ namespace rocks.kfs.StepsToCare
                     mergeFields.Add( "LinkedPages", linkedPages );
                     mergeFields.Add( "AssignedPerson", assignee );
                     mergeFields.Add( "Person", assignee.PersonAlias.Person );
+                    mergeFields.Add( "NoteTemplates", noteTemplates );
 
                     var notificationType = assignee.PersonAlias.Person.GetAttributeValue( rocks.kfs.StepsToCare.SystemGuid.PersonAttribute.NOTIFICATION.AsGuid() );
 
@@ -581,6 +615,7 @@ namespace rocks.kfs.StepsToCare
                                     .ThenBy( cw => cw.Worker.CategoryValues.Contains( careNeed.CategoryValueId.ToString() ) )
                                     .ThenBy( cw => cw.Worker.Campuses.Contains( careNeed.CampusId.ToString() ) );
         }
+
         private static PageReference GetParentPage( int pageId )
         {
             var pageCache = PageCache.Get( pageId );
@@ -594,7 +629,8 @@ namespace rocks.kfs.StepsToCare
             }
             return new PageReference( pageCache.Guid.ToString() );
         }
-        private static ServiceLog LogEvent( RockContext rockContext, string type, string input, string result )
+
+        public static ServiceLog LogEvent( RockContext rockContext, string type, string input, string result )
         {
             if ( rockContext == null )
             {

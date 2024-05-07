@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2022 by Kingdom First Solutions
+// Copyright 2024 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
 // limitations under the License.
 // </copyright>
 //
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity.ModelConfiguration;
+using System.Runtime.Serialization;
+using Rock.Data;
+using Rock.Lava;
+using Rock.Model;
+
 namespace rocks.kfs.StepsToCare.Model
 {
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data.Entity.ModelConfiguration;
-    using System.Runtime.Serialization;
-    using Rock.Data;
-    using Rock.Model;
-
     [Table( "_rocks_kfs_StepsToCare_CareWorker" )]
     [DataContract]
     public partial class CareWorker : Rock.Data.Model<CareWorker>, Rock.Data.IRockEntity
@@ -75,14 +76,15 @@ namespace rocks.kfs.StepsToCare.Model
         /// </value>
         [DataMember]
         public Gender? Gender { get; set; }
+
         #endregion Entity Properties
 
         #region Virtual Properties
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual PersonAlias PersonAlias { get; set; }
 
-        [LavaInclude]
+        [LavaVisible]
         public virtual ICollection<AssignedPerson> AssignedPersons { get; set; }
 
         #endregion Virtual Properties
@@ -105,7 +107,7 @@ namespace rocks.kfs.StepsToCare.Model
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CareWorkerConfiguration"/> class.
-        /// </summary> 
+        /// </summary>
         public CareWorkerConfiguration()
         {
             this.HasRequired( cw => cw.PersonAlias ).WithMany().HasForeignKey( cw => cw.PersonAliasId ).WillCascadeOnDelete( false );
@@ -115,5 +117,5 @@ namespace rocks.kfs.StepsToCare.Model
         }
     }
 
-    #endregion
+    #endregion Entity Configuration
 }
