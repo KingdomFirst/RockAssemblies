@@ -285,7 +285,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                 var careNeed24Hrs = careNeeds
                     .Where( n => n.StatusValueId == openValueId && DbFunctions.DiffHours( n.DateEntered.Value, RockDateTime.Now ) >= minimumCareTouchesHours );
                 var careNeedFlagged = careNeed24Hrs
-                    .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && cn.AssignedPersons.Any( ap => ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value && ap.PersonAliasId == n.CreatedByPersonAliasId ) ).DefaultIfEmpty(),
+                    .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && cn.AssignedPersons.Any( ap => ap.FollowUpWorker && ap.PersonAliasId == n.CreatedByPersonAliasId ) ).DefaultIfEmpty(),
                     ( cn, n ) => new FlaggedNeed
                     {
                         CareNeed = cn,
@@ -360,7 +360,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                         var emailMessage = new RockEmailMessage( followUpSystemCommunication );
                         var smsMessage = new RockSMSMessage( followUpSystemCommunication );
 
-                        foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value ) )
+                        foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ap.FollowUpWorker ) )
                         {
                             assignee.PersonAlias.Person.LoadAttributes();
 
@@ -452,7 +452,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                         //var pushMessage = new RockPushMessage( careTouchNeededCommunication );
                         var recipients = new List<RockMessageRecipient>();
 
-                        foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ( ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value ) || ( flagNeed.TouchTemplate != null && flagNeed.TouchTemplate.NotifyAll ) ) )
+                        foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ( ap.FollowUpWorker ) || ( flagNeed.TouchTemplate != null && flagNeed.TouchTemplate.NotifyAll ) ) )
                         {
                             assignee.PersonAlias.Person.LoadAttributes();
 
