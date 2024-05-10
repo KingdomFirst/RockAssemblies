@@ -145,6 +145,7 @@
   <ItemGroup>
     <Compile Include="Configuration.cs" />
     <Compile Include="Controls\CyberSourceHostedPaymentControl.cs" />
+    <Compile Include="CyberSourceTypes.cs" />
     <Compile Include="Gateway.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

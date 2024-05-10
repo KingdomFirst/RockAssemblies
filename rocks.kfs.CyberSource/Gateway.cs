@@ -37,6 +37,8 @@ using CyberSourceSDK = CyberSource;
 using rocks.kfs.CyberSource.Controls;
 using System.Text;
 using System.Xml.Linq;
+using static rocks.kfs.CyberSource.CyberSourceTypes;
+using Rock.Jobs;
 
 namespace rocks.kfs.CyberSource
 {
@@ -195,7 +197,6 @@ namespace rocks.kfs.CyberSource
                 values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_ONE_TIME ) );
                 values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_WEEKLY ) );
                 values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_BIWEEKLY ) );
-                values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_FIRST_AND_FIFTEENTH ) );
                 values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_MONTHLY ) );
                 values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_QUARTERLY ) );
                 values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_YEARLY ) );
@@ -263,7 +264,7 @@ namespace rocks.kfs.CyberSource
                 throw new NullFinancialGatewayException();
             }
 
-            var customerId = referencedPaymentInfo.GatewayPersonIdentifier;
+            var customerId = referencedPaymentInfo.GatewayPersonIdentifier.Replace( "null", "" );
             var tokenizerToken = referencedPaymentInfo.ReferenceNumber;
             var amount = referencedPaymentInfo.Amount;
 
@@ -290,22 +291,14 @@ namespace rocks.kfs.CyberSource
                 Comments: description
             );
 
-            Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator paymentProcessingInformationOptionsInitiator = new Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator(
-                CredentialStoredOnFile: true
-            );
+            //Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator paymentProcessingInformationOptionsInitiator = new Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator(
+            //    CredentialStoredOnFile: true
+            //);
 
-            Ptsv2paymentsProcessingInformationAuthorizationOptions paymentProcessingInformationAuthorization = new Ptsv2paymentsProcessingInformationAuthorizationOptions(
-                Initiator: paymentProcessingInformationOptionsInitiator,
-                IgnoreAvsResult: true
-            );
-
-            Ptsv2paymentsPaymentInformationCustomer paymentInformationCustomer = new Ptsv2paymentsPaymentInformationCustomer(
-                Id: customerId
-            );
-
-            Ptsv2paymentsPaymentInformation paymentInformation = new Ptsv2paymentsPaymentInformation(
-                Customer: paymentInformationCustomer
-            );
+            //Ptsv2paymentsProcessingInformationAuthorizationOptions paymentProcessingInformationAuthorization = new Ptsv2paymentsProcessingInformationAuthorizationOptions(
+            //    Initiator: paymentProcessingInformationOptionsInitiator,
+            //    IgnoreAvsResult: true
+            //);
 
             string defaultCurrency = "USD";
             Ptsv2paymentsOrderInformationAmountDetails orderInformationAmountDetails = new Ptsv2paymentsOrderInformationAmountDetails(
@@ -317,8 +310,8 @@ namespace rocks.kfs.CyberSource
             Ptsv2paymentsProcessingInformation paymentProcessingInformation = new Ptsv2paymentsProcessingInformation(
                  ActionList: new List<string> { "TOKEN_CREATE" },
                  ActionTokenTypes: new List<string> { "customer", "paymentInstrument" },
-                 Capture: processingInformationCapture, //Capture: amount > 0,
-                 AuthorizationOptions: paymentProcessingInformationAuthorization
+                 Capture: processingInformationCapture //Capture: amount > 0,
+                                                       //AuthorizationOptions: paymentProcessingInformationAuthorization
              );
 
             Ptsv2paymentsOrderInformationBillTo orderInformationBillTo = new Ptsv2paymentsOrderInformationBillTo(
@@ -338,6 +331,14 @@ namespace rocks.kfs.CyberSource
                 BillTo: orderInformationBillTo
             );
 
+            Ptsv2paymentsPaymentInformationCustomer paymentInformationCustomer = new Ptsv2paymentsPaymentInformationCustomer(
+                Id: customerId
+            );
+
+            Ptsv2paymentsPaymentInformation paymentInformation = new Ptsv2paymentsPaymentInformation(
+                Customer: paymentInformationCustomer
+            );
+
             Ptsv2paymentsTokenInformation tokenInformation = new Ptsv2paymentsTokenInformation(
                 TransientTokenJwt: tokenizerToken
             );
@@ -349,30 +350,26 @@ namespace rocks.kfs.CyberSource
 
             CreatePaymentRequest requestObj = null;
 
-            //if ( customerId.IsNotNullOrWhiteSpace() )
-            //{
-            //    paymentProcessingInformation.ActionTokenTypes = new List<string> { "paymentInstrument" };
-
-            //    requestObj = new CreatePaymentRequest(
-            //        ProcessingInformation: paymentProcessingInformation,
-            //        PaymentInformation: paymentInformation,
-            //        ClientReferenceInformation: clientReferenceInformation,
-            //        OrderInformation: orderInformation,
-            //        TokenInformation: tokenInformation,
-            //        DeviceInformation: deviceInformation
-            //    );
-            //}
-            //else
-            //{
-            //queryParameters.Add( "payment_token", tokenizerToken );
-            requestObj = new CreatePaymentRequest(
-                ProcessingInformation: paymentProcessingInformation,
-                ClientReferenceInformation: clientReferenceInformation,
-                OrderInformation: orderInformation,
-                TokenInformation: tokenInformation,
-                DeviceInformation: deviceInformation
-            );
-            //}
+            if ( customerId.IsNotNullOrWhiteSpace() )
+            {
+                requestObj = new CreatePaymentRequest(
+                    ProcessingInformation: paymentProcessingInformation,
+                    PaymentInformation: paymentInformation,
+                    ClientReferenceInformation: clientReferenceInformation,
+                    OrderInformation: orderInformation,
+                    DeviceInformation: deviceInformation
+                );
+            }
+            else
+            {
+                requestObj = new CreatePaymentRequest(
+                    ProcessingInformation: paymentProcessingInformation,
+                    ClientReferenceInformation: clientReferenceInformation,
+                    OrderInformation: orderInformation,
+                    TokenInformation: tokenInformation,
+                    DeviceInformation: deviceInformation
+                );
+            }
 
             PtsV2PaymentsPost201Response chargeResult = null;
             try
@@ -552,10 +549,13 @@ namespace rocks.kfs.CyberSource
                 return null;
             }
 
-            string orderInformationAmountDetailsCurrency = "USD";
+            string defaultCurrency = "USD";
+            var currencyCode = origTransaction.ForeignCurrencyCodeValueId.HasValue ?
+                            DefinedValueCache.Get( origTransaction.ForeignCurrencyCodeValueId.Value ).Value :
+                            defaultCurrency;
             Ptsv2paymentsidcapturesOrderInformationAmountDetails orderInformationAmountDetails = new Ptsv2paymentsidcapturesOrderInformationAmountDetails(
                 TotalAmount: amount.ToString(),
-                Currency: orderInformationAmountDetailsCurrency
+                Currency: currencyCode
            );
 
             Ptsv2paymentsidrefundsOrderInformation orderInformation = new Ptsv2paymentsidrefundsOrderInformation(
@@ -568,7 +568,7 @@ namespace rocks.kfs.CyberSource
 
             Ptsv2paymentsidreversalsReversalInformationAmountDetails reversalInformationAmountDetails = new Ptsv2paymentsidreversalsReversalInformationAmountDetails(
                 TotalAmount: origTransaction.TotalAmount.ToString(),
-                Currency: orderInformationAmountDetailsCurrency
+                Currency: currencyCode
             );
 
             Ptsv2paymentsidreversalsReversalInformation reversalInformation = new Ptsv2paymentsidreversalsReversalInformation(
