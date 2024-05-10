@@ -659,19 +659,180 @@ namespace rocks.kfs.CyberSource
             }
             return transaction;
         }
-
         /// <summary>
         /// Adds the scheduled payment.
         /// </summary>
-        /// <param name="financialGateway"></param>
+        /// <param name="financialGateway">The financial gateway.</param>
         /// <param name="schedule">The schedule.</param>
         /// <param name="paymentInfo">The payment info.</param>
         /// <param name="errorMessage">The error message.</param>
         /// <returns></returns>
+        /// <exception cref="ReferencePaymentInfoRequired"></exception>
         public override FinancialScheduledTransaction AddScheduledPayment( FinancialGateway financialGateway, PaymentSchedule schedule, PaymentInfo paymentInfo, out string errorMessage )
         {
-            errorMessage = "This gateway does not support adding scheduled transactions. Transactions should be created through the CyberSource interface.";
-            return null;
+            var descriptionGuid = Guid.NewGuid();
+            var descriptionCode = descriptionGuid.ToString().RemoveSpecialCharacters().Left( 20 );
+
+            var referencedPaymentInfo = paymentInfo as ReferencePaymentInfo;
+            if ( referencedPaymentInfo == null )
+            {
+                throw new ReferencePaymentInfoRequired();
+            }
+            if ( financialGateway == null )
+            {
+                throw new NullFinancialGatewayException();
+            }
+
+            var customerId = referencedPaymentInfo.GatewayPersonIdentifier;
+            if ( customerId == "null" )
+            {
+                errorMessage = "There was an error creating the customer on the Gateway. Please try again later.";
+                return null;
+            }
+
+            string subscriptionDescription = $"{referencedPaymentInfo.Description}|Subscription Ref: {descriptionGuid}";
+            var configDictionary = new Configuration().GetConfiguration( financialGateway );
+            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+
+            try
+            {
+                errorMessage = string.Empty;
+
+                Rbsv1subscriptionsClientReferenceInformation clientReferenceInformation = new Rbsv1subscriptionsClientReferenceInformation(
+                    Code: descriptionCode
+                );
+
+                Rbsv1subscriptionsSubscriptionInformation subscriptionInformation = new Rbsv1subscriptionsSubscriptionInformation(
+                    Name: subscriptionDescription
+                );
+                string defaultCurrency = "USD";
+                GetAllPlansResponseOrderInformationAmountDetails orderInformationAmountDetails = new GetAllPlansResponseOrderInformationAmountDetails(
+                    BillingAmount: paymentInfo.Amount.ToString( "0.00" ),
+                    Currency: DefinedValueCache.Get( paymentInfo.AmountCurrencyCodeValueId.ToIntSafe( -1 ) )?.Value ?? defaultCurrency
+                );
+
+                GetAllPlansResponseOrderInformation orderInformation = new GetAllPlansResponseOrderInformation(
+                    AmountDetails: orderInformationAmountDetails
+                );
+
+                string processingInformationCommerceIndicator = "recurring";
+                string processingInformationAuthorizationOptionsInitiatorType = "merchant";
+                Rbsv1subscriptionsProcessingInformationAuthorizationOptionsInitiator processingInformationAuthorizationOptionsInitiator = new Rbsv1subscriptionsProcessingInformationAuthorizationOptionsInitiator(
+                    Type: processingInformationAuthorizationOptionsInitiatorType
+                );
+
+                Rbsv1subscriptionsProcessingInformationAuthorizationOptions processingInformationAuthorizationOptions = new Rbsv1subscriptionsProcessingInformationAuthorizationOptions(
+                    Initiator: processingInformationAuthorizationOptionsInitiator
+                );
+
+                Rbsv1subscriptionsProcessingInformation processingInformation = new Rbsv1subscriptionsProcessingInformation(
+                    CommerceIndicator: processingInformationCommerceIndicator,
+                    AuthorizationOptions: processingInformationAuthorizationOptions
+                );
+
+                //string paymentInformationCustomerId = "C24F5921EB870D99E053AF598E0A4105";
+                Rbsv1subscriptionsPaymentInformationCustomer paymentInformationCustomer = new Rbsv1subscriptionsPaymentInformationCustomer(
+                    Id: customerId
+                );
+
+                Rbsv1subscriptionsPaymentInformation paymentInformation = new Rbsv1subscriptionsPaymentInformation(
+                    Customer: paymentInformationCustomer
+                );
+
+                Rbsv1subscriptionsPlanInformation planInformation = new Rbsv1subscriptionsPlanInformation();
+
+                CreateSubscriptionResponse subscriptionResult = null;
+
+                string subscriptionId;
+
+                if ( SetSubscriptionPlanParams( planInformation, subscriptionInformation, schedule.TransactionFrequencyValue.Guid, schedule.StartDate, out errorMessage ) )
+                {
+
+                    var requestObj = new CreateSubscriptionRequest(
+                        ClientReferenceInformation: clientReferenceInformation,
+                        ProcessingInformation: processingInformation,
+                        PlanInformation: planInformation,
+                        SubscriptionInformation: subscriptionInformation,
+                        OrderInformation: orderInformation,
+                        PaymentInformation: paymentInformation
+                    );
+
+                    try
+                    {
+                        var apiInstance = new SubscriptionsApi( clientConfig );
+                        subscriptionResult = apiInstance.CreateSubscription( requestObj );
+                        //return result;
+                    }
+                    catch ( Exception e )
+                    {
+                        errorMessage += "Exception on calling the Subscriptions API : " + e.Message;
+                        //return null;
+                    }
+
+                    subscriptionId = subscriptionResult.Id;
+
+                    if ( subscriptionId.IsNullOrWhiteSpace() )
+                    {
+                        // Error from CreateSubscription.
+                        errorMessage += "Subscription Id is missing.";
+                        return null;
+                    }
+                }
+                else
+                {
+                    // Error from SetSubscriptionPlanParams.
+                    return null;
+                }
+
+                // Set the paymentInfo.TransactionCode to the subscriptionId so that we know what CreateSubsciption created.
+                // This might be handy in case we have an exception and need to know what the subscriptionId is.
+                referencedPaymentInfo.TransactionCode = subscriptionId;
+
+                var scheduledTransaction = new FinancialScheduledTransaction();
+                scheduledTransaction.TransactionCode = customerId;
+                scheduledTransaction.GatewayScheduleId = subscriptionId;
+                scheduledTransaction.FinancialGatewayId = financialGateway.Id;
+
+                PaymentInstrumentList customerInfo;
+                try
+                {
+                    var apiInstance = new CustomerPaymentInstrumentApi( clientConfig );
+                    customerInfo = apiInstance.GetCustomerPaymentInstrumentsList( customerId, null, null, null );
+                }
+                catch ( Exception e )
+                {
+                    errorMessage += "Exception getting Customer Information for Scheduled Payment: " + e.Message;
+                    return null;
+                }
+
+                scheduledTransaction.FinancialPaymentDetail = PopulatePaymentInfo( paymentInfo, customerInfo.Embedded.PaymentInstruments.LastOrDefault() );
+
+                try
+                {
+                    GetScheduledPaymentStatus( scheduledTransaction, out errorMessage );
+                }
+                catch ( Exception ex )
+                {
+                    throw new Exception( $"Exception getting Scheduled Payment Status. {errorMessage}", ex );
+                }
+
+                return scheduledTransaction;
+            }
+            catch ( Exception )
+            {
+                // If there is an exception, Rock won't save this as a scheduled transaction, so make sure the subscription didn't get created so mystery scheduled transactions don't happen.
+                var apiInstance = new SubscriptionsApi( clientConfig );
+                var subscriptionSearchResult = apiInstance.GetAllSubscriptions( null, null, descriptionCode, null );
+                var orphanedSubscription = subscriptionSearchResult.Subscriptions.FirstOrDefault();
+
+                if ( orphanedSubscription != null )
+                {
+                    var subscriptionId = orphanedSubscription.Id;
+                    var cancelResult = apiInstance.CancelSubscription( subscriptionId );
+                }
+
+                throw;
+            }
         }
 
         /// <summary>
@@ -717,10 +878,70 @@ namespace rocks.kfs.CyberSource
         /// <param name="transaction">The transaction.</param>
         /// <param name="errorMessage">The error message.</param>
         /// <returns></returns>
-        public override bool GetScheduledPaymentStatus( FinancialScheduledTransaction transaction, out string errorMessage )
+        public override bool GetScheduledPaymentStatus( FinancialScheduledTransaction scheduledTransaction, out string errorMessage )
         {
-            errorMessage = "This gateway does not support scheduled transactions. Transactions should be managed through the CyberSource interface.";
-            return false;
+            errorMessage = string.Empty;
+
+            var subscriptionId = scheduledTransaction.GatewayScheduleId;
+
+            FinancialGateway financialGateway = scheduledTransaction.FinancialGateway;
+            if ( financialGateway == null && scheduledTransaction.FinancialGatewayId.HasValue )
+            {
+                financialGateway = new FinancialGatewayService( new Rock.Data.RockContext() ).GetNoTracking( scheduledTransaction.FinancialGatewayId.Value );
+            }
+
+            SubscriptionsApi apiInstance = null;
+            GetSubscriptionResponse subscriptionResponse = null;
+            try
+            {
+                var configDictionary = new Configuration().GetConfiguration( financialGateway );
+                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+
+                apiInstance = new SubscriptionsApi( clientConfig );
+                subscriptionResponse = apiInstance.GetSubscription( subscriptionId );
+            }
+            catch ( Exception e )
+            {
+                errorMessage += $"Exception on calling the Subscription Response API : {e.Message}";
+            }
+
+            if ( apiInstance.GetStatusCode() == System.Net.HttpStatusCode.OK.ToIntSafe() )
+            {
+                if ( subscriptionResponse != null )
+                {
+                    var gatewayStartDate = subscriptionResponse.SubscriptionInformation?.StartDate?.AsDateTime();
+                    if ( gatewayStartDate.HasValue )
+                    {
+                        // Rock DateTimes don't keep any TimeZone or offset, so make sure the date is DateTimeKind.Unspecified instead of UTC.
+                        // Note that the DateTime stored to the database will get the DateTimeKind stripped off, so this is only issue for DateTime data
+                        // that isn't saved to the database yet.
+                        gatewayStartDate = DateTime.SpecifyKind( gatewayStartDate.Value, DateTimeKind.Unspecified );
+                    }
+
+                    scheduledTransaction.NextPaymentDate = gatewayStartDate;
+                    scheduledTransaction.FinancialPaymentDetail.GatewayPersonIdentifier = subscriptionResponse.PaymentInformation?.Customer?.Id;
+                    scheduledTransaction.StatusMessage = subscriptionResponse.SubscriptionInformation.Status;
+                    scheduledTransaction.Status = GetFinancialScheduledTransactionStatus( subscriptionResponse.SubscriptionInformation.Status );
+                }
+
+                scheduledTransaction.LastStatusUpdateDateTime = RockDateTime.Now;
+
+                errorMessage = string.Empty;
+                return true;
+            }
+            else
+            {
+                if ( apiInstance.GetStatusCode() == System.Net.HttpStatusCode.NotFound.ToIntSafe() || apiInstance.GetStatusCode() == System.Net.HttpStatusCode.Forbidden.ToIntSafe() )
+                {
+                    // Assume that a status code of Forbidden or NonFound indicates that the schedule doesn't exist, or was deleted.
+                    scheduledTransaction.IsActive = false;
+                    errorMessage = string.Empty;
+                    return true;
+                }
+
+                errorMessage += subscriptionResponse.ToString();
+                return false;
+            }
         }
 
         /// <summary>
@@ -840,33 +1061,263 @@ namespace rocks.kfs.CyberSource
         {
             errorMessage = string.Empty;
 
+            if ( paymentInfo == null )
+            {
+                throw new ReferencePaymentInfoRequired();
+            }
+
             if ( financialGateway == null )
             {
                 throw new NullFinancialGatewayException();
             }
 
-            Tmsv2customersBuyerInformation buyerInformation = new Tmsv2customersBuyerInformation(
-                MerchantCustomerID: paymentInfo.FinancialPersonSavedAccountId?.ToString(),
-                Email: paymentInfo.Email
-           );
+            var tokenizerToken = paymentInfo.ReferenceNumber;
 
-            var requestObj = new PostCustomerRequest(
-                BuyerInformation: buyerInformation
-           );
+            Ptsv2paymentsClientReferenceInformation clientReferenceInformation = new Ptsv2paymentsClientReferenceInformation(
+                Comments: paymentInfo.FullName
+            );
 
+            string defaultCurrency = "USD";
+            Ptsv2paymentsOrderInformationAmountDetails orderInformationAmountDetails = new Ptsv2paymentsOrderInformationAmountDetails(
+                TotalAmount: "0.00",
+                Currency: DefinedValueCache.Get( paymentInfo.AmountCurrencyCodeValueId.ToIntSafe( -1 ) )?.Value ?? defaultCurrency
+            );
+
+            //bool processingInformationCapture = financialGateway.GetAttributeValue( AttributeKey.CapturePayment ).AsBoolean();
+            Ptsv2paymentsProcessingInformation paymentProcessingInformation = new Ptsv2paymentsProcessingInformation(
+                 ActionList: new List<string> { "TOKEN_CREATE" },
+                 ActionTokenTypes: new List<string> { "customer", "paymentInstrument" }
+                 //Capture: processingInformationCapture //Capture: amount > 0,
+             );
+
+            Ptsv2paymentsOrderInformationBillTo orderInformationBillTo = new Ptsv2paymentsOrderInformationBillTo(
+                FirstName: paymentInfo.FirstName,
+                LastName: paymentInfo.LastName.IsNullOrWhiteSpace() ? paymentInfo.BusinessName : paymentInfo.LastName,
+                Address1: paymentInfo.Street1,
+                Locality: paymentInfo.City,
+                AdministrativeArea: paymentInfo.State,
+                PostalCode: paymentInfo.PostalCode,
+                Country: paymentInfo.Country,
+                Email: paymentInfo.Email,
+                PhoneNumber: paymentInfo.Phone
+            );
+
+            Ptsv2paymentsOrderInformation orderInformation = new Ptsv2paymentsOrderInformation(
+                AmountDetails: orderInformationAmountDetails,
+                BillTo: orderInformationBillTo
+            );
+
+            Ptsv2paymentsTokenInformation tokenInformation = new Ptsv2paymentsTokenInformation(
+                TransientTokenJwt: tokenizerToken
+            );
+
+            Ptsv2paymentsDeviceInformation deviceInformation = new Ptsv2paymentsDeviceInformation(
+                IpAddress: paymentInfo.IPAddress
+            );
+
+            CreatePaymentRequest requestObj = new CreatePaymentRequest(
+                    ProcessingInformation: paymentProcessingInformation,
+                    ClientReferenceInformation: clientReferenceInformation,
+                    OrderInformation: orderInformation,
+                    TokenInformation: tokenInformation,
+                    DeviceInformation: deviceInformation
+                );
+
+            PtsV2PaymentsPost201Response tokenResult = null;
             try
             {
                 var configDictionary = new Configuration().GetConfiguration( financialGateway );
                 var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
 
-                var apiInstance = new CustomerApi( clientConfig );
-                TmsV2CustomersResponse result = apiInstance.PostCustomer( requestObj );
-                return result.Id;
+                var apiInstance = new PaymentsApi( clientConfig );
+                tokenResult = apiInstance.CreatePayment( requestObj );
+                //return result;
             }
             catch ( Exception e )
             {
                 errorMessage += "Exception on calling the API : " + e.Message;
+                //return null;
+            }
+
+            if ( tokenResult == null || tokenResult.ErrorInformation != null )
+            {
+                if ( tokenResult == null )
+                {
+                    return null;
+                }
+
+                errorMessage += string.Format( "{0} ({1})", tokenResult.ErrorInformation.Message, tokenResult.ErrorInformation.Reason );
+                ExceptionLogService.LogException( $"Error processing CyberSource Customer Token Creation. Result Code:  {tokenResult.ErrorInformation.Message} ({tokenResult.ErrorInformation.Reason})." );
+            }
+
+            var customerId = tokenResult.PaymentInformation?.Customer?.Id;
+            if ( customerId.IsNullOrWhiteSpace() )
+            {
+                customerId = tokenResult.TokenInformation?.Customer?.Id;
+            }
+            if ( customerId.IsNullOrWhiteSpace() )
+            {
+                //errorMessage = "Null response from CreateCustomerAccount.";
+                customerId = "null";
+            }
+            return customerId;
+        }
+
+        /// <summary>
+        /// Populates the FinancialPaymentDetail record for a FinancialTransaction or FinancialScheduledTransaction
+        /// </summary>
+        /// <param name="paymentInfo">The payment information.</param>
+        /// <param name="paymentInstrument">The payment instrument response, contains billing address and card info.</param>
+        /// <returns></returns>
+        private FinancialPaymentDetail PopulatePaymentInfo( PaymentInfo paymentInfo, Tmsv2customersEmbeddedDefaultPaymentInstrument paymentInstrument )
+        {
+            FinancialPaymentDetail financialPaymentDetail = new FinancialPaymentDetail();
+            if ( paymentInstrument != null )
+            {
+                // Since we are using a token for payment, it is possible that the Gateway has a different address associated with the payment method.
+                financialPaymentDetail.NameOnCard = $"{paymentInstrument.BillTo.FirstName} {paymentInstrument.BillTo.LastName}";
+
+                // If address wasn't collected when entering the transaction, set the address to the billing info returned from the gateway (if any).
+                if ( paymentInfo.Street1.IsNullOrWhiteSpace() )
+                {
+                    if ( paymentInstrument.BillTo.Address1.IsNotNullOrWhiteSpace() )
+                    {
+                        paymentInfo.Street1 = paymentInstrument.BillTo.Address1;
+                        paymentInfo.Street2 = paymentInstrument.BillTo.Address2;
+                        paymentInfo.City = paymentInstrument.BillTo.Locality;
+                        paymentInfo.State = paymentInstrument.BillTo.AdministrativeArea;
+                        paymentInfo.PostalCode = paymentInstrument.BillTo.PostalCode;
+                        paymentInfo.Country = paymentInstrument.BillTo.Country;
+                    }
+                }
+            }
+
+            var creditCardResponse = paymentInstrument.Card;
+            var achResponse = paymentInstrument.BankAccount;
+            financialPaymentDetail.GatewayPersonIdentifier = ( paymentInfo as ReferencePaymentInfo )?.GatewayPersonIdentifier;
+            financialPaymentDetail.FinancialPersonSavedAccountId = ( paymentInfo as ReferencePaymentInfo )?.FinancialPersonSavedAccountId;
+
+            if ( creditCardResponse != null )
+            {
+                financialPaymentDetail.CurrencyTypeValueId = DefinedValueCache.GetId( Rock.SystemGuid.DefinedValue.CURRENCY_TYPE_CREDIT_CARD.AsGuid() );
+                financialPaymentDetail.AccountNumberMasked = paymentInstrument.Embedded?.InstrumentIdentifier?.Card?.Number;
+
+                financialPaymentDetail.ExpirationMonth = creditCardResponse.ExpirationMonth.AsIntegerOrNull();
+                financialPaymentDetail.ExpirationYear = creditCardResponse.ExpirationYear.AsIntegerOrNull();
+
+                //// The gateway tells us what the CreditCardType is since it was selected using their hosted payment entry frame.
+                //// So, first see if we can determine CreditCardTypeValueId using the CardType response from the gateway
+
+                // See if we can figure it out from the CC Type (Amex, Visa, etc)
+                var creditCardTypeValue = CreditCardPaymentInfo.GetCreditCardTypeFromName( creditCardResponse.Type );
+                if ( creditCardTypeValue == null )
+                {
+                    // GetCreditCardTypeFromName should have worked, but just in case, see if we can figure it out from the MaskedCard using RegEx
+                    creditCardTypeValue = CreditCardPaymentInfo.GetCreditCardTypeFromCreditCardNumber( financialPaymentDetail.AccountNumberMasked );
+                }
+
+                financialPaymentDetail.CreditCardTypeValueId = creditCardTypeValue?.Id;
+            }
+            else if ( achResponse != null )
+            {
+                financialPaymentDetail.CurrencyTypeValueId = DefinedValueCache.GetId( Rock.SystemGuid.DefinedValue.CURRENCY_TYPE_ACH.AsGuid() );
+                financialPaymentDetail.AccountNumberMasked = achResponse.Type;
+            }
+
+            return financialPaymentDetail;
+        }
+
+        private bool SetSubscriptionPlanParams( Rbsv1subscriptionsPlanInformation planInformation, Rbsv1subscriptionsSubscriptionInformation subscriptionInformation, Guid scheduleTransactionFrequencyValueGuid, DateTime startDate, out string errorMessage )
+        {
+            errorMessage = string.Empty;
+
+            var startDateUTC = startDate.ToUniversalTime();
+            subscriptionInformation.StartDate = startDateUTC.ToString( "yyyy-MM-ddTHH:mm:ssZ" );
+            BillingPeriodUnit? billingPeriodUnit = null;
+            int billingDuration = 0;
+            int billingCycleInterval = 1;
+            //int startDayOfMonth = startDateUTC.Day;
+
+            //if (startDayOfMonth > 28)
+            //{
+            //    startDayOfMonth = 31;
+
+            //    // since we have to use magic 31 to indicate the last day of the month, adjust the NextBillDate to be the last day of the specified month
+            //    // (so it doesn't post on original startDate and again on the last day of the month)
+            //    var nextBillYear = startDateUTC.Year;
+            //    var nextBillMonth = startDateUTC.Month;
+            //    DateTime endOfMonth = new DateTime(nextBillYear, nextBillMonth, DateTime.DaysInMonth(nextBillYear, nextBillMonth));
+
+            //    billingPlanParameters.NextBillDateUTC = endOfMonth;
+            //}
+
+            if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_MONTHLY.AsGuid() )
+            {
+                billingPeriodUnit = BillingPeriodUnit.M;
+            }
+            else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_WEEKLY.AsGuid() )
+            {
+                billingPeriodUnit = BillingPeriodUnit.W;
+            }
+            else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_BIWEEKLY.AsGuid() )
+            {
+                billingCycleInterval = 2;
+                billingPeriodUnit = BillingPeriodUnit.D;
+            }
+            else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_QUARTERLY.AsGuid() )
+            {
+                billingCycleInterval = 3;
+                billingPeriodUnit = BillingPeriodUnit.M;
+            }
+            else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_YEARLY.AsGuid() )
+            {
+                billingPeriodUnit = BillingPeriodUnit.Y;
+            }
+            else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_ONE_TIME.AsGuid() )
+            {
+                // If ONE-TIME create a monthly subscription, but with a duration of 1 so that it only does it once.
+                billingCycleInterval = 1;
+                billingPeriodUnit = BillingPeriodUnit.M;
+                billingDuration = 1;
+            }
+            else
+            {
+                errorMessage = $"Unsupported Schedule Frequency {DefinedValueCache.Get( scheduleTransactionFrequencyValueGuid )?.Value}";
+                return false;
+            }
+
+            planInformation.BillingPeriod = new GetAllPlansResponsePlanInformationBillingPeriod( billingCycleInterval.ToString(), billingPeriodUnit.ToString() );
+            if ( billingDuration != 0 )
+            {
+                planInformation.BillingCycles = new Rbsv1plansPlanInformationBillingCycles( billingDuration.ToString() );
+            }
+            return true;
+        }
+
+        internal static Rock.Model.FinancialScheduledTransactionStatus? GetFinancialScheduledTransactionStatus( string subscriptionStatus )
+        {
+            if ( subscriptionStatus == null )
+            {
                 return null;
+            }
+
+            switch ( subscriptionStatus )
+            {
+                case "PENDING":
+                case "ACTIVE":
+                    return FinancialScheduledTransactionStatus.Active;
+                case "CANCELLED":
+                    return FinancialScheduledTransactionStatus.Canceled;
+                case "COMPLETED":
+                    return FinancialScheduledTransactionStatus.Completed;
+                case "FAILED":
+                    return FinancialScheduledTransactionStatus.Failed;
+                case "DELINQUENT":
+                    return FinancialScheduledTransactionStatus.PastDue;
+                case "SUSPENDED":
+                    return FinancialScheduledTransactionStatus.Paused;
+                default:
+                    return subscriptionStatus.ConvertToEnumOrNull<FinancialScheduledTransactionStatus>();
             }
         }
 
