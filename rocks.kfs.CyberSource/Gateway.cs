@@ -854,11 +854,172 @@ namespace rocks.kfs.CyberSource
         /// <param name="paymentInfo">The payment info.</param>
         /// <param name="errorMessage">The error message.</param>
         /// <returns></returns>
-        public override bool UpdateScheduledPayment( FinancialScheduledTransaction transaction, PaymentInfo paymentInfo, out string errorMessage )
+        public override bool UpdateScheduledPayment( FinancialScheduledTransaction scheduledTransaction, PaymentInfo paymentInfo, out string errorMessage )
         {
-            errorMessage = "This gateway does not support updating scheduled transactions. Transactions should be updated through the CyberSource interface.";
-            return false;
-        }
+            errorMessage = string.Empty;
+
+            var referencedPaymentInfo = paymentInfo as ReferencePaymentInfo;
+            if ( referencedPaymentInfo == null )
+            {
+                throw new ReferencePaymentInfoRequired();
+            }
+
+            var subscriptionId = scheduledTransaction.GatewayScheduleId;
+
+            Rbsv1subscriptionsidSubscriptionInformation subscriptionInformation = new Rbsv1subscriptionsidSubscriptionInformation();
+
+            Rbsv1subscriptionsidOrderInformationAmountDetails orderInformationAmountDetails = new Rbsv1subscriptionsidOrderInformationAmountDetails(
+                BillingAmount: paymentInfo.Amount.ToString( "0.00" )
+            );
+
+            Rbsv1subscriptionsidOrderInformation orderInformation = new Rbsv1subscriptionsidOrderInformation(
+                AmountDetails: orderInformationAmountDetails
+            );
+
+            Rbsv1subscriptionsPaymentInformationCustomer paymentInformationCustomer = null;
+            if ( referencedPaymentInfo.GatewayPersonIdentifier.IsNotNullOrWhiteSpace() )
+            {
+                paymentInformationCustomer = new Rbsv1subscriptionsPaymentInformationCustomer(
+                    Id: referencedPaymentInfo.GatewayPersonIdentifier
+                );
+            }
+
+            Rbsv1subscriptionsPaymentInformation paymentInformation = new Rbsv1subscriptionsPaymentInformation(
+                Customer: paymentInformationCustomer
+            );
+
+            Rbsv1subscriptionsidPlanInformation planInformation = new Rbsv1subscriptionsidPlanInformation();
+
+            UpdateSubscriptionResponse subscriptionResult = null;
+
+            var transactionFrequencyGuid = DefinedValueCache.Get( scheduledTransaction.TransactionFrequencyValueId ).Guid;
+
+            var configDictionary = new Configuration().GetConfiguration( scheduledTransaction.FinancialGateway );
+            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+
+            FinancialGateway financialGateway;
+            string gatewayUrl;
+            string apiKey;
+
+            //if ( SetSubscriptionPlanParams( planInformation, subscriptionInformation, transactionFrequencyGuid, scheduledTransaction.StartDate, out errorMessage ) )
+            //{
+            //    var apiInstance = new SubscriptionsApi( clientConfig );
+
+            //    if ( paymentInformationCustomer == null || referencedPaymentInfo.GatewayPersonIdentifier.IsNullOrWhiteSpace() )
+            //    {
+            //        // If the GatewayPersonIdentifier wasn't known to Rock, get the CustomerId from MyWellGateway.
+            //        var subscription = apiInstance.GetSubscription( subscriptionId );
+            //        referencedPaymentInfo.GatewayPersonIdentifier = subscription.PaymentInformation?.Customer?.Id;
+            //        paymentInformationCustomer = new Rbsv1subscriptionsPaymentInformationCustomer( Id: referencedPaymentInfo.GatewayPersonIdentifier );
+            //    }
+
+            //    //SubscriptionResponse subscriptionResult;
+            //    var subscriptionStatusResult = apiInstance.GetSubscription( subscriptionId );
+            //    if ( subscriptionStatusResult.SubscriptionInformation.Status != "ACTIVE" )
+            //    {
+            //        // If subscription isn't active (it might be cancelled due to expired card),
+            //        // change the status back to active
+            //        try
+            //        {
+            //            var setSubscriptionStatusResult = apiInstance.ActivateSubscription( subscriptionId );
+
+            //            if ( apiInstance.GetStatusCode() != 200 || setSubscriptionStatusResult.Status != "COMPLETED" )
+            //            {
+            //                // Write decline/error as an exception.
+            //                var exception = new Exception( $"Error re-activating CyberSource subscription. Message:  {setSubscriptionStatusResult.Status} " );
+
+            //                ExceptionLogService.LogException( exception );
+
+            //                errorMessage = setSubscriptionStatusResult.Status;
+
+            //                return false;
+            //            }
+            //        }
+            //        catch ( Exception e )
+            //        {
+            //            errorMessage += $"Error re-activating CyberSource subscription. Message:  {e.Message} ";
+
+            //            var exception = new Exception( errorMessage );
+            //            ExceptionLogService.LogException( exception );
+            //            return false;
+
+            //        }
+
+            //        try
+            //        {
+            //            subscriptionResult = apiInstance.UpdateSubscription( subscriptionId, new UpdateSubscription( PlanInformation: planInformation, SubscriptionInformation: subscriptionInformation, OrderInformation: orderInformation ) );
+
+            //        }
+            //        catch ( Exception e )
+            //        {
+            //            // Write decline/error as an exception.
+            //            var exception = new Exception( $"Error processing CyberSource subscription. Message:  {e.Message} " );
+
+            //            ExceptionLogService.LogException( exception );
+            //            errorMessage = e.Message;
+
+            //            return false;
+            //        }
+
+            //        subscriptionId = subscriptionResult?.Data?.Id;
+
+            //        if ( subscriptionId != scheduledTransaction.GatewayScheduleId )
+            //        {
+            //            // Shouldn't happen, but just in case...
+            //            if ( scheduledTransaction.PreviousGatewayScheduleIds == null )
+            //            {
+            //                scheduledTransaction.PreviousGatewayScheduleIds = new List<string>();
+            //            }
+
+            //            scheduledTransaction.PreviousGatewayScheduleIds.Add( scheduledTransaction.GatewayScheduleId );
+
+            //            referencedPaymentInfo.TransactionCode = subscriptionId;
+            //            scheduledTransaction.GatewayScheduleId = subscriptionId;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        // Error from SetSubscriptionBillingPlanParameters
+            //        return false;
+            //    }
+
+            //    if ( referencedPaymentInfo.IncludesAddressData() )
+            //    {
+            //        var updateCustomerAddressResponse = this.UpdateCustomerAddress( gatewayUrl, apiKey, referencedPaymentInfo );
+            //        if ( !updateCustomerAddressResponse.IsSuccessStatus() )
+            //        {
+            //            errorMessage = updateCustomerAddressResponse.Message;
+            //            return false;
+            //        }
+            //    }
+
+            //    var customerId = referencedPaymentInfo.GatewayPersonIdentifier;
+
+            //    CustomerResponse customerInfo;
+            //    try
+            //    {
+            //        customerInfo = this.GetCustomer( gatewayUrl, this.GetPrivateApiKey( financialGateway ), customerId );
+            //    }
+            //    catch ( Exception ex )
+            //    {
+            //        throw new MyWellGatewayException( $"Exception getting Customer Information for Scheduled Payment", ex );
+            //    }
+
+            //    scheduledTransaction.FinancialPaymentDetail = PopulatePaymentInfo( paymentInfo, customerInfo?.Data?.PaymentMethod, customerInfo?.Data?.BillingAddress );
+            //    scheduledTransaction.TransactionCode = customerId;
+
+            //    try
+            //    {
+            //        GetScheduledPaymentStatus( scheduledTransaction, out errorMessage );
+            //    }
+            //    catch ( Exception ex )
+            //    {
+            //        throw new MyWellGatewayException( $"Exception getting Scheduled Payment Status. {errorMessage}", ex );
+            //    }
+
+            //    errorMessage = null;
+                return true;
+            }
 
         /// <summary>
         /// Cancels the scheduled payment.
