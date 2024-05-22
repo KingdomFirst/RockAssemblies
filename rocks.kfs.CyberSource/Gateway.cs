@@ -194,7 +194,6 @@ namespace rocks.kfs.CyberSource
             {
                 // In the event we wish to check whether recurring billing is truly supported this is where the code would have to be. For now I am not going to.
                 var values = new List<DefinedValueCache>();
-                values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_ONE_TIME ) );
                 values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_WEEKLY ) );
                 values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_BIWEEKLY ) );
                 values.Add( DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_MONTHLY ) );
@@ -308,8 +307,6 @@ namespace rocks.kfs.CyberSource
 
             bool processingInformationCapture = financialGateway.GetAttributeValue( AttributeKey.CapturePayment ).AsBoolean();
             Ptsv2paymentsProcessingInformation paymentProcessingInformation = new Ptsv2paymentsProcessingInformation(
-                 ActionList: new List<string> { "TOKEN_CREATE" },
-                 ActionTokenTypes: new List<string> { "customer", "paymentInstrument" },
                  Capture: processingInformationCapture //Capture: amount > 0,
                                                        //AuthorizationOptions: paymentProcessingInformationAuthorization
              );
@@ -362,6 +359,9 @@ namespace rocks.kfs.CyberSource
             }
             else
             {
+                paymentProcessingInformation.ActionList = new List<string> { "TOKEN_CREATE" };
+                paymentProcessingInformation.ActionTokenTypes = new List<string> { "customer", "paymentInstrument" };
+
                 requestObj = new CreatePaymentRequest(
                     ProcessingInformation: paymentProcessingInformation,
                     ClientReferenceInformation: clientReferenceInformation,
@@ -1068,7 +1068,7 @@ namespace rocks.kfs.CyberSource
                 errorMessage += $"Exception on calling the Subscription Response API : {e.Message}";
             }
 
-            if ( apiInstance.GetStatusCode() == System.Net.HttpStatusCode.OK.ToIntSafe() )
+            if ( apiInstance.GetStatusCode() == ( int ) System.Net.HttpStatusCode.OK )
             {
                 if ( subscriptionResponse != null )
                 {
@@ -1094,7 +1094,7 @@ namespace rocks.kfs.CyberSource
             }
             else
             {
-                if ( apiInstance.GetStatusCode() == System.Net.HttpStatusCode.NotFound.ToIntSafe() || apiInstance.GetStatusCode() == System.Net.HttpStatusCode.Forbidden.ToIntSafe() )
+                if ( apiInstance.GetStatusCode() == ( int ) System.Net.HttpStatusCode.NotFound || apiInstance.GetStatusCode() == ( int ) System.Net.HttpStatusCode.Forbidden )
                 {
                     // Assume that a status code of Forbidden or NonFound indicates that the schedule doesn't exist, or was deleted.
                     scheduledTransaction.IsActive = false;
