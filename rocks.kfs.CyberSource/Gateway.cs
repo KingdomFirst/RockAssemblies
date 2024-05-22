@@ -867,8 +867,14 @@ namespace rocks.kfs.CyberSource
             }
 
             var subscriptionId = scheduledTransaction.GatewayScheduleId;
+            var descriptionGuid = Guid.NewGuid();
+            string subscriptionDescription = $"{referencedPaymentInfo.Description} - Subscription Ref: {descriptionGuid}";
 
-            Rbsv1subscriptionsidSubscriptionInformation subscriptionInformation = new Rbsv1subscriptionsidSubscriptionInformation();
+            var startDateUTC = scheduledTransaction.StartDate.ToUniversalTime();
+            Rbsv1subscriptionsSubscriptionInformation subscriptionInformation = new Rbsv1subscriptionsSubscriptionInformation(
+                Name: subscriptionDescription,
+                StartDate: startDateUTC.ToString( "yyyy-MM-ddTHH:mm:ssZ" )
+            );
 
             Rbsv1subscriptionsidOrderInformationAmountDetails orderInformationAmountDetails = new Rbsv1subscriptionsidOrderInformationAmountDetails(
                 BillingAmount: paymentInfo.Amount.ToString( "0.00" )
@@ -890,7 +896,7 @@ namespace rocks.kfs.CyberSource
                 Customer: paymentInformationCustomer
             );
 
-            Rbsv1subscriptionsidPlanInformation planInformation = new Rbsv1subscriptionsidPlanInformation();
+            Rbsv1subscriptionsPlanInformation planInformation = new Rbsv1subscriptionsPlanInformation();
 
             UpdateSubscriptionResponse subscriptionResult = null;
 
@@ -903,125 +909,168 @@ namespace rocks.kfs.CyberSource
             string gatewayUrl;
             string apiKey;
 
-            //if ( SetSubscriptionPlanParams( planInformation, subscriptionInformation, transactionFrequencyGuid, scheduledTransaction.StartDate, out errorMessage ) )
-            //{
-            //    var apiInstance = new SubscriptionsApi( clientConfig );
+            if ( SetSubscriptionPlanParams( planInformation, subscriptionInformation, transactionFrequencyGuid, scheduledTransaction.StartDate, out errorMessage ) )
+            {
+                var apiInstance = new SubscriptionsApi( clientConfig );
 
-            //    if ( paymentInformationCustomer == null || referencedPaymentInfo.GatewayPersonIdentifier.IsNullOrWhiteSpace() )
-            //    {
-            //        // If the GatewayPersonIdentifier wasn't known to Rock, get the CustomerId from MyWellGateway.
-            //        var subscription = apiInstance.GetSubscription( subscriptionId );
-            //        referencedPaymentInfo.GatewayPersonIdentifier = subscription.PaymentInformation?.Customer?.Id;
-            //        paymentInformationCustomer = new Rbsv1subscriptionsPaymentInformationCustomer( Id: referencedPaymentInfo.GatewayPersonIdentifier );
-            //    }
+                if ( paymentInformationCustomer == null || referencedPaymentInfo.GatewayPersonIdentifier.IsNullOrWhiteSpace() )
+                {
+                    // If the GatewayPersonIdentifier wasn't known to Rock, get the CustomerId from Gateway.
+                    var subscription = apiInstance.GetSubscription( subscriptionId );
+                    referencedPaymentInfo.GatewayPersonIdentifier = subscription.PaymentInformation?.Customer?.Id;
+                    paymentInformationCustomer = new Rbsv1subscriptionsPaymentInformationCustomer( Id: referencedPaymentInfo.GatewayPersonIdentifier );
+                }
 
-            //    //SubscriptionResponse subscriptionResult;
-            //    var subscriptionStatusResult = apiInstance.GetSubscription( subscriptionId );
-            //    if ( subscriptionStatusResult.SubscriptionInformation.Status != "ACTIVE" )
-            //    {
-            //        // If subscription isn't active (it might be cancelled due to expired card),
-            //        // change the status back to active
-            //        try
-            //        {
-            //            var setSubscriptionStatusResult = apiInstance.ActivateSubscription( subscriptionId );
+                //SubscriptionResponse subscriptionResult;
+                var subscriptionStatusResult = apiInstance.GetSubscription( subscriptionId );
+                if ( subscriptionStatusResult.SubscriptionInformation.Status != "ACTIVE" )
+                {
+                    // If subscription isn't active (it might be cancelled due to expired card),
+                    // change the status back to active
+                    try
+                    {
+                        var setSubscriptionStatusResult = apiInstance.ActivateSubscription( subscriptionId );
 
-            //            if ( apiInstance.GetStatusCode() != 200 || setSubscriptionStatusResult.Status != "COMPLETED" )
-            //            {
-            //                // Write decline/error as an exception.
-            //                var exception = new Exception( $"Error re-activating CyberSource subscription. Message:  {setSubscriptionStatusResult.Status} " );
+                        if ( apiInstance.GetStatusCode() != 200 || setSubscriptionStatusResult.Status != "COMPLETED" )
+                        {
+                            // Write decline/error as an exception.
+                            var exception = new Exception( $"Error re-activating CyberSource subscription. Message:  {setSubscriptionStatusResult.Status} " );
 
-            //                ExceptionLogService.LogException( exception );
+                            ExceptionLogService.LogException( exception );
 
-            //                errorMessage = setSubscriptionStatusResult.Status;
+                            errorMessage = setSubscriptionStatusResult.Status;
 
-            //                return false;
-            //            }
-            //        }
-            //        catch ( Exception e )
-            //        {
-            //            errorMessage += $"Error re-activating CyberSource subscription. Message:  {e.Message} ";
+                            return false;
+                        }
+                    }
+                    catch ( Exception e )
+                    {
+                        errorMessage += $"Error re-activating CyberSource subscription. Message:  {e.Message} ";
 
-            //            var exception = new Exception( errorMessage );
-            //            ExceptionLogService.LogException( exception );
-            //            return false;
+                        var exception = new Exception( errorMessage );
+                        ExceptionLogService.LogException( exception );
+                        return false;
 
-            //        }
+                    }
+                }
 
-            //        try
-            //        {
-            //            subscriptionResult = apiInstance.UpdateSubscription( subscriptionId, new UpdateSubscription( PlanInformation: planInformation, SubscriptionInformation: subscriptionInformation, OrderInformation: orderInformation ) );
+                try
+                {
+                    var updatePlanInformation = new Rbsv1subscriptionsidPlanInformation( planInformation.BillingCycles );
+                    var updateSubscriptionInformation = new Rbsv1subscriptionsidSubscriptionInformation( subscriptionInformation.Code, subscriptionInformation.PlanId, subscriptionInformation.Name, subscriptionInformation.StartDate );
+                    subscriptionResult = apiInstance.UpdateSubscription( subscriptionId, new UpdateSubscription( PlanInformation: updatePlanInformation, SubscriptionInformation: updateSubscriptionInformation, OrderInformation: orderInformation ) );
+                }
+                catch ( Exception e )
+                {
+                    // Write decline/error as an exception.
+                    var exception = new Exception( $"Error processing CyberSource subscription. Message:  {e.Message} " );
 
-            //        }
-            //        catch ( Exception e )
-            //        {
-            //            // Write decline/error as an exception.
-            //            var exception = new Exception( $"Error processing CyberSource subscription. Message:  {e.Message} " );
+                    ExceptionLogService.LogException( exception );
+                    errorMessage = e.Message;
 
-            //            ExceptionLogService.LogException( exception );
-            //            errorMessage = e.Message;
+                    return false;
+                }
 
-            //            return false;
-            //        }
+                subscriptionId = subscriptionResult?.Id;
 
-            //        subscriptionId = subscriptionResult?.Data?.Id;
+                if ( subscriptionId != scheduledTransaction.GatewayScheduleId )
+                {
+                    // Shouldn't happen, but just in case...
+                    if ( scheduledTransaction.PreviousGatewayScheduleIds == null )
+                    {
+                        scheduledTransaction.PreviousGatewayScheduleIds = new List<string>();
+                    }
 
-            //        if ( subscriptionId != scheduledTransaction.GatewayScheduleId )
-            //        {
-            //            // Shouldn't happen, but just in case...
-            //            if ( scheduledTransaction.PreviousGatewayScheduleIds == null )
-            //            {
-            //                scheduledTransaction.PreviousGatewayScheduleIds = new List<string>();
-            //            }
+                    scheduledTransaction.PreviousGatewayScheduleIds.Add( scheduledTransaction.GatewayScheduleId );
 
-            //            scheduledTransaction.PreviousGatewayScheduleIds.Add( scheduledTransaction.GatewayScheduleId );
-
-            //            referencedPaymentInfo.TransactionCode = subscriptionId;
-            //            scheduledTransaction.GatewayScheduleId = subscriptionId;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        // Error from SetSubscriptionBillingPlanParameters
-            //        return false;
-            //    }
-
-            //    if ( referencedPaymentInfo.IncludesAddressData() )
-            //    {
-            //        var updateCustomerAddressResponse = this.UpdateCustomerAddress( gatewayUrl, apiKey, referencedPaymentInfo );
-            //        if ( !updateCustomerAddressResponse.IsSuccessStatus() )
-            //        {
-            //            errorMessage = updateCustomerAddressResponse.Message;
-            //            return false;
-            //        }
-            //    }
-
-            //    var customerId = referencedPaymentInfo.GatewayPersonIdentifier;
-
-            //    CustomerResponse customerInfo;
-            //    try
-            //    {
-            //        customerInfo = this.GetCustomer( gatewayUrl, this.GetPrivateApiKey( financialGateway ), customerId );
-            //    }
-            //    catch ( Exception ex )
-            //    {
-            //        throw new MyWellGatewayException( $"Exception getting Customer Information for Scheduled Payment", ex );
-            //    }
-
-            //    scheduledTransaction.FinancialPaymentDetail = PopulatePaymentInfo( paymentInfo, customerInfo?.Data?.PaymentMethod, customerInfo?.Data?.BillingAddress );
-            //    scheduledTransaction.TransactionCode = customerId;
-
-            //    try
-            //    {
-            //        GetScheduledPaymentStatus( scheduledTransaction, out errorMessage );
-            //    }
-            //    catch ( Exception ex )
-            //    {
-            //        throw new MyWellGatewayException( $"Exception getting Scheduled Payment Status. {errorMessage}", ex );
-            //    }
-
-            //    errorMessage = null;
-                return true;
+                    referencedPaymentInfo.TransactionCode = subscriptionId;
+                    scheduledTransaction.GatewayScheduleId = subscriptionId;
+                }
             }
+            else
+            {
+                // Error from SetSubscriptionBillingPlanParameters
+                return false;
+            }
+
+            var customerId = referencedPaymentInfo.GatewayPersonIdentifier;
+
+            if ( referencedPaymentInfo.IncludesAddressData() )
+            {
+                Tmsv2customersEmbeddedDefaultPaymentInstrument updatePaymentInstrumentResponse = null;
+                var customerPaymentApiInstance = new CustomerPaymentInstrumentApi( clientConfig );
+
+                try
+                {
+                    var customerPaymentInstrumentList = customerPaymentApiInstance.GetCustomerPaymentInstrumentsList( customerId );
+                    if ( customerPaymentApiInstance.GetStatusCode() != 200 && customerPaymentInstrumentList != null )
+                    {
+                        var paymentInstrument = customerPaymentInstrumentList.Embedded?.PaymentInstruments?.FirstOrDefault( pi => pi._Default.HasValue && pi._Default.Value );
+                        if ( paymentInstrument != null )
+                        {
+                            var newBillTo = new Tmsv2customersEmbeddedDefaultPaymentInstrumentBillTo(
+                                FirstName: referencedPaymentInfo.FirstName,
+                                LastName: referencedPaymentInfo.LastName.IsNullOrWhiteSpace() ? referencedPaymentInfo.BusinessName : referencedPaymentInfo.LastName,
+                                Address1: referencedPaymentInfo.Street1,
+                                Locality: referencedPaymentInfo.City,
+                                AdministrativeArea: referencedPaymentInfo.State,
+                                PostalCode: referencedPaymentInfo.PostalCode,
+                                Country: referencedPaymentInfo.Country,
+                                Email: referencedPaymentInfo.Email,
+                                PhoneNumber: referencedPaymentInfo.Phone
+                            );
+
+                            PatchCustomerPaymentInstrumentRequest patchCustomerPaymentInstrumentRequest = new PatchCustomerPaymentInstrumentRequest( BillTo: newBillTo );
+
+                            updatePaymentInstrumentResponse = customerPaymentApiInstance.PatchCustomersPaymentInstrument( referencedPaymentInfo.GatewayPersonIdentifier, paymentInstrument.Id, patchCustomerPaymentInstrumentRequest );
+                        }
+                    }
+                    if ( customerPaymentApiInstance.GetStatusCode() != 200 )
+                    {
+                        errorMessage = customerPaymentApiInstance.ToString();
+                        return false;
+                    }
+                }
+                catch ( Exception e )
+                {
+                    // Write decline/error as an exception.
+                    var exception = new Exception( $"Error processing CyberSource Address Update. Message:  {e.Message} " );
+
+                    ExceptionLogService.LogException( exception );
+                    errorMessage = e.Message;
+
+                    return false;
+                }
+
+            }
+
+            PaymentInstrumentList customerInfo;
+            try
+            {
+                var customerPaymentApiInstance = new CustomerPaymentInstrumentApi( clientConfig );
+                customerInfo = customerPaymentApiInstance.GetCustomerPaymentInstrumentsList( customerId, null, null, null );
+            }
+            catch ( Exception e )
+            {
+                errorMessage += "Exception getting Customer Information for Scheduled Payment: " + e.Message;
+                return false;
+            }
+
+            scheduledTransaction.FinancialPaymentDetail = PopulatePaymentInfo( paymentInfo, customerInfo.Embedded.PaymentInstruments.LastOrDefault( pi => pi._Default.HasValue && pi._Default.Value ) );
+            scheduledTransaction.TransactionCode = customerId;
+
+            try
+            {
+                GetScheduledPaymentStatus( scheduledTransaction, out errorMessage );
+            }
+            catch ( Exception ex )
+            {
+                throw new Exception( $"Exception getting Scheduled Payment Status. {errorMessage}", ex );
+            }
+
+            errorMessage = null;
+            return true;
+        }
 
         /// <summary>
         /// Cancels the scheduled payment.
