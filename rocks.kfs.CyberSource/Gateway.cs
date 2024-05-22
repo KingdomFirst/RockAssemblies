@@ -690,7 +690,7 @@ namespace rocks.kfs.CyberSource
                 return null;
             }
 
-            string subscriptionDescription = $"{referencedPaymentInfo.Description}|Subscription Ref: {descriptionGuid}";
+            string subscriptionDescription = $"{referencedPaymentInfo.Description} - Subscription Ref: {descriptionGuid}";
             var configDictionary = new Configuration().GetConfiguration( financialGateway );
             var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
 
@@ -702,8 +702,10 @@ namespace rocks.kfs.CyberSource
                     Code: descriptionCode
                 );
 
+                var startDateUTC = schedule.StartDate.ToUniversalTime();
                 Rbsv1subscriptionsSubscriptionInformation subscriptionInformation = new Rbsv1subscriptionsSubscriptionInformation(
-                    Name: subscriptionDescription
+                    Name: subscriptionDescription,
+                    StartDate: startDateUTC.ToString( "yyyy-MM-ddTHH:mm:ssZ" )
                 );
                 string defaultCurrency = "USD";
                 GetAllPlansResponseOrderInformationAmountDetails orderInformationAmountDetails = new GetAllPlansResponseOrderInformationAmountDetails(
@@ -766,7 +768,7 @@ namespace rocks.kfs.CyberSource
                     catch ( Exception e )
                     {
                         errorMessage += "Exception on calling the Subscriptions API : " + e.Message;
-                        //return null;
+                        return null;
                     }
 
                     subscriptionId = subscriptionResult.Id;
@@ -818,7 +820,7 @@ namespace rocks.kfs.CyberSource
 
                 return scheduledTransaction;
             }
-            catch ( Exception )
+            catch ( Exception ex2 )
             {
                 // If there is an exception, Rock won't save this as a scheduled transaction, so make sure the subscription didn't get created so mystery scheduled transactions don't happen.
                 var apiInstance = new SubscriptionsApi( clientConfig );
@@ -1423,8 +1425,13 @@ namespace rocks.kfs.CyberSource
             else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_BIWEEKLY.AsGuid() )
             {
                 billingCycleInterval = 2;
-                billingPeriodUnit = BillingPeriodUnit.D;
+                billingPeriodUnit = BillingPeriodUnit.W;
             }
+            // DAILY does not exist, but the gateway supports it.
+            //else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_DAILY.AsGuid() )
+            //{
+            //    billingPeriodUnit = BillingPeriodUnit.D;
+            //}
             else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_QUARTERLY.AsGuid() )
             {
                 billingCycleInterval = 3;
