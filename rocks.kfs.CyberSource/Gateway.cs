@@ -958,7 +958,7 @@ namespace rocks.kfs.CyberSource
                 {
                     var updatePlanInformation = new Rbsv1subscriptionsidPlanInformation( planInformation.BillingCycles );
                     var updateSubscriptionInformation = new Rbsv1subscriptionsidSubscriptionInformation( subscriptionInformation.Code, subscriptionInformation.PlanId, subscriptionInformation.Name, subscriptionInformation.StartDate );
-                    subscriptionResult = apiInstance.UpdateSubscription( subscriptionId, new UpdateSubscription( PlanInformation: updatePlanInformation, SubscriptionInformation: updateSubscriptionInformation, OrderInformation: orderInformation ) );
+                    subscriptionResult = apiInstance.UpdateSubscription( subscriptionId, new UpdateSubscription( PlanInformation: updatePlanInformation, OrderInformation: orderInformation ) );
                 }
                 catch ( Exception e )
                 {
@@ -1134,6 +1134,7 @@ namespace rocks.kfs.CyberSource
                     scheduledTransaction.FinancialPaymentDetail.GatewayPersonIdentifier = subscriptionResponse.PaymentInformation?.Customer?.Id;
                     scheduledTransaction.StatusMessage = subscriptionResponse.SubscriptionInformation.Status;
                     scheduledTransaction.Status = GetFinancialScheduledTransactionStatus( subscriptionResponse.SubscriptionInformation.Status );
+                    scheduledTransaction.TransactionFrequencyValueId = GetFinancialScheduledTransactionFrequency( subscriptionResponse.PlanInformation.BillingPeriod );
                 }
 
                 scheduledTransaction.LastStatusUpdateDateTime = RockDateTime.Now;
@@ -1153,6 +1154,35 @@ namespace rocks.kfs.CyberSource
 
                 errorMessage += subscriptionResponse.ToString();
                 return false;
+            }
+        }
+
+        private int GetFinancialScheduledTransactionFrequency( GetAllPlansResponsePlanInformationBillingPeriod billingPeriod )
+        {
+            switch ( billingPeriod.Unit )
+            {
+                case "W":
+                    if (billingPeriod.Length == "2" )
+                    {
+                        return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_BIWEEKLY.AsGuid() ).Id;
+                    }
+                    else
+                    {
+                        return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_WEEKLY.AsGuid() ).Id;
+                    }
+                case "M":
+                    if ( billingPeriod.Length == "3" )
+                    {
+                        return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_QUARTERLY.AsGuid() ).Id;
+                    }
+                    else
+                    {
+                        return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_MONTHLY.AsGuid() ).Id;
+                    }
+                case "Y":
+                        return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_YEARLY.AsGuid() ).Id;
+                default:
+                    return -1;
             }
         }
 
@@ -1489,13 +1519,6 @@ namespace rocks.kfs.CyberSource
             else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_YEARLY.AsGuid() )
             {
                 billingPeriodUnit = BillingPeriodUnit.Y;
-            }
-            else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_ONE_TIME.AsGuid() )
-            {
-                // If ONE-TIME create a monthly subscription, but with a duration of 1 so that it only does it once.
-                billingCycleInterval = 1;
-                billingPeriodUnit = BillingPeriodUnit.M;
-                billingDuration = 1;
             }
             else
             {
