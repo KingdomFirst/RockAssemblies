@@ -908,6 +908,7 @@ namespace rocks.kfs.CyberSource
             FinancialGateway financialGateway;
             string gatewayUrl;
             string apiKey;
+            GetSubscriptionResponse subscriptionStatusResult = null;
 
             if ( SetSubscriptionPlanParams( planInformation, subscriptionInformation, transactionFrequencyGuid, scheduledTransaction.StartDate, out errorMessage ) )
             {
@@ -921,9 +922,8 @@ namespace rocks.kfs.CyberSource
                     paymentInformationCustomer = new Rbsv1subscriptionsPaymentInformationCustomer( Id: referencedPaymentInfo.GatewayPersonIdentifier );
                 }
 
-                //SubscriptionResponse subscriptionResult;
-                var subscriptionStatusResult = apiInstance.GetSubscription( subscriptionId );
-                if ( subscriptionStatusResult.SubscriptionInformation.Status != "ACTIVE" )
+                subscriptionStatusResult = apiInstance.GetSubscription( subscriptionId );
+                if ( subscriptionStatusResult.SubscriptionInformation.Status != "ACTIVE" && subscriptionStatusResult.SubscriptionInformation.Status != "PENDING" )
                 {
                     // If subscription isn't active (it might be cancelled due to expired card),
                     // change the status back to active
@@ -956,9 +956,37 @@ namespace rocks.kfs.CyberSource
 
                 try
                 {
-                    var updatePlanInformation = new Rbsv1subscriptionsidPlanInformation( planInformation.BillingCycles );
-                    var updateSubscriptionInformation = new Rbsv1subscriptionsidSubscriptionInformation( subscriptionInformation.Code, subscriptionInformation.PlanId, subscriptionInformation.Name, subscriptionInformation.StartDate );
-                    subscriptionResult = apiInstance.UpdateSubscription( subscriptionId, new UpdateSubscription( PlanInformation: updatePlanInformation, OrderInformation: orderInformation ) );
+                    if ( subscriptionStatusResult.SubscriptionInformation.StartDate != subscriptionInformation.StartDate || subscriptionStatusResult.PlanInformation.BillingPeriod != planInformation.BillingPeriod )
+                    {
+                        // Cancel and add new subscription if they change the gift date or billing period.
+                        var deletedGatewayScheduleId = scheduledTransaction.GatewayScheduleId;
+
+                        PaymentSchedule paymentSchedule = new PaymentSchedule
+                        {
+                            TransactionFrequencyValue = DefinedValueCache.Get( scheduledTransaction.TransactionFrequencyValueId ),
+                            StartDate = scheduledTransaction.StartDate,
+                            EndDate = scheduledTransaction.EndDate,
+                            NumberOfPayments = scheduledTransaction.NumberOfPayments,
+                            PersonId = scheduledTransaction.AuthorizedPersonAlias.PersonId
+                        };
+
+                        apiInstance.CancelSubscription( subscriptionId );
+
+                        AddScheduledPayment( scheduledTransaction.FinancialGateway, paymentSchedule, paymentInfo, out errorMessage );
+
+                        if ( scheduledTransaction.PreviousGatewayScheduleIds == null )
+                        {
+                            scheduledTransaction.PreviousGatewayScheduleIds = new List<string>();
+                        }
+
+                        scheduledTransaction.PreviousGatewayScheduleIds.Add( deletedGatewayScheduleId );
+                    }
+                    else
+                    {
+                        var updatePlanInformation = new Rbsv1subscriptionsidPlanInformation( planInformation.BillingCycles );
+                        var updateSubscriptionInformation = new Rbsv1subscriptionsidSubscriptionInformation( subscriptionInformation.Code, subscriptionInformation.PlanId, subscriptionInformation.Name, subscriptionInformation.StartDate );
+                        subscriptionResult = apiInstance.UpdateSubscription( subscriptionId, new UpdateSubscription( PlanInformation: updatePlanInformation, OrderInformation: orderInformation ) );
+                    }
                 }
                 catch ( Exception e )
                 {
@@ -1162,7 +1190,7 @@ namespace rocks.kfs.CyberSource
             switch ( billingPeriod.Unit )
             {
                 case "W":
-                    if (billingPeriod.Length == "2" )
+                    if ( billingPeriod.Length == "2" )
                     {
                         return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_BIWEEKLY.AsGuid() ).Id;
                     }
@@ -1180,7 +1208,7 @@ namespace rocks.kfs.CyberSource
                         return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_MONTHLY.AsGuid() ).Id;
                     }
                 case "Y":
-                        return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_YEARLY.AsGuid() ).Id;
+                    return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_YEARLY.AsGuid() ).Id;
                 default:
                     return -1;
             }
