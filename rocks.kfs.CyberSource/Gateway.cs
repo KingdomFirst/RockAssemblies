@@ -1158,7 +1158,9 @@ namespace rocks.kfs.CyberSource
                         gatewayStartDate = DateTime.SpecifyKind( gatewayStartDate.Value, DateTimeKind.Unspecified );
                     }
 
-                    scheduledTransaction.NextPaymentDate = gatewayStartDate;
+                    var getNextPaymentDate = GetNextPaymentDate( subscriptionResponse, out errorMessage );
+
+                    scheduledTransaction.NextPaymentDate = getNextPaymentDate;
                     scheduledTransaction.FinancialPaymentDetail.GatewayPersonIdentifier = subscriptionResponse.PaymentInformation?.Customer?.Id;
                     scheduledTransaction.StatusMessage = subscriptionResponse.SubscriptionInformation.Status;
                     scheduledTransaction.Status = GetFinancialScheduledTransactionStatus( subscriptionResponse.SubscriptionInformation.Status );
@@ -1167,7 +1169,10 @@ namespace rocks.kfs.CyberSource
 
                 scheduledTransaction.LastStatusUpdateDateTime = RockDateTime.Now;
 
-                errorMessage = string.Empty;
+                if ( errorMessage.IsNullOrWhiteSpace() )
+                {
+                    errorMessage = string.Empty;
+                }
                 return true;
             }
             else
@@ -1183,6 +1188,77 @@ namespace rocks.kfs.CyberSource
                 errorMessage += subscriptionResponse.ToString();
                 return false;
             }
+        }
+
+        private DateTime? GetNextPaymentDate( GetSubscriptionResponse subscriptionResponse, out string errorMessage )
+        {
+            errorMessage = string.Empty;
+
+            var gatewayStartDate = subscriptionResponse.SubscriptionInformation?.StartDate?.AsDateTime();
+            var billingUnit = subscriptionResponse.PlanInformation?.BillingPeriod?.Unit;
+            var billingLength = subscriptionResponse.PlanInformation?.BillingPeriod?.Length.AsIntegerOrNull();
+            var billingCyclesCurrent = subscriptionResponse.PlanInformation?.BillingCycles?.Current.AsInteger();
+            var billingCyclesTotal = subscriptionResponse.PlanInformation?.BillingCycles?.Total.AsInteger();
+            if ( gatewayStartDate == null || billingUnit == null || billingLength == null )
+            {
+                errorMessage = "One of the required fields is null, StartDate, Billing.Unit or Billing.Length";
+                return gatewayStartDate;
+            }
+            var nextPaymentDate = gatewayStartDate;
+
+            if ( ( billingCyclesCurrent == null || billingCyclesTotal == null || billingCyclesTotal == 0 ) && billingCyclesCurrent <= billingCyclesTotal && gatewayStartDate < RockDateTime.Now )
+            {
+                if ( billingUnit == "W" )
+                {
+                    var calcDifference = ( RockDateTime.Now - gatewayStartDate.Value ).TotalDays / 7;
+                    if ( billingLength > 1 )
+                    {
+                        calcDifference = calcDifference / billingLength.Value;
+                        nextPaymentDate = gatewayStartDate.Value.AddDays( Math.Ceiling( calcDifference * ( 7 * billingLength.Value ) ) );
+                    }
+                    else
+                    {
+                        nextPaymentDate = gatewayStartDate.Value.AddDays( Math.Ceiling( calcDifference * 7 ) );
+                    }
+                }
+                else if ( billingUnit == "M" )
+                {
+                    var monthDifference = ( RockDateTime.Now.Year - gatewayStartDate.Value.Year ) * 12 + RockDateTime.Now.Month - gatewayStartDate.Value.Month;
+                    if ( billingLength > 1 )
+                    {
+                        var calcMonthDifference = ( double ) ( monthDifference / billingLength.Value );
+                        nextPaymentDate = gatewayStartDate.Value.AddMonths( Math.Ceiling( calcMonthDifference ).ToIntSafe() * billingLength.Value );
+                    }
+                    else
+                    {
+                        nextPaymentDate = gatewayStartDate.Value.AddMonths( monthDifference );
+                    }
+
+                    if ( nextPaymentDate < RockDateTime.Now )
+                    {
+                        nextPaymentDate = nextPaymentDate.Value.AddMonths( billingLength.Value );
+                    }
+                }
+                else if ( billingUnit == "Y" )
+                {
+                    var yearDifference = ( RockDateTime.Now.Year - gatewayStartDate.Value.Year );
+                    nextPaymentDate.Value.AddYears( yearDifference );
+                    if ( nextPaymentDate < RockDateTime.Now )
+                    {
+                        nextPaymentDate = nextPaymentDate.Value.AddYears( billingLength.Value );
+                    }
+                }
+                else
+                {
+                    var calcDifference = ( RockDateTime.Now - gatewayStartDate.Value ).TotalDays;
+                    nextPaymentDate = gatewayStartDate.Value.AddDays( calcDifference + 1 );
+                }
+            }
+            else
+            {
+                errorMessage = "Your billing cycle is complete. There will be no future gifts without setting up a new subscription.";
+            }
+            return nextPaymentDate;
         }
 
         private int GetFinancialScheduledTransactionFrequency( GetAllPlansResponsePlanInformationBillingPeriod billingPeriod )
