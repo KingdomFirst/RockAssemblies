@@ -226,7 +226,7 @@ namespace rocks.kfs.CyberSource
         /// <returns></returns>
         public override bool SupportsSavedAccount( DefinedValueCache currencyType )
         {
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -704,6 +704,7 @@ namespace rocks.kfs.CyberSource
 
                 var startDateUTC = schedule.StartDate.ToUniversalTime();
                 Rbsv1subscriptionsSubscriptionInformation subscriptionInformation = new Rbsv1subscriptionsSubscriptionInformation(
+                    Code: descriptionCode,
                     Name: subscriptionDescription,
                     StartDate: startDateUTC.ToString( "yyyy-MM-ddTHH:mm:ssZ" )
                 );
@@ -909,6 +910,7 @@ namespace rocks.kfs.CyberSource
             string gatewayUrl;
             string apiKey;
             GetSubscriptionResponse subscriptionStatusResult = null;
+            DateTime? nextPaymentDate = RockDateTime.Now;
 
             if ( SetSubscriptionPlanParams( planInformation, subscriptionInformation, transactionFrequencyGuid, scheduledTransaction.StartDate, out errorMessage ) )
             {
@@ -923,9 +925,9 @@ namespace rocks.kfs.CyberSource
                 }
 
                 subscriptionStatusResult = apiInstance.GetSubscription( subscriptionId );
-                if ( subscriptionStatusResult.SubscriptionInformation.Status != "ACTIVE" && subscriptionStatusResult.SubscriptionInformation.Status != "PENDING" )
+                if ( subscriptionStatusResult.SubscriptionInformation.Status == "SUSPENDED" )
                 {
-                    // If subscription isn't active (it might be cancelled due to expired card),
+                    // If subscription isn't active (it might be suspended due to expired card),
                     // change the status back to active
                     try
                     {
@@ -953,10 +955,15 @@ namespace rocks.kfs.CyberSource
 
                     }
                 }
+                else
+                {
+                    nextPaymentDate = GetNextPaymentDate( subscriptionStatusResult, out errorMessage );
+                }
 
+                var nextPaymentDateUTC = nextPaymentDate.Value.ToUniversalTime();
                 try
                 {
-                    if ( subscriptionStatusResult.SubscriptionInformation.StartDate != subscriptionInformation.StartDate || subscriptionStatusResult.PlanInformation.BillingPeriod != planInformation.BillingPeriod )
+                    if ( nextPaymentDateUTC != startDateUTC || subscriptionStatusResult.PaymentInformation.Customer.Id != paymentInformation.Customer.Id || subscriptionStatusResult.PlanInformation.BillingPeriod.Unit != planInformation.BillingPeriod.Unit || subscriptionStatusResult.PlanInformation.BillingPeriod.Length != planInformation.BillingPeriod.Length || subscriptionStatusResult.SubscriptionInformation.Status == "CANCELLED" )
                     {
                         // Cancel and add new subscription if they change the gift date or billing period.
                         var deletedGatewayScheduleId = scheduledTransaction.GatewayScheduleId;
@@ -970,22 +977,58 @@ namespace rocks.kfs.CyberSource
                             PersonId = scheduledTransaction.AuthorizedPersonAlias.PersonId
                         };
 
-                        apiInstance.CancelSubscription( subscriptionId );
-
-                        AddScheduledPayment( scheduledTransaction.FinancialGateway, paymentSchedule, paymentInfo, out errorMessage );
-
-                        if ( scheduledTransaction.PreviousGatewayScheduleIds == null )
+                        if ( subscriptionStatusResult.SubscriptionInformation.Status != "CANCELLED" )
                         {
-                            scheduledTransaction.PreviousGatewayScheduleIds = new List<string>();
+                            apiInstance.CancelSubscription( subscriptionId );
                         }
 
-                        scheduledTransaction.PreviousGatewayScheduleIds.Add( deletedGatewayScheduleId );
+                        var dummyFinancialScheduledTransaction = AddScheduledPayment( scheduledTransaction.FinancialGateway, paymentSchedule, paymentInfo, out errorMessage );
+
+                        if ( dummyFinancialScheduledTransaction != null )
+                        {
+                            subscriptionId = dummyFinancialScheduledTransaction.GatewayScheduleId;
+
+                            // keep track of the deleted schedule id in case some have been processed but not downloaded yet.
+                            if ( scheduledTransaction.PreviousGatewayScheduleIds == null )
+                            {
+                                scheduledTransaction.PreviousGatewayScheduleIds = new List<string>();
+                            }
+
+                            scheduledTransaction.PreviousGatewayScheduleIds.Add( deletedGatewayScheduleId );
+
+                            scheduledTransaction.GatewayScheduleId = subscriptionId;
+
+                            scheduledTransaction.IsActive = true;
+
+                            //try
+                            //{
+                            //    // update FinancialPaymentDetail with any changes in payment information
+                            //    Customer customerInfo = this.GetCustomerVaultQueryResponse( financialGateway, referencedPaymentInfo.GatewayPersonIdentifier )?.CustomerVault.Customer;
+                            //    UpdateFinancialPaymentDetail( customerInfo, scheduledTransaction.FinancialPaymentDetail );
+                            //}
+                            //catch ( Exception ex )
+                            //{
+                            //    throw new Exception( $"Exception getting Customer Information for Scheduled Payment.", ex );
+                            //}
+
+                            errorMessage = string.Empty;
+
+                            try
+                            {
+                                GetScheduledPaymentStatus( scheduledTransaction, out errorMessage );
+                            }
+                            catch ( Exception ex )
+                            {
+                                throw new Exception( $"Exception getting Scheduled Payment Status. {errorMessage}", ex );
+                            }
+                        }
                     }
                     else
                     {
                         var updatePlanInformation = new Rbsv1subscriptionsidPlanInformation( planInformation.BillingCycles );
                         var updateSubscriptionInformation = new Rbsv1subscriptionsidSubscriptionInformation( subscriptionInformation.Code, subscriptionInformation.PlanId, subscriptionInformation.Name, subscriptionInformation.StartDate );
                         subscriptionResult = apiInstance.UpdateSubscription( subscriptionId, new UpdateSubscription( PlanInformation: updatePlanInformation, OrderInformation: orderInformation ) );
+                        subscriptionId = subscriptionResult?.Id;
                     }
                 }
                 catch ( Exception e )
@@ -998,8 +1041,6 @@ namespace rocks.kfs.CyberSource
 
                     return false;
                 }
-
-                subscriptionId = subscriptionResult?.Id;
 
                 if ( subscriptionId != scheduledTransaction.GatewayScheduleId )
                 {
@@ -1031,7 +1072,7 @@ namespace rocks.kfs.CyberSource
                 try
                 {
                     var customerPaymentInstrumentList = customerPaymentApiInstance.GetCustomerPaymentInstrumentsList( customerId );
-                    if ( customerPaymentApiInstance.GetStatusCode() != 200 && customerPaymentInstrumentList != null )
+                    if ( customerPaymentApiInstance.GetStatusCode() == 200 && customerPaymentInstrumentList != null )
                     {
                         var paymentInstrument = customerPaymentInstrumentList.Embedded?.PaymentInstruments?.FirstOrDefault( pi => pi._Default.HasValue && pi._Default.Value );
                         if ( paymentInstrument != null )
@@ -1044,7 +1085,7 @@ namespace rocks.kfs.CyberSource
                                 AdministrativeArea: referencedPaymentInfo.State,
                                 PostalCode: referencedPaymentInfo.PostalCode,
                                 Country: referencedPaymentInfo.Country,
-                                Email: referencedPaymentInfo.Email,
+                                Email: ( referencedPaymentInfo.Email != "update@invalid.email" && referencedPaymentInfo.Email.IsNotNullOrWhiteSpace() ) ? referencedPaymentInfo.Email : scheduledTransaction.AuthorizedPersonAlias.Person.Email,
                                 PhoneNumber: referencedPaymentInfo.Phone
                             );
 
@@ -1103,13 +1144,41 @@ namespace rocks.kfs.CyberSource
         /// <summary>
         /// Cancels the scheduled payment.
         /// </summary>
-        /// <param name="transaction">The transaction.</param>
+        /// <param name="transaction">The scheduled transaction.</param>
         /// <param name="errorMessage">The error message.</param>
         /// <returns></returns>
         public override bool CancelScheduledPayment( FinancialScheduledTransaction transaction, out string errorMessage )
         {
-            errorMessage = "This gateway does not support canceling scheduled transactions. Transactions should be cancelled through the CyberSource interface.";
-            return false;
+            var subscriptionId = transaction.GatewayScheduleId;
+
+            var configDictionary = new Configuration().GetConfiguration( transaction.FinancialGateway );
+            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+
+            var apiInstance = new SubscriptionsApi( clientConfig );
+
+            CancelSubscriptionResponse cancelResult = null;
+
+            try
+            {
+                cancelResult = apiInstance.CancelSubscription( subscriptionId );
+                transaction.IsActive = false;
+
+                errorMessage = string.Empty;
+                return true;
+            }
+            catch ( Exception e )
+            {
+                var apiException = ( CyberSourceSDK.Client.ApiException ) e;
+                if ( ( apiException != null && apiException.ErrorCode == 400 ) || apiInstance.GetStatusCode() == ( int ) System.Net.HttpStatusCode.NotFound || apiInstance.GetStatusCode() == ( int ) System.Net.HttpStatusCode.Forbidden )
+                {
+                    // Assume that status code of Forbidden or NonFound indicates that the schedule doesn't exist, or was deleted.
+                    errorMessage = string.Empty;
+                    return true;
+                }
+
+                errorMessage = "Exception on calling the CyberSource API : " + e.Message;
+                return false;
+            }
         }
 
         /// <summary>
@@ -1169,6 +1238,11 @@ namespace rocks.kfs.CyberSource
 
                 scheduledTransaction.LastStatusUpdateDateTime = RockDateTime.Now;
 
+                if ( scheduledTransaction.Status == FinancialScheduledTransactionStatus.Canceled )
+                {
+                    scheduledTransaction.IsActive = false;
+                }
+
                 if ( errorMessage.IsNullOrWhiteSpace() )
                 {
                     errorMessage = string.Empty;
@@ -1206,20 +1280,13 @@ namespace rocks.kfs.CyberSource
             }
             var nextPaymentDate = gatewayStartDate;
 
-            if ( ( billingCyclesCurrent == null || billingCyclesTotal == null || billingCyclesTotal == 0 ) && billingCyclesCurrent <= billingCyclesTotal && gatewayStartDate < RockDateTime.Now )
+            if ( ( billingCyclesCurrent == null || billingCyclesTotal == null || billingCyclesTotal == 0 || billingCyclesCurrent <= billingCyclesTotal ) && gatewayStartDate < RockDateTime.Now )
             {
                 if ( billingUnit == "W" )
                 {
-                    var calcDifference = ( RockDateTime.Now - gatewayStartDate.Value ).TotalDays / 7;
-                    if ( billingLength > 1 )
-                    {
-                        calcDifference = calcDifference / billingLength.Value;
-                        nextPaymentDate = gatewayStartDate.Value.AddDays( Math.Ceiling( calcDifference * ( 7 * billingLength.Value ) ) );
-                    }
-                    else
-                    {
-                        nextPaymentDate = gatewayStartDate.Value.AddDays( Math.Ceiling( calcDifference * 7 ) );
-                    }
+                    var weekCalc = ( 7 * billingLength.Value );
+                    var calcDifference = ( RockDateTime.Now - gatewayStartDate.Value ).TotalDays / weekCalc;
+                    nextPaymentDate = gatewayStartDate.Value.AddDays( Math.Ceiling( calcDifference ) * weekCalc );
                 }
                 else if ( billingUnit == "M" )
                 {
@@ -1444,7 +1511,7 @@ namespace rocks.kfs.CyberSource
                 AdministrativeArea: paymentInfo.State,
                 PostalCode: paymentInfo.PostalCode,
                 Country: paymentInfo.Country,
-                Email: paymentInfo.Email,
+                Email: paymentInfo.Email ?? "update@invalid.email",
                 PhoneNumber: paymentInfo.Phone
             );
 
