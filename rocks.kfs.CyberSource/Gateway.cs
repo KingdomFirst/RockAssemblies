@@ -396,6 +396,7 @@ namespace rocks.kfs.CyberSource
 
                 errorMessage += string.Format( "{0} ({1})", chargeResult.ErrorInformation.Message, chargeResult.ErrorInformation.Reason );
                 ExceptionLogService.LogException( $"Error processing CyberSource transaction. Result Code:  {chargeResult.ErrorInformation.Message} ({chargeResult.ErrorInformation.Reason})." );
+                return null;
             }
 
             var transaction = new FinancialTransaction();
