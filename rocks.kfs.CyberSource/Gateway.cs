@@ -813,7 +813,7 @@ namespace rocks.kfs.CyberSource
                 referencedPaymentInfo.TransactionCode = subscriptionId;
 
                 var scheduledTransaction = new FinancialScheduledTransaction();
-                scheduledTransaction.TransactionCode = customerId;
+                scheduledTransaction.TransactionCode = subscriptionResult.SubscriptionInformation?.Code ?? customerId;
                 scheduledTransaction.GatewayScheduleId = subscriptionId;
                 scheduledTransaction.FinancialGatewayId = financialGateway.Id;
 
@@ -1388,33 +1388,116 @@ namespace rocks.kfs.CyberSource
         /// <returns></returns>
         public override List<Payment> GetPayments( FinancialGateway gateway, DateTime startDate, DateTime endDate, out string errorMessage )
         {
+            errorMessage = string.Empty;
+
             var today = RockDateTime.Now;
-            var lookupContext = new RockContext();
-            var accountLookup = new FinancialAccountService( lookupContext );
-            var transactionLookup = new FinancialTransactionService( lookupContext );
-            var donationUrl = GetBaseUrl( gateway, "donations", out errorMessage );
             var errorMessages = new List<string>();
+            var paymentList = new List<Payment>();
 
-            if ( donationUrl.IsNullOrWhiteSpace() )
+            string query = $"submitTimeUtc:[{( ( DateTimeOffset ) startDate.ToUniversalTime() ).ToUnixTimeMilliseconds()} TO {( ( DateTimeOffset ) endDate.ToUniversalTime() ).ToUnixTimeMilliseconds()}] AND orderInformation.amountDetails.totalAmount:[0.01 TO 999999999.99]";
+            int offset = 0;
+            // maximum limit of the CyberSource API is 2500
+            int limit = 2500;
+            string sort = "submitTimeUtc:asc";
+            var requestObj = new CreateSearchRequest(
+                Query: query,
+                Offset: offset,
+                Limit: limit,
+                Sort: sort
+            );
+            var configDictionary = new Configuration().GetConfiguration( gateway );
+            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+
+            TssV2TransactionsPost201Response searchResult = null;
+            try
             {
-                // errorMessage already set
-                return null;
+                var apiInstance = new SearchTransactionsApi( clientConfig );
+                searchResult = apiInstance.CreateSearch( requestObj );
+                //return result;
+            }
+            catch ( Exception e )
+            {
+                errorMessage = "Exception on calling the API : " + e.Message;
+                return paymentList;
             }
 
-            var authenticator = GetAuthenticator( gateway, out errorMessage );
-            if ( authenticator == null )
+            if ( searchResult == null || searchResult.Embedded == null || !searchResult.Embedded.TransactionSummaries.Any() )
             {
-                // errorMessage already set
-                return null;
+                // empty result
+                errorMessage = "Empty response returned From gateway.";
+                return paymentList;
             }
 
+            foreach ( var transaction in searchResult.Embedded.TransactionSummaries )
+            {
+                Payment payment = new Payment();
+                payment.TransactionCode = transaction.Id;
+
+                payment.Status = transaction.ApplicationInformation.RFlag;
+
+                payment.IsFailure = transaction.ApplicationInformation.ReasonCode != "100";
+
+                payment.GatewayScheduleId = transaction.ClientReferenceInformation.Code.Left( 20 );
+
+                try
+                {
+                    var apiInstance = new SubscriptionsApi( clientConfig );
+                    var subscriptionSearchResult = apiInstance.GetAllSubscriptions( null, null, payment.GatewayScheduleId, null );
+                    var subscriptionResult = subscriptionSearchResult.Subscriptions.FirstOrDefault();
+
+                    if ( subscriptionResult != null )
+                    {
+                        payment.GatewayScheduleId = subscriptionResult.Id;
+                    }
+
+                }
+                catch ( Exception e )
+                {
+                    errorMessages.Add( $"Failed to retrieve subscription via code {payment.GatewayScheduleId}. Error message: {e.Message}" );
+                }
+
+                payment.GatewayPersonIdentifier = transaction.PaymentInformation?.Customer?.CustomerId;
+
+                payment.Amount = transaction.OrderInformation.AmountDetails.TotalAmount.AsDecimal();
+
+                var statusMessage = new StringBuilder();
+                DateTime? transactionDateTime = transaction.SubmitTimeUtc.AsDateTime();
+                foreach ( var transactionAction in transaction.ApplicationInformation.Applications )
+                {
+                    string actionType = transactionAction.Name;
+
+                    string responseText = transactionAction.RMessage;
+
+                    statusMessage.AppendFormat(
+                        "{0} ({1}): {2}; Status: {3}",
+                        transactionAction.ReconciliationId, ( transactionAction.RFlag.IsNotNullOrWhiteSpace() ) ? transactionAction.RFlag : transactionAction.RCode,
+                        actionType,
+                        responseText );
+
+                    statusMessage.AppendLine();
+
+                    if ( actionType == "ics_bill" )
+                    {
+                        payment.IsSettled = true;
+                        payment.SettledGroupId = transactionAction.ReconciliationId.Trim();
+                        payment.SettledDate = transactionDateTime.HasValue ? transactionDateTime.Value.ToLocalTime() : today;
+                    }
+
+                    if ( transactionDateTime.HasValue && ( actionType == "ics_bill" || actionType == "ics_auth" ) )
+                    {
+                        payment.TransactionDateTime = transactionDateTime.Value.ToLocalTime();
+                        payment.StatusMessage = statusMessage.ToString().Left( 200 );
+                        paymentList.Add( payment );
+                    }
+                }
+            }
 
             if ( errorMessages.Any() )
             {
                 errorMessage = string.Join( "<br>", errorMessages );
             }
 
-            return new List<Payment>();
+            return paymentList;
         }
 
         /// <summary>
@@ -1426,7 +1509,7 @@ namespace rocks.kfs.CyberSource
         public override string GetReferenceNumber( FinancialTransaction transaction, out string errorMessage )
         {
             errorMessage = string.Empty;
-            return string.Empty;
+            return transaction?.FinancialPaymentDetail?.GatewayPersonIdentifier;
         }
 
         /// <summary>
@@ -1438,7 +1521,7 @@ namespace rocks.kfs.CyberSource
         public override string GetReferenceNumber( FinancialScheduledTransaction scheduledTransaction, out string errorMessage )
         {
             errorMessage = string.Empty;
-            return string.Empty;
+            return scheduledTransaction?.FinancialPaymentDetail?.GatewayPersonIdentifier ?? scheduledTransaction.TransactionCode;
         }
 
         /// <summary>
