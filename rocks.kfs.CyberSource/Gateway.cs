@@ -1087,7 +1087,7 @@ namespace rocks.kfs.CyberSource
 
             if ( referencedPaymentInfo.IncludesAddressData() )
             {
-                Tmsv2customersEmbeddedDefaultPaymentInstrument updatePaymentInstrumentResponse = null;
+                PatchCustomerPaymentInstrumentRequest updatePaymentInstrumentResponse = null;
                 var customerPaymentApiInstance = new CustomerPaymentInstrumentApi( clientConfig );
 
                 try
@@ -1095,7 +1095,7 @@ namespace rocks.kfs.CyberSource
                     var customerPaymentInstrumentList = customerPaymentApiInstance.GetCustomerPaymentInstrumentsList( customerId );
                     if ( customerPaymentApiInstance.GetStatusCode() == 200 && customerPaymentInstrumentList != null )
                     {
-                        var paymentInstrument = customerPaymentInstrumentList.Embedded?.PaymentInstruments?.FirstOrDefault( pi => pi._Default.HasValue && pi._Default.Value );
+                        var paymentInstrument = customerPaymentInstrumentList.Embedded?.PaymentInstruments?.FirstOrDefault( pi => pi.Default.HasValue && pi.Default.Value );
                         if ( paymentInstrument != null )
                         {
                             var newBillTo = new Tmsv2customersEmbeddedDefaultPaymentInstrumentBillTo(
@@ -1146,7 +1146,7 @@ namespace rocks.kfs.CyberSource
                 return false;
             }
 
-            scheduledTransaction.FinancialPaymentDetail = PopulatePaymentInfo( paymentInfo, customerInfo.Embedded.PaymentInstruments.LastOrDefault( pi => pi._Default.HasValue && pi._Default.Value ) );
+            scheduledTransaction.FinancialPaymentDetail = PopulatePaymentInfo( paymentInfo, customerInfo.Embedded.PaymentInstruments.LastOrDefault( pi => pi.Default.HasValue && pi.Default.Value ) );
             scheduledTransaction.TransactionCode = customerId;
 
             try
