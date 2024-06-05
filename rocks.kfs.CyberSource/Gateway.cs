@@ -19,7 +19,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Text;
 using System.Web.UI;
+using System.Xml.Linq;
 using Newtonsoft.Json;
 using RestSharp.Authenticators;
 
@@ -32,13 +34,9 @@ using Rock.Web.Cache;
 
 using CyberSource.Api;
 using CyberSource.Model;
-using CyberSourceSDK = CyberSource;
-
 using rocks.kfs.CyberSource.Controls;
-using System.Text;
-using System.Xml.Linq;
 using static rocks.kfs.CyberSource.CyberSourceTypes;
-using Rock.Jobs;
+using CyberSourceSDK = CyberSource;
 
 namespace rocks.kfs.CyberSource
 {
@@ -603,6 +601,7 @@ namespace rocks.kfs.CyberSource
                 }
             }
             var attemptType = "Refund";
+            var alreadyHandledErrors = new List<string> { "TRANSACTION_ALREADY_REVERSED_OR_SETTLED", "AUTH_ALREADY_REVERSED", "DUPLICATE_REQUEST", "CAPTURE_ALREADY_VOIDED" };
             try
             {
                 if ( applications.Any( a => a.Name == "ics_bill" && a.ReasonCode == "100" ) )
@@ -619,7 +618,24 @@ namespace rocks.kfs.CyberSource
             }
             catch ( Exception e )
             {
+                var apiException = ( CyberSourceSDK.Client.ApiException ) e;
                 errorMessage += "Exception on calling the API : " + e.Message;
+
+                PtsV2PaymentsRefundPost201Response alreadyHandled = null;
+
+                if ( apiException != null && apiException.ErrorContent != null )
+                {
+                    PushFunds401Response parsedError = JsonConvert.DeserializeObject<PushFunds401Response>( apiException.ErrorContent );
+                    if ( parsedError != null && alreadyHandledErrors.Contains( parsedError.Reason ) )
+                    {
+                        errorMessage = $"The refund/reversal has already been handled, please check with your Gateway Provider for more info. ({parsedError.Reason}) ";
+                        if ( origTransaction.Refunds == null || !origTransaction.Refunds.Any() )
+                        {
+                            refundResponse = new PtsV2PaymentsRefundPost201Response( Id: parsedError.Id );
+                            alreadyHandled = refundResponse;
+                        }
+                    }
+                }
 
                 try
                 {
@@ -639,6 +655,10 @@ namespace rocks.kfs.CyberSource
                 catch ( Exception ie )
                 {
                     errorMessage += "Exception on calling the API : " + ie.Message;
+                    if ( alreadyHandled != null )
+                    {
+                        refundResponse = alreadyHandled;
+                    }
                 }
             }
 
