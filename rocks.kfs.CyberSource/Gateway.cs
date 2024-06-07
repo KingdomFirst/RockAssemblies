@@ -37,6 +37,7 @@ using CyberSource.Model;
 using rocks.kfs.CyberSource.Controls;
 using static rocks.kfs.CyberSource.CyberSourceTypes;
 using CyberSourceSDK = CyberSource;
+using System.Threading;
 
 namespace rocks.kfs.CyberSource
 {
@@ -284,18 +285,8 @@ namespace rocks.kfs.CyberSource
             var description = stringBuilderDescription.ToString().Truncate( 600 );
 
             Ptsv2paymentsClientReferenceInformation clientReferenceInformation = new Ptsv2paymentsClientReferenceInformation(
-                //Code: clientReferenceInformationCode,
                 Comments: description
             );
-
-            //Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator paymentProcessingInformationOptionsInitiator = new Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator(
-            //    CredentialStoredOnFile: true
-            //);
-
-            //Ptsv2paymentsProcessingInformationAuthorizationOptions paymentProcessingInformationAuthorization = new Ptsv2paymentsProcessingInformationAuthorizationOptions(
-            //    Initiator: paymentProcessingInformationOptionsInitiator,
-            //    IgnoreAvsResult: true
-            //);
 
             string defaultCurrency = "USD";
             Ptsv2paymentsOrderInformationAmountDetails orderInformationAmountDetails = new Ptsv2paymentsOrderInformationAmountDetails(
@@ -305,8 +296,7 @@ namespace rocks.kfs.CyberSource
 
             bool processingInformationCapture = financialGateway.GetAttributeValue( AttributeKey.CapturePayment ).AsBoolean();
             Ptsv2paymentsProcessingInformation paymentProcessingInformation = new Ptsv2paymentsProcessingInformation(
-                 Capture: processingInformationCapture //Capture: amount > 0,
-                                                       //AuthorizationOptions: paymentProcessingInformationAuthorization
+                 Capture: processingInformationCapture
              );
 
             Ptsv2paymentsOrderInformationBillTo orderInformationBillTo = new Ptsv2paymentsOrderInformationBillTo(
@@ -337,7 +327,6 @@ namespace rocks.kfs.CyberSource
             Ptsv2paymentsTokenInformation tokenInformation = new Ptsv2paymentsTokenInformation(
                 TransientTokenJwt: tokenizerToken
             );
-
 
             Ptsv2paymentsDeviceInformation deviceInformation = new Ptsv2paymentsDeviceInformation(
                 IpAddress: paymentInfo.IPAddress
@@ -405,13 +394,15 @@ namespace rocks.kfs.CyberSource
                 transaction.ForeignKey = chargeResult.TokenInformation?.Customer?.Id;
             }
 
-            //Customer customerInfo = this.GetCustomerVaultQueryResponse( financialGateway, customerId )?.CustomerVault.Customer;
+            Thread.Sleep( 250 );
+
             TssV2TransactionsGet200Response transactionDetail = GetTransactionDetailResponse( financialGateway, chargeResult.Id );
             var requestCount = 0;
-            while ( transactionDetail == null && requestCount < 10 )
+            while ( ( transactionDetail == null || transactionDetail.PaymentInformation == null ) && requestCount < 10 )
             {
                 transactionDetail = GetTransactionDetailResponse( financialGateway, chargeResult.Id );
                 requestCount += 1;
+                Thread.Sleep( 250 );
             }
             transaction.FinancialPaymentDetail = CreatePaymentPaymentDetail( transactionDetail );
 
@@ -480,7 +471,7 @@ namespace rocks.kfs.CyberSource
                 }
 
                 financialPaymentDetail.CreditCardTypeValueId = creditCardTypeValue?.Id;
-                financialPaymentDetail.AccountNumberMasked = transactionDetail.PaymentInformation.Card.Suffix;
+                financialPaymentDetail.AccountNumberMasked = $"{transactionDetail.PaymentInformation.Card.Prefix}XXXXXX{transactionDetail.PaymentInformation.Card.Suffix}";
 
                 financialPaymentDetail.ExpirationMonth = transactionDetail.PaymentInformation.Card.ExpirationMonth.AsIntegerOrNull();
                 financialPaymentDetail.ExpirationYear = transactionDetail.PaymentInformation.Card.ExpirationYear.AsIntegerOrNull();
@@ -894,6 +885,7 @@ namespace rocks.kfs.CyberSource
 
             var startDateUTC = scheduledTransaction.StartDate.ToUniversalTime();
             Rbsv1subscriptionsSubscriptionInformation subscriptionInformation = new Rbsv1subscriptionsSubscriptionInformation(
+                Code: scheduledTransaction.TransactionCode,
                 Name: subscriptionDescription,
                 StartDate: startDateUTC.ToString( "yyyy-MM-ddTHH:mm:ssZ" )
             );
@@ -1008,6 +1000,7 @@ namespace rocks.kfs.CyberSource
                         if ( dummyFinancialScheduledTransaction != null )
                         {
                             subscriptionId = dummyFinancialScheduledTransaction.GatewayScheduleId;
+                            subscriptionInformation.Code = dummyFinancialScheduledTransaction.TransactionCode;
 
                             // keep track of the deleted schedule id in case some have been processed but not downloaded yet.
                             if ( scheduledTransaction.PreviousGatewayScheduleIds == null )
@@ -1147,7 +1140,7 @@ namespace rocks.kfs.CyberSource
             }
 
             scheduledTransaction.FinancialPaymentDetail = PopulatePaymentInfo( paymentInfo, customerInfo.Embedded.PaymentInstruments.LastOrDefault( pi => pi.Default.HasValue && pi.Default.Value ) );
-            scheduledTransaction.TransactionCode = customerId;
+            scheduledTransaction.TransactionCode = subscriptionInformation.Code;
 
             try
             {
@@ -1239,18 +1232,7 @@ namespace rocks.kfs.CyberSource
             {
                 if ( subscriptionResponse != null )
                 {
-                    var gatewayStartDate = subscriptionResponse.SubscriptionInformation?.StartDate?.AsDateTime();
-                    if ( gatewayStartDate.HasValue )
-                    {
-                        // Rock DateTimes don't keep any TimeZone or offset, so make sure the date is DateTimeKind.Unspecified instead of UTC.
-                        // Note that the DateTime stored to the database will get the DateTimeKind stripped off, so this is only issue for DateTime data
-                        // that isn't saved to the database yet.
-                        gatewayStartDate = DateTime.SpecifyKind( gatewayStartDate.Value, DateTimeKind.Unspecified );
-                    }
-
-                    var getNextPaymentDate = GetNextPaymentDate( subscriptionResponse, out errorMessage );
-
-                    scheduledTransaction.NextPaymentDate = getNextPaymentDate;
+                    scheduledTransaction.NextPaymentDate = GetNextPaymentDate( subscriptionResponse, out errorMessage );
                     scheduledTransaction.FinancialPaymentDetail.GatewayPersonIdentifier = subscriptionResponse.PaymentInformation?.Customer?.Id;
                     scheduledTransaction.StatusMessage = subscriptionResponse.SubscriptionInformation.Status;
                     scheduledTransaction.Status = GetFinancialScheduledTransactionStatus( subscriptionResponse.SubscriptionInformation.Status );
@@ -1280,7 +1262,7 @@ namespace rocks.kfs.CyberSource
                     return true;
                 }
 
-                errorMessage += subscriptionResponse.ToString();
+                errorMessage += subscriptionResponse?.ToString();
                 return false;
             }
         }
