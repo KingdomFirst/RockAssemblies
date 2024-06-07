@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2023 by Kingdom First Solutions
+// Copyright 2024 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle( "rocks.kfs.CyberSource" )]
 [assembly: AssemblyProduct( "rocks.kfs.CyberSource" )]
-[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2023" )]
+[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2024" )]
 
 // Auto increment assembly versions
 [assembly: AssemblyVersion( "1.0.*" )]
