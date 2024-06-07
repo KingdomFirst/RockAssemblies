@@ -147,8 +147,31 @@ namespace rocks.kfs.CyberSource.Controls
     // setup
     var flex = new Flex(captureContext);
     var microform = flex.microform({{ styles: myStyles }});
-
     var number, securityCode;
+
+    var loadCheckInterval = setInterval(checkCybersourceFieldsLoaded,1000);
+    var flexTimeout = 900000;
+    let flexTimeLoaded = new Date().getTime();
+
+    function checkCybersourceFieldsLoaded(clearTimer = true) {{
+        var currentTime = new Date().getTime();
+        var timeDiff = currentTime - flexTimeLoaded;
+        if (timeDiff >= flexTimeout) {{
+            if (clearTimer) {{
+                clearInterval(loadCheckInterval);
+            }}
+
+            var $errorsOutput = $('.js-validation-message');
+            if ($errorsOutput.length == 0) {{
+                $errorsOutput = $('<div class=""alert alert-warning mt-3""></div>').appendTo(($('.btn-give-now').length > 0) ? $('.btn-give-now').parent() : '.navigation.actions');
+            }}
+
+            $errorsOutput.text('We\'re sorry your session has timed out. Please reload the page to try again.');
+            $errorsOutput.append('<p><a href=""javascript:location.reload();"" class=""btn btn-warning mt-3"" onclick=""Rock.controls.bootstrapButton.showLoading(this);"" data-loading-text=""Reloading..."">Reload Page</a></p>');
+            $errorsOutput.parent().show();
+            $('.btn-give-now, .js-submit-hostedpaymentinfo, .navigation.actions .btn').addClass('disabled').removeAttr('href');
+        }}
+    }}
 
     function initCyberSourceMicroFormFields() {{
         if ($('.cybersource-payment-inputs .js-credit-card-input').length == 0) {{
@@ -171,7 +194,7 @@ namespace rocks.kfs.CyberSource.Controls
             var $errorsOutput = $('.js-validation-message');
 
             console.error(data);
-            $errorsOutput.text(data.message)
+            $errorsOutput.text(data.message);
             $errorsOutput.parent().show();
         }});
 
@@ -186,6 +209,8 @@ namespace rocks.kfs.CyberSource.Controls
             cardIcon.className = 'fa-2x fas fa-credit-card';
           }}
         }});
+
+        checkCybersourceFieldsLoaded(false);
     }}
 
     function submitCyberSourceMicroFormInfo() {{
