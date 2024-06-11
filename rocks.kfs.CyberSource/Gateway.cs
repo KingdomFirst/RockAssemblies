@@ -238,7 +238,7 @@ namespace rocks.kfs.CyberSource
         /// <returns></returns>
         public override FinancialTransaction Authorize( FinancialGateway financialGateway, PaymentInfo paymentInfo, out string errorMessage )
         {
-            errorMessage = "This gateway does not support authorizing transactions. Transactions should be created through the CyberSource interface.";
+            errorMessage = "This gateway does not support only authorizing transactions. Authorization transactions should be created through the CyberSource interface.";
             return null;
         }
 
