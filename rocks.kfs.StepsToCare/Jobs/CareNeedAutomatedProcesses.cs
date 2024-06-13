@@ -557,11 +557,11 @@ namespace rocks.kfs.StepsToCare.Jobs
                         //var pushMessage = new RockPushMessage( outstandingNeedsCommunication );
                         var recipients = new List<RockMessageRecipient>();
 
-                        var assignedNeeds = careNeeds.Where( cn => cn.AssignedPersons.Any( ap => ap.PersonAliasId == assigned.PersonAliasId ) && ( outstandingNeedsIncludeSnoozed == "Yes" || ( outstandingNeedsIncludeSnoozed != "Yes" && cn.StatusValueId != snoozedValueId ) ) );
+                        var assignedNeeds = careNeeds.Where( cn => cn.AssignedPersons.Any( ap => ap.PersonAliasId == assigned.PersonAliasId ) ).ToList();
 
-                        if ( outstandingNeedsIncludeSnoozed == "Other" && assignedNeeds.Any() )
+                        if ( outstandingNeedsIncludeSnoozed == "No" || ( outstandingNeedsIncludeSnoozed == "Other" && !assignedNeeds.Any( cn => cn.StatusValueId != snoozedValueId ) ) )
                         {
-                            assignedNeeds = careNeeds.Where( cn => cn.AssignedPersons.Any( ap => ap.PersonAliasId == assigned.PersonAliasId ) );
+                            assignedNeeds = assignedNeeds.Where( cn => cn.StatusValueId != snoozedValueId ).ToList();
                         }
 
                         if ( assignedNeeds.Any() )
