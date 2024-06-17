@@ -70,6 +70,12 @@ namespace rocks.kfs.StepsToCare.Jobs
         IsRequired = true,
         Key = AttributeKey.FollowUpDays )]
 
+    [CustomDropdownListField( "Outstanding Needs Include Snoozed",
+        Description = "How should snoozed needs be handled in the Outstanding Needs notification?",
+        ListSource = "No^Do not include,Other^If other statuses are assigned,Yes^Always include",
+        DefaultValue = "No",
+        Key = AttributeKey.OutstandingNeedsIncludeSnoozed )]
+
     [LinkedPage( "Care Dashboard Page",
         Description = "Page used to populate 'LinkedPages.CareDashboard' lava field in notification.",
         Key = AttributeKey.CareDashboardPage )]
@@ -153,6 +159,7 @@ namespace rocks.kfs.StepsToCare.Jobs
             public const string AdultFamilyWorkers = "AdultFamilyWorkers";
             public const string LoadBalanceWorkersType = "LoadBalanceWorkersType";
             public const string FutureThresholdDays = "FutureThresholdDays";
+            public const string OutstandingNeedsIncludeSnoozed = "OutstandingNeedsIncludeSnoozed";
         }
 
         private static class CategoryKey
@@ -265,9 +272,6 @@ namespace rocks.kfs.StepsToCare.Jobs
                 }
 
                 var careNeeds = careNeedService.Queryable( "PersonAlias,SubmitterPersonAlias" ).Where( n => n.StatusValueId != closedValueId );
-                var careAssigned = assignedPersonService.Queryable()
-                    .Where( ap => ap.PersonAliasId != null && ap.NeedId != null && ap.CareNeed.StatusValueId != closedValueId )
-                    .DistinctBy( ap => ap.PersonAliasId );
 
                 var careNeedFollowUp = careNeeds
                     .Where( n =>
@@ -299,7 +303,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                 {
                     foreach ( var catTemplate in allTouchTemplates )
                     {
-                        var careNeedsInCategory = careNeeds.Where( n => n.StatusValueId != closedValueId && n.CategoryValueId.HasValue && n.CategoryValueId == catTemplate.Key );
+                        var careNeedsInCategory = careNeeds.Where( n => n.StatusValueId != closedValueId && n.StatusValueId != snoozedValueId && n.CategoryValueId.HasValue && n.CategoryValueId == catTemplate.Key );
                         foreach ( var template in catTemplate.Value )
                         {
                             var currentFlaggedTemplatesQry = careNeedsInCategory
@@ -534,6 +538,12 @@ namespace rocks.kfs.StepsToCare.Jobs
                 // Send Outstanding needs daily notification
                 if ( outstandingNeedsCommunication != null && outstandingNeedsCommunication.Id > 0 )
                 {
+                    var outstandingNeedsIncludeSnoozed = dataMap.GetString( AttributeKey.OutstandingNeedsIncludeSnoozed );
+
+                    var careAssigned = assignedPersonService.Queryable()
+                        .Where( ap => ap.PersonAliasId != null && ap.NeedId != null && ap.CareNeed.StatusValueId != closedValueId && ( outstandingNeedsIncludeSnoozed == "Yes" || outstandingNeedsIncludeSnoozed == "Other" || ( outstandingNeedsIncludeSnoozed == "No" && ap.CareNeed.StatusValueId != snoozedValueId ) ) )
+                        .DistinctBy( ap => ap.PersonAliasId );
+
                     foreach ( var assigned in careAssigned )
                     {
                         var smsNumber = assigned.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber();
@@ -547,68 +557,76 @@ namespace rocks.kfs.StepsToCare.Jobs
                         //var pushMessage = new RockPushMessage( outstandingNeedsCommunication );
                         var recipients = new List<RockMessageRecipient>();
 
-                        var assignedNeeds = careNeeds.Where( cn => cn.AssignedPersons.Any( ap => ap.PersonAliasId == assigned.PersonAliasId ) );
+                        var assignedNeeds = careNeeds.Where( cn => cn.AssignedPersons.Any( ap => ap.PersonAliasId == assigned.PersonAliasId ) ).ToList();
 
-                        assigned.PersonAlias.Person.LoadAttributes();
-
-                        var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, assigned.PersonAlias.Person );
-                        mergeFields.Add( "CareNeeds", assignedNeeds );
-                        mergeFields.Add( "LinkedPages", linkedPages );
-                        mergeFields.Add( "AssignedPerson", assigned );
-                        mergeFields.Add( "Person", assigned.PersonAlias.Person );
-                        mergeFields.Add( "NoteTemplates", noteTemplates );
-
-                        var notificationType = assigned.PersonAlias.Person.GetAttributeValue( SystemGuid.PersonAttribute.NOTIFICATION.AsGuid() );
-
-                        if ( notificationType == null || notificationType == "Email" || notificationType == "Both" )
+                        if ( outstandingNeedsIncludeSnoozed == "No" || ( outstandingNeedsIncludeSnoozed == "Other" && !assignedNeeds.Any( cn => cn.StatusValueId != snoozedValueId ) ) )
                         {
-                            if ( !assigned.PersonAlias.Person.CanReceiveEmail( false ) )
+                            assignedNeeds = assignedNeeds.Where( cn => cn.StatusValueId != snoozedValueId ).ToList();
+                        }
+
+                        if ( assignedNeeds.Any() )
+                        {
+                            assigned.PersonAlias.Person.LoadAttributes();
+
+                            var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, assigned.PersonAlias.Person );
+                            mergeFields.Add( "CareNeeds", assignedNeeds );
+                            mergeFields.Add( "LinkedPages", linkedPages );
+                            mergeFields.Add( "AssignedPerson", assigned );
+                            mergeFields.Add( "Person", assigned.PersonAlias.Person );
+                            mergeFields.Add( "NoteTemplates", noteTemplates );
+
+                            var notificationType = assigned.PersonAlias.Person.GetAttributeValue( SystemGuid.PersonAttribute.NOTIFICATION.AsGuid() );
+
+                            if ( notificationType == null || notificationType == "Email" || notificationType == "Both" )
                             {
-                                errorCount += 1;
-                                errorMessages.Add( string.Format( "{0} does not have a valid email address.", assigned.PersonAlias.Person.FullName ) );
+                                if ( !assigned.PersonAlias.Person.CanReceiveEmail( false ) )
+                                {
+                                    errorCount += 1;
+                                    errorMessages.Add( string.Format( "{0} does not have a valid email address.", assigned.PersonAlias.Person.FullName ) );
+                                }
+                                else
+                                {
+                                    emailMessage.AddRecipient( new RockEmailMessageRecipient( assigned.PersonAlias.Person, mergeFields ) );
+                                }
+                            }
+                            if ( notificationType == "SMS" || notificationType == "Both" )
+                            {
+                                if ( string.IsNullOrWhiteSpace( smsNumber ) )
+                                {
+                                    errorCount += 1;
+                                    errorMessages.Add( string.Format( "No SMS number could be found for {0}.", assigned.PersonAlias.Person.FullName ) );
+                                }
+                                smsMessage.AddRecipient( new RockSMSMessageRecipient( assigned.PersonAlias.Person, smsNumber, mergeFields ) );
+                            }
+                            //pushMessage.AddRecipient( new RockPushMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.Devices, mergeFields ) );
+
+                            if ( emailMessage.GetRecipients().Count > 0 )
+                            {
+                                emailMessage.Send( out errors );
+                            }
+                            if ( smsMessage.GetRecipients().Count > 0 )
+                            {
+                                smsMessage.Send( out errorsSms );
+                            }
+
+                            if ( errors.Any() )
+                            {
+                                errorCount += errors.Count;
+                                errorMessages.AddRange( errors );
                             }
                             else
                             {
-                                emailMessage.AddRecipient( new RockEmailMessageRecipient( assigned.PersonAlias.Person, mergeFields ) );
+                                assignedPersonEmails++;
                             }
-                        }
-                        if ( notificationType == "SMS" || notificationType == "Both" )
-                        {
-                            if ( string.IsNullOrWhiteSpace( smsNumber ) )
+                            if ( errorsSms.Any() )
                             {
-                                errorCount += 1;
-                                errorMessages.Add( string.Format( "No SMS number could be found for {0}.", assigned.PersonAlias.Person.FullName ) );
+                                errorCount += errorsSms.Count;
+                                errorMessages.AddRange( errorsSms );
                             }
-                            smsMessage.AddRecipient( new RockSMSMessageRecipient( assigned.PersonAlias.Person, smsNumber, mergeFields ) );
-                        }
-                        //pushMessage.AddRecipient( new RockPushMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.Devices, mergeFields ) );
-
-                        if ( emailMessage.GetRecipients().Count > 0 )
-                        {
-                            emailMessage.Send( out errors );
-                        }
-                        if ( smsMessage.GetRecipients().Count > 0 )
-                        {
-                            smsMessage.Send( out errorsSms );
-                        }
-
-                        if ( errors.Any() )
-                        {
-                            errorCount += errors.Count;
-                            errorMessages.AddRange( errors );
-                        }
-                        else
-                        {
-                            assignedPersonEmails++;
-                        }
-                        if ( errorsSms.Any() )
-                        {
-                            errorCount += errorsSms.Count;
-                            errorMessages.AddRange( errorsSms );
-                        }
-                        else
-                        {
-                            assignedPersonSms++;
+                            else
+                            {
+                                assignedPersonSms++;
+                            }
                         }
                     }
                 }
