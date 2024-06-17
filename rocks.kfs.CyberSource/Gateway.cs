@@ -289,10 +289,10 @@ namespace rocks.kfs.CyberSource
                 Comments: description
             );
 
-            string defaultCurrency = "USD";
+            string definedCurrencyCode = GetCurrencyCode( referencedPaymentInfo );
             Ptsv2paymentsOrderInformationAmountDetails orderInformationAmountDetails = new Ptsv2paymentsOrderInformationAmountDetails(
                 TotalAmount: amount.ToString( "0.00" ),
-                Currency: DefinedValueCache.Get( referencedPaymentInfo.AmountCurrencyCodeValueId.ToIntSafe( -1 ) )?.Value ?? defaultCurrency
+                Currency: definedCurrencyCode
             );
 
             bool processingInformationCapture = financialGateway.GetAttributeValue( AttributeKey.CapturePayment ).AsBoolean();
@@ -540,7 +540,7 @@ namespace rocks.kfs.CyberSource
                 return null;
             }
 
-            string defaultCurrency = "USD";
+            string defaultCurrency = GetCurrencyCode( null );
             var currencyCode = origTransaction.ForeignCurrencyCodeValueId.HasValue ?
                             DefinedValueCache.Get( origTransaction.ForeignCurrencyCodeValueId.Value ).Value :
                             defaultCurrency;
@@ -721,10 +721,10 @@ namespace rocks.kfs.CyberSource
                     Name: subscriptionDescription,
                     StartDate: startDateUTC.ToString( "yyyy-MM-ddTHH:mm:ssZ" )
                 );
-                string defaultCurrency = "USD";
+                string definedCurrencyCode = GetCurrencyCode( referencedPaymentInfo );
                 GetAllPlansResponseOrderInformationAmountDetails orderInformationAmountDetails = new GetAllPlansResponseOrderInformationAmountDetails(
                     BillingAmount: paymentInfo.Amount.ToString( "0.00" ),
-                    Currency: DefinedValueCache.Get( paymentInfo.AmountCurrencyCodeValueId.ToIntSafe( -1 ) )?.Value ?? defaultCurrency
+                    Currency: definedCurrencyCode
                 );
 
                 GetAllPlansResponseOrderInformation orderInformation = new GetAllPlansResponseOrderInformation(
@@ -1612,10 +1612,11 @@ namespace rocks.kfs.CyberSource
                 Comments: paymentInfo.FullName
             );
 
-            string defaultCurrency = "USD";
+            string definedCurrencyCode = GetCurrencyCode( paymentInfo );
+
             Ptsv2paymentsOrderInformationAmountDetails orderInformationAmountDetails = new Ptsv2paymentsOrderInformationAmountDetails(
                 TotalAmount: "0.00",
-                Currency: DefinedValueCache.Get( paymentInfo.AmountCurrencyCodeValueId.ToIntSafe( -1 ) )?.Value ?? defaultCurrency
+                Currency: definedCurrencyCode
             );
 
             //bool processingInformationCapture = financialGateway.GetAttributeValue( AttributeKey.CapturePayment ).AsBoolean();
@@ -1696,6 +1697,27 @@ namespace rocks.kfs.CyberSource
                 customerId = "null";
             }
             return customerId;
+        }
+
+        private static string GetCurrencyCode( ReferencePaymentInfo paymentInfo )
+        {
+            if ( paymentInfo == null )
+            {
+                paymentInfo = new ReferencePaymentInfo();
+            }
+
+            string defaultCurrency = "USD";
+            var globalAttributesCache = GlobalAttributesCache.Get();
+            var organizationCurrencyCodeGuid = globalAttributesCache.GetValue( Rock.SystemKey.SystemSetting.ORGANIZATION_CURRENCY_CODE ).AsGuidOrNull();
+            var organizationCurrencyCode = DefinedValueCache.Get( organizationCurrencyCodeGuid.Value )?.Value;
+
+            var definedCurrencyCode = DefinedValueCache.Get( paymentInfo.AmountCurrencyCodeValueId.ToIntSafe( -1 ) )?.Value;
+            if ( definedCurrencyCode.IsNullOrWhiteSpace() )
+            {
+                definedCurrencyCode = organizationCurrencyCode ?? defaultCurrency;
+            }
+
+            return definedCurrencyCode;
         }
 
         /// <summary>
