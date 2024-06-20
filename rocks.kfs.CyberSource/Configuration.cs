@@ -49,5 +49,4 @@ namespace rocks.kfs.CyberSource
             return _configurationDictionary;
         }
     }
-
 }

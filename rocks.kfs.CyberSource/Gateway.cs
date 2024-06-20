@@ -38,7 +38,6 @@ using CyberSource.Model;
 using rocks.kfs.CyberSource.Controls;
 using static rocks.kfs.CyberSource.CyberSourceTypes;
 using CyberSourceSDK = CyberSource;
-using System.Linq.Expressions;
 
 namespace rocks.kfs.CyberSource
 {
@@ -95,18 +94,10 @@ namespace rocks.kfs.CyberSource
     [DecimalField(
         "Credit Card Fee Coverage Percentage (Future)",
         Key = AttributeKey.CreditCardFeeCoveragePercentage,
-        Description = @"The credit card fee percentage that will be used to determine what to add to the person's donation, if they want to cover the fee.",
+        Description = @"The credit card fee percentage that will be used to determine what to add to the person's donation when they choose to cover the fee.",
         IsRequired = false,
         DefaultValue = null,
         Order = 6 )]
-
-    [CurrencyField(
-        "ACH Transaction Fee Coverage Amount (Future)",
-        Key = AttributeKey.ACHTransactionFeeCoverageAmount,
-        Description = "The dollar amount to add to an ACH transaction, if they want to cover the fee.",
-        IsRequired = false,
-        DefaultValue = null,
-        Order = 7 )]
 
     [BooleanField(
         "Capture Payment",
@@ -114,7 +105,7 @@ namespace rocks.kfs.CyberSource
         Description = "Indicates whether to also include a capture in the submitted authorization request or not. If not, transactions will have to be settled.",
         IsRequired = true,
         DefaultBooleanValue = false,
-        Order = 8 )]
+        Order = 7 )]
 
     #endregion
 
@@ -125,13 +116,6 @@ namespace rocks.kfs.CyberSource
     {
         private static readonly string DemoUrl = "apitest.cybersource.com";
         private static readonly string ProductionUrl = "api.cybersource.com";
-
-        private static int recordTypePersonId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() ).Id;
-        private static int recordStatusPendingId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_PENDING.AsGuid() ).Id;
-        private static int homePhoneValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_PHONE_TYPE_HOME ).Id;
-        private static int homeLocationValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.GROUP_LOCATION_TYPE_HOME ).Id;
-        private static int searchKeyValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_SEARCH_KEYS_ALTERNATE_ID.AsGuid() ).Id;
-        private static int contributionTypeId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_TYPE_CONTRIBUTION ).Id;
 
         #region Attribute Keys
 
@@ -151,11 +135,6 @@ namespace rocks.kfs.CyberSource
             /// The credit card fee coverage percentage
             /// </summary>
             public const string CreditCardFeeCoveragePercentage = "CreditCardFeeCoveragePercentage";
-
-            /// <summary>
-            /// The ach transaction fee coverage amount
-            /// </summary>
-            public const string ACHTransactionFeeCoverageAmount = "ACHTransactionFeeCoverageAmount";
         }
 
         #endregion Attribute Keys
@@ -163,6 +142,8 @@ namespace rocks.kfs.CyberSource
         /// <summary>
         /// Gets the gateway URL.
         /// </summary>
+        /// <param name="financialGateway">The financial gateway.</param>
+        /// <returns>string</returns>
         /// <value>
         /// The gateway URL.
         /// </value>
@@ -209,7 +190,7 @@ namespace rocks.kfs.CyberSource
         /// <value>
         /// The configure URL.
         /// </value>
-        public string ConfigureURL => "https://ubctest.cybersource.com/ebc2/";
+        public string ConfigureURL => "https://businesscenter.cybersource.com/ebc2/";
 
         /// <summary>
         /// Gets the URL that the Gateway Information UI will navigate to when they click the 'Learn More' link
@@ -223,7 +204,7 @@ namespace rocks.kfs.CyberSource
         /// Returns a boolean value indicating if 'Saved Account' functionality is supported for the given currency type.
         /// </summary>
         /// <param name="currencyType">Type of the currency.</param>
-        /// <returns></returns>
+        /// <returns>boolean</returns>
         public override bool SupportsSavedAccount( DefinedValueCache currencyType )
         {
             return true;
@@ -238,14 +219,14 @@ namespace rocks.kfs.CyberSource
         /// <returns></returns>
         public override FinancialTransaction Authorize( FinancialGateway financialGateway, PaymentInfo paymentInfo, out string errorMessage )
         {
-            errorMessage = "This gateway does not support only authorizing transactions. Authorization transactions should be created through the CyberSource interface.";
+            errorMessage = "This gateway does not support authorization transactions. Authorization transactions should be created through the CyberSource interface.";
             return null;
         }
 
         /// <summary>
-        /// Charges the specified payment info using the DirectPost API
+        /// Charges the specified payment info using the Payments API
         /// </summary>
-        /// <param name="financialGateway">The financial gateway.</param>
+        /// <param name="financialGateway">The Rock financial gateway.</param>
         /// <param name="paymentInfo">The payment info.</param>
         /// <param name="errorMessage">The error message.</param>
         /// <returns></returns>
@@ -367,12 +348,10 @@ namespace rocks.kfs.CyberSource
 
                 var apiInstance = new PaymentsApi( clientConfig );
                 chargeResult = apiInstance.CreatePayment( requestObj );
-                //return result;
             }
             catch ( Exception e )
             {
                 errorMessage += "Exception on calling the API : " + e.Message;
-                //return null;
             }
 
             if ( chargeResult == null || chargeResult.ErrorInformation != null )
@@ -395,9 +374,7 @@ namespace rocks.kfs.CyberSource
                 transaction.ForeignKey = chargeResult.TokenInformation?.Customer?.Id;
             }
 
-            Thread.Sleep( 250 );
-
-            TssV2TransactionsGet200Response transactionDetail = GetTransactionDetailResponse( financialGateway, chargeResult.Id );
+            TssV2TransactionsGet200Response transactionDetail = null;
             var requestCount = 0;
             while ( ( transactionDetail == null || transactionDetail.PaymentInformation == null ) && requestCount < 10 )
             {
@@ -477,7 +454,7 @@ namespace rocks.kfs.CyberSource
                 financialPaymentDetail.ExpirationMonth = transactionDetail.PaymentInformation.Card.ExpirationMonth.AsIntegerOrNull();
                 financialPaymentDetail.ExpirationYear = transactionDetail.PaymentInformation.Card.ExpirationYear.AsIntegerOrNull();
             }
-            // ACH not supported by majority of CyberSource Payment Processors. There are 
+            // ACH not supported by majority of CyberSource Payment Processors.
             //else
             //{
             //    // ach payment
@@ -488,7 +465,7 @@ namespace rocks.kfs.CyberSource
         }
 
         /// <summary>
-        /// Gets the additional lava fields in the form of a flatted out dictionary where child properties are delimited with '_' (Billing.Street1 becomes Billing_Street1)
+        /// Gets the additional lava fields in the form of a flattened dictionary where child properties are delimited with '_' (Billing.Street1 becomes Billing_Street1)
         /// </summary>
         /// <param name="xdocResult">The xdoc result.</param>
         /// <returns></returns>
