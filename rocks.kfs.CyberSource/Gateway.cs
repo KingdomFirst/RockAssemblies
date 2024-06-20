@@ -684,7 +684,7 @@ namespace rocks.kfs.CyberSource
         public override FinancialScheduledTransaction AddScheduledPayment( FinancialGateway financialGateway, PaymentSchedule schedule, PaymentInfo paymentInfo, out string errorMessage )
         {
             var descriptionGuid = Guid.NewGuid();
-            var descriptionCode = descriptionGuid.ToString().RemoveSpecialCharacters().Left( 20 );
+            var descriptionCode = descriptionGuid.ToString().RemoveSpecialCharacters().Left( 8 );
 
             var referencedPaymentInfo = paymentInfo as ReferencePaymentInfo;
             if ( referencedPaymentInfo == null )
@@ -711,8 +711,13 @@ namespace rocks.kfs.CyberSource
             {
                 errorMessage = string.Empty;
 
+                Riskv1decisionsClientReferenceInformationPartner clientPartnerInformation = new Riskv1decisionsClientReferenceInformationPartner(
+                    SolutionId: descriptionCode
+                );
+
                 Rbsv1subscriptionsClientReferenceInformation clientReferenceInformation = new Rbsv1subscriptionsClientReferenceInformation(
-                    Code: descriptionCode
+                    Code: descriptionCode,
+                    Partner: clientPartnerInformation
                 );
 
                 var startDateUTC = schedule.StartDate.ToUniversalTime();
@@ -746,7 +751,6 @@ namespace rocks.kfs.CyberSource
                     AuthorizationOptions: processingInformationAuthorizationOptions
                 );
 
-                //string paymentInformationCustomerId = "C24F5921EB870D99E053AF598E0A4105";
                 Rbsv1subscriptionsPaymentInformationCustomer paymentInformationCustomer = new Rbsv1subscriptionsPaymentInformationCustomer(
                     Id: customerId
                 );
@@ -1392,25 +1396,6 @@ namespace rocks.kfs.CyberSource
             var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
             var allSubscriptions = new List<GetAllSubscriptionsResponseSubscriptions>();
 
-            try
-            {
-                var apiInstance = new SubscriptionsApi( clientConfig );
-                var page = 0;
-                var totalCount = 100;
-                var pageSize = 100;
-                while ( totalCount > pageSize * page )
-                {
-                    var subscriptionSearchResult = apiInstance.GetAllSubscriptions( page * pageSize, pageSize, null, null );
-                    allSubscriptions.AddRange( subscriptionSearchResult.Subscriptions );
-                    totalCount = subscriptionSearchResult.TotalCount ?? 100;
-                    page += 1;
-                }
-            }
-            catch ( Exception e )
-            {
-                ExceptionLogService.LogException( $"Error getting CyberSource subscriptions:  {e.Message}." );
-            }
-
             TssV2TransactionsPost201Response searchResult = null;
             try
             {
@@ -1440,38 +1425,47 @@ namespace rocks.kfs.CyberSource
 
                 payment.IsFailure = transaction.ApplicationInformation.ReasonCode != "100";
 
-                payment.GatewayScheduleId = transaction.ClientReferenceInformation.Code.Left( 20 );
+                payment.GatewayScheduleId = transaction.ClientReferenceInformation.Partner.SolutionId;
 
                 try
                 {
-                    var getSubscriptionFromList = allSubscriptions.Where( s => s.PaymentInformation != null
-                                        && s.PaymentInformation.Customer != null
-                                        && s.PaymentInformation.Customer.Id == transaction.PaymentInformation.Customer.CustomerId
-                                        && s.OrderInformation != null
-                                        && s.OrderInformation.AmountDetails != null
-                                        && s.OrderInformation.AmountDetails.BillingAmount == transaction.OrderInformation.AmountDetails.TotalAmount
-                                        && s.SubscriptionInformation != null
-                                        && ( s.SubscriptionInformation.Status == "ACTIVE" || s.SubscriptionInformation.Status == "PENDING" ) );
+                    if ( payment.GatewayScheduleId == null )
+                    {
+                        throw new Exception( $"Transaction {payment.TransactionCode} SolutionId is null" );
+                    }
+                    var apiInstance = new SubscriptionsApi( clientConfig );
+                    var subscriptionSearchResult = apiInstance.GetAllSubscriptions( null, null, payment.GatewayScheduleId, null );
+                    var subscriptionResult = subscriptionSearchResult.Subscriptions.FirstOrDefault();
+
+                    if ( subscriptionResult != null )
+                    {
+                        payment.GatewayScheduleId = subscriptionResult.Id;
+                    }
+                }
+                catch ( Exception e )
+                {
+                    if ( !allSubscriptions.Any() )
+                    {
+                        allSubscriptions = GetAllSubscriptions( clientConfig );
+                    }
+
+                    var getSubscriptionFromList = allSubscriptions.Where( s => s.SubscriptionInformation != null
+                        && ( s.SubscriptionInformation.Status == "ACTIVE" || s.SubscriptionInformation.Status == "PENDING" )
+                        && s.PaymentInformation != null
+                        && s.PaymentInformation.Customer != null
+                        && s.PaymentInformation.Customer.Id == transaction.PaymentInformation.Customer.CustomerId
+                        && s.OrderInformation != null
+                        && s.OrderInformation.AmountDetails != null
+                        && s.OrderInformation.AmountDetails.BillingAmount == transaction.OrderInformation.AmountDetails.TotalAmount );
 
                     if ( getSubscriptionFromList.Count() == 1 )
                     {
                         payment.GatewayScheduleId = getSubscriptionFromList.FirstOrDefault().Id;
                     }
-                    else
+                    else if ( getSubscriptionFromList.Count() != 0 )
                     {
-                        var apiInstance = new SubscriptionsApi( clientConfig );
-                        var subscriptionSearchResult = apiInstance.GetAllSubscriptions( null, null, payment.GatewayScheduleId, null );
-                        var subscriptionResult = subscriptionSearchResult.Subscriptions.FirstOrDefault();
-
-                        if ( subscriptionResult != null )
-                        {
-                            payment.GatewayScheduleId = subscriptionResult.Id;
-                        }
+                        errorMessages.Add( $"Failed to retrieve subscription via code {payment.GatewayScheduleId} and multiple matching subscriptions found. Error message: {e.Message}" );
                     }
-                }
-                catch ( Exception e )
-                {
-                    errorMessages.Add( $"Failed to retrieve subscription via code {payment.GatewayScheduleId}. Error message: {e.Message}" );
                 }
 
                 payment.GatewayPersonIdentifier = transaction.PaymentInformation?.Customer?.CustomerId;
@@ -1516,6 +1510,30 @@ namespace rocks.kfs.CyberSource
             }
 
             return paymentList;
+        }
+
+        private List<GetAllSubscriptionsResponseSubscriptions> GetAllSubscriptions( CyberSourceSDK.Client.Configuration clientConfig )
+        {
+            var allSubscriptions = new List<GetAllSubscriptionsResponseSubscriptions>();
+            try
+            {
+                var apiInstance = new SubscriptionsApi( clientConfig );
+                var page = 0;
+                var totalCount = 100;
+                var pageSize = 100;
+                while ( totalCount > pageSize * page )
+                {
+                    var subscriptionSearchResult = apiInstance.GetAllSubscriptions( page * pageSize, pageSize, null, null );
+                    allSubscriptions.AddRange( subscriptionSearchResult.Subscriptions );
+                    totalCount = subscriptionSearchResult.TotalCount ?? 100;
+                    page += 1;
+                }
+            }
+            catch ( Exception e )
+            {
+                ExceptionLogService.LogException( $"Error getting CyberSource subscriptions:  {e.Message}." );
+            }
+            return allSubscriptions;
         }
 
         /// <summary>
