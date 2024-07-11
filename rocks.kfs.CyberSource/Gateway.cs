@@ -1327,6 +1327,13 @@ namespace rocks.kfs.CyberSource
             return hostedPaymentControl;
         }
 
+        /// <summary>
+        /// Gets the JavaScript needed to tell the hostedPaymentInfoControl to get send the paymentInfo and get a token.
+        /// Have your 'Next' or 'Submit' call this so that the hostedPaymentInfoControl will fetch the token/response
+        /// </summary>
+        /// <param name="financialGateway">The financial gateway.</param>
+        /// <param name="hostedPaymentInfoControl">The hosted payment information control.</param>
+        /// <returns></returns>
         public string GetHostPaymentInfoSubmitScript( FinancialGateway financialGateway, Control hostedPaymentInfoControl )
         {
             return $"submitCyberSourceMicroFormInfo();";
@@ -1358,6 +1365,16 @@ namespace rocks.kfs.CyberSource
             referencePaymentInfo.InitialCurrencyTypeValue = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.CURRENCY_TYPE_CREDIT_CARD );
         }
 
+        /// <summary>
+        /// Creates the customer account using a token received from the HostedPaymentInfoControl <seealso cref="M:Rock.Financial.IHostedGatewayComponent.GetHostedPaymentInfoControl(Rock.Model.FinancialGateway,System.String,Rock.Financial.HostedPaymentInfoControlOptions)" />
+        /// and returns a customer account token that can be used for future transactions.
+        /// </summary>
+        /// <param name="financialGateway">The financial gateway.</param>
+        /// <param name="paymentInfo">The payment information.</param>
+        /// <param name="errorMessage">The error message.</param>
+        /// <returns></returns>
+        /// <exception cref="rocks.kfs.CyberSource.Gateway.ReferencePaymentInfoRequired"></exception>
+        /// <exception cref="rocks.kfs.CyberSource.Gateway.NullFinancialGatewayException"></exception>
         public string CreateCustomerAccount( FinancialGateway financialGateway, ReferencePaymentInfo paymentInfo, out string errorMessage )
         {
             errorMessage = string.Empty;
@@ -1460,11 +1477,25 @@ namespace rocks.kfs.CyberSource
             return customerId;
         }
 
+        /// <summary>
+        /// Gets the earliest scheduled start date that the gateway will accept for the start date, based on the current local time.
+        /// </summary>
+        /// <param name="financialGateway">The financial gateway.</param>
+        /// <returns></returns>
         public DateTime GetEarliestScheduledStartDate( FinancialGateway financialGateway )
         {
             return RockDateTime.Today.AddDays( 1 ).Date;
         }
 
+        /// <summary>
+        /// Gets the hosted gateway modes that this gateway has configured/supports. Use this to determine which mode to use (in cases where both are supported, like Scheduled Payments lists ).
+        /// If the Gateway supports both hosted and unhosted (and has Hosted mode configured), hosted mode should be preferred.
+        /// </summary>
+        /// <param name="financialGateway"></param>
+        /// <returns></returns>
+        /// <value>
+        /// The hosted gateway modes that this gateway supports
+        /// </value>
         public HostedGatewayMode[] GetSupportedHostedGatewayModes( FinancialGateway financialGateway )
         {
             return new HostedGatewayMode[1] { HostedGatewayMode.Hosted };
@@ -1474,6 +1505,12 @@ namespace rocks.kfs.CyberSource
 
         #region Private Helpers
 
+        /// <summary>
+        /// Gets the transaction detail response from the CyberSource API.
+        /// </summary>
+        /// <param name="financialGateway">The financial gateway.</param>
+        /// <param name="id">The transaction identifier.</param>
+        /// <returns></returns>
         private TssV2TransactionsGet200Response GetTransactionDetailResponse( FinancialGateway financialGateway, string id )
         {
             try
@@ -1494,7 +1531,7 @@ namespace rocks.kfs.CyberSource
         }
 
         /// <summary>
-        /// Populates the payment information.
+        /// Populates the payment information from the CyberSource API Response.
         /// </summary>
         /// <param name="transactionDetail">The customer information.</param>
         /// <returns></returns>
@@ -1506,7 +1543,7 @@ namespace rocks.kfs.CyberSource
         }
 
         /// <summary>
-        /// Updates the financial payment detail fields from the information in transactionDetail
+        /// Updates the financial payment detail fields from the information in transactionDetail response from the CyberSource API
         /// </summary>
         /// <param name="transactionDetail">The customer information.</param>
         /// <param name="financialPaymentDetail">The financial payment detail.</param>
@@ -1577,6 +1614,15 @@ namespace rocks.kfs.CyberSource
             return additionalLavaFields;
         }
 
+        /// <summary>
+        /// Sets the subscription plan parameters in a reusable method before adding or updating a scheduled payment.
+        /// </summary>
+        /// <param name="planInformation">The plan information.</param>
+        /// <param name="subscriptionInformation">The subscription information.</param>
+        /// <param name="scheduleTransactionFrequencyValueGuid">The schedule transaction frequency value unique identifier.</param>
+        /// <param name="startDate">The start date.</param>
+        /// <param name="errorMessage">The error message.</param>
+        /// <returns></returns>
         private bool SetSubscriptionPlanParams( Rbsv1subscriptionsPlanInformation planInformation, Rbsv1subscriptionsSubscriptionInformation subscriptionInformation, Guid scheduleTransactionFrequencyValueGuid, DateTime startDate, out string errorMessage )
         {
             errorMessage = string.Empty;
@@ -1628,6 +1674,12 @@ namespace rocks.kfs.CyberSource
             return true;
         }
 
+        /// <summary>
+        /// Gets the next payment date by generating it off of the StartDate, Billing Period Unit and Length
+        /// </summary>
+        /// <param name="subscriptionResponse">The subscription response from the CyberSource API.</param>
+        /// <param name="errorMessage">The error message.</param>
+        /// <returns></returns>
         private DateTime? GetNextPaymentDate( GetSubscriptionResponse subscriptionResponse, out string errorMessage )
         {
             errorMessage = string.Empty;
@@ -1692,6 +1744,11 @@ namespace rocks.kfs.CyberSource
             return nextPaymentDate;
         }
 
+        /// <summary>
+        /// Gets the financial scheduled transaction frequency defined value id based off of the CyberSource API Billing Period Unit.
+        /// </summary>
+        /// <param name="billingPeriod">The billing period.</param>
+        /// <returns></returns>
         private int GetFinancialScheduledTransactionFrequency( GetAllPlansResponsePlanInformationBillingPeriod billingPeriod )
         {
             switch ( billingPeriod.Unit )
@@ -1721,6 +1778,11 @@ namespace rocks.kfs.CyberSource
             }
         }
 
+        /// <summary>
+        /// Gets all subscriptions from the CyberSource API, multiple calls can happen to the API to get ALL the subscriptions due to paging limits.
+        /// </summary>
+        /// <param name="clientConfig">The client configuration.</param>
+        /// <returns></returns>
         private List<GetAllSubscriptionsResponseSubscriptions> GetAllSubscriptions( CyberSourceSDK.Client.Configuration clientConfig )
         {
             var allSubscriptions = new List<GetAllSubscriptionsResponseSubscriptions>();
@@ -1745,7 +1807,12 @@ namespace rocks.kfs.CyberSource
             return allSubscriptions;
         }
 
-        private static string GetCurrencyCode( ReferencePaymentInfo paymentInfo )
+        /// <summary>
+        /// Gets the currency code from the Payment Info or Global attribute if not set.
+        /// </summary>
+        /// <param name="paymentInfo">The payment information.</param>
+        /// <returns></returns>
+        private string GetCurrencyCode( ReferencePaymentInfo paymentInfo )
         {
             if ( paymentInfo == null )
             {
@@ -1834,6 +1901,11 @@ namespace rocks.kfs.CyberSource
 
         #region Static Helpers
 
+        /// <summary>
+        /// Gets the Rock financial scheduled transaction status.
+        /// </summary>
+        /// <param name="subscriptionStatus">The subscription status from CyberSource.</param>
+        /// <returns></returns>
         internal static Rock.Model.FinancialScheduledTransactionStatus? GetFinancialScheduledTransactionStatus( string subscriptionStatus )
         {
             if ( subscriptionStatus == null )
@@ -1926,26 +1998,6 @@ namespace rocks.kfs.CyberSource
             baseUrl = string.Format( "https://{0}/{2}", baseUrl, resource );
 
             return baseUrl;
-        }
-
-        /// <summary>
-        /// Gets the authenticator.
-        /// </summary>
-        /// <param name="gateway">The gateway.</param>
-        /// <param name="errorMessage">The error message.</param>
-        /// <returns></returns>
-        private HttpBasicAuthenticator GetAuthenticator( FinancialGateway gateway, out string errorMessage )
-        {
-            errorMessage = string.Empty;
-            var apiKey = GetAttributeValue( gateway, AttributeKey.APIKey );
-            var apiSecret = GetAttributeValue( gateway, AttributeKey.APISecret );
-            if ( apiKey.IsNullOrWhiteSpace() || apiSecret.IsNullOrWhiteSpace() )
-            {
-                errorMessage = "API Key or API Secret is not valid";
-                return null;
-            }
-
-            return new HttpBasicAuthenticator( apiKey, apiSecret );
         }
         #endregion
 
