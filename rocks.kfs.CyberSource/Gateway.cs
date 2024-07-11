@@ -389,109 +389,6 @@ namespace rocks.kfs.CyberSource
             return transaction;
         }
 
-        private TssV2TransactionsGet200Response GetTransactionDetailResponse( FinancialGateway financialGateway, string id )
-        {
-            try
-            {
-                var configDictionary = new Configuration().GetConfiguration( financialGateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
-
-                var apiInstance = new TransactionDetailsApi( clientConfig );
-                var result = apiInstance.GetTransaction( id );
-                return result;
-            }
-            catch ( Exception e )
-            {
-                var errorMessage = "Exception on calling the API : " + e.Message;
-                ExceptionLogService.LogException( errorMessage );
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Populates the payment information.
-        /// </summary>
-        /// <param name="transactionDetail">The customer information.</param>
-        /// <returns></returns>
-        private FinancialPaymentDetail CreatePaymentPaymentDetail( TssV2TransactionsGet200Response transactionDetail )
-        {
-            var financialPaymentDetail = new FinancialPaymentDetail();
-            UpdateFinancialPaymentDetail( transactionDetail, financialPaymentDetail );
-            return financialPaymentDetail;
-        }
-
-        /// <summary>
-        /// Updates the financial payment detail fields from the information in transactionDetail
-        /// </summary>
-        /// <param name="transactionDetail">The customer information.</param>
-        /// <param name="financialPaymentDetail">The financial payment detail.</param>
-        private void UpdateFinancialPaymentDetail( TssV2TransactionsGet200Response transactionDetail, FinancialPaymentDetail financialPaymentDetail )
-        {
-            financialPaymentDetail.GatewayPersonIdentifier = transactionDetail.PaymentInformation?.Customer?.Id;
-
-            string paymentType = transactionDetail.PaymentInformation.PaymentType.Type;
-            if ( paymentType == "credit card" )
-            {
-                // cc payment
-                var curType = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.CURRENCY_TYPE_CREDIT_CARD );
-                financialPaymentDetail.NameOnCard = $"{transactionDetail.OrderInformation.BillTo.FirstName} {transactionDetail.OrderInformation.BillTo.LastName}";
-                financialPaymentDetail.CurrencyTypeValueId = curType != null ? curType.Id : ( int? ) null;
-
-                //// The gateway tells us what the CreditCardType is since it was selected using their hosted payment entry frame.
-                //// So, first see if we can determine CreditCardTypeValueId using the CardType response from the gateway
-
-                // See if we can figure it out from the CC Type (Amex, Visa, etc)
-                var creditCardTypeValue = CreditCardPaymentInfo.GetCreditCardTypeFromName( transactionDetail.ProcessingInformation.PaymentSolution );
-                if ( creditCardTypeValue == null )
-                {
-                    // GetCreditCardTypeFromName should have worked, but just in case, see if we can figure it out from the MaskedCard using RegEx
-                    creditCardTypeValue = CreditCardPaymentInfo.GetCreditCardTypeFromCreditCardNumber( transactionDetail.PaymentInformation.Card.Prefix );
-                }
-
-                financialPaymentDetail.CreditCardTypeValueId = creditCardTypeValue?.Id;
-                financialPaymentDetail.AccountNumberMasked = $"{transactionDetail.PaymentInformation.Card.Prefix}XXXXXX{transactionDetail.PaymentInformation.Card.Suffix}";
-
-                financialPaymentDetail.ExpirationMonth = transactionDetail.PaymentInformation.Card.ExpirationMonth.AsIntegerOrNull();
-                financialPaymentDetail.ExpirationYear = transactionDetail.PaymentInformation.Card.ExpirationYear.AsIntegerOrNull();
-            }
-            // ACH not supported by majority of CyberSource Payment Processors.
-            //else
-            //{
-            //    // ach payment
-            //    var curType = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.CURRENCY_TYPE_ACH );
-            //    financialPaymentDetail.CurrencyTypeValueId = curType != null ? curType.Id : ( int? ) null;
-            //    financialPaymentDetail.AccountNumberMasked = customerInfo.CheckAccount;
-            //}
-        }
-
-        /// <summary>
-        /// Gets the additional lava fields in the form of a flattened dictionary where child properties are delimited with '_' (Billing.Street1 becomes Billing_Street1)
-        /// </summary>
-        /// <param name="xdocResult">The xdoc result.</param>
-        /// <returns></returns>
-        private static Dictionary<string, object> GetAdditionalLavaFields<T>( T obj )
-        {
-            var xdocResult = JsonConvert.DeserializeXNode( obj.ToJson(), "root" );
-            var additionalLavaFields = new Dictionary<string, object>();
-            foreach ( XElement element in xdocResult.Root.Elements() )
-            {
-                if ( element.HasElements )
-                {
-                    string prefix = element.Name.LocalName;
-                    foreach ( XElement childElement in element.Elements() )
-                    {
-                        additionalLavaFields.AddOrIgnore( prefix + "_" + childElement.Name.LocalName, childElement.Value.Trim() );
-                    }
-                }
-                else
-                {
-                    additionalLavaFields.AddOrIgnore( element.Name.LocalName, element.Value.Trim() );
-                }
-            }
-
-            return additionalLavaFields;
-        }
-
         /// <summary>
         /// Credits (Refunds) the specified transaction.
         /// </summary>
@@ -649,6 +546,7 @@ namespace rocks.kfs.CyberSource
             }
             return transaction;
         }
+
         /// <summary>
         /// Adds the scheduled payment.
         /// </summary>
@@ -1243,99 +1141,6 @@ namespace rocks.kfs.CyberSource
             }
         }
 
-        private DateTime? GetNextPaymentDate( GetSubscriptionResponse subscriptionResponse, out string errorMessage )
-        {
-            errorMessage = string.Empty;
-
-            var gatewayStartDate = subscriptionResponse.SubscriptionInformation?.StartDate?.AsDateTime();
-            var billingUnit = subscriptionResponse.PlanInformation?.BillingPeriod?.Unit;
-            var billingLength = subscriptionResponse.PlanInformation?.BillingPeriod?.Length.AsIntegerOrNull();
-            var billingCyclesCurrent = subscriptionResponse.PlanInformation?.BillingCycles?.Current.AsInteger();
-            var billingCyclesTotal = subscriptionResponse.PlanInformation?.BillingCycles?.Total.AsInteger();
-            if ( gatewayStartDate == null || billingUnit == null || billingLength == null )
-            {
-                errorMessage = "One of the required fields is null, StartDate, Billing.Unit or Billing.Length";
-                return gatewayStartDate;
-            }
-            var nextPaymentDate = gatewayStartDate;
-
-            if ( ( billingCyclesCurrent == null || billingCyclesTotal == null || billingCyclesTotal == 0 || billingCyclesCurrent <= billingCyclesTotal ) && gatewayStartDate < RockDateTime.Now )
-            {
-                if ( billingUnit == "W" )
-                {
-                    var weekCalc = ( 7 * billingLength.Value );
-                    var calcDifference = ( RockDateTime.Now - gatewayStartDate.Value ).TotalDays / weekCalc;
-                    nextPaymentDate = gatewayStartDate.Value.AddDays( Math.Ceiling( calcDifference ) * weekCalc );
-                }
-                else if ( billingUnit == "M" )
-                {
-                    var monthDifference = ( RockDateTime.Now.Year - gatewayStartDate.Value.Year ) * 12 + RockDateTime.Now.Month - gatewayStartDate.Value.Month;
-                    if ( billingLength > 1 )
-                    {
-                        var calcMonthDifference = ( double ) ( monthDifference / billingLength.Value );
-                        nextPaymentDate = gatewayStartDate.Value.AddMonths( Math.Ceiling( calcMonthDifference ).ToIntSafe() * billingLength.Value );
-                    }
-                    else
-                    {
-                        nextPaymentDate = gatewayStartDate.Value.AddMonths( monthDifference );
-                    }
-
-                    if ( nextPaymentDate < RockDateTime.Now )
-                    {
-                        nextPaymentDate = nextPaymentDate.Value.AddMonths( billingLength.Value );
-                    }
-                }
-                else if ( billingUnit == "Y" )
-                {
-                    var yearDifference = ( RockDateTime.Now.Year - gatewayStartDate.Value.Year );
-                    nextPaymentDate.Value.AddYears( yearDifference );
-                    if ( nextPaymentDate < RockDateTime.Now )
-                    {
-                        nextPaymentDate = nextPaymentDate.Value.AddYears( billingLength.Value );
-                    }
-                }
-                else
-                {
-                    var calcDifference = ( RockDateTime.Now - gatewayStartDate.Value ).TotalDays;
-                    nextPaymentDate = gatewayStartDate.Value.AddDays( calcDifference + 1 );
-                }
-            }
-            else
-            {
-                errorMessage = "Your billing cycle is complete. There will be no future gifts without setting up a new subscription.";
-            }
-            return nextPaymentDate;
-        }
-
-        private int GetFinancialScheduledTransactionFrequency( GetAllPlansResponsePlanInformationBillingPeriod billingPeriod )
-        {
-            switch ( billingPeriod.Unit )
-            {
-                case "W":
-                    if ( billingPeriod.Length == "2" )
-                    {
-                        return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_BIWEEKLY.AsGuid() ).Id;
-                    }
-                    else
-                    {
-                        return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_WEEKLY.AsGuid() ).Id;
-                    }
-                case "M":
-                    if ( billingPeriod.Length == "3" )
-                    {
-                        return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_QUARTERLY.AsGuid() ).Id;
-                    }
-                    else
-                    {
-                        return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_MONTHLY.AsGuid() ).Id;
-                    }
-                case "Y":
-                    return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_YEARLY.AsGuid() ).Id;
-                default:
-                    return -1;
-            }
-        }
-
         /// <summary>
         /// Gets the payments that have been processed for any scheduled transactions
         /// </summary>
@@ -1480,30 +1285,6 @@ namespace rocks.kfs.CyberSource
             }
 
             return paymentList;
-        }
-
-        private List<GetAllSubscriptionsResponseSubscriptions> GetAllSubscriptions( CyberSourceSDK.Client.Configuration clientConfig )
-        {
-            var allSubscriptions = new List<GetAllSubscriptionsResponseSubscriptions>();
-            try
-            {
-                var apiInstance = new SubscriptionsApi( clientConfig );
-                var page = 0;
-                var totalCount = 100;
-                var pageSize = 100;
-                while ( totalCount > pageSize * page )
-                {
-                    var subscriptionSearchResult = apiInstance.GetAllSubscriptions( page * pageSize, pageSize, null, null );
-                    allSubscriptions.AddRange( subscriptionSearchResult.Subscriptions );
-                    totalCount = subscriptionSearchResult.TotalCount ?? 100;
-                    page += 1;
-                }
-            }
-            catch ( Exception e )
-            {
-                ExceptionLogService.LogException( $"Error getting CyberSource subscriptions:  {e.Message}." );
-            }
-            return allSubscriptions;
         }
 
         /// <summary>
@@ -1679,6 +1460,291 @@ namespace rocks.kfs.CyberSource
             return customerId;
         }
 
+        public DateTime GetEarliestScheduledStartDate( FinancialGateway financialGateway )
+        {
+            return RockDateTime.Today.AddDays( 1 ).Date;
+        }
+
+        public HostedGatewayMode[] GetSupportedHostedGatewayModes( FinancialGateway financialGateway )
+        {
+            return new HostedGatewayMode[1] { HostedGatewayMode.Hosted };
+        }
+
+        #endregion
+
+        #region Private Helpers
+
+        private TssV2TransactionsGet200Response GetTransactionDetailResponse( FinancialGateway financialGateway, string id )
+        {
+            try
+            {
+                var configDictionary = new Configuration().GetConfiguration( financialGateway );
+                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+
+                var apiInstance = new TransactionDetailsApi( clientConfig );
+                var result = apiInstance.GetTransaction( id );
+                return result;
+            }
+            catch ( Exception e )
+            {
+                var errorMessage = "Exception on calling the API : " + e.Message;
+                ExceptionLogService.LogException( errorMessage );
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Populates the payment information.
+        /// </summary>
+        /// <param name="transactionDetail">The customer information.</param>
+        /// <returns></returns>
+        private FinancialPaymentDetail CreatePaymentPaymentDetail( TssV2TransactionsGet200Response transactionDetail )
+        {
+            var financialPaymentDetail = new FinancialPaymentDetail();
+            UpdateFinancialPaymentDetail( transactionDetail, financialPaymentDetail );
+            return financialPaymentDetail;
+        }
+
+        /// <summary>
+        /// Updates the financial payment detail fields from the information in transactionDetail
+        /// </summary>
+        /// <param name="transactionDetail">The customer information.</param>
+        /// <param name="financialPaymentDetail">The financial payment detail.</param>
+        private void UpdateFinancialPaymentDetail( TssV2TransactionsGet200Response transactionDetail, FinancialPaymentDetail financialPaymentDetail )
+        {
+            financialPaymentDetail.GatewayPersonIdentifier = transactionDetail.PaymentInformation?.Customer?.Id;
+
+            string paymentType = transactionDetail.PaymentInformation.PaymentType.Type;
+            if ( paymentType == "credit card" )
+            {
+                // cc payment
+                var curType = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.CURRENCY_TYPE_CREDIT_CARD );
+                financialPaymentDetail.NameOnCard = $"{transactionDetail.OrderInformation.BillTo.FirstName} {transactionDetail.OrderInformation.BillTo.LastName}";
+                financialPaymentDetail.CurrencyTypeValueId = curType != null ? curType.Id : ( int? ) null;
+
+                //// The gateway tells us what the CreditCardType is since it was selected using their hosted payment entry frame.
+                //// So, first see if we can determine CreditCardTypeValueId using the CardType response from the gateway
+
+                // See if we can figure it out from the CC Type (Amex, Visa, etc)
+                var creditCardTypeValue = CreditCardPaymentInfo.GetCreditCardTypeFromName( transactionDetail.ProcessingInformation.PaymentSolution );
+                if ( creditCardTypeValue == null )
+                {
+                    // GetCreditCardTypeFromName should have worked, but just in case, see if we can figure it out from the MaskedCard using RegEx
+                    creditCardTypeValue = CreditCardPaymentInfo.GetCreditCardTypeFromCreditCardNumber( transactionDetail.PaymentInformation.Card.Prefix );
+                }
+
+                financialPaymentDetail.CreditCardTypeValueId = creditCardTypeValue?.Id;
+                financialPaymentDetail.AccountNumberMasked = $"{transactionDetail.PaymentInformation.Card.Prefix}XXXXXX{transactionDetail.PaymentInformation.Card.Suffix}";
+
+                financialPaymentDetail.ExpirationMonth = transactionDetail.PaymentInformation.Card.ExpirationMonth.AsIntegerOrNull();
+                financialPaymentDetail.ExpirationYear = transactionDetail.PaymentInformation.Card.ExpirationYear.AsIntegerOrNull();
+            }
+            // ACH not supported by majority of CyberSource Payment Processors.
+            //else
+            //{
+            //    // ach payment
+            //    var curType = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.CURRENCY_TYPE_ACH );
+            //    financialPaymentDetail.CurrencyTypeValueId = curType != null ? curType.Id : ( int? ) null;
+            //    financialPaymentDetail.AccountNumberMasked = customerInfo.CheckAccount;
+            //}
+        }
+
+        /// <summary>
+        /// Gets the additional lava fields in the form of a flattened dictionary where child properties are delimited with '_' (Billing.Street1 becomes Billing_Street1)
+        /// </summary>
+        /// <param name="xdocResult">The xdoc result.</param>
+        /// <returns></returns>
+        private static Dictionary<string, object> GetAdditionalLavaFields<T>( T obj )
+        {
+            var xdocResult = JsonConvert.DeserializeXNode( obj.ToJson(), "root" );
+            var additionalLavaFields = new Dictionary<string, object>();
+            foreach ( XElement element in xdocResult.Root.Elements() )
+            {
+                if ( element.HasElements )
+                {
+                    string prefix = element.Name.LocalName;
+                    foreach ( XElement childElement in element.Elements() )
+                    {
+                        additionalLavaFields.AddOrIgnore( prefix + "_" + childElement.Name.LocalName, childElement.Value.Trim() );
+                    }
+                }
+                else
+                {
+                    additionalLavaFields.AddOrIgnore( element.Name.LocalName, element.Value.Trim() );
+                }
+            }
+
+            return additionalLavaFields;
+        }
+
+        private bool SetSubscriptionPlanParams( Rbsv1subscriptionsPlanInformation planInformation, Rbsv1subscriptionsSubscriptionInformation subscriptionInformation, Guid scheduleTransactionFrequencyValueGuid, DateTime startDate, out string errorMessage )
+        {
+            errorMessage = string.Empty;
+
+            var startDateUTC = startDate.ToUniversalTime();
+            subscriptionInformation.StartDate = startDateUTC.ToString( "yyyy-MM-ddTHH:mm:ssZ" );
+            BillingPeriodUnit? billingPeriodUnit = null;
+            int billingDuration = 0;
+            int billingCycleInterval = 1;
+
+            if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_MONTHLY.AsGuid() )
+            {
+                billingPeriodUnit = BillingPeriodUnit.M;
+            }
+            else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_WEEKLY.AsGuid() )
+            {
+                billingPeriodUnit = BillingPeriodUnit.W;
+            }
+            else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_BIWEEKLY.AsGuid() )
+            {
+                billingCycleInterval = 2;
+                billingPeriodUnit = BillingPeriodUnit.W;
+            }
+            // DAILY does not exist, but the gateway supports it.
+            //else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_DAILY.AsGuid() )
+            //{
+            //    billingPeriodUnit = BillingPeriodUnit.D;
+            //}
+            else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_QUARTERLY.AsGuid() )
+            {
+                billingCycleInterval = 3;
+                billingPeriodUnit = BillingPeriodUnit.M;
+            }
+            else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_YEARLY.AsGuid() )
+            {
+                billingPeriodUnit = BillingPeriodUnit.Y;
+            }
+            else
+            {
+                errorMessage = $"Unsupported Schedule Frequency {DefinedValueCache.Get( scheduleTransactionFrequencyValueGuid )?.Value}";
+                return false;
+            }
+
+            planInformation.BillingPeriod = new GetAllPlansResponsePlanInformationBillingPeriod( billingCycleInterval.ToString(), billingPeriodUnit.ToString() );
+            if ( billingDuration != 0 )
+            {
+                planInformation.BillingCycles = new Rbsv1plansPlanInformationBillingCycles( billingDuration.ToString() );
+            }
+            return true;
+        }
+
+        private DateTime? GetNextPaymentDate( GetSubscriptionResponse subscriptionResponse, out string errorMessage )
+        {
+            errorMessage = string.Empty;
+
+            var gatewayStartDate = subscriptionResponse.SubscriptionInformation?.StartDate?.AsDateTime();
+            var billingUnit = subscriptionResponse.PlanInformation?.BillingPeriod?.Unit;
+            var billingLength = subscriptionResponse.PlanInformation?.BillingPeriod?.Length.AsIntegerOrNull();
+            var billingCyclesCurrent = subscriptionResponse.PlanInformation?.BillingCycles?.Current.AsInteger();
+            var billingCyclesTotal = subscriptionResponse.PlanInformation?.BillingCycles?.Total.AsInteger();
+            if ( gatewayStartDate == null || billingUnit == null || billingLength == null )
+            {
+                errorMessage = "One of the required fields is null, StartDate, Billing.Unit or Billing.Length";
+                return gatewayStartDate;
+            }
+            var nextPaymentDate = gatewayStartDate;
+
+            if ( ( billingCyclesCurrent == null || billingCyclesTotal == null || billingCyclesTotal == 0 || billingCyclesCurrent <= billingCyclesTotal ) && gatewayStartDate < RockDateTime.Now )
+            {
+                if ( billingUnit == "W" )
+                {
+                    var weekCalc = ( 7 * billingLength.Value );
+                    var calcDifference = ( RockDateTime.Now - gatewayStartDate.Value ).TotalDays / weekCalc;
+                    nextPaymentDate = gatewayStartDate.Value.AddDays( Math.Ceiling( calcDifference ) * weekCalc );
+                }
+                else if ( billingUnit == "M" )
+                {
+                    var monthDifference = ( RockDateTime.Now.Year - gatewayStartDate.Value.Year ) * 12 + RockDateTime.Now.Month - gatewayStartDate.Value.Month;
+                    if ( billingLength > 1 )
+                    {
+                        var calcMonthDifference = ( double ) ( monthDifference / billingLength.Value );
+                        nextPaymentDate = gatewayStartDate.Value.AddMonths( Math.Ceiling( calcMonthDifference ).ToIntSafe() * billingLength.Value );
+                    }
+                    else
+                    {
+                        nextPaymentDate = gatewayStartDate.Value.AddMonths( monthDifference );
+                    }
+
+                    if ( nextPaymentDate < RockDateTime.Now )
+                    {
+                        nextPaymentDate = nextPaymentDate.Value.AddMonths( billingLength.Value );
+                    }
+                }
+                else if ( billingUnit == "Y" )
+                {
+                    var yearDifference = ( RockDateTime.Now.Year - gatewayStartDate.Value.Year );
+                    nextPaymentDate.Value.AddYears( yearDifference );
+                    if ( nextPaymentDate < RockDateTime.Now )
+                    {
+                        nextPaymentDate = nextPaymentDate.Value.AddYears( billingLength.Value );
+                    }
+                }
+                else
+                {
+                    var calcDifference = ( RockDateTime.Now - gatewayStartDate.Value ).TotalDays;
+                    nextPaymentDate = gatewayStartDate.Value.AddDays( calcDifference + 1 );
+                }
+            }
+            else
+            {
+                errorMessage = "Your billing cycle is complete. There will be no future gifts without setting up a new subscription.";
+            }
+            return nextPaymentDate;
+        }
+
+        private int GetFinancialScheduledTransactionFrequency( GetAllPlansResponsePlanInformationBillingPeriod billingPeriod )
+        {
+            switch ( billingPeriod.Unit )
+            {
+                case "W":
+                    if ( billingPeriod.Length == "2" )
+                    {
+                        return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_BIWEEKLY.AsGuid() ).Id;
+                    }
+                    else
+                    {
+                        return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_WEEKLY.AsGuid() ).Id;
+                    }
+                case "M":
+                    if ( billingPeriod.Length == "3" )
+                    {
+                        return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_QUARTERLY.AsGuid() ).Id;
+                    }
+                    else
+                    {
+                        return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_MONTHLY.AsGuid() ).Id;
+                    }
+                case "Y":
+                    return DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_YEARLY.AsGuid() ).Id;
+                default:
+                    return -1;
+            }
+        }
+
+        private List<GetAllSubscriptionsResponseSubscriptions> GetAllSubscriptions( CyberSourceSDK.Client.Configuration clientConfig )
+        {
+            var allSubscriptions = new List<GetAllSubscriptionsResponseSubscriptions>();
+            try
+            {
+                var apiInstance = new SubscriptionsApi( clientConfig );
+                var page = 0;
+                var totalCount = 100;
+                var pageSize = 100;
+                while ( totalCount > pageSize * page )
+                {
+                    var subscriptionSearchResult = apiInstance.GetAllSubscriptions( page * pageSize, pageSize, null, null );
+                    allSubscriptions.AddRange( subscriptionSearchResult.Subscriptions );
+                    totalCount = subscriptionSearchResult.TotalCount ?? 100;
+                    page += 1;
+                }
+            }
+            catch ( Exception e )
+            {
+                ExceptionLogService.LogException( $"Error getting CyberSource subscriptions:  {e.Message}." );
+            }
+            return allSubscriptions;
+        }
+
         private static string GetCurrencyCode( ReferencePaymentInfo paymentInfo )
         {
             if ( paymentInfo == null )
@@ -1764,56 +1830,9 @@ namespace rocks.kfs.CyberSource
             return financialPaymentDetail;
         }
 
-        private bool SetSubscriptionPlanParams( Rbsv1subscriptionsPlanInformation planInformation, Rbsv1subscriptionsSubscriptionInformation subscriptionInformation, Guid scheduleTransactionFrequencyValueGuid, DateTime startDate, out string errorMessage )
-        {
-            errorMessage = string.Empty;
+        #endregion Private Helpers
 
-            var startDateUTC = startDate.ToUniversalTime();
-            subscriptionInformation.StartDate = startDateUTC.ToString( "yyyy-MM-ddTHH:mm:ssZ" );
-            BillingPeriodUnit? billingPeriodUnit = null;
-            int billingDuration = 0;
-            int billingCycleInterval = 1;
-
-            if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_MONTHLY.AsGuid() )
-            {
-                billingPeriodUnit = BillingPeriodUnit.M;
-            }
-            else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_WEEKLY.AsGuid() )
-            {
-                billingPeriodUnit = BillingPeriodUnit.W;
-            }
-            else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_BIWEEKLY.AsGuid() )
-            {
-                billingCycleInterval = 2;
-                billingPeriodUnit = BillingPeriodUnit.W;
-            }
-            // DAILY does not exist, but the gateway supports it.
-            //else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_DAILY.AsGuid() )
-            //{
-            //    billingPeriodUnit = BillingPeriodUnit.D;
-            //}
-            else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_QUARTERLY.AsGuid() )
-            {
-                billingCycleInterval = 3;
-                billingPeriodUnit = BillingPeriodUnit.M;
-            }
-            else if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_YEARLY.AsGuid() )
-            {
-                billingPeriodUnit = BillingPeriodUnit.Y;
-            }
-            else
-            {
-                errorMessage = $"Unsupported Schedule Frequency {DefinedValueCache.Get( scheduleTransactionFrequencyValueGuid )?.Value}";
-                return false;
-            }
-
-            planInformation.BillingPeriod = new GetAllPlansResponsePlanInformationBillingPeriod( billingCycleInterval.ToString(), billingPeriodUnit.ToString() );
-            if ( billingDuration != 0 )
-            {
-                planInformation.BillingCycles = new Rbsv1plansPlanInformationBillingCycles( billingDuration.ToString() );
-            }
-            return true;
-        }
+        #region Static Helpers
 
         internal static Rock.Model.FinancialScheduledTransactionStatus? GetFinancialScheduledTransactionStatus( string subscriptionStatus )
         {
@@ -1842,19 +1861,6 @@ namespace rocks.kfs.CyberSource
             }
         }
 
-        public DateTime GetEarliestScheduledStartDate( FinancialGateway financialGateway )
-        {
-            return RockDateTime.Today.AddDays( 1 ).Date;
-        }
-
-        public HostedGatewayMode[] GetSupportedHostedGatewayModes( FinancialGateway financialGateway )
-        {
-            return new HostedGatewayMode[1] { HostedGatewayMode.Hosted };
-        }
-
-        #endregion
-
-        #region Static Helpers
 
         /// <summary>
         /// Gets the financial gateway.
