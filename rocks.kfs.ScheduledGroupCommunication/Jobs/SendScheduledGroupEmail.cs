@@ -77,7 +77,6 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
             var fromNameAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_FROM_NAME.AsGuid() ).Id;
             var subjectAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SUBJECT.AsGuid() ).Id;
             var messageAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_MESSAGE.AsGuid() ).Id;
-            var groupEntityTypeId = EntityTypeCache.Get( Rock.SystemGuid.EntityType.GROUP.AsGuid() ).Id;
 
             try
             {
@@ -114,8 +113,6 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
                     // Use a new context to limit the amount of change-tracking required
                     using ( var rockContext = new RockContext() )
                     {
-                        rockContext.Database.CommandTimeout = commandTimeout;
-
                         var attributeMatrixId = new AttributeMatrixItemService( rockContext )
                             .GetNoTracking( d.EntityId.Value )
                             .AttributeMatrixId;
@@ -127,14 +124,11 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
 
                         var attributeValue = new AttributeValueService( rockContext )
                             .Queryable().AsNoTracking()
-                            .Where( av => av.EntityId.HasValue && av.Attribute.EntityTypeId.Value.Equals( groupEntityTypeId ) )
-                            .GroupBy( av => av.Value )
-                            .Select( av => new { EntityId = av.Max( v => v.EntityId.Value ), Value = av.Key } )
-                            .FirstOrDefault( av => av.Value.Equals( attributeMatrixGuid, StringComparison.CurrentCultureIgnoreCase ) );
+                            .FirstOrDefault( a => a.Value.Equals( attributeMatrixGuid, StringComparison.CurrentCultureIgnoreCase ) );
 
-                        if ( attributeValue != null )
+                        if ( attributeValue != null && attributeValue.EntityId.HasValue )
                         {
-                            dAttributeMatrixItemAndGroupIds.Add( d.EntityId.Value, attributeValue.EntityId );
+                            dAttributeMatrixItemAndGroupIds.Add( d.EntityId.Value, attributeValue.EntityId.Value );
                         }
                     }
                 }

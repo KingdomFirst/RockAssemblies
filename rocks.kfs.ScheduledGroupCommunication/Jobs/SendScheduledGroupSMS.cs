@@ -73,9 +73,8 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
             var smsMediumType = EntityTypeCache.Get( "Rock.Communication.Medium.Sms" );
             var dateAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_SEND_DATE.AsGuid() ).Id;
             var recurrenceAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_SEND_RECURRENCE.AsGuid() ).Id;
-            var fromNumberAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_FROM_NUMBER_SYSTEM_PHONE.AsGuid() ).Id;
+            var fromNumberAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_FROM_NUMBER.AsGuid() ).Id;
             var messageAttributeId = Rock.Web.Cache.AttributeCache.Get( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_MESSAGE.AsGuid() ).Id;
-            var groupEntityTypeId = EntityTypeCache.Get( Rock.SystemGuid.EntityType.GROUP.AsGuid() ).Id;
 
             try
             {
@@ -112,8 +111,6 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
                     // Use a new context to limit the amount of change-tracking required
                     using ( var rockContext = new RockContext() )
                     {
-                        rockContext.Database.CommandTimeout = commandTimeout;
-
                         var attributeMatrixId = new AttributeMatrixItemService( rockContext )
                             .GetNoTracking( d.EntityId.Value )
                             .AttributeMatrixId;
@@ -125,14 +122,11 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
 
                         var attributeValue = new AttributeValueService( rockContext )
                             .Queryable().AsNoTracking()
-                            .Where( av => av.EntityId.HasValue && av.Attribute.EntityTypeId.Value.Equals( groupEntityTypeId ) )
-                            .GroupBy( av => av.Value )
-                            .Select( av => new { EntityId = av.Max( v => v.EntityId.Value ), Value = av.Key } )
-                            .FirstOrDefault( av => av.Value.Equals( attributeMatrixGuid, StringComparison.CurrentCultureIgnoreCase ) );
+                            .FirstOrDefault( a => a.Value.Equals( attributeMatrixGuid, StringComparison.CurrentCultureIgnoreCase ) );
 
-                        if ( attributeValue != null )
+                        if ( attributeValue != null && attributeValue.EntityId.HasValue )
                         {
-                            dAttributeMatrixItemAndGroupIds.Add( d.EntityId.Value, attributeValue.EntityId );
+                            dAttributeMatrixItemAndGroupIds.Add( d.EntityId.Value, attributeValue.EntityId.Value );
                         }
                     }
                 }
@@ -147,7 +141,7 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
                         var fromNumberGuid = new AttributeValueService( rockContext )
                             .GetByAttributeIdAndEntityId( fromNumberAttributeId, attributeMatrixItemAndGroupId.Key )
                             .Value;
-                        var fromNumber = SystemPhoneNumberCache.Get( fromNumberGuid.AsGuid() );
+                        var fromNumber = DefinedValueCache.Get( fromNumberGuid.AsGuid() );
 
                         var message = new AttributeValueService( rockContext )
                             .GetByAttributeIdAndEntityId( messageAttributeId, attributeMatrixItemAndGroupId.Key )
@@ -213,7 +207,7 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
                                 }
 
                                 communication.SMSMessage = message;
-                                communication.SmsFromSystemPhoneNumberId = fromNumber.Id;
+                                communication.SMSFromDefinedValueId = fromNumber.Id;
                                 communication.Subject = string.Empty;
                                 communication.Status = CommunicationStatus.Approved;
 
