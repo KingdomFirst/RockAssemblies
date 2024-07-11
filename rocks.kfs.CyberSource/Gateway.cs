@@ -24,7 +24,6 @@ using System.Threading;
 using System.Web.UI;
 using System.Xml.Linq;
 using Newtonsoft.Json;
-using RestSharp.Authenticators;
 
 using Rock;
 using Rock.Attribute;
@@ -578,7 +577,9 @@ namespace rocks.kfs.CyberSource
                 return null;
             }
 
+            string subscriptionId = "";
             string subscriptionDescription = $"{referencedPaymentInfo.Description} - Subscription Ref: {descriptionGuid}";
+
             var configDictionary = new Configuration().GetConfiguration( financialGateway );
             var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
 
@@ -637,8 +638,6 @@ namespace rocks.kfs.CyberSource
                 Rbsv1subscriptionsPlanInformation planInformation = new Rbsv1subscriptionsPlanInformation();
 
                 CreateSubscriptionResponse subscriptionResult = null;
-
-                string subscriptionId;
 
                 if ( SetSubscriptionPlanParams( planInformation, subscriptionInformation, schedule.TransactionFrequencyValue.Guid, schedule.StartDate, out errorMessage ) )
                 {
@@ -712,17 +711,33 @@ namespace rocks.kfs.CyberSource
 
                 return scheduledTransaction;
             }
-            catch ( Exception ex2 )
+            catch ( Exception )
             {
                 // If there is an exception, Rock won't save this as a scheduled transaction, so make sure the subscription didn't get created so mystery scheduled transactions don't happen.
                 var apiInstance = new SubscriptionsApi( clientConfig );
-                var subscriptionSearchResult = apiInstance.GetAllSubscriptions( null, null, descriptionCode, null );
-                var orphanedSubscription = subscriptionSearchResult.Subscriptions.FirstOrDefault();
 
-                if ( orphanedSubscription != null )
+                GetSubscriptionResponse subscriptionResult = null;
+                try
                 {
-                    var subscriptionId = orphanedSubscription.Id;
-                    var cancelResult = apiInstance.CancelSubscription( subscriptionId );
+                    subscriptionResult = apiInstance.GetSubscription( subscriptionId );
+                }
+                catch ( Exception ) { }
+
+                GetAllSubscriptionsResponseSubscriptions orphanedSubscription = null;
+                if ( subscriptionResult == null )
+                {
+                    var subscriptionSearchResult = apiInstance.GetAllSubscriptions( null, null, descriptionCode, null );
+                    orphanedSubscription = subscriptionSearchResult.Subscriptions.FirstOrDefault();
+
+                    if ( orphanedSubscription != null )
+                    {
+                        subscriptionId = orphanedSubscription.Id;
+                    }
+                }
+
+                if ( subscriptionResult != null || orphanedSubscription != null )
+                {
+                    apiInstance.CancelSubscription( subscriptionId );
                 }
 
                 throw;
