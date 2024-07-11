@@ -127,12 +127,6 @@ namespace rocks.kfs.CyberSource.Controls
 
     // custom styles that will be applied to each field we create using Microform
     var myStyles = {{
-        //'input': {{
-        //    'font-size': '14px',
-        //    'font-family': 'helvetica, tahoma, calibri, sans-serif',
-        //    'color': '#555'
-        //}},
-        //':focus': {{ 'color': 'blue' }},
         ':disabled': {{ 'cursor': 'not-allowed' }},
         'valid': {{ 'color': '#3c763d' }},
         'invalid': {{ 'color': '#a94442' }}
@@ -142,7 +136,6 @@ namespace rocks.kfs.CyberSource.Controls
       visa: 'fab fa-cc-visa', 
       mastercard: 'fab fa-cc-mastercard', 
       amex: 'fab fa-cc-amex',
-      //maestro: 'fab fa-cc-maestro',
       discover: 'fab fa-cc-discover',
       dinersclub: 'fab fa-cc-diners-club',
       jcb: 'fab fa-cc-jcb'
@@ -236,9 +229,6 @@ namespace rocks.kfs.CyberSource.Controls
                 $errorsOutput.text(err.message)
                 $errorsOutput.parent().show();
             }} else {{
-                // At this point you may pass the token back to your server as you wish.
-                // In this example we append a hidden input to the form and submit it.
-                console.log(JSON.stringify(token));
                 flexResponse.val(token);
 
                 if (tokenizerPostbackScript) {{

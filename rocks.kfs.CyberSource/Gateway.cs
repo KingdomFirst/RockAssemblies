@@ -758,7 +758,6 @@ namespace rocks.kfs.CyberSource
                     {
                         var apiInstance = new SubscriptionsApi( clientConfig );
                         subscriptionResult = apiInstance.CreateSubscription( requestObj );
-                        //return result;
                     }
                     catch ( Exception e )
                     {
@@ -840,7 +839,7 @@ namespace rocks.kfs.CyberSource
         /// <returns></returns>
         public override bool ReactivateScheduledPayment( FinancialScheduledTransaction transaction, out string errorMessage )
         {
-            errorMessage = "This gateway does not support reactivating scheduled transactions. Transactions should be updated through the CyberSource interface.";
+            errorMessage = "This gateway does not support reactivating scheduled transactions. Inactive transactions should be managed through the CyberSource interface.";
             return false;
         }
 
@@ -1228,10 +1227,6 @@ namespace rocks.kfs.CyberSource
                     scheduledTransaction.IsActive = false;
                 }
 
-                if ( errorMessage.IsNullOrWhiteSpace() )
-                {
-                    errorMessage = string.Empty;
-                }
                 return true;
             }
             else
@@ -1240,7 +1235,6 @@ namespace rocks.kfs.CyberSource
                 {
                     // Assume that a status code of Forbidden or NonFound indicates that the schedule doesn't exist, or was deleted.
                     scheduledTransaction.IsActive = false;
-                    errorMessage = string.Empty;
                     return true;
                 }
 
@@ -1378,7 +1372,6 @@ namespace rocks.kfs.CyberSource
             {
                 var apiInstance = new SearchTransactionsApi( clientConfig );
                 searchResult = apiInstance.CreateSearch( requestObj );
-                //return result;
             }
             catch ( Exception e )
             {
@@ -1551,7 +1544,6 @@ namespace rocks.kfs.CyberSource
             hostedPaymentControl.CyberSourceGateway = financialGateway;
 
             return hostedPaymentControl;
-
         }
 
         public string GetHostPaymentInfoSubmitScript( FinancialGateway financialGateway, Control hostedPaymentInfoControl )
@@ -1576,12 +1568,10 @@ namespace rocks.kfs.CyberSource
             {
                 errorMessage = "null response from GetHostedPaymentInfoToken";
                 referencePaymentInfo.ReferenceNumber = cyberSourcePaymentControl.PaymentInfoToken;
-                // referencePaymentInfo.InitialCurrencyTypeValue = cyberSourcePaymentControl.CurrencyTypeValue;
             }
             else
             {
                 referencePaymentInfo.ReferenceNumber = cyberSourcePaymentControl.PaymentInfoToken;
-                //referencePaymentInfo.InitialCurrencyTypeValue = cyberSourcePaymentControl.CurrencyTypeValue;
             }
             // no ach support for now, so hard coded to CC instead of from control.
             referencePaymentInfo.InitialCurrencyTypeValue = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.CURRENCY_TYPE_CREDIT_CARD );
@@ -1614,11 +1604,9 @@ namespace rocks.kfs.CyberSource
                 Currency: definedCurrencyCode
             );
 
-            //bool processingInformationCapture = financialGateway.GetAttributeValue( AttributeKey.CapturePayment ).AsBoolean();
             Ptsv2paymentsProcessingInformation paymentProcessingInformation = new Ptsv2paymentsProcessingInformation(
                  ActionList: new List<string> { "TOKEN_CREATE" },
                  ActionTokenTypes: new List<string> { "customer", "paymentInstrument" }
-                 //Capture: processingInformationCapture //Capture: amount > 0,
              );
 
             Ptsv2paymentsOrderInformationBillTo orderInformationBillTo = new Ptsv2paymentsOrderInformationBillTo(
@@ -1662,12 +1650,10 @@ namespace rocks.kfs.CyberSource
 
                 var apiInstance = new PaymentsApi( clientConfig );
                 tokenResult = apiInstance.CreatePayment( requestObj );
-                //return result;
             }
             catch ( Exception e )
             {
                 errorMessage += "Exception on calling the API : " + e.Message;
-                //return null;
             }
 
             if ( tokenResult == null || tokenResult.ErrorInformation != null )
@@ -1688,7 +1674,6 @@ namespace rocks.kfs.CyberSource
             }
             if ( customerId.IsNullOrWhiteSpace() )
             {
-                //errorMessage = "Null response from CreateCustomerAccount.";
                 customerId = "null";
             }
             return customerId;
@@ -1788,20 +1773,6 @@ namespace rocks.kfs.CyberSource
             BillingPeriodUnit? billingPeriodUnit = null;
             int billingDuration = 0;
             int billingCycleInterval = 1;
-            //int startDayOfMonth = startDateUTC.Day;
-
-            //if (startDayOfMonth > 28)
-            //{
-            //    startDayOfMonth = 31;
-
-            //    // since we have to use magic 31 to indicate the last day of the month, adjust the NextBillDate to be the last day of the specified month
-            //    // (so it doesn't post on original startDate and again on the last day of the month)
-            //    var nextBillYear = startDateUTC.Year;
-            //    var nextBillMonth = startDateUTC.Month;
-            //    DateTime endOfMonth = new DateTime(nextBillYear, nextBillMonth, DateTime.DaysInMonth(nextBillYear, nextBillMonth));
-
-            //    billingPlanParameters.NextBillDateUTC = endOfMonth;
-            //}
 
             if ( scheduleTransactionFrequencyValueGuid == Rock.SystemGuid.DefinedValue.TRANSACTION_FREQUENCY_MONTHLY.AsGuid() )
             {
