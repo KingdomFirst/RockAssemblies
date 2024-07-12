@@ -1496,7 +1496,7 @@ namespace rocks.kfs.CyberSource
         /// <returns></returns>
         public DateTime GetEarliestScheduledStartDate( FinancialGateway financialGateway )
         {
-            return RockDateTime.Today.AddDays( 1 ).Date;
+            return RockDateTime.Today.Date;
         }
 
         /// <summary>
