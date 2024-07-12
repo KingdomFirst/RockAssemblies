@@ -813,9 +813,6 @@ namespace rocks.kfs.CyberSource
             var configDictionary = new Configuration().GetConfiguration( scheduledTransaction.FinancialGateway );
             var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
 
-            FinancialGateway financialGateway;
-            string gatewayUrl;
-            string apiKey;
             GetSubscriptionResponse subscriptionStatusResult = null;
             DateTime? nextPaymentDate = RockDateTime.Now;
 
@@ -907,17 +904,6 @@ namespace rocks.kfs.CyberSource
                             scheduledTransaction.GatewayScheduleId = subscriptionId;
 
                             scheduledTransaction.IsActive = true;
-
-                            //try
-                            //{
-                            //    // update FinancialPaymentDetail with any changes in payment information
-                            //    Customer customerInfo = this.GetCustomerVaultQueryResponse( financialGateway, referencedPaymentInfo.GatewayPersonIdentifier )?.CustomerVault.Customer;
-                            //    UpdateFinancialPaymentDetail( customerInfo, scheduledTransaction.FinancialPaymentDetail );
-                            //}
-                            //catch ( Exception ex )
-                            //{
-                            //    throw new Exception( $"Exception getting Customer Information for Scheduled Payment.", ex );
-                            //}
 
                             errorMessage = string.Empty;
 
