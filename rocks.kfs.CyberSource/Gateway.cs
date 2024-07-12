@@ -1090,7 +1090,7 @@ namespace rocks.kfs.CyberSource
             FinancialGateway financialGateway = scheduledTransaction.FinancialGateway;
             if ( financialGateway == null && scheduledTransaction.FinancialGatewayId.HasValue )
             {
-                financialGateway = new FinancialGatewayService( new Rock.Data.RockContext() ).GetNoTracking( scheduledTransaction.FinancialGatewayId.Value );
+                financialGateway = new FinancialGatewayService( new RockContext() ).GetNoTracking( scheduledTransaction.FinancialGatewayId.Value );
             }
 
             SubscriptionsApi apiInstance = null;
@@ -1211,11 +1211,19 @@ namespace rocks.kfs.CyberSource
                     }
                     var apiInstance = new SubscriptionsApi( clientConfig );
                     var subscriptionSearchResult = apiInstance.GetAllSubscriptions( null, null, payment.GatewayScheduleId, null );
-                    var subscriptionResult = subscriptionSearchResult.Subscriptions.FirstOrDefault();
 
-                    if ( subscriptionResult != null )
+                    if ( subscriptionSearchResult.Subscriptions.Count() == 1 )
                     {
-                        payment.GatewayScheduleId = subscriptionResult.Id;
+                        var subscriptionResult = subscriptionSearchResult.Subscriptions.FirstOrDefault();
+
+                        if ( subscriptionResult != null )
+                        {
+                            payment.GatewayScheduleId = subscriptionResult.Id;
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception( $"No subscription or more than one found with Subscription Code {payment.GatewayScheduleId}." );
                     }
                 }
                 catch ( Exception e )
