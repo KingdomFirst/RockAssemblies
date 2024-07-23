@@ -67,7 +67,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+    <Reference Include="Newtonsoft.Json">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -77,7 +77,7 @@
     <Reference Include="nunit.framework, Version=3.10.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NUnit.3.10.1\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="RestSharp, Version=108.0.3.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+    <Reference Include="RestSharp">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\RestSharp.dll</HintPath>
     </Reference>
@@ -87,6 +87,10 @@
     </Reference>
     <Reference Include="Rock.Common">
       <HintPath>..\..\RockWeb\Bin\Rock.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Rock.Enums">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\Rock.Enums.dll</HintPath>
     </Reference>
     <Reference Include="Rock.Lava.Shared">
       <HintPath>..\..\RockWeb\Bin\Rock.Lava.Shared.dll</HintPath>

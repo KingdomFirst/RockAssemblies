@@ -25,6 +25,7 @@
 .vs/*
 */bin/*
 */obj/*
+*.dtbcache.json
 
 # Debug and Release Files #
 ###########################
