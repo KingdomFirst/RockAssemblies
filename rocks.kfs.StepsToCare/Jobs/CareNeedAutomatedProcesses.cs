@@ -277,7 +277,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                     .Where( n =>
                         ( !n.CustomFollowUp && n.StatusValueId == openValueId && n.DateEntered <= DbFunctions.AddDays( RockDateTime.Now, -followUpDays ) )
                         ||
-                        ( n.CustomFollowUp && ( n.StatusValueId == openValueId || n.StatusValueId == snoozedValueId ) && ( n.RenewMaxCount == null || n.RenewCurrentCount <= n.RenewMaxCount )
+                        ( ( n.StatusValueId == openValueId || n.StatusValueId == snoozedValueId ) && ( n.RenewMaxCount == null || n.RenewCurrentCount <= n.RenewMaxCount )
                             && (
                                 ( n.SnoozeDate == null && n.DateEntered <= DbFunctions.AddDays( RockDateTime.Now, -n.RenewPeriodDays ) )
                                 ||
@@ -353,7 +353,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                 {
                     careNeed.StatusValueId = followUpValue.Id;
                     careNeed.FollowUpDate = RockDateTime.Now;
-                    if ( careNeed.CustomFollowUp )
+                    if ( careNeed.CustomFollowUp || careNeed.SnoozeDate.HasValue )
                     {
                         careNeed.RenewCurrentCount++;
                     }
