@@ -25,6 +25,7 @@
 .vs/*
 */bin/*
 */obj/*
+*.dtbcache.json
 
 # Debug and Release Files #
 ###########################
@@ -34,4 +35,3 @@
 # Reporting Sevices Files #
 ###########################
 **/SqlServerTypes/*
-com.kfs.Import/bin/
