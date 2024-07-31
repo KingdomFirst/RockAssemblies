@@ -266,7 +266,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                                     touchTemplates.Add( touchTemplate );
                                 }
                             }
-                            allTouchTemplates.AddOrIgnore( needCategory.Id, touchTemplates );
+                            allTouchTemplates.AddOrReplace( needCategory.Id, touchTemplates );
                         }
                     }
                 }
