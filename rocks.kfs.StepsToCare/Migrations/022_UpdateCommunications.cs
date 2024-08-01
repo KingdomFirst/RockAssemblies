@@ -178,6 +178,7 @@ Quick Notes:
 {% endfor %}" );
 
             RockMigrationHelper.UpdateSystemCommunication( "Plugins", "Outstanding Care Needs", "", "", "", "", "", "Outstanding Care Needs", @"{{ 'Global' | Attribute:'EmailHeader' }}
+{% assign careNeedsSize = CareNeeds | Size %}{% assign personToken = Person | PersonTokenCreate:2880,careNeedsSize %}
 <table class='row' style='border-collapse: collapse; border-spacing: 0; display: table; padding: 0; position: relative; text-align: left; vertical-align: top; width: 100%;'>
    <tbody>
       <tr style='padding: 0; text-align: left; vertical-align: top;'>
@@ -208,7 +209,7 @@ Quick Notes:
                                              <h2 style='line-height: normal; margin-top: .83em;'>{{ careNeed.PersonAlias.Person.FullName }}<br><span style='font-weight: normal; font-size: 14px'>{{ careNeed.DateEntered }} | {{ careNeed.Category.Value }}</span></h2>
                                              <p>{{ careNeed.Details }}</p>
                                              <p style='font-size: 14px'><strong>Status:</strong> {{ careNeed.Status.Value }}<br>
-                                            <strong>Care Touches:</strong> {{ careNeed.TouchCount }}</p>
+                                             <strong>Care Touches:</strong> {{ careNeed.TouchCount }}</p>
                                           </td>
                                        </tr>
                                     </tbody>
@@ -221,7 +222,7 @@ Quick Notes:
                                                 <table border='0' cellpadding='0' cellspacing='0' class='button-shell'>
                                                    <tbody>
                                                       <tr>
-                                                         <td align='center' valign='middle' class='button-content' style='border-radius: 3px; background-color: rgb(0, 0, 0);'><a class='button-link' title='View Detail' href='{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDetail }}?CareNeedId={{ careNeed.Id }}' target='_blank' style='color: rgb(255, 255, 255);display: inline-block;font-weight: normal;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;background-color: rgb(0, 0, 0);padding: 6px;border: 1px solid rgb(0, 0, 0);border-radius: 3px;font-size: 14px'>View Detail</a></td>
+                                                         <td align='center' valign='middle' class='button-content' style='border-radius: 3px; background-color: rgb(0, 0, 0);'><a class='button-link' title='View Detail' href='{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNoteId=-1&CareNeedId={{ careNeed.Id }}&rckipid={{ personToken }}' target='_blank' style='color: rgb(255, 255, 255);display: inline-block;font-weight: normal;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;background-color: rgb(0, 0, 0);padding: 6px;border: 1px solid rgb(0, 0, 0);border-radius: 3px;font-size: 14px'>View Detail</a></td>
                                                       </tr>
                                                    </tbody>
                                                 </table>
@@ -254,7 +255,7 @@ Quick Notes:
             <table border='0' cellpadding='0' cellspacing='0' class='button-shell'>
                <tbody>
                   <tr>
-                     <td align='center' valign='middle' class='button-content' style='border-radius: 3px; background-color: rgb(0, 0, 0);'><a class='button-link' title='View Care Dashboard' href='{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}' target='_blank' style='color: rgb(255, 255, 255);display: inline-block;font-weight: bold;font-size: 16px;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;background-color: rgb(0, 0, 0);padding: 15px;border: 1px solid rgb(0, 0, 0);border-radius: 3px;'>View Care Dashboard</a></td>
+                     <td align='center' valign='middle' class='button-content' style='border-radius: 3px; background-color: rgb(0, 0, 0);'><a class='button-link' title='View Care Dashboard' href='{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?rckipid={{ personToken }}' target='_blank' style='color: rgb(255, 255, 255);display: inline-block;font-weight: bold;font-size: 16px;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;background-color: rgb(0, 0, 0);padding: 15px;border: 1px solid rgb(0, 0, 0);border-radius: 3px;'>View Care Dashboard</a></td>
                   </tr>
                </tbody>
             </table>
@@ -264,7 +265,7 @@ Quick Notes:
 </table>
 {{ 'Global' | Attribute:'EmailFooter' }}", SystemGuid.SystemCommunication.CARE_NEED_OUTSTANDING_NEEDS, true, @"{{ Person.NickName }},
 You currently have {{ CareNeeds | Size }} care needs assigned to you.
-View them at {{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}" );
+View them at {% assign personToken = Person | PersonTokenCreate:2880,2 %}{% capture dashboardLink %}{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?rckipid={{ personToken }}{% endcapture %}{{ dashboardLink | CreateShortLink }}" );
         }
 
         public override void Down()
