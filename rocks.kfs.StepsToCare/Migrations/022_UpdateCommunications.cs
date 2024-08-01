@@ -40,11 +40,11 @@ namespace rocks.kfs.StepsToCare.Migrations
      <tr>
        <td>
     		<div><!--[if mso]>
-    		  <v:roundrect xmlns:v=""urn:schemas-microsoft-com:vml"" xmlns:w=""urn:schemas-microsoft-com:office:word"" href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?rckipid={{ personToken }}"" style=""height:38px;v-text-anchor:middle;width:175px;"" arcsize=""11%"" strokecolor=""#269abc"" fillcolor=""#31b0d5"">
+    		  <v:roundrect xmlns:v=""urn:schemas-microsoft-com:vml"" xmlns:w=""urn:schemas-microsoft-com:office:word"" href=""{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?rckipid={{ personToken }}"" style=""height:38px;v-text-anchor:middle;width:175px;"" arcsize=""11%"" strokecolor=""#269abc"" fillcolor=""#31b0d5"">
     			<w:anchorlock/>
     			<center style=""color:#ffffff;font-family:sans-serif;font-size:14px;font-weight:normal;"">View Care Dashboard</center>
     		  </v:roundrect>
-    		<![endif]--><a href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?rckipid={{ personToken }}""
+    		<![endif]--><a href=""{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?rckipid={{ personToken }}""
     		style=""background-color:#31b0d5;border:1px solid #269abc;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:14px;font-weight:normal;line-height:38px;text-align:center;text-decoration:none;width:175px;-webkit-text-size-adjust:none;mso-hide:all;"">View Care Dashboard</a></div>
 
     	</td>
@@ -54,11 +54,11 @@ namespace rocks.kfs.StepsToCare.Migrations
      <tr>
        <td>
     		<div><!--[if mso]>
-    		  <v:roundrect xmlns:v=""urn:schemas-microsoft-com:vml"" xmlns:w=""urn:schemas-microsoft-com:office:word"" href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote=-1&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}"" style=""height:38px;v-text-anchor:middle;width:175px;"" arcsize=""11%"" strokecolor=""#269abc"" fillcolor=""#31b0d5"">
+    		  <v:roundrect xmlns:v=""urn:schemas-microsoft-com:vml"" xmlns:w=""urn:schemas-microsoft-com:office:word"" href=""{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote=-1&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}"" style=""height:38px;v-text-anchor:middle;width:175px;"" arcsize=""11%"" strokecolor=""#269abc"" fillcolor=""#31b0d5"">
     			<w:anchorlock/>
     			<center style=""color:#ffffff;font-family:sans-serif;font-size:14px;font-weight:normal;"">Take Action</center>
     		  </v:roundrect>
-    		<![endif]--><a href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote=-1&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}""
+    		<![endif]--><a href=""{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote=-1&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}""
     		style=""background-color:#31b0d5;border:1px solid #269abc;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:14px;font-weight:normal;line-height:38px;text-align:center;text-decoration:none;width:175px;-webkit-text-size-adjust:none;mso-hide:all;"">Take Action</a></div>
 
     	</td>
@@ -77,11 +77,11 @@ namespace rocks.kfs.StepsToCare.Migrations
  <tr>
    <td>
 		<div><!--[if mso]>
-		  <v:roundrect xmlns:v=""urn:schemas-microsoft-com:vml"" xmlns:w=""urn:schemas-microsoft-com:office:word"" href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote={{ template.Id }}&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}"" style=""height:38px;v-text-anchor:middle;width:95px;padding-left:5px;padding-right:5px;"" arcsize=""11%"" strokecolor=""#269abc"" fillcolor=""#31b0d5"">
+		  <v:roundrect xmlns:v=""urn:schemas-microsoft-com:vml"" xmlns:w=""urn:schemas-microsoft-com:office:word"" href=""{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote={{ template.Id }}&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}"" style=""height:38px;v-text-anchor:middle;width:95px;padding-left:5px;padding-right:5px;"" arcsize=""11%"" strokecolor=""#269abc"" fillcolor=""#31b0d5"">
 			<w:anchorlock/>
 			<center style=""color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:normal;"">{{ template.Note }}</center>
 		  </v:roundrect>
-		<![endif]--><a href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote={{ template.Id }}&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}""
+		<![endif]--><a href=""{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote={{ template.Id }}&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}""
 		style=""background-color: #31b0d5;border: 1px solid #269abc;border-radius: 4px;color: #ffffff;display: inline-block;font-family: sans-serif;font-size: 13px;font-weight: normal;line-height: 38px;text-align: center;text-decoration: none;width: 95px;-webkit-text-size-adjust: none;mso-hide: all;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;padding-left: 5px;padding-right: 5px;"">{{ template.Note }}</a></div>
 
 	</td>
@@ -94,7 +94,7 @@ namespace rocks.kfs.StepsToCare.Migrations
 {{ 'Global' | Attribute:'EmailFooter' }}
 ", SystemGuid.SystemCommunication.CARE_NEED_FOLLOWUP_WITH_ACTIONS, true, @"A Care Need has been flagged for follow up
 ""{{ CareNeed.Details | Truncate:20,'...' }}""
-{% capture dashboardLink %}{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}{% endcapture -%}{{ dashboardLink }}
+{% capture dashboardLink %}{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}{% endcapture -%}{{ dashboardLink }}
 
 Quick Notes:
 {% for template in NoteTemplates %} {{ template.Note }}: {% capture templateLink %}{{ dashboardLink }}?QuickNote={{ template.Id }}&CareNeed={{ CareNeed.Id }}&rckipid={{ Person | PersonTokenCreate:2880,2 }}{% endcapture %}{{ templateLink | CreateShortLink }}
@@ -118,11 +118,11 @@ Quick Notes:
      <tr>
        <td>
     		<div><!--[if mso]>
-    		  <v:roundrect xmlns:v=""urn:schemas-microsoft-com:vml"" xmlns:w=""urn:schemas-microsoft-com:office:word"" href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?rckipid={{ personToken }}"" style=""height:38px;v-text-anchor:middle;width:175px;"" arcsize=""11%"" strokecolor=""#269abc"" fillcolor=""#31b0d5"">
+    		  <v:roundrect xmlns:v=""urn:schemas-microsoft-com:vml"" xmlns:w=""urn:schemas-microsoft-com:office:word"" href=""{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?rckipid={{ personToken }}"" style=""height:38px;v-text-anchor:middle;width:175px;"" arcsize=""11%"" strokecolor=""#269abc"" fillcolor=""#31b0d5"">
     			<w:anchorlock/>
     			<center style=""color:#ffffff;font-family:sans-serif;font-size:14px;font-weight:normal;"">View Care Dashboard</center>
     		  </v:roundrect>
-    		<![endif]--><a href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?rckipid={{ personToken }}""
+    		<![endif]--><a href=""{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?rckipid={{ personToken }}""
     		style=""background-color:#31b0d5;border:1px solid #269abc;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:14px;font-weight:normal;line-height:38px;text-align:center;text-decoration:none;width:175px;-webkit-text-size-adjust:none;mso-hide:all;"">View Care Dashboard</a></div>
 
     	</td>
@@ -132,11 +132,11 @@ Quick Notes:
      <tr>
        <td>
     		<div><!--[if mso]>
-    		  <v:roundrect xmlns:v=""urn:schemas-microsoft-com:vml"" xmlns:w=""urn:schemas-microsoft-com:office:word"" href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote=-1&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}"" style=""height:38px;v-text-anchor:middle;width:175px;"" arcsize=""11%"" strokecolor=""#269abc"" fillcolor=""#31b0d5"">
+    		  <v:roundrect xmlns:v=""urn:schemas-microsoft-com:vml"" xmlns:w=""urn:schemas-microsoft-com:office:word"" href=""{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote=-1&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}"" style=""height:38px;v-text-anchor:middle;width:175px;"" arcsize=""11%"" strokecolor=""#269abc"" fillcolor=""#31b0d5"">
     			<w:anchorlock/>
     			<center style=""color:#ffffff;font-family:sans-serif;font-size:14px;font-weight:normal;"">Take Action</center>
     		  </v:roundrect>
-    		<![endif]--><a href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote=-1&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}""
+    		<![endif]--><a href=""{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote=-1&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}""
     		style=""background-color:#31b0d5;border:1px solid #269abc;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:14px;font-weight:normal;line-height:38px;text-align:center;text-decoration:none;width:175px;-webkit-text-size-adjust:none;mso-hide:all;"">Take Action</a></div>
 
     	</td>
@@ -154,11 +154,11 @@ Quick Notes:
  <tr>
    <td>
 		<div><!--[if mso]>
-		  <v:roundrect xmlns:v=""urn:schemas-microsoft-com:vml"" xmlns:w=""urn:schemas-microsoft-com:office:word"" href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote={{ template.Id }}&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}"" style=""height:38px;v-text-anchor:middle;width:95px;padding-left:5px;padding-right:5px;"" arcsize=""11%"" strokecolor=""#269abc"" fillcolor=""#31b0d5"">
+		  <v:roundrect xmlns:v=""urn:schemas-microsoft-com:vml"" xmlns:w=""urn:schemas-microsoft-com:office:word"" href=""{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote={{ template.Id }}&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}"" style=""height:38px;v-text-anchor:middle;width:95px;padding-left:5px;padding-right:5px;"" arcsize=""11%"" strokecolor=""#269abc"" fillcolor=""#31b0d5"">
 			<w:anchorlock/>
 			<center style=""color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:normal;"">{{ template.Note }}</center>
 		  </v:roundrect>
-		<![endif]--><a href=""{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote={{ template.Id }}&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}""
+		<![endif]--><a href=""{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}?QuickNote={{ template.Id }}&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}""
 		style=""background-color: #31b0d5;border: 1px solid #269abc;border-radius: 4px;color: #ffffff;display: inline-block;font-family: sans-serif;font-size: 13px;font-weight: normal;line-height: 38px;text-align: center;text-decoration: none;width: 95px;-webkit-text-size-adjust: none;mso-hide: all;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;padding-left: 5px;padding-right: 5px;"">{{ template.Note }}</a></div>
 
 	</td>
@@ -171,7 +171,7 @@ Quick Notes:
 {{ 'Global' | Attribute:'EmailFooter' }}
 ", SystemGuid.SystemCommunication.CARE_NEED_TOUCH_NEEDED_WITH_ACTIONS, true, @"Your assigned Care Need requires attention:
 ""{{ CareNeed.Details | Truncate:20,'...' }}""
-{% capture dashboardLink %}{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}{% endcapture -%}{{ dashboardLink }}
+{% capture dashboardLink %}{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}{% endcapture -%}{{ dashboardLink }}
 
 Quick Notes:
 {% for template in NoteTemplates %} {{ template.Note }}: {% capture templateLink %}{{ dashboardLink }}?QuickNote={{ template.Id }}&CareNeed={{ CareNeed.Id }}&rckipid={{ Person | PersonTokenCreate:2880,2 }}{% endcapture %}{{ templateLink | CreateShortLink }}
