@@ -92,12 +92,14 @@ namespace rocks.kfs.StepsToCare.Migrations
  </tr>
 </table>
 {{ 'Global' | Attribute:'EmailFooter' }}
-", SystemGuid.SystemCommunication.CARE_NEED_FOLLOWUP_WITH_ACTIONS, true, @"A Care Need has been flagged for follow up
+", SystemGuid.SystemCommunication.CARE_NEED_FOLLOWUP_WITH_ACTIONS, true, @"{% assign noteTemplateSize = NoteTemplates | Size | Plus:1 %}{% assign personToken = Person | PersonTokenCreate:2880,noteTemplateSize -%}
+A Care Need has been flagged for follow up
 ""{{ CareNeed.Details | Truncate:20,'...' }}""
-{% capture dashboardLink %}{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}{% endcapture -%}{{ dashboardLink }}
+{% capture dashboardLink %}{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}{% endcapture -%}
+{% capture genericLink %}{{ dashboardLink }}?QuickNote=-1&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}{% endcapture %}{{ genericLink | CreateShortLink }}
 
 Quick Notes:
-{% for template in NoteTemplates %} {{ template.Note }}: {% capture templateLink %}{{ dashboardLink }}?QuickNote={{ template.Id }}&CareNeed={{ CareNeed.Id }}&rckipid={{ Person | PersonTokenCreate:2880,2 }}{% endcapture %}{{ templateLink | CreateShortLink }}
+{% for template in NoteTemplates %} {{ template.Note }}: {% capture templateLink %}{{ dashboardLink }}?QuickNote={{ template.Id }}&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}{% endcapture %}{{ templateLink | CreateShortLink }}
 {% endfor %}" );
 
             RockMigrationHelper.UpdateSystemCommunication( "Plugins", "Care Touch Needed with Actions", "", "", "", "", "", "Your assigned Care Need requires attention", @"{{ 'Global' | Attribute:'EmailHeader' }}
@@ -169,12 +171,14 @@ Quick Notes:
  </tr>
 </table>
 {{ 'Global' | Attribute:'EmailFooter' }}
-", SystemGuid.SystemCommunication.CARE_NEED_TOUCH_NEEDED_WITH_ACTIONS, true, @"Your assigned Care Need requires attention:
+", SystemGuid.SystemCommunication.CARE_NEED_TOUCH_NEEDED_WITH_ACTIONS, true, @"{% assign noteTemplateSize = NoteTemplates | Size | Plus:1 %}{% assign personToken = Person | PersonTokenCreate:2880,noteTemplateSize -%}
+Your assigned Care Need requires attention:
 ""{{ CareNeed.Details | Truncate:20,'...' }}""
-{% capture dashboardLink %}{{ 'Global' | Attribute:'InternalApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}{% endcapture -%}{{ dashboardLink }}
+{% capture dashboardLink %}{{ 'Global' | Attribute:'PublicApplicationRoot' | ReplaceLast:'/','' }}{{ LinkedPages.CareDashboard }}{% endcapture -%}
+{%- capture genericLink -%}{{ dashboardLink }}?QuickNote=-1&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}{% endcapture %}{{ genericLink | CreateShortLink }}
 
 Quick Notes:
-{% for template in NoteTemplates %} {{ template.Note }}: {% capture templateLink %}{{ dashboardLink }}?QuickNote={{ template.Id }}&CareNeed={{ CareNeed.Id }}&rckipid={{ Person | PersonTokenCreate:2880,2 }}{% endcapture %}{{ templateLink | CreateShortLink }}
+{% for template in NoteTemplates %} {{ template.Note }}: {% capture templateLink %}{{ dashboardLink }}?QuickNote={{ template.Id }}&CareNeed={{ CareNeed.Id }}&rckipid={{ personToken }}{% endcapture %}{{ templateLink | CreateShortLink }}
 {% endfor %}" );
 
             RockMigrationHelper.UpdateSystemCommunication( "Plugins", "Outstanding Care Needs", "", "", "", "", "", "Outstanding Care Needs", @"{{ 'Global' | Attribute:'EmailHeader' }}
