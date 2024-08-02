@@ -417,7 +417,7 @@ namespace rocks.kfs.StepsToCare
                                 careAssignee.CareNeed = careNeed;
                                 careAssignee.PersonAliasId = member.Person.PrimaryAliasId;
                                 careAssignee.Type = AssignedType.GroupRole;
-                                careAssignee.TypeQualifier = $"{member.GroupRoleId}^{member.GroupTypeId}^{member.Group.GroupType.Name} > {member.GroupRole.Name}";
+                                careAssignee.TypeQualifier = $"{member.GroupRoleId}^{member.GroupTypeId}^{member.Group.GroupType.Name} > {member.GroupRole.Name}^{member.Group.Id}^{member.Group.GroupType.Name} > {member.Group.Name} > {member.GroupRole.Name}";
                                 careAssignee.FollowUpWorker = false;
 
                                 assignedPeople.Add( careAssignee );
