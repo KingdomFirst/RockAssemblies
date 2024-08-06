@@ -27,5 +27,10 @@ namespace rocks.kfs.StepsToCare.Model
         public bool NotifyAll { get; set; }
         public bool Recurring { get; set; }
         public int Order { get; set; } = 0;
+
+        public override string ToString()
+        {
+            return NoteTemplate.Note;
+        }
     }
 }
