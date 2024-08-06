@@ -211,11 +211,13 @@ namespace rocks.kfs.StepsToCare.Jobs
                 var beginDateTime = lastStartDateTime ?? JobStartDateTime.AddDays( -1 );
                 //beginDateTime = JobStartDateTime.AddDays( -3 );
 
-                var detailPage = PageCache.Get( dataMap.GetString( AttributeKey.CareDetailPage ) );
-                var detailPageRoute = detailPage.PageRoutes.FirstOrDefault();
+                var detailPageParts = dataMap.GetString( AttributeKey.CareDetailPage ).SplitDelimitedValues( "," );
+                var detailPage = PageCache.Get( detailPageParts[0] );
+                var detailPageRoute = detailPage?.PageRoutes.FirstOrDefault( r => detailPageParts.Length == 1 || ( detailPageParts.Length > 1 && r.Guid == detailPageParts[1].AsGuid() ) );
                 var detailPagePath = detailPageRoute != null ? "/" + detailPageRoute.Route : "/page/" + detailPage.Id;
-                var dashboardPage = PageCache.Get( dataMap.GetString( AttributeKey.CareDashboardPage ) );
-                var dashboardPageRoute = dashboardPage.PageRoutes.FirstOrDefault();
+                var dashboardPageParts = dataMap.GetString( AttributeKey.CareDashboardPage ).SplitDelimitedValues( "," );
+                var dashboardPage = PageCache.Get( dashboardPageParts[0] );
+                var dashboardPageRoute = dashboardPage?.PageRoutes.FirstOrDefault( r => dashboardPageParts.Length == 1 || ( dashboardPageParts.Length > 1 && r.Guid == dashboardPageParts[1].AsGuid() ) );
                 var dashboardPagePath = dashboardPageRoute != null ? "/" + dashboardPageRoute.Route : "/page/" + dashboardPage.Id;
 
                 AssignWorkersToNeeds( rockContext, beginDateTime, dataMap, detailPagePath, dashboardPagePath );
@@ -266,7 +268,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                                     touchTemplates.Add( touchTemplate );
                                 }
                             }
-                            allTouchTemplates.AddOrIgnore( needCategory.Id, touchTemplates );
+                            allTouchTemplates.AddOrReplace( needCategory.Id, touchTemplates );
                         }
                     }
                 }
@@ -277,7 +279,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                     .Where( n =>
                         ( !n.CustomFollowUp && n.StatusValueId == openValueId && n.DateEntered <= DbFunctions.AddDays( RockDateTime.Now, -followUpDays ) )
                         ||
-                        ( n.CustomFollowUp && ( n.StatusValueId == openValueId || n.StatusValueId == snoozedValueId ) && ( n.RenewMaxCount == null || n.RenewCurrentCount <= n.RenewMaxCount )
+                        ( ( n.StatusValueId == openValueId || n.StatusValueId == snoozedValueId ) && ( n.RenewMaxCount == null || n.RenewCurrentCount <= n.RenewMaxCount )
                             && (
                                 ( n.SnoozeDate == null && n.DateEntered <= DbFunctions.AddDays( RockDateTime.Now, -n.RenewPeriodDays ) )
                                 ||
@@ -353,7 +355,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                 {
                     careNeed.StatusValueId = followUpValue.Id;
                     careNeed.FollowUpDate = RockDateTime.Now;
-                    if ( careNeed.CustomFollowUp )
+                    if ( careNeed.CustomFollowUp || careNeed.SnoozeDate.HasValue )
                     {
                         careNeed.RenewCurrentCount++;
                     }

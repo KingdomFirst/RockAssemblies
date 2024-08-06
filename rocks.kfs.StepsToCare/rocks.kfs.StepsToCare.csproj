@@ -82,6 +82,7 @@
     <Compile Include="Field\Types\CareNeedFieldType.cs" />
     <Compile Include="Field\Types\NoteTemplateFieldType.cs" />
     <Compile Include="Jobs\CareNeedAutomatedProcesses.cs" />
+    <Compile Include="Migrations\022_UpdateCommunications.cs" />
     <Compile Include="Migrations\021_DefaultValue.cs" />
     <Compile Include="Migrations\020_NewCommunications.cs" />
     <Compile Include="Migrations\019_AddFieldTypeAndAttributeMatrix.cs" />
