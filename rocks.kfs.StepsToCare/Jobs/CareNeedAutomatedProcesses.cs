@@ -309,13 +309,13 @@ namespace rocks.kfs.StepsToCare.Jobs
                         foreach ( var template in catTemplate.Value )
                         {
                             var currentFlaggedTemplatesQry = careNeedsInCategory
-                                .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && ( ( n.Text == template.NoteTemplate.Note && template.Recurring && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ) || DbFunctions.DiffHours( cn.DateEntered, RockDateTime.Now ) >= template.MinimumCareTouchHours ) ),
+                                .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && ( ( ( n.Text == template.NoteTemplate.Note || n.ForeignGuid == template.NoteTemplate.Guid ) && template.Recurring && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ) || DbFunctions.DiffHours( cn.DateEntered, RockDateTime.Now ) >= template.MinimumCareTouchHours ) ),
                                     ( cn, n ) => new FlaggedNeed
                                     {
                                         CareNeed = cn,
                                         Note = n,
-                                        HasNoteOlderThanHours = ( n.Text == template.NoteTemplate.Note && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ),
-                                        NoteTouchCount = careNeedNotesQry.Count( note => note.EntityId == cn.Id && ( note.Text == template.NoteTemplate.Note && ( !template.Recurring || ( template.Recurring && DbFunctions.DiffHours( note.CreatedDateTime, RockDateTime.Now ) <= template.MinimumCareTouchHours ) ) ) ),
+                                        HasNoteOlderThanHours = ( ( n.Text == template.NoteTemplate.Note || n.ForeignGuid == template.NoteTemplate.Guid ) && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ),
+                                        NoteTouchCount = careNeedNotesQry.Count( note => note.EntityId == cn.Id && ( ( note.Text == template.NoteTemplate.Note || note.ForeignGuid == template.NoteTemplate.Guid ) && ( !template.Recurring || ( template.Recurring && DbFunctions.DiffHours( note.CreatedDateTime, RockDateTime.Now ) <= template.MinimumCareTouchHours ) ) ) ),
                                         TouchCount = careNeedNotesQry.Where( note => note.EntityId == cn.Id && n.Caption != "Action" ).Count()
                                     } )
                                 .Where( f => f.NoteTouchCount < template.MinimumCareTouches );
