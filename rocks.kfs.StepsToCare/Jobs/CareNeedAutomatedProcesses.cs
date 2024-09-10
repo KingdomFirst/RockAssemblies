@@ -298,7 +298,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                         HasFollowUpWorkerNote = n != null,
                         TouchCount = careNeedNotesQry.Where( note => note.EntityId == cn.Id && n.Caption != "Action" ).Count()
                     } )
-                    .Where( f => !f.HasFollowUpWorkerNote || f.TouchCount <= minimumCareTouches )
+                    .Where( f => !f.HasFollowUpWorkerNote || f.TouchCount < minimumCareTouches )
                     .ToList();
 
                 if ( allTouchTemplates.Count() > 0 )
