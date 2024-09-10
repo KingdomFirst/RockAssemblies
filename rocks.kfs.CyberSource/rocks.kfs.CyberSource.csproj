@@ -88,6 +88,10 @@
     <Reference Include="Rock.Common">
       <HintPath>..\..\RockWeb\Bin\Rock.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Rock.Enums, Version=1.16.3.4, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\Rock.Enums.dll</HintPath>
+    </Reference>
     <Reference Include="Rock.Lava.Shared">
       <HintPath>..\..\RockWeb\Bin\Rock.Lava.Shared.dll</HintPath>
     </Reference>
