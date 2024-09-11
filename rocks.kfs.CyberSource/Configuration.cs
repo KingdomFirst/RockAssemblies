@@ -33,8 +33,9 @@ namespace rocks.kfs.CyberSource
 {
     public class Configuration
     {
-        // initialize dictionary object
         private readonly Dictionary<string, string> _configurationDictionary = new Dictionary<string, string>();
+
+        private static CyberSourceSDK.Client.Configuration _clientConfig;
 
         public Dictionary<string, string> GetConfiguration( FinancialGateway cyberSourceGateway )
         {
@@ -58,6 +59,17 @@ namespace rocks.kfs.CyberSource
             _configurationDictionary.Add( "proxyPort", string.Empty );
 
             return _configurationDictionary;
+        }
+
+        public static CyberSourceSDK.Client.Configuration GetClientConfig( FinancialGateway gateway )
+        {
+            if ( _clientConfig == null )
+            {
+                var configDictionary = new Configuration().GetConfiguration( gateway );
+                _clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            }
+
+            return _clientConfig;
         }
 
         public static string GetMicroFormJWK( FinancialGateway gateway, out string microformJWK )
@@ -92,8 +104,7 @@ namespace rocks.kfs.CyberSource
 
             try
             {
-                var configDictionary = new Configuration().GetConfiguration( gateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+                var clientConfig = GetClientConfig( gateway );
 
                 var apiInstance = new MicroformIntegrationApi( clientConfig );
                 String result = apiInstance.GenerateCaptureContext( requestObj );

@@ -344,8 +344,7 @@ namespace rocks.kfs.CyberSource
             PtsV2PaymentsPost201Response chargeResult = null;
             try
             {
-                var configDictionary = new Configuration().GetConfiguration( financialGateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+                var clientConfig = Configuration.GetClientConfig( financialGateway );
 
                 var apiInstance = new PaymentsApi( clientConfig );
                 chargeResult = apiInstance.CreatePayment( requestObj );
@@ -450,8 +449,7 @@ namespace rocks.kfs.CyberSource
             PtsV2PaymentsRefundPost201Response refundResponse = null;
             PtsV2PaymentsReversalsPost201Response reversalResponse = null;
             TssV2TransactionsGet200Response transactionDetail = GetTransactionDetailResponse( financialGateway, origTransaction.TransactionCode );
-            var configDictionary = new Configuration().GetConfiguration( financialGateway );
-            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            var clientConfig = Configuration.GetClientConfig( financialGateway );
             if ( transactionDetail != null && transactionDetail.ApplicationInformation != null )
             {
                 applications.AddRange( transactionDetail.ApplicationInformation.Applications );
@@ -582,8 +580,7 @@ namespace rocks.kfs.CyberSource
             string subscriptionId = "";
             string subscriptionDescription = $"{referencedPaymentInfo.Description} - Subscription Ref: {descriptionGuid}";
 
-            var configDictionary = new Configuration().GetConfiguration( financialGateway );
-            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            var clientConfig = Configuration.GetClientConfig( financialGateway );
 
             try
             {
@@ -812,8 +809,7 @@ namespace rocks.kfs.CyberSource
 
             var transactionFrequencyGuid = DefinedValueCache.Get( scheduledTransaction.TransactionFrequencyValueId ).Guid;
 
-            var configDictionary = new Configuration().GetConfiguration( scheduledTransaction.FinancialGateway );
-            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            var clientConfig = Configuration.GetClientConfig( scheduledTransaction.FinancialGateway );
 
             GetSubscriptionResponse subscriptionStatusResult = null;
             DateTime? nextPaymentDate = RockDateTime.Now;
@@ -1048,8 +1044,7 @@ namespace rocks.kfs.CyberSource
         {
             var subscriptionId = transaction.GatewayScheduleId;
 
-            var configDictionary = new Configuration().GetConfiguration( transaction.FinancialGateway );
-            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            var clientConfig = Configuration.GetClientConfig( transaction.FinancialGateway );
 
             var apiInstance = new SubscriptionsApi( clientConfig );
 
@@ -1100,8 +1095,7 @@ namespace rocks.kfs.CyberSource
             GetSubscriptionResponse subscriptionResponse = null;
             try
             {
-                var configDictionary = new Configuration().GetConfiguration( financialGateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+                var clientConfig = Configuration.GetClientConfig( financialGateway );
 
                 apiInstance = new SubscriptionsApi( clientConfig );
                 subscriptionResponse = apiInstance.GetSubscription( subscriptionId );
@@ -1172,8 +1166,7 @@ namespace rocks.kfs.CyberSource
                 Limit: limit,
                 Sort: sort
             );
-            var configDictionary = new Configuration().GetConfiguration( gateway );
-            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            var clientConfig = Configuration.GetClientConfig( gateway );
             var allSubscriptions = new List<GetAllSubscriptionsResponseSubscriptions>();
 
             TssV2TransactionsPost201Response searchResult = null;
@@ -1456,8 +1449,7 @@ namespace rocks.kfs.CyberSource
             PtsV2PaymentsPost201Response tokenResult = null;
             try
             {
-                var configDictionary = new Configuration().GetConfiguration( financialGateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+                var clientConfig = Configuration.GetClientConfig( financialGateway );
 
                 var apiInstance = new PaymentsApi( clientConfig );
                 tokenResult = apiInstance.CreatePayment( requestObj );
@@ -1573,8 +1565,7 @@ namespace rocks.kfs.CyberSource
         {
             try
             {
-                var configDictionary = new Configuration().GetConfiguration( financialGateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+                var clientConfig = Configuration.GetClientConfig( financialGateway );
 
                 var apiInstance = new TransactionDetailsApi( clientConfig );
                 var result = apiInstance.GetTransaction( id );
