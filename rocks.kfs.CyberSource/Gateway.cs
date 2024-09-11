@@ -37,6 +37,7 @@ using CyberSource.Model;
 using rocks.kfs.CyberSource.Controls;
 using static rocks.kfs.CyberSource.CyberSourceTypes;
 using CyberSourceSDK = CyberSource;
+using rocks.kfs.CyberSource.Model;
 
 namespace rocks.kfs.CyberSource
 {
@@ -111,7 +112,7 @@ namespace rocks.kfs.CyberSource
     /// <summary>
     /// CyberSource Payment Gateway
     /// </summary>
-    public class Gateway : GatewayComponent, IHostedGatewayComponent
+    public class Gateway : GatewayComponent, IHostedGatewayComponent, IObsidianHostedGatewayComponent
     {
         private static readonly string DemoUrl = "apitest.cybersource.com";
         private static readonly string ProductionUrl = "api.cybersource.com";
@@ -1515,6 +1516,51 @@ namespace rocks.kfs.CyberSource
 
         #endregion
 
+        #region IObsidianFinancialGateway
+
+        /// <inheritdoc/>
+        public string GetObsidianControlFileUrl( FinancialGateway financialGateway )
+        {
+            return "/Plugins/rocks_kfs/Obsidian/Controls/cyberSourceGatewayControl.obs.js";
+        }
+
+        /// <inheritdoc/>
+        public object GetObsidianControlSettings( FinancialGateway financialGateway, HostedPaymentInfoControlOptions options )
+        {
+            var microFormJWK = "";
+            var microFormJsPath = Configuration.GetMicroFormJWK( financialGateway, out microFormJWK );
+
+            return new
+            {
+                gatewayUrl = GetGatewayUrl( financialGateway ),
+                microFormJsPath,
+                microFormJWK
+            };
+        }
+
+        /// <inheritdoc/>
+        public bool TryGetPaymentTokenFromParameters( FinancialGateway financialGateway, IDictionary<string, string> parameters, out string paymentToken )
+        {
+            paymentToken = null;
+
+            return false;
+        }
+
+        /// <inheritdoc/>
+        public bool IsPaymentTokenCharged( FinancialGateway financialGateway, string paymentToken )
+        {
+            return false;
+        }
+
+        /// <inheritdoc/>
+        public FinancialTransaction FetchPaymentTokenTransaction( RockContext rockContext, FinancialGateway financialGateway, int? fundId, string paymentToken )
+        {
+            // This method is not required in our implementation.
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
         #region Private Helpers
 
         /// <summary>
@@ -1908,7 +1954,6 @@ namespace rocks.kfs.CyberSource
 
             return financialPaymentDetail;
         }
-
         #endregion Private Helpers
 
         #region Static Helpers

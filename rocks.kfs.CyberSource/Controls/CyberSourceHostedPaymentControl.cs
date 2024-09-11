@@ -15,24 +15,14 @@
 // </copyright>
 //
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
 using Rock;
 using Rock.Model;
-using Rock.Web.Cache;
 using Rock.Web.UI;
 using Rock.Web.UI.Controls;
-
-using CyberSource.Api;
-using CyberSource.Model;
-using CyberSourceSDK = CyberSource;
-
-using rocks.kfs.CyberSource.Model;
 
 namespace rocks.kfs.CyberSource.Controls
 {
@@ -243,68 +233,11 @@ namespace rocks.kfs.CyberSource.Controls
 
         private void InitializeCyberSourceAPI()
         {
-            List<String> targetOrigins = new List<String>()
-            {
-                GlobalAttributesCache.Get().GetValue( "PublicApplicationRoot" ).ReplaceIfEndsWith("/",""),
-                GlobalAttributesCache.Get().GetValue( "InternalApplicationRoot" ).ReplaceIfEndsWith("/","")
-            };
+            var microFormJsPath = "https://flex.cybersource.com/microform/bundle/v2/flex-microform.min.js";
 
-            List<String> allowedCardNetworks = new List<String>()
-            {
-                "VISA",
-                "MAESTRO",
-                "MASTERCARD",
-                "AMEX",
-                "DISCOVER",
-                "DINERSCLUB",
-                "JCB",
-                "CUP",
-                "CARTESBANCAIRES",
-                "CARNET"
-            };
+            microFormJsPath = Configuration.GetMicroFormJWK( CyberSourceGateway, out microformJWK );
 
-            string clientVersion = "v2.0";
-
-            var requestObj = new GenerateCaptureContextRequest(
-                TargetOrigins: targetOrigins,
-                AllowedCardNetworks: allowedCardNetworks,
-                ClientVersion: clientVersion
-            );
-
-            try
-            {
-                var configDictionary = new Configuration().GetConfiguration( _cyberSourceGateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
-
-                var apiInstance = new MicroformIntegrationApi( clientConfig );
-                String result = apiInstance.GenerateCaptureContext( requestObj );
-                microformJWK = result;
-
-                var microFormJsPath = "https://flex.cybersource.com/microform/bundle/v2/flex-microform.min.js";
-
-                try
-                {
-                    var splitResult = result.Split( '.' );
-                    var parseJwtResponse = Base64UrlDecode( splitResult[1] );
-                    var parseToObject = parseJwtResponse.FromJsonOrNull<FlexCaptureContextPayload>();
-
-                    if ( parseToObject != null && parseToObject.ctx?.FirstOrDefault().data != null )
-                    {
-                        microFormJsPath = parseToObject.ctx.FirstOrDefault().data.clientLibrary;
-                    }
-                }
-                catch ( Exception ex )
-                {
-                    ExceptionLogService.LogException( ex );
-
-                }
-                RockPage.AddScriptSrcToHead( this.Page, "MicroformJSV2", microFormJsPath );
-            }
-            catch ( Exception e )
-            {
-                ExceptionLogService.LogException( "Exception on calling the CyberSource API : " + e.Message );
-                throw e;
-            }
+            RockPage.AddScriptSrcToHead( this.Page, "MicroformJSV2", microFormJsPath );
         }
 
         /// <summary>
@@ -495,21 +428,6 @@ namespace rocks.kfs.CyberSource.Controls
 @"<span class='js-validation-message'></span>";
             _divValidationMessage.Style[HtmlTextWriterStyle.Display] = "none";
             this.Controls.Add( _divValidationMessage );
-        }
-
-        public static string Base64UrlDecode( string text )
-        {
-            text = text.Replace( '_', '/' ).Replace( '-', '+' );
-            switch ( text.Length % 4 )
-            {
-                case 2:
-                    text += "==";
-                    break;
-                case 3:
-                    text += "=";
-                    break;
-            }
-            return Encoding.UTF8.GetString( Convert.FromBase64String( text ) );
         }
     }
 }

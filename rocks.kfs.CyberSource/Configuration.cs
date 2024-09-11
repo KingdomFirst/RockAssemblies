@@ -14,9 +14,20 @@
 // limitations under the License.
 // </copyright>
 //
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
 using Rock;
 using Rock.Model;
+using Rock.Web.Cache;
+
+using CyberSource.Api;
+using CyberSource.Model;
+using CyberSourceSDK = CyberSource;
+
+using rocks.kfs.CyberSource.Model;
 
 namespace rocks.kfs.CyberSource
 {
@@ -47,6 +58,87 @@ namespace rocks.kfs.CyberSource
             _configurationDictionary.Add( "proxyPort", string.Empty );
 
             return _configurationDictionary;
+        }
+
+        public static string GetMicroFormJWK( FinancialGateway gateway, out string microformJWK )
+        {
+            List<String> targetOrigins = new List<String>()
+            {
+                GlobalAttributesCache.Get().GetValue( "PublicApplicationRoot" ).ReplaceIfEndsWith("/",""),
+                GlobalAttributesCache.Get().GetValue( "InternalApplicationRoot" ).ReplaceIfEndsWith("/","")
+            };
+
+            List<String> allowedCardNetworks = new List<String>()
+            {
+                "VISA",
+                "MAESTRO",
+                "MASTERCARD",
+                "AMEX",
+                "DISCOVER",
+                "DINERSCLUB",
+                "JCB",
+                "CUP",
+                "CARTESBANCAIRES",
+                "CARNET"
+            };
+
+            string clientVersion = "v2.0";
+
+            var requestObj = new GenerateCaptureContextRequest(
+                TargetOrigins: targetOrigins,
+                AllowedCardNetworks: allowedCardNetworks,
+                ClientVersion: clientVersion
+            );
+
+            try
+            {
+                var configDictionary = new Configuration().GetConfiguration( gateway );
+                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+
+                var apiInstance = new MicroformIntegrationApi( clientConfig );
+                String result = apiInstance.GenerateCaptureContext( requestObj );
+                microformJWK = result;
+
+                var microFormJsPath = "https://flex.cybersource.com/microform/bundle/v2/flex-microform.min.js";
+
+                try
+                {
+                    var splitResult = result.Split( '.' );
+                    var parseJwtResponse = Base64UrlDecode( splitResult[1] );
+                    var parseToObject = parseJwtResponse.FromJsonOrNull<FlexCaptureContextPayload>();
+
+                    if ( parseToObject != null && parseToObject.ctx?.FirstOrDefault().data != null )
+                    {
+                        microFormJsPath = parseToObject.ctx.FirstOrDefault().data.clientLibrary;
+                    }
+                }
+                catch ( Exception ex )
+                {
+                    ExceptionLogService.LogException( ex );
+
+                }
+                return microFormJsPath;
+            }
+            catch ( Exception e )
+            {
+                ExceptionLogService.LogException( "Exception on calling the CyberSource API : " + e.Message );
+                throw e;
+            }
+        }
+
+        public static string Base64UrlDecode( string text )
+        {
+            text = text.Replace( '_', '/' ).Replace( '-', '+' );
+            switch ( text.Length % 4 )
+            {
+                case 2:
+                    text += "==";
+                    break;
+                case 3:
+                    text += "=";
+                    break;
+            }
+            return Encoding.UTF8.GetString( Convert.FromBase64String( text ) );
         }
     }
 }
