@@ -57,13 +57,14 @@ namespace rocks.kfs.CyberSource
             _configurationDictionary.Add( "timeout", "10000" );
             _configurationDictionary.Add( "proxyAddress", string.Empty );
             _configurationDictionary.Add( "proxyPort", string.Empty );
+            _configurationDictionary.Add( "rockGatewayGuid", cyberSourceGateway.Guid.ToString() );
 
             return _configurationDictionary;
         }
 
         public static CyberSourceSDK.Client.Configuration GetClientConfig( FinancialGateway gateway )
         {
-            if ( _clientConfig == null )
+            if ( _clientConfig == null || !_clientConfig.MerchantConfigDictionaryObj.Contains( new KeyValuePair<string, string>( "rockGatewayGuid", gateway.Guid.ToString() ) ) )
             {
                 var configDictionary = new Configuration().GetConfiguration( gateway );
                 _clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );

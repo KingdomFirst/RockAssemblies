@@ -150,6 +150,7 @@ namespace rocks.kfs.CyberSource
         [System.Diagnostics.DebuggerStepThrough]
         public static string GetGatewayUrl( FinancialGateway financialGateway )
         {
+            financialGateway.LoadAttributes();
             bool testMode = financialGateway.GetAttributeValue( AttributeKey.Mode ).Equals( "Test" );
             if ( testMode )
             {
@@ -1415,15 +1416,19 @@ namespace rocks.kfs.CyberSource
             Ptsv2paymentsOrderInformationBillTo orderInformationBillTo = new Ptsv2paymentsOrderInformationBillTo(
                 FirstName: paymentInfo.FirstName,
                 LastName: paymentInfo.LastName.IsNullOrWhiteSpace() ? paymentInfo.BusinessName : paymentInfo.LastName,
-                Address1: paymentInfo.Street1,
-                Address2: paymentInfo.Street2,
-                Locality: paymentInfo.City,
-                AdministrativeArea: paymentInfo.State,
-                PostalCode: paymentInfo.PostalCode,
-                Country: paymentInfo.Country,
                 Email: paymentInfo.Email ?? "update@invalid.email",
                 PhoneNumber: paymentInfo.Phone
             );
+
+            if ( paymentInfo.Street1.IsNotNullOrWhiteSpace() && paymentInfo.City.IsNotNullOrWhiteSpace() && paymentInfo.State.IsNotNullOrWhiteSpace() && paymentInfo.PostalCode.IsNotNullOrWhiteSpace() )
+            {
+                orderInformationBillTo.Address1 = paymentInfo.Street1;
+                orderInformationBillTo.Address2 = paymentInfo.Street2;
+                orderInformationBillTo.Locality = paymentInfo.City;
+                orderInformationBillTo.AdministrativeArea = paymentInfo.State;
+                orderInformationBillTo.PostalCode = paymentInfo.PostalCode;
+                orderInformationBillTo.Country = paymentInfo.Country;
+            }
 
             Ptsv2paymentsOrderInformation orderInformation = new Ptsv2paymentsOrderInformation(
                 AmountDetails: orderInformationAmountDetails,
