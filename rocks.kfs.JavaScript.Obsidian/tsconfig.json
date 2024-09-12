@@ -15,7 +15,7 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "esModuleInterop": true,
-    "strict": true,
+    "strict": false,
     "importHelpers": true,
     "jsx": "preserve",
     "lib": [
