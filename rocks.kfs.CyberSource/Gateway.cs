@@ -37,6 +37,7 @@ using CyberSource.Model;
 using rocks.kfs.CyberSource.Controls;
 using static rocks.kfs.CyberSource.CyberSourceTypes;
 using CyberSourceSDK = CyberSource;
+using rocks.kfs.CyberSource.Model;
 
 namespace rocks.kfs.CyberSource
 {
@@ -111,7 +112,7 @@ namespace rocks.kfs.CyberSource
     /// <summary>
     /// CyberSource Payment Gateway
     /// </summary>
-    public class Gateway : GatewayComponent, IHostedGatewayComponent
+    public class Gateway : GatewayComponent, IHostedGatewayComponent, IObsidianHostedGatewayComponent
     {
         private static readonly string DemoUrl = "apitest.cybersource.com";
         private static readonly string ProductionUrl = "api.cybersource.com";
@@ -149,6 +150,7 @@ namespace rocks.kfs.CyberSource
         [System.Diagnostics.DebuggerStepThrough]
         public static string GetGatewayUrl( FinancialGateway financialGateway )
         {
+            financialGateway.LoadAttributes();
             bool testMode = financialGateway.GetAttributeValue( AttributeKey.Mode ).Equals( "Test" );
             if ( testMode )
             {
@@ -343,8 +345,7 @@ namespace rocks.kfs.CyberSource
             PtsV2PaymentsPost201Response chargeResult = null;
             try
             {
-                var configDictionary = new Configuration().GetConfiguration( financialGateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+                var clientConfig = Configuration.GetClientConfig( financialGateway );
 
                 var apiInstance = new PaymentsApi( clientConfig );
                 chargeResult = apiInstance.CreatePayment( requestObj );
@@ -449,8 +450,7 @@ namespace rocks.kfs.CyberSource
             PtsV2PaymentsRefundPost201Response refundResponse = null;
             PtsV2PaymentsReversalsPost201Response reversalResponse = null;
             TssV2TransactionsGet200Response transactionDetail = GetTransactionDetailResponse( financialGateway, origTransaction.TransactionCode );
-            var configDictionary = new Configuration().GetConfiguration( financialGateway );
-            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            var clientConfig = Configuration.GetClientConfig( financialGateway );
             if ( transactionDetail != null && transactionDetail.ApplicationInformation != null )
             {
                 applications.AddRange( transactionDetail.ApplicationInformation.Applications );
@@ -581,8 +581,7 @@ namespace rocks.kfs.CyberSource
             string subscriptionId = "";
             string subscriptionDescription = $"{referencedPaymentInfo.Description} - Subscription Ref: {descriptionGuid}";
 
-            var configDictionary = new Configuration().GetConfiguration( financialGateway );
-            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            var clientConfig = Configuration.GetClientConfig( financialGateway );
 
             try
             {
@@ -811,8 +810,7 @@ namespace rocks.kfs.CyberSource
 
             var transactionFrequencyGuid = DefinedValueCache.Get( scheduledTransaction.TransactionFrequencyValueId ).Guid;
 
-            var configDictionary = new Configuration().GetConfiguration( scheduledTransaction.FinancialGateway );
-            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            var clientConfig = Configuration.GetClientConfig( scheduledTransaction.FinancialGateway );
 
             GetSubscriptionResponse subscriptionStatusResult = null;
             DateTime? nextPaymentDate = RockDateTime.Now;
@@ -1047,8 +1045,7 @@ namespace rocks.kfs.CyberSource
         {
             var subscriptionId = transaction.GatewayScheduleId;
 
-            var configDictionary = new Configuration().GetConfiguration( transaction.FinancialGateway );
-            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            var clientConfig = Configuration.GetClientConfig( transaction.FinancialGateway );
 
             var apiInstance = new SubscriptionsApi( clientConfig );
 
@@ -1099,8 +1096,7 @@ namespace rocks.kfs.CyberSource
             GetSubscriptionResponse subscriptionResponse = null;
             try
             {
-                var configDictionary = new Configuration().GetConfiguration( financialGateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+                var clientConfig = Configuration.GetClientConfig( financialGateway );
 
                 apiInstance = new SubscriptionsApi( clientConfig );
                 subscriptionResponse = apiInstance.GetSubscription( subscriptionId );
@@ -1171,8 +1167,7 @@ namespace rocks.kfs.CyberSource
                 Limit: limit,
                 Sort: sort
             );
-            var configDictionary = new Configuration().GetConfiguration( gateway );
-            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            var clientConfig = Configuration.GetClientConfig( gateway );
             var allSubscriptions = new List<GetAllSubscriptionsResponseSubscriptions>();
 
             TssV2TransactionsPost201Response searchResult = null;
@@ -1421,15 +1416,19 @@ namespace rocks.kfs.CyberSource
             Ptsv2paymentsOrderInformationBillTo orderInformationBillTo = new Ptsv2paymentsOrderInformationBillTo(
                 FirstName: paymentInfo.FirstName,
                 LastName: paymentInfo.LastName.IsNullOrWhiteSpace() ? paymentInfo.BusinessName : paymentInfo.LastName,
-                Address1: paymentInfo.Street1,
-                Address2: paymentInfo.Street2,
-                Locality: paymentInfo.City,
-                AdministrativeArea: paymentInfo.State,
-                PostalCode: paymentInfo.PostalCode,
-                Country: paymentInfo.Country,
                 Email: paymentInfo.Email ?? "update@invalid.email",
                 PhoneNumber: paymentInfo.Phone
             );
+
+            if ( paymentInfo.Street1.IsNotNullOrWhiteSpace() && paymentInfo.City.IsNotNullOrWhiteSpace() && paymentInfo.State.IsNotNullOrWhiteSpace() && paymentInfo.PostalCode.IsNotNullOrWhiteSpace() )
+            {
+                orderInformationBillTo.Address1 = paymentInfo.Street1;
+                orderInformationBillTo.Address2 = paymentInfo.Street2;
+                orderInformationBillTo.Locality = paymentInfo.City;
+                orderInformationBillTo.AdministrativeArea = paymentInfo.State;
+                orderInformationBillTo.PostalCode = paymentInfo.PostalCode;
+                orderInformationBillTo.Country = paymentInfo.Country;
+            }
 
             Ptsv2paymentsOrderInformation orderInformation = new Ptsv2paymentsOrderInformation(
                 AmountDetails: orderInformationAmountDetails,
@@ -1455,8 +1454,7 @@ namespace rocks.kfs.CyberSource
             PtsV2PaymentsPost201Response tokenResult = null;
             try
             {
-                var configDictionary = new Configuration().GetConfiguration( financialGateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+                var clientConfig = Configuration.GetClientConfig( financialGateway );
 
                 var apiInstance = new PaymentsApi( clientConfig );
                 tokenResult = apiInstance.CreatePayment( requestObj );
@@ -1515,6 +1513,51 @@ namespace rocks.kfs.CyberSource
 
         #endregion
 
+        #region IObsidianFinancialGateway
+
+        /// <inheritdoc/>
+        public string GetObsidianControlFileUrl( FinancialGateway financialGateway )
+        {
+            return "/Plugins/rocks_kfs/Obsidian/Controls/cyberSourceGatewayControl.obs.js";
+        }
+
+        /// <inheritdoc/>
+        public object GetObsidianControlSettings( FinancialGateway financialGateway, HostedPaymentInfoControlOptions options )
+        {
+            var microFormJWK = "";
+            var microFormJsPath = Configuration.GetMicroFormJWK( financialGateway, out microFormJWK );
+
+            return new
+            {
+                gatewayUrl = GetGatewayUrl( financialGateway ),
+                microFormJsPath,
+                microFormJWK
+            };
+        }
+
+        /// <inheritdoc/>
+        public bool TryGetPaymentTokenFromParameters( FinancialGateway financialGateway, IDictionary<string, string> parameters, out string paymentToken )
+        {
+            paymentToken = null;
+
+            return false;
+        }
+
+        /// <inheritdoc/>
+        public bool IsPaymentTokenCharged( FinancialGateway financialGateway, string paymentToken )
+        {
+            return false;
+        }
+
+        /// <inheritdoc/>
+        public FinancialTransaction FetchPaymentTokenTransaction( RockContext rockContext, FinancialGateway financialGateway, int? fundId, string paymentToken )
+        {
+            // This method is not required in our implementation.
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
         #region Private Helpers
 
         /// <summary>
@@ -1527,8 +1570,7 @@ namespace rocks.kfs.CyberSource
         {
             try
             {
-                var configDictionary = new Configuration().GetConfiguration( financialGateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+                var clientConfig = Configuration.GetClientConfig( financialGateway );
 
                 var apiInstance = new TransactionDetailsApi( clientConfig );
                 var result = apiInstance.GetTransaction( id );
@@ -1908,7 +1950,6 @@ namespace rocks.kfs.CyberSource
 
             return financialPaymentDetail;
         }
-
         #endregion Private Helpers
 
         #region Static Helpers
