@@ -37,7 +37,6 @@ using CyberSource.Model;
 using rocks.kfs.CyberSource.Controls;
 using static rocks.kfs.CyberSource.CyberSourceTypes;
 using CyberSourceSDK = CyberSource;
-using rocks.kfs.CyberSource.Model;
 
 namespace rocks.kfs.CyberSource
 {
