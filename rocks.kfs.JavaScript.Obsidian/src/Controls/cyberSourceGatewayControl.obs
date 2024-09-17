@@ -224,7 +224,7 @@
     const standardStyling = ``;
 
     /**
-     * Ensures the CyberSource Flex Microform script is loaded into the browser.
+     * Ensures the Cybersource Flex Microform script is loaded into the browser.
      *
      * @param microFormJWK The microform jwk key that will be used to initialize the script.
      */
@@ -387,9 +387,9 @@
     }
 
     /**
-     * Translates the CyberSource field name into a user friendly one.
+     * Translates the Cybersource field name into a user friendly one.
      *
-     * @param field The field name as provided by CyberSource.
+     * @param field The field name as provided by Cybersource.
      *
      * @returns A user friendly name for the field.
      */
@@ -427,7 +427,7 @@
          }
      }
 
-     function initCyberSourceMicroFormFields():void {
+     function initCybersourceMicroFormFields():void {
          if (FlexJS?.number == undefined && FlexJS?.securityCode == undefined) {
              FlexJS.number = FlexJS?.microform?.createField('number', { placeholder: '0000 0000 0000 0000' });
              FlexJS.securityCode = FlexJS?.microform?.createField('securityCode');
@@ -461,7 +461,7 @@
          checkCybersourceFieldsLoaded(false);
      };
 
-     function submitCyberSourceMicroFormInfo():void {
+     function submitCybersourceMicroFormInfo():void {
          var options = {
              expirationMonth: ('00'+ccexpvalue.month).slice(-2),
              expirationYear: ccexpvalue.year
@@ -496,7 +496,7 @@
 
     let hasAttemptedSubmit = false;
 
-    /** true if we have received a token back from CyberSource. */
+    /** true if we have received a token back from Cybersource. */
     let hasReceivedToken = false;
 
     const creditCardButtonClasses = ["btn", "btn-default", "active", "payment-creditcard"];
@@ -568,7 +568,7 @@
     }
 
     /**
-     * Callback function that handles the timeout scenario of CyberSource.
+     * Callback function that handles the timeout scenario of Cybersource.
      */
     const timeoutCallback: TimeoutCallback = () => {
         // If we got a timeout after sending the response then ignore the error.
@@ -577,7 +577,7 @@
         }
 
         // A timeout callback will fire due to a timeout or incomplete
-        // input fields (CyberSource doesn't tell us why).
+        // input fields (Cybersource doesn't tell us why).
         console.log("The tokenization didn't respond in the expected timeframe. This could be due to an invalid or incomplete field or poor connectivity - " + Date());
 
         // Since we don't know exactly what happened, lets see if it might
@@ -645,7 +645,7 @@
 
             hasAttemptedSubmit = true;
             //if (validationErrors.length === 0) {
-                submitCyberSourceMicroFormInfo();
+                submitCybersourceMicroFormInfo();
             //}
             //else {
             //    emit(GatewayEmitStrings.Validation, validationErrors);
@@ -654,7 +654,7 @@
     });
 
     // Additional processing once our template has been processed and mounted
-    // into the DOM. Initialize the CollectJS fields.
+    // into the DOM. Initialize the Cybersource Microform fields.
     onMounted(async () => {
         await loadStandardStyleTagAsync();
 
@@ -684,7 +684,7 @@
                 securityCode: undefined
             };
 
-            initCyberSourceMicroFormFields();
+            initCybersourceMicroFormFields();
         }
         catch {
             failedToLoad.value = true;
