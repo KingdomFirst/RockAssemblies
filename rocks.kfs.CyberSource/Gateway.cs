@@ -37,6 +37,7 @@ using CyberSource.Model;
 using rocks.kfs.CyberSource.Controls;
 using static rocks.kfs.CyberSource.CyberSourceTypes;
 using CyberSourceSDK = CyberSource;
+using rocks.kfs.CyberSource.Model;
 
 namespace rocks.kfs.CyberSource
 {
@@ -1395,6 +1396,22 @@ namespace rocks.kfs.CyberSource
             }
 
             var tokenizerToken = paymentInfo.ReferenceNumber;
+
+            if ( tokenizerToken.StartsWith( "{" ) && tokenizerToken.EndsWith( "}" ) )
+            {
+                var parseToken = JsonConvert.DeserializeObject<AddressToken>( tokenizerToken );
+                if ( parseToken != null )
+                {
+                    paymentInfo.Street1 = parseToken.BillingAddress.Street1;
+                    paymentInfo.Street2 = parseToken.BillingAddress.Street2;
+                    paymentInfo.City = parseToken.BillingAddress.City;
+                    paymentInfo.State = parseToken.BillingAddress.State;
+                    paymentInfo.PostalCode = parseToken.BillingAddress.PostalCode;
+                    paymentInfo.Country = parseToken.BillingAddress.Country;
+
+                    tokenizerToken = parseToken.OriginalToken;
+                }
+            }
 
             Ptsv2paymentsClientReferenceInformation clientReferenceInformation = new Ptsv2paymentsClientReferenceInformation(
                 Comments: paymentInfo.FullName
