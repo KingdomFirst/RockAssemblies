@@ -35,13 +35,13 @@
 
                 <button type="button" style="display: none;" class="payment-button js-payment-button"></button>
             </div>
+        </div>
 
-            <div v-show="validationMessage" class="alert alert-validation js-payment-input-validation">
-                <span class='js-validation-message'>
-                    {{ validationMessage }}
-                    <p v-show="validationMessageShowReload"><a href="javascript:location.reload();" class="btn btn-warning mt-3" onclick="Rock.controls.bootstrapButton.showLoading(this);" data-loading-text="Reloading...">Reload Page</a></p>
-                </span>
-            </div>
+        <div v-show="validationMessage" class="alert alert-validation js-payment-input-validation">
+            <span class='js-validation-message'>
+                {{ validationMessage }}
+                <p v-show="validationMessageShowReload"><a href="javascript:location.reload();" class="btn btn-warning mt-3" onclick="Rock.controls.bootstrapButton.showLoading(this);" data-loading-text="Reloading...">Reload Page</a></p>
+            </span>
         </div>
 
         <input ref="inputStyleHook" class="form-control cybersource-input-style-hook form-group" style="display: none;">
@@ -128,6 +128,8 @@
         cardIcons: Record<string, string>
 
         timeoutDuration?: number;
+
+        initialLoadTimeout?: number;
 
         timeoutCallback?: TimeoutCallback;
 
@@ -388,6 +390,7 @@
             placeholderCss,
             cardIcons,
             timeoutDuration: 10000,
+            initialLoadTimeout: 30000,
             flexTimeout: 900000,
             flexTimeLoaded: new Date().getTime(),
             callback: () => { /* Intentionally empty, this will be replaced by the caller. */ }
@@ -426,7 +429,7 @@
                  clearInterval(FlexJS?.loadCheckInterval);
              }
 
-            validationMessage.value = 'We\'re sorry your session has timed out. Please reload the page to try again.';
+            validationMessage.value = 'We\'re sorry your payment session has timed out. Please reload the page to try again.';
             validationMessageShowReload.value = true;
 
             var actionBtn = document.querySelector('.btn-give-now, .js-submit-hostedpaymentinfo, .navigation.actions .btn, .registration-entry .actions .btn-primary');
@@ -448,6 +451,7 @@
 
          FlexJS?.number?.on('error', function(data) {
              console.error(data);
+             loading.value = false;
              validationMessage.value = data.message;
          });
 
@@ -469,6 +473,15 @@
          });
 
          checkCybersourceFieldsLoaded(false);
+
+         setTimeout(function () {
+             if (loading.value) {
+                 loading.value = false;
+                 failedToLoad.value = true;
+                 FlexJS.config.flexTimeLoaded -= FlexJS.config.flexTimeout;
+                 checkCybersourceFieldsLoaded(false);
+             }
+         }, FlexJS?.config?.initialLoadTimeout);
      };
 
      function submitCybersourceMicroFormInfo():void {
