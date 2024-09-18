@@ -7,7 +7,12 @@
 
         <div v-show="!loading && !failedToLoad" style="max-width: 600px;">
             <div :id="controlId" class="js-cybersource-payment-inputs cybersource-payment-inputs" ref="paymentInputs">
-                <div class="gateway-creditcard-container gateway-payment-container js-gateway-creditcard-container">
+                <div class="gateway-address-container js-gateway-address-container">
+                    <h4>Billing</h4>
+                    <AddressControl label="Address" v-model="address" :disabled="isSaving" :rules="'required'" />
+                </div>
+                <div class="gateway-creditcard-container gateway-payment-container js-gateway-creditcard-container" >
+                    <h4>Payment</h4>
                     <div class="form-group position-relative">
                         <label class="control-label">Card Number</label>
                         <div class="form-control js-credit-card-input iframe-input credit-card-input"></div>
@@ -17,7 +22,7 @@
                     <div class="row">
                         <div class="col-xs-6 exp-col">
                             <div class="iframe-input credit-card-exp-input js-credit-card-exp-input"></div>
-                            <DatePartsPicker label="Expiration Date" :isRequired="true" :startYear="nowYear" :futureYearCount="15" v-model="ccexpvalue" :showBlankItem="false" :multiple="false" :hideDay="true" />
+                            <DatePartsPicker label="Expiration Date" :isRequired="true" :startYear="nowYear" :futureYearCount="15" v-model="ccexpvalue" :showBlankItem="false" :multiple="false" :hideDay="true" :disabled="isSaving" />
                         </div>
                         <div class="col-xs-6 cvv-col">
                             <div class="form-group">
@@ -193,10 +198,13 @@
     import { computed, onMounted, PropType, ref } from "vue";
     import LoadingIndicator from "@Obsidian/Controls/loadingIndicator";
     import DatePartsPicker from "@Obsidian/Controls/datePartsPicker";
+    import AddressControl from "@Obsidian/Controls/addressControl.obs";
     import { newGuid } from "@Obsidian/Utility/guid";
     import { onSubmitPayment } from "@Obsidian/Core/Controls/financialGateway";
     import { GatewayEmitStrings } from "@Obsidian/Enums/Controls/gatewayEmitStrings";
     import { FormError } from "@Obsidian/Utility/form";
+    import { AddressControlBag } from "@Obsidian/ViewModels/Controls/addressControlBag";
+
 
     /**
      * The settings we expect to receive from the web server.
@@ -205,6 +213,7 @@
         gatewayUrl: string;
         microFormJsPath: string;
         microFormJWK: string;
+        address?: AddressControlBag | null;
     };
 
     /**
@@ -222,6 +231,7 @@
     };
 
     const standardStyling = ``;
+    const isSaving = ref<boolean>(false);
 
     /**
      * Ensures the Cybersource Flex Microform script is loaded into the browser.
@@ -462,6 +472,8 @@
      };
 
      function submitCybersourceMicroFormInfo():void {
+         isSaving.value = true;
+
          var options = {
              expirationMonth: ('00'+ccexpvalue.month).slice(-2),
              expirationYear: ccexpvalue.year
@@ -473,10 +485,15 @@
              if (err) {
                  // handle error
                  console.error(err);
+                 isSaving.value = false;
                  emit(GatewayEmitStrings.Error, err.message);
              } else {
-                hasReceivedToken = true;
-                emit(GatewayEmitStrings.Success, token ?? "");
+                 hasReceivedToken = true;
+                 let addressToken = {
+                     billingAddress: address.value,
+                     originalToken: token
+                 }
+                 emit(GatewayEmitStrings.Success, JSON.stringify(addressToken) ?? "");
              }
          });
      };
@@ -517,6 +534,7 @@
     const tokenResponseSent = ref(false);
 
     let ccexpvalue:MonthYearDay = { month: 0, year: 0, day: 0 };
+    const address = ref<AddressControlBag | undefined>(props.settings.address ?? undefined);
 
     /**
      * Contains a unique identifier that we can use to allow MicroformJS
@@ -627,6 +645,7 @@
         const validationErrors = validateInputs();
 
         if (hasAttemptedSubmit && !(FlexJS?.inSubmission ?? false) && !hasReceivedToken) {
+            isSaving.value = false;
             emit(GatewayEmitStrings.Validation, validationErrors);
         }
     };
@@ -678,7 +697,7 @@
                 config: options,
                 captureContext: props.settings.microFormJWK,
                 inSubmission: false,
-                microform: flex.microform({ styles: FlexJS?.config.customStyles }),
+                microform: flex.microform({ styles: options.customStyles }),
                 loadCheckInterval: setInterval(checkCybersourceFieldsLoaded,1000),
                 number: undefined,
                 securityCode: undefined
