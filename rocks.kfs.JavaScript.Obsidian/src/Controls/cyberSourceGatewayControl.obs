@@ -203,7 +203,57 @@
     const standardStyling = ``;
     const isSaving = ref<boolean>(false);
 
+    const props = defineProps({
+        settings: {
+            type: Object as PropType<Settings>,
+            required: true
+        }
+    });
+
+    const emit = defineEmits<{
+        (e: typeof GatewayEmitStrings.Success, value: string): void;
+        (e: typeof GatewayEmitStrings.Validation, value: FormError[]): void;
+        (e: typeof GatewayEmitStrings.Error, value: string): void;
+    }>();
+
+    let hasAttemptedSubmit = false;
+
+    /** true if we have received a token back from Cybersource. */
+    let hasReceivedToken = false;
+
+    const creditCardButtonClasses = ["btn", "btn-default", "active", "payment-creditcard"];
+
+    const nowYear = computed((): number => { return new Date().getFullYear(); });
+
+    /** true while we are still loading data; otherwise false. */
+    const loading = ref(true);
+
+    /** true if we failed to load the Microform content. */
+    const failedToLoad = ref(false);
+
+    /** Contains the current validation message to be displayed. */
+    const validationMessage = ref("");
+    const validationMessageShowReload = ref(false);
+
+    /** true if we have already sent a token response to the server; otherwise false. */
+    const tokenResponseSent = ref(false);
+
+    let ccexpvalue: MonthYearDay = { month: 0, year: 0, day: 0 };
+
+    /** In order for the AddressControl to allow our code to be compiled I had to add
+     *  // @ts-ignore above each line in the addressControl.obs file that generated an exception.
+     */
+    const address = ref<AddressControlBag | undefined>(props.settings.address ?? undefined);
+
     /**
+     * Contains a unique identifier that we can use to allow MicroformJS
+     * to find our input fields.
+     */
+    const controlId = `cyberSource_${newGuid()}`;
+
+    const paymentInputs = ref<HTMLElement | null>(null);
+
+        /**
      * Ensures the Cybersource Flex Microform script is loaded into the browser.
      *
      * @param microFormJWK The microform jwk key that will be used to initialize the script.
@@ -421,56 +471,6 @@
              }
          });
      };
-
-    const props = defineProps({
-        settings: {
-            type: Object as PropType<Settings>,
-            required: true
-        }
-    });
-
-    const emit = defineEmits<{
-        (e: typeof GatewayEmitStrings.Success, value: string): void;
-        (e: typeof GatewayEmitStrings.Validation, value: FormError[]): void;
-        (e: typeof GatewayEmitStrings.Error, value: string): void;
-    }>();
-
-    let hasAttemptedSubmit = false;
-
-    /** true if we have received a token back from Cybersource. */
-    let hasReceivedToken = false;
-
-    const creditCardButtonClasses = ["btn", "btn-default", "active", "payment-creditcard"];
-
-    const nowYear = computed((): number => { return new Date().getFullYear(); });
-
-    /** true while we are still loading data; otherwise false. */
-    const loading = ref(true);
-
-    /** true if we failed to load the Microform content. */
-    const failedToLoad = ref(false);
-
-    /** Contains the current validation message to be displayed. */
-    const validationMessage = ref("");
-    const validationMessageShowReload = ref(false);
-
-    /** true if we have already sent a token response to the server; otherwise false. */
-    const tokenResponseSent = ref(false);
-
-    let ccexpvalue: MonthYearDay = { month: 0, year: 0, day: 0 };
-
-    /** In order for the AddressControl to allow our code to be compiled I had to add
-     *  // @ts-ignore above each line in the addressControl.obs file that generated an exception.
-     */
-    const address = ref<AddressControlBag | undefined>(props.settings.address ?? undefined);
-
-    /**
-     * Contains a unique identifier that we can use to allow MicroformJS
-     * to find our input fields.
-     */
-    const controlId = `cyberSource_${newGuid()}`;
-
-    const paymentInputs = ref<HTMLElement | null>(null);
 
     /**
      * Commented out by KFS for now, I would love to handle validation the same way as other Gateway's,
