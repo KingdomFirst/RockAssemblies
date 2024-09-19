@@ -88,6 +88,10 @@
     <Reference Include="Rock.Common">
       <HintPath>..\..\RockWeb\Bin\Rock.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Rock.Enums">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\Rock.Enums.dll</HintPath>
+    </Reference>
     <Reference Include="Rock.Lava.Shared">
       <HintPath>..\..\RockWeb\Bin\Rock.Lava.Shared.dll</HintPath>
     </Reference>
@@ -146,6 +150,7 @@
     <Compile Include="Controls\CyberSourceHostedPaymentControl.cs" />
     <Compile Include="CyberSourceTypes.cs" />
     <Compile Include="Gateway.cs" />
+    <Compile Include="Model\AddressToken.cs" />
     <Compile Include="Model\FlexCaptureContextPayload.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
