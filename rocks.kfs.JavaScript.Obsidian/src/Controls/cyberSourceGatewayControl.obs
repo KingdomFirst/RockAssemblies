@@ -67,38 +67,18 @@
         [index: string]: InputField | undefined;
     };
 
-    type CardTokenResponse = {
-        number: string | null;
-
-        bin: string | null;
-
-        exp: string | null;
-
-        hash: string | null;
-
-        type: string | null;
-    };
-
-    type TokenResponse = {
-        token?: string;
-
-        card?: CardTokenResponse;
-
-        validationMessage?: string;
-
-        errorMessage?: string;
-    };
-
     type MonthYearDay = {
         month: number;
         year: number;
         day: number;
     }
 
-    type TimeoutCallback = () => void;
-    type ValidationCallback = (field: string, validated: boolean, message: string) => void;
-    type FieldsAvailableCallback = () => void;
-    type ResponseCallback = (response: TokenResponse) => void;
+    /**
+     * Commented out by KFS for now, I would love to handle validation and timeout the same way as other Gateway's,
+     * but Cybersource is not as great at returning invalid states of their fields. Need to look into it, but going to comment out code for now.
+     */
+    //type TimeoutCallback = () => void;
+    //type ValidationCallback = (field: string, validated: boolean, message: string) => void;
 
     type MicroformOptions = {
         paymentSelector: string;
@@ -111,27 +91,17 @@
 
         customStyles: Record<string, Record<string, string>>;
 
-        customCss: Record<string, string>;
-
-        focusCss: Record<string, string>;
-
-        invalidCss: Record<string, string>;
-
-        placeholderCss: Record<string, string>;
-
         cardIcons: Record<string, string>
 
         timeoutDuration?: number;
 
         initialLoadTimeout?: number;
 
-        timeoutCallback?: TimeoutCallback;
+        //timeoutCallback?: TimeoutCallback;
 
-        validationCallback?: ValidationCallback;
+        //validationCallback?: ValidationCallback;
 
-        fieldsAvailableCallback?: FieldsAvailableCallback;
-
-        callback: ResponseCallback;
+        //callback: ResponseCallback;
 
         flexTimeout?: number;
 
@@ -214,18 +184,21 @@
     };
 
     /**
+     * Commented out by KFS for now, I would love to handle validation the same way as other Gateway's,
+     * but Cybersource is not as great at returning invalid states of their fields. Need to look into it, but going to comment out code for now.
+     * 
      * The field validation state for the various input fields.
      */
-    type ValidationField = {
-        /** The name of the field. */
-        field: string;
+    //type ValidationField = {
+    //    /** The name of the field. */
+    //    field: string;
 
-        /** true if the field is valid; otherwise false. */
-        status: boolean;
+    //    /** true if the field is valid; otherwise false. */
+    //    status: boolean;
 
-        /** If status if false this will contain the error message; otherwise an empty string. */
-        message: string;
-    };
+    //    /** If status if false this will contain the error message; otherwise an empty string. */
+    //    message: string;
+    //};
 
     const standardStyling = ``;
     const isSaving = ref<boolean>(false);
@@ -327,34 +300,36 @@
             timeoutDuration: 10000,
             initialLoadTimeout: 30000,
             flexTimeout: 900000,
-            flexTimeLoaded: props.settings.jwkGeneratedTime,
-            callback: () => { /* Intentionally empty, this will be replaced by the caller. */ }
+            flexTimeLoaded: props.settings.jwkGeneratedTime
         };
 
         return options;
     }
 
     /**
+     * Commented out by KFS for now, I would love to handle validation the same way as other Gateway's,
+     * but Cybersource is not as great at returning invalid states of their fields. Need to look into it, but going to comment out code for now.
+     * 
      * Translates the Cybersource field name into a user friendly one.
      *
      * @param field The field name as provided by Cybersource.
      *
      * @returns A user friendly name for the field.
      */
-     function getFieldFriendlyName(field: string): string {
-        if (field === "ccnumber") {
-            return "Card Number";
-        }
-        else if (field === "ccexp") {
-            return "Expiration Date";
-        }
-        else if (field === "cvv") {
-            return "Security Code";
-        }
-        else {
-            return "Payment Information";
-        }
-    }
+    // function getFieldFriendlyName(field: string): string {
+    //    if (field === "ccnumber") {
+    //        return "Card Number";
+    //    }
+    //    else if (field === "ccexp") {
+    //        return "Expiration Date";
+    //    }
+    //    else if (field === "cvv") {
+    //        return "Security Code";
+    //    }
+    //    else {
+    //        return "Payment Information";
+    //    }
+    //}
     
      function checkCybersourceFieldsLoaded(clearTimer:boolean = true): void {
          var currentTime = new Date().getTime();
@@ -482,7 +457,7 @@
     /** true if we have already sent a token response to the server; otherwise false. */
     const tokenResponseSent = ref(false);
 
-    let ccexpvalue:MonthYearDay = { month: 0, year: 0, day: 0 };
+    let ccexpvalue: MonthYearDay = { month: 0, year: 0, day: 0 };
 
     /** In order for the AddressControl to allow our code to be compiled I had to add
      *  // @ts-ignore above each line in the addressControl.obs file that generated an exception.
@@ -497,76 +472,89 @@
 
     const paymentInputs = ref<HTMLElement | null>(null);
 
-    /** Contains all the field validation states. */
-    const validationFieldStatus: Record<string, ValidationField> = {
-        ccnumber: { field: getFieldFriendlyName("ccnumber"), status: false, message: "is required" },
-        ccexp: { field: getFieldFriendlyName("ccexp"), status: false, message: "is required" },
-        cvv: { field: getFieldFriendlyName("cvv"), status: false, message: "is required" }
-    };
+    /**
+     * Commented out by KFS for now, I would love to handle validation the same way as other Gateway's,
+     * but Cybersource is not as great at returning invalid states of their fields. Need to look into it, but going to comment out code for now.
+     * 
+     * Contains all the field validation states. */
+    //const validationFieldStatus: Record<string, ValidationField> = {
+    //    ccnumber: { field: getFieldFriendlyName("ccnumber"), status: false, message: "is required" },
+    //    ccexp: { field: getFieldFriendlyName("ccexp"), status: false, message: "is required" },
+    //    cvv: { field: getFieldFriendlyName("cvv"), status: false, message: "is required" }
+    //};
 
     /**
+     * Commented out by KFS for now, I would love to handle validation the same way as other Gateway's,
+     * but Cybersource is not as great at returning invalid states of their fields. Need to look into it, but going to comment out code for now.
+     * 
      * Validates all the inputs from MicroformJS to see if any visible input
      * fields are invalid.
      *
      * @returns An object that describes if all the inputs are valid.
      */
-    function validateInputs(): FormError[] {
-        const errors: FormError[] = [];
+    //function validateInputs(): FormError[] {
+    //    const errors: FormError[] = [];
 
-        for (const validationFieldKey in validationFieldStatus) {
-            const validationField = validationFieldStatus[validationFieldKey];
+    //    for (const validationFieldKey in validationFieldStatus) {
+    //        const validationField = validationFieldStatus[validationFieldKey];
 
-            const inputField = document.querySelector(FlexJS.config.fields[validationFieldKey].selector ?? "") as HTMLElement;
-            const fieldVisible = (inputField?.offsetWidth ?? 0) !== 0 || (inputField?.offsetHeight ?? 0) !== 0;
+    //        const inputField = document.querySelector(FlexJS.config.fields[validationFieldKey].selector ?? "") as HTMLElement;
+    //        const fieldVisible = (inputField?.offsetWidth ?? 0) !== 0 || (inputField?.offsetHeight ?? 0) !== 0;
 
-            if (fieldVisible && !validationField.status) {
-                const validationFieldTitle = getFieldFriendlyName(validationFieldKey);
+    //        if (fieldVisible && !validationField.status) {
+    //            const validationFieldTitle = getFieldFriendlyName(validationFieldKey);
 
-                errors.push({
-                    name: validationFieldTitle,
-                    text: validationField.message || "unknown validation error"
-                });
-            }
-        }
+    //            errors.push({
+    //                name: validationFieldTitle,
+    //                text: validationField.message || "unknown validation error"
+    //            });
+    //        }
+    //    }
 
-        return errors;
-    }
+    //    return errors;
+    //}
 
     /**
+     * Commented out by KFS for now, I would love to handle timeout the same way as other Gateway's,
+     * but Cybersource is not as great at returning invalid states of their fields. Need to look into it, but going to comment out code for now.
+     * 
      * Callback function that handles the timeout scenario of Cybersource.
      */
-    const timeoutCallback: TimeoutCallback = () => {
-        // If we got a timeout after sending the response then ignore the error.
-        if (tokenResponseSent.value) {
-            return;
-        }
+    //const timeoutCallback: TimeoutCallback = () => {
+    //    // If we got a timeout after sending the response then ignore the error.
+    //    if (tokenResponseSent.value) {
+    //        return;
+    //    }
 
-        // A timeout callback will fire due to a timeout or incomplete
-        // input fields (Cybersource doesn't tell us why).
-        console.log("The tokenization didn't respond in the expected timeframe. This could be due to an invalid or incomplete field or poor connectivity - " + Date());
+    //    // A timeout callback will fire due to a timeout or incomplete
+    //    // input fields (Cybersource doesn't tell us why).
+    //    console.log("The tokenization didn't respond in the expected timeframe. This could be due to an invalid or incomplete field or poor connectivity - " + Date());
 
-        // Since we don't know exactly what happened, lets see if it might
-        // be invalid inputs by checking them all manually.
-        //const validationErrors = validateInputs();
+    //    // Since we don't know exactly what happened, lets see if it might
+    //    // be invalid inputs by checking them all manually.
+    //    const validationErrors = validateInputs();
 
-        //if (validationErrors.length > 0) {
-        //    emit(GatewayEmitStrings.Validation, validationErrors);
-        //}
-        //else {
-            // Inputs seem to be valid, so show a message to let them
-            // know what seems to be happening.
-            console.log("Timeout happened for unknown reason, probably poor connectivity since we already validated inputs.");
+    //    if (validationErrors.length > 0) {
+    //        emit(GatewayEmitStrings.Validation, validationErrors);
+    //    }
+    //    else {
+    //        // Inputs seem to be valid, so show a message to let them
+    //        // know what seems to be happening.
+    //        console.log("Timeout happened for unknown reason, probably poor connectivity since we already validated inputs.");
 
-            emit(GatewayEmitStrings.Validation, [
-                {
-                    name: "Payment Timeout",
-                    text: "Response from gateway timed out. This could be do to poor connectivity or invalid payment values."
-                }
-            ]);
-        //}
-    };
+    //        emit(GatewayEmitStrings.Validation, [
+    //            {
+    //                name: "Payment Timeout",
+    //                text: "Response from gateway timed out. This could be do to poor connectivity or invalid payment values."
+    //            }
+    //        ]);
+    //    }
+    //};
 
     /**
+     * Commented out by KFS for now, I would love to handle validation the same way as other Gateway's,
+     * but Cybersource is not as great at returning invalid states of their fields. Need to look into it, but going to comment out code for now.
+     * 
      * Callback function that handles field validation results from the
      * Microform back-end.
      *
@@ -574,28 +562,28 @@
      * @param validated true if the field is valid; otherwise false.
      * @param message A message that describes the reason for the validation failure.
      */
-    const validationCallback: ValidationCallback = (field: string, validated: boolean, message: string): void => {
-        // if there is a validation error, keep the message and field that
-        // has the error. Then we'll check it before starting the payment
-        // submission.
+    //const validationCallback: ValidationCallback = (field: string, validated: boolean, message: string): void => {
+    //    // if there is a validation error, keep the message and field that
+    //    // has the error. Then we'll check it before starting the payment
+    //    // submission.
 
-        if (message === "Field is empty") {
-            message = "is required";
-        }
+    //    if (message === "Field is empty") {
+    //        message = "is required";
+    //    }
 
-        validationFieldStatus[field] = {
-            field: field,
-            status: validated,
-            message: message
-        };
+    //    validationFieldStatus[field] = {
+    //        field: field,
+    //        status: validated,
+    //        message: message
+    //    };
 
-        const validationErrors = validateInputs();
+    //    const validationErrors = validateInputs();
 
-        if (hasAttemptedSubmit && !(FlexJS?.inSubmission ?? false) && !hasReceivedToken) {
-            isSaving.value = false;
-            emit(GatewayEmitStrings.Validation, validationErrors);
-        }
-    };
+    //    if (hasAttemptedSubmit && !(FlexJS?.inSubmission ?? false) && !hasReceivedToken) {
+    //        isSaving.value = false;
+    //        emit(GatewayEmitStrings.Validation, validationErrors);
+    //    }
+    //};
 
     // Add a callback when the submit payment button is pressed.
     onSubmitPayment(() => {
