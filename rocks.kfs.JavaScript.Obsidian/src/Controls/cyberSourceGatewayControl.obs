@@ -43,12 +43,6 @@
                 <p v-show="validationMessageShowReload"><a href="javascript:location.reload();" class="btn btn-warning mt-3" onclick="Rock.controls.bootstrapButton.showLoading(this);" data-loading-text="Reloading...">Reload Page</a></p>
             </span>
         </div>
-
-        <input ref="inputStyleHook" class="form-control cybersource-input-style-hook form-group" style="display: none;">
-
-        <div class="form-group has-error" style="display: none;">
-            <input ref="inputInvalidStyleHook" type="text" class="form-control">
-        </div>
     </div>
 </template>
 
@@ -215,6 +209,7 @@
         gatewayUrl: string;
         microFormJsPath: string;
         microFormJWK: string;
+        jwkGeneratedTime: number;
         address?: AddressControlBag | null;
     };
 
@@ -245,7 +240,6 @@
             const script = document.createElement("script");
             script.type = "text/javascript";
             script.src = props.settings.microFormJsPath;
-            //script.setAttribute("data-tokenization-key", microFormJWK);
             script.setAttribute("data-variant", "inline");
             document.getElementsByTagName("head")[0].appendChild(script);
 
@@ -284,71 +278,16 @@
      * and control references.
      *
      * @param controlId The identifier of the parent control that contains all the input fields.
-     * @param inputStyleHook The element that will be used for standard styling information.
-     * @param inputInvalidStyleHook The element that will be used for invalid styling information.
      *
      * @returns An object that contains the FlexJS options.
      */
-     function getFlexJSOptions(controlId: string, inputStyleHook: HTMLElement | null, inputInvalidStyleHook: HTMLElement | null): MicroformOptions {
+     function getFlexJSOptions(controlId: string): MicroformOptions {
         // Populate our custom CSS to make the fields mostly match standard Rock
         // input fields.
         const customStyles: Record<string, Record<string, string>> = {
             ':disabled': { 'cursor': 'not-allowed' },
             'valid': { 'color': '#3c763d' },
             'invalid': { 'color': '#a94442' }
-        };
-        const customCss: Record<string, string> = {
-            "margin-bottom": "5px",
-            "margin-top": "0"
-        };
-        if (inputStyleHook) {
-            const inputStyles = getComputedStyle(inputStyleHook);
-
-            customCss["color"] = inputStyles.color;
-            customCss["border-bottom-color"] = inputStyles.borderBottomColor;
-            customCss["border-bottom-left-radius"] = inputStyles.borderBottomLeftRadius;
-            customCss["border-bottom-right-radius"] = inputStyles.borderBottomRightRadius;
-            customCss["border-bottom-style"] = inputStyles.borderBottomStyle;
-            customCss["border-bottom-width"] = inputStyles.borderBottomWidth;
-            customCss["border-left-color"] = inputStyles.borderLeftColor;
-            customCss["border-left-style"] = inputStyles.borderLeftStyle;
-            customCss["border-left-width"] = inputStyles.borderLeftWidth;
-            customCss["border-right-color"] = inputStyles.borderRightColor;
-            customCss["border-right-style"] = inputStyles.borderRightStyle;
-            customCss["border-right-width"] = inputStyles.borderRightWidth;
-            customCss["border-top-color"] = inputStyles.borderTopColor;
-            customCss["border-top-left-radius"] = inputStyles.borderTopLeftRadius;
-            customCss["border-top-right-radius"] = inputStyles.borderTopRightRadius;
-            customCss["border-top-style"] = inputStyles.borderTopStyle;
-            customCss["border-top-width"] = inputStyles.borderTopWidth;
-            customCss["border-width"] = inputStyles.borderWidth;
-            customCss["border-style"] = inputStyles.borderStyle;
-            customCss["border-radius"] = inputStyles.borderRadius;
-            customCss["border-color"] = inputStyles.borderColor;
-            customCss["background-color"] = inputStyles.backgroundColor;
-            customCss["box-shadow"] = inputStyles.boxShadow;
-            customCss["padding"] = inputStyles.padding;
-            customCss["font-size"] = inputStyles.fontSize;
-            customCss["height"] = inputStyles.height;
-            customCss["font-family"] = inputStyles.fontFamily;
-        }
-
-        // Custom focus CSS to make the input fields match Rock style.
-        const focusCss: Record<string, string> = {
-            "border-color": getComputedStyle(document.documentElement).getPropertyValue("--focus-state-border-color"),
-            "outline-style": "none"
-        };
-
-        // Custom invalid CSS to apply to the field to make it look like a Rock
-        // input field.
-        const invalidCss: Record<string, string> = {};
-        if (inputInvalidStyleHook) {
-            invalidCss["border-color"] = getComputedStyle(inputInvalidStyleHook).borderColor;
-        }
-
-        // Custom CSS to apply to the placeholder text.
-        const placeholderCss: Record<string, string> = {
-            "color": getComputedStyle(document.documentElement).getPropertyValue("--input-placeholder")
         };
 
         const cardIcons: Record<string, string> = {
@@ -384,15 +323,11 @@
             },
             styleSniffer: false,
             customStyles,
-            customCss,
-            focusCss,
-            invalidCss,
-            placeholderCss,
             cardIcons,
             timeoutDuration: 10000,
             initialLoadTimeout: 30000,
             flexTimeout: 900000,
-            flexTimeLoaded: new Date().getTime(),
+            flexTimeLoaded: props.settings.jwkGeneratedTime,
             callback: () => { /* Intentionally empty, this will be replaced by the caller. */ }
         };
 
@@ -436,6 +371,7 @@
             if (actionBtn != null) {
                 actionBtn.classList.add('disabled');
                 actionBtn.removeAttribute('href');
+                actionBtn.setAttribute('disabled', 'disabled');
             }
          }
      }
@@ -547,6 +483,10 @@
     const tokenResponseSent = ref(false);
 
     let ccexpvalue:MonthYearDay = { month: 0, year: 0, day: 0 };
+
+    /** In order for the AddressControl to allow our code to be compiled I had to add
+     *  // @ts-ignore above each line in the addressControl.obs file that generated an exception.
+     */
     const address = ref<AddressControlBag | undefined>(props.settings.address ?? undefined);
 
     /**
@@ -554,12 +494,6 @@
      * to find our input fields.
      */
     const controlId = `cyberSource_${newGuid()}`;
-
-    /** Reference to helper element that allows us to get CSS styles. */
-    const inputStyleHook = ref<HTMLElement | null>(null);
-
-    /** Reference to helper element that allows us to get invalid input CSS styles. */
-    const inputInvalidStyleHook = ref<HTMLElement | null>(null);
 
     const paymentInputs = ref<HTMLElement | null>(null);
 
@@ -702,7 +636,7 @@
         }
 
         try {
-            const options = getFlexJSOptions(controlId, inputStyleHook.value, inputInvalidStyleHook.value);
+            const options = getFlexJSOptions(controlId);
 
             var flex = new Flex(props.settings.microFormJWK);
 
