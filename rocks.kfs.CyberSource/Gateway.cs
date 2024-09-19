@@ -1442,10 +1442,6 @@ namespace rocks.kfs.CyberSource
                 PhoneNumber: paymentInfo.Phone
             );
 
-            if ( paymentInfo.Street1.IsNotNullOrWhiteSpace() && paymentInfo.City.IsNotNullOrWhiteSpace() && paymentInfo.State.IsNotNullOrWhiteSpace() && paymentInfo.PostalCode.IsNotNullOrWhiteSpace() )
-            {
-            }
-
             Ptsv2paymentsOrderInformation orderInformation = new Ptsv2paymentsOrderInformation(
                 AmountDetails: orderInformationAmountDetails,
                 BillTo: orderInformationBillTo
