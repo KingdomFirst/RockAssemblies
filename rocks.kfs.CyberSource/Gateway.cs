@@ -352,7 +352,8 @@ namespace rocks.kfs.CyberSource
             }
             catch ( Exception e )
             {
-                errorMessage += "Exception on calling the API : " + e.Message;
+                ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
+                errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the payment information you entered and try again.";
             }
 
             if ( chargeResult == null || chargeResult.ErrorInformation != null )
@@ -485,7 +486,8 @@ namespace rocks.kfs.CyberSource
             catch ( Exception e )
             {
                 var apiException = ( CyberSourceSDK.Client.ApiException ) e;
-                errorMessage += "Exception on calling the API : " + e.Message;
+                ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
+                errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the payment information you entered and try again.";
 
                 PtsV2PaymentsRefundPost201Response alreadyHandled = null;
 
@@ -520,7 +522,8 @@ namespace rocks.kfs.CyberSource
                 }
                 catch ( Exception ie )
                 {
-                    errorMessage += "Exception on calling the API : " + ie.Message;
+                    ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
+                    errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the refund information entered and try again.";
                     if ( alreadyHandled != null )
                     {
                         refundResponse = alreadyHandled;
@@ -658,7 +661,8 @@ namespace rocks.kfs.CyberSource
                     }
                     catch ( Exception e )
                     {
-                        errorMessage += "Exception on calling the Subscriptions API : " + e.Message;
+                        ExceptionLogService.LogException( $"Exception on calling the Cybersource Subscriptions API: {e.Message}" );
+                        errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the payment information you entered and try again.";
                         return null;
                     }
 
@@ -839,7 +843,7 @@ namespace rocks.kfs.CyberSource
                         if ( apiInstance.GetStatusCode() != 200 || setSubscriptionStatusResult.Status != "COMPLETED" )
                         {
                             // Write decline/error as an exception.
-                            var exception = new Exception( $"Error re-activating CyberSource subscription. Message:  {setSubscriptionStatusResult.Status} " );
+                            var exception = new Exception( $"Error re-activating Cybersource subscription. Message:  {setSubscriptionStatusResult.Status} " );
 
                             ExceptionLogService.LogException( exception );
 
@@ -850,7 +854,7 @@ namespace rocks.kfs.CyberSource
                     }
                     catch ( Exception e )
                     {
-                        errorMessage += $"Error re-activating CyberSource subscription. Message:  {e.Message} ";
+                        errorMessage += $"Error re-activating Cybersource subscription. Message:  {e.Message} ";
 
                         var exception = new Exception( errorMessage );
                         ExceptionLogService.LogException( exception );
@@ -930,7 +934,8 @@ namespace rocks.kfs.CyberSource
                     var exception = new Exception( $"Error processing CyberSource subscription. Message:  {e.Message} " );
 
                     ExceptionLogService.LogException( exception );
-                    errorMessage = e.Message;
+                    errorMessage = "We encountered an error while calling the Gateway provider API. Kindly double-check the subscription information you entered and try again.";
+
 
                     return false;
                 }
@@ -1000,7 +1005,7 @@ namespace rocks.kfs.CyberSource
                     var exception = new Exception( $"Error processing CyberSource Address Update. Message:  {e.Message} " );
 
                     ExceptionLogService.LogException( exception );
-                    errorMessage = e.Message;
+                    errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the address information you entered and try again.";
 
                     return false;
                 }
@@ -1069,7 +1074,8 @@ namespace rocks.kfs.CyberSource
                     return true;
                 }
 
-                errorMessage = "Exception on calling the CyberSource API : " + e.Message;
+                ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
+                errorMessage = "We encountered an error while calling the Gateway provider API. Kindly double-check the payment information you entered and try again.";
                 return false;
             }
         }
@@ -1103,7 +1109,8 @@ namespace rocks.kfs.CyberSource
             }
             catch ( Exception e )
             {
-                errorMessage += $"Exception on calling the Subscription Response API : {e.Message}";
+                ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
+                errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the subscription information you entered and try again.";
             }
 
             if ( apiInstance.GetStatusCode() == ( int ) System.Net.HttpStatusCode.OK )
@@ -1178,7 +1185,8 @@ namespace rocks.kfs.CyberSource
             }
             catch ( Exception e )
             {
-                errorMessage = "Exception on calling the API : " + e.Message;
+                ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
+                errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the payment information you entered and try again.";
                 return paymentList;
             }
 
@@ -1473,7 +1481,8 @@ namespace rocks.kfs.CyberSource
             }
             catch ( Exception e )
             {
-                errorMessage += "Exception on calling the API : " + e.Message;
+                ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
+                errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the payment information you entered and try again.";
             }
 
             if ( tokenResult == null || tokenResult.ErrorInformation != null )
@@ -1595,8 +1604,7 @@ namespace rocks.kfs.CyberSource
             }
             catch ( Exception e )
             {
-                var errorMessage = "Exception on calling the API : " + e.Message;
-                ExceptionLogService.LogException( errorMessage );
+                ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
                 return null;
             }
         }
