@@ -28,226 +28,309 @@ namespace rocks.kfs.MobileAppMigration.Migrations
 
             Sql( @"UPDATE [Site] SET [SiteType] = 1, [IsSystem] = 0 WHERE [Guid] = '1DEF6B4D-F796-45E5-9535-BC1A5A1EA327'" );
 
+            var layoutHomepageGuid = "10D01240-BFBD-43FF-89EC-8AB0C837360E";
             // Site:Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddLayout( "1DEF6B4D-F796-45E5-9535-BC1A5A1EA327", "Homepage.xaml", "Homepage", "", "10D01240-BFBD-43FF-89EC-8AB0C837360E" );
+            RockMigrationHelper.AddLayout( "1DEF6B4D-F796-45E5-9535-BC1A5A1EA327", "Homepage.xaml", "Homepage", "", layoutHomepageGuid );
 
+            var layoutNoScrollGuid = "A7C77AD7-69CB-4FE8-A3F6-AE7E48C53457";
             // Site:Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddLayout( "1DEF6B4D-F796-45E5-9535-BC1A5A1EA327", "No Scrollview.xaml", "No Scrollview", "", "A7C77AD7-69CB-4FE8-A3F6-AE7E48C53457" );
+            RockMigrationHelper.AddLayout( "1DEF6B4D-F796-45E5-9535-BC1A5A1EA327", "No Scrollview.xaml", "No Scrollview", "", layoutNoScrollGuid );
+
+            var layoutMobilePhone_Homepage = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<ContentPage xmlns=""http://xamarin.com/schemas/2014/forms""
+             xmlns:x=""http://schemas.microsoft.com/winfx/2009/xaml""
+             xmlns:Rock=""clr-namespace:Rock.Mobile.Cms;assembly=Rock.Mobile""
+             xmlns:Common=""clr-namespace:Rock.Mobile.Common;assembly=Rock.Mobile.Common"">
+    <ScrollView>
+        <StackLayout>
+            <Rock:Zone ZoneName=""Main"" />
+        </StackLayout>
+    </ScrollView>
+</ContentPage>";
+            var layoutMobileTablet_Homepage = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<ContentPage xmlns=""http://xamarin.com/schemas/2014/forms""
+             xmlns:x=""http://schemas.microsoft.com/winfx/2009/xaml""
+             xmlns:Rock=""clr-namespace:Rock.Mobile.Cms;assembly=Rock.Mobile""
+             xmlns:Common=""clr-namespace:Rock.Mobile.Common;assembly=Rock.Mobile.Common"">
+    <ScrollView>
+        <StackLayout>
+            <Rock:Zone ZoneName=""Main"" />
+        </StackLayout>
+    </ScrollView>
+</ContentPage>";
+            var layoutMobilePhone_NoScroll = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<ContentPage xmlns=""http://xamarin.com/schemas/2014/forms""
+             xmlns:x=""http://schemas.microsoft.com/winfx/2009/xaml""
+             xmlns:Rock=""clr-namespace:Rock.Mobile.Cms;assembly=Rock.Mobile""
+             xmlns:Common=""clr-namespace:Rock.Mobile.Common;assembly=Rock.Mobile.Common"">
+        <StackLayout>
+            <Rock:Zone ZoneName=""Main"" />
+        </StackLayout>
+</ContentPage>";
+            var layoutMobileTablet_NoScroll = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<ContentPage xmlns=""http://xamarin.com/schemas/2014/forms""
+             xmlns:x=""http://schemas.microsoft.com/winfx/2009/xaml""
+             xmlns:Rock=""clr-namespace:Rock.Mobile.Cms;assembly=Rock.Mobile""
+             xmlns:Common=""clr-namespace:Rock.Mobile.Common;assembly=Rock.Mobile.Common"">
+        <StackLayout>
+            <Rock:Zone ZoneName=""Main"" />
+        </StackLayout>
+</ContentPage>";
+
+            Sql( $@"UPDATE [Layout] SET LayoutMobilePhone = '{layoutMobilePhone_Homepage}', LayoutMobileTablet = '{layoutMobileTablet_Homepage}' WHERE [Guid] = {layoutHomepageGuid}" );
+            Sql( $@"UPDATE [Layout] SET LayoutMobilePhone = '{layoutMobilePhone_NoScroll}', LayoutMobileTablet = '{layoutMobileTablet_NoScroll}' WHERE [Guid] = {layoutHomepageGuid}" );
 
             // Add Page 
             //  Internal Name: Kingdom First Solutions Mobile App Homepage
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, null, "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Kingdom First Solutions Mobile App Homepage", "", "7665A012-33D3-4990-8614-B8274A4221C7", "" );
+            RockMigrationHelper.AddPage( true, null, layoutHomepageGuid, "Kingdom First Solutions Mobile App Homepage", "", "7665A012-33D3-4990-8614-B8274A4221C7", "" );
 
             Sql( @"DECLARE @PageId int;
                    SELECT @PageId = Id FROM [Page] WHERE [Guid] = '7665A012-33D3-4990-8614-B8274A4221C7';
                    UPDATE [Site] SET [DefaultPageId] = @PageId WHERE [Guid] = '1DEF6B4D-F796-45E5-9535-BC1A5A1EA327'" );
 
             // Add Page 
-            //  Internal Name: Communication View
-            //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Communication View", "", "341B07E0-E710-4C9A-8DAA-A5121917C330", "" );
-
-            // Add Page 
-            //  Internal Name: Edit Profile
-            //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Edit Profile", "", "A3929533-0055-44BE-9752-38B9DF024468", "" );
-
-            // Add Page 
             //  Internal Name: C3 Home
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "C3 Home", "", "C244F574-D08A-424A-BBE4-9A63F98B18C3", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "C3 Home", "", "C244F574-D08A-424A-BBE4-9A63F98B18C3", "" );
 
             // Add Page 
             //  Internal Name: Sunday
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Sunday", "", "CEECD2DD-2AE9-42B8-AA75-0C762444BAF1", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Sunday", "", "CEECD2DD-2AE9-42B8-AA75-0C762444BAF1", "" );
 
             // Add Page 
             //  Internal Name: Bible
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Bible", "", "8FC1504B-9D6B-4375-822E-4F44C9B939DD", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Bible", "", "8FC1504B-9D6B-4375-822E-4F44C9B939DD", "" );
 
             // Add Page 
             //  Internal Name: Give
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Give", "", "D71681C4-3662-4E3C-8A8B-9A72844DEA43", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Give", "", "D71681C4-3662-4E3C-8A8B-9A72844DEA43", "" );
+
+            // Add Page 
+            //  Internal Name: Communication View
+            //  Site: Kingdom First Solutions Mobile App
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Communication View", "", "341B07E0-E710-4C9A-8DAA-A5121917C330", "" );
+
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '341B07E0-E710-4C9A-8DAA-A5121917C330'" );
+
+            // Add Page 
+            //  Internal Name: Edit Profile
+            //  Site: Kingdom First Solutions Mobile App
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Edit Profile", "", "A3929533-0055-44BE-9752-38B9DF024468", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = 'A3929533-0055-44BE-9752-38B9DF024468'" );
 
             // Add Page 
             //  Internal Name: Webview - Any URL
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "A7C77AD7-69CB-4FE8-A3F6-AE7E48C53457", "Webview - Any URL", "", "743CF21F-C3C1-4AF1-8552-97A62A2B609B", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutNoScrollGuid, "Webview - Any URL", "", "743CF21F-C3C1-4AF1-8552-97A62A2B609B", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '743CF21F-C3C1-4AF1-8552-97A62A2B609B'" );
 
             // Add Page 
             //  Internal Name: Login
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Login", "", "23DCB577-AD0C-4DC6-97A3-2E1F0834D005", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Login", "", "23DCB577-AD0C-4DC6-97A3-2E1F0834D005", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '23DCB577-AD0C-4DC6-97A3-2E1F0834D005'" );
 
             // Add Page 
             //  Internal Name: Onboard
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Onboard", "", "641C23AE-C04E-4EA6-85E3-B33F2062F36D", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Onboard", "", "641C23AE-C04E-4EA6-85E3-B33F2062F36D", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '641C23AE-C04E-4EA6-85E3-B33F2062F36D'" );
 
             // Add Page 
             //  Internal Name: Register
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Register", "", "8DFDE07D-E9E0-4C38-99A8-DAC5A7C566DC", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Register", "", "8DFDE07D-E9E0-4C38-99A8-DAC5A7C566DC", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '8DFDE07D-E9E0-4C38-99A8-DAC5A7C566DC'" );
 
             // Add Page 
             //  Internal Name: My Account/Push Notifications
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "My Account/Push Notifications", "", "058F59CD-86D7-420B-81F0-2EFA2543CDDC", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "My Account/Push Notifications", "", "058F59CD-86D7-420B-81F0-2EFA2543CDDC", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '058F59CD-86D7-420B-81F0-2EFA2543CDDC'" );
 
             // Add Page 
             //  Internal Name: My Account/Giving History
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "My Account/Giving History", "", "0A152319-16B7-4899-B803-5780130E96A8", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "My Account/Giving History", "", "0A152319-16B7-4899-B803-5780130E96A8", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '0A152319-16B7-4899-B803-5780130E96A8'" );
 
             // Add Page 
             //  Internal Name: Push Notifications
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "A7C77AD7-69CB-4FE8-A3F6-AE7E48C53457", "Push Notifications", "", "751D63CC-1E10-4199-BB99-D6F411AF3BA6", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutNoScrollGuid, "Push Notifications", "", "751D63CC-1E10-4199-BB99-D6F411AF3BA6", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '751D63CC-1E10-4199-BB99-D6F411AF3BA6'" );
 
             // Add Page 
             //  Internal Name: Push Notification - Detail
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Push Notification - Detail", "", "4D7C4316-56F7-4BE7-A182-0074F47081EE", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Push Notification - Detail", "", "4D7C4316-56F7-4BE7-A182-0074F47081EE", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '4D7C4316-56F7-4BE7-A182-0074F47081EE'" );
 
             // Add Page 
             //  Internal Name: Giving History - All Transactions
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Giving History - All Transactions", "", "1E0EE431-671D-4AD4-9A31-83C12CDE4D19", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Giving History - All Transactions", "", "1E0EE431-671D-4AD4-9A31-83C12CDE4D19", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '1E0EE431-671D-4AD4-9A31-83C12CDE4D19'" );
 
             // Add Page 
             //  Internal Name: Prayer
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Prayer", "", "6D328172-D7EE-434B-BD79-A4D7ECA14684", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Prayer", "", "6D328172-D7EE-434B-BD79-A4D7ECA14684", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '6D328172-D7EE-434B-BD79-A4D7ECA14684'" );
 
             // Add Page 
             //  Internal Name: Prayer - Prayer Wall
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Prayer - Prayer Wall", "", "77F98E18-2E27-4D4A-B4CF-2FFA285A7014", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Prayer - Prayer Wall", "", "77F98E18-2E27-4D4A-B4CF-2FFA285A7014", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '77F98E18-2E27-4D4A-B4CF-2FFA285A7014'" );
 
             // Add Page 
             //  Internal Name: Prayer - Submit Prayer
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Prayer - Submit Prayer", "", "2A94E058-189A-49CD-AC22-99677CBDB351", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Prayer - Submit Prayer", "", "2A94E058-189A-49CD-AC22-99677CBDB351", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '2A94E058-189A-49CD-AC22-99677CBDB351'" );
 
             // Add Page 
             //  Internal Name: Prayer - Private Entry
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Prayer - Private Entry", "", "9A40B634-0E80-4207-BF0B-3050EFD49516", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Prayer - Private Entry", "", "9A40B634-0E80-4207-BF0B-3050EFD49516", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '9A40B634-0E80-4207-BF0B-3050EFD49516'" );
 
             // Add Page 
             //  Internal Name: Prayer Session
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Prayer Session", "", "68EAF2D8-688C-44C3-9222-340047E07095", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Prayer Session", "", "68EAF2D8-688C-44C3-9222-340047E07095", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '68EAF2D8-688C-44C3-9222-340047E07095'" );
 
             // Add Page 
             //  Internal Name: Communication Preferences
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Communication Preferences", "", "D426B3D7-ADCD-4516-B539-FDD6426DD230", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Communication Preferences", "", "D426B3D7-ADCD-4516-B539-FDD6426DD230", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = 'D426B3D7-ADCD-4516-B539-FDD6426DD230'" );
 
             // Add Page 
             //  Internal Name: Content Item View
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Content Item View", "", "FDF02B2C-F252-4F17-A947-C34957F1E2CC", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Content Item View", "", "FDF02B2C-F252-4F17-A947-C34957F1E2CC", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = 'FDF02B2C-F252-4F17-A947-C34957F1E2CC'" );
 
             // Add Page 
             //  Internal Name: Group Detail
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Group Detail", "", "EFB5029C-0BEA-4ADE-BFED-2E75B99A46D4", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Group Detail", "", "EFB5029C-0BEA-4ADE-BFED-2E75B99A46D4", "" );
 
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = 'EFB5029C-0BEA-4ADE-BFED-2E75B99A46D'" );
             // Add Page 
             //  Internal Name: C3 Home - Ministries
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "C3 Home - Ministries", "", "A95A3FF3-9287-4B50-99C7-ED01D00BAB2B", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "C3 Home - Ministries", "", "A95A3FF3-9287-4B50-99C7-ED01D00BAB2B", "" );
 
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = 'A95A3FF3-9287-4B50-99C7-ED01D00BAB2B'" );
             // Add Page 
             //  Internal Name: C3 Home - About
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "C3 Home - About", "", "17025FF4-2717-44F6-A4B7-B42A24600576", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "C3 Home - About", "", "17025FF4-2717-44F6-A4B7-B42A24600576", "" );
 
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '17025FF4-2717-44F6-A4B7-B42A24600576'" );
             // Add Page 
             //  Internal Name: C3 Home - Welcome
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "C3 Home - Welcome", "", "649DDAB5-0872-4051-9E57-BE986884A0EC", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "C3 Home - Welcome", "", "649DDAB5-0872-4051-9E57-BE986884A0EC", "" );
 
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '649DDAB5-0872-4051-9E57-BE986884A0EC'" );
             // Add Page 
             //  Internal Name: C3 Home - Ministries
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "C3 Home - Ministries", "", "78F86495-2973-4173-B9B7-5A7D32D6DBBB", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "C3 Home - Ministries", "", "78F86495-2973-4173-B9B7-5A7D32D6DBBB", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '78F86495-2973-4173-B9B7-5A7D32D6DBBB'" );
 
             // Add Page 
             //  Internal Name: C3 Home - Coming Up
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "C3 Home - Coming Up", "", "81DEF3F4-FE28-433B-9B16-C1462545EBA3", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "C3 Home - Coming Up", "", "81DEF3F4-FE28-433B-9B16-C1462545EBA3", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '81DEF3F4-FE28-433B-9B16-C1462545EBA3'" );
 
             // Add Page 
             //  Internal Name: C3 Home - What's Next
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "C3 Home - Whats Next", "", "FC76C90A-D72B-4772-9DCE-DBC3CB11C545", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "C3 Home - Whats Next", "", "FC76C90A-D72B-4772-9DCE-DBC3CB11C545", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = 'FC76C90A-D72B-4772-9DCE-DBC3CB11C545'" );
 
             // Add Page 
             //  Internal Name: My Groups
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "My Groups", "", "6944F938-3379-4E0C-8FB4-188FCB383BB6", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "My Groups", "", "6944F938-3379-4E0C-8FB4-188FCB383BB6", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '6944F938-3379-4E0C-8FB4-188FCB383BB6'" );
 
             // Add Page 
             //  Internal Name: Group Finder
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Group Finder", "", "3696C320-3C61-476F-94A8-11E934891D67", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Group Finder", "", "3696C320-3C61-476F-94A8-11E934891D67", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '3696C320-3C61-476F-94A8-11E934891D67'" );
 
             // Add Page 
             //  Internal Name: Group Edit
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Group Edit", "", "367B9E49-0330-4890-B554-BA7F034ADC9B", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Group Edit", "", "367B9E49-0330-4890-B554-BA7F034ADC9B", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '367B9E49-0330-4890-B554-BA7F034ADC9B'" );
 
             // Add Page 
             //  Internal Name: Group Member View
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Group Member View", "", "78671DCD-A1E0-461F-8F28-B0C10467BE57", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Group Member View", "", "78671DCD-A1E0-461F-8F28-B0C10467BE57", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '78671DCD-A1E0-461F-8F28-B0C10467BE57'" );
 
             // Add Page 
             //  Internal Name: Group Registration
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Group Registration", "", "B8C9AF1D-7EEE-45C0-8619-93ABBF528F9B", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Group Registration", "", "B8C9AF1D-7EEE-45C0-8619-93ABBF528F9B", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = 'B8C9AF1D-7EEE-45C0-8619-93ABBF528F9B'" );
 
             // Add Page 
             //  Internal Name: Watch
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "A7C77AD7-69CB-4FE8-A3F6-AE7E48C53457", "Watch", "", "4D192169-934E-491D-A1B1-5D4B759BA94E", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutNoScrollGuid, "Watch", "", "4D192169-934E-491D-A1B1-5D4B759BA94E", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '4D192169-934E-491D-A1B1-5D4B759BA94E'" );
 
             // Add Page 
             //  Internal Name: Series Detail
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Series Detail", "", "D035D65C-EB4F-4DAD-8EAC-47478042CA8C", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Series Detail", "", "D035D65C-EB4F-4DAD-8EAC-47478042CA8C", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = 'D035D65C-EB4F-4DAD-8EAC-47478042CA8C'" );
 
             // Add Page 
             //  Internal Name: Watch - Alternate
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Watch - Alternate", "", "5F5D7552-1093-4E40-AF21-28AFA489D0A8", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Watch - Alternate", "", "5F5D7552-1093-4E40-AF21-28AFA489D0A8", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = '5F5D7552-1093-4E40-AF21-28AFA489D0A8'" );
 
             // Add Page 
             //  Internal Name: Message Detail
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Message Detail", "", "A5733C5C-7329-4A64-8FDB-228EACA7E601", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Message Detail", "", "A5733C5C-7329-4A64-8FDB-228EACA7E601", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = 'A5733C5C-7329-4A64-8FDB-228EACA7E601'" );
 
             // Add Page 
             //  Internal Name: Take Notes
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Take Notes", "", "AA18A142-B85A-4373-AF92-A2E3BD329197", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Take Notes", "", "AA18A142-B85A-4373-AF92-A2E3BD329197", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = 'AA18A142-B85A-4373-AF92-A2E3BD329197'" );
 
             // Add Page 
             //  Internal Name: Listen
             //  Site: Kingdom First Solutions Mobile App
-            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", "10D01240-BFBD-43FF-89EC-8AB0C837360E", "Listen", "", "B84CDC78-0C4E-4D59-A68F-157F01F6B9E7", "" );
+            RockMigrationHelper.AddPage( true, "7665A012-33D3-4990-8614-B8274A4221C7", layoutHomepageGuid, "Listen", "", "B84CDC78-0C4E-4D59-A68F-157F01F6B9E7", "" );
+            Sql( @"UPDATE [Page] SET DisplayInNavWhen = 2 WHERE [Guid] = 'B84CDC78-0C4E-4D59-A68F-157F01F6B9E7'" );
 
 
             Sql( @"DECLARE @ApiKeyId int, @ProfilePageId int, @CommunicationViewPageId int;
                    SELECT @ProfilePageId = Id FROM [Page] WHERE [Guid] = 'A3929533-0055-44BE-9752-38B9DF024468';
                    SELECT @CommunicationViewPageId = Id FROM [Page] WHERE [Guid] = '341B07E0-E710-4C9A-8DAA-A5121917C330';
-                   UPDATE [Site] SET [AdditionalSettings] = '{""LastDeploymentDate"":null,""LastDeploymentVersionId"":null,""PhoneUpdatePackageUrl"":null,""TabletUpdatePackageUrl"":null,""ShellType"":2,""TabLocation"":1,""CssStyle"":"".tab-bar {\n -xf-bar-background-color: #709bb5;\n -rock-selected-tab-color: #ffffff;\n -rock-unselected-tab-color: #99ffffff;\n}"",""ApiKeyId"":null,""ProfilePageId"":'+ @ProfilePageId + ',""PersonAttributeCategories"":[0],""BarBackgroundColor"":""#709bb5"",""MenuButtonColor"":""#ffffff"",""ActivityIndicatorColor"":""#709bb5"",""FlyoutXaml"":""<ListView SeparatorVisibility=\""None\"" \n    HasUnevenRows=\""true\"" \n    ItemsSource=\""{Binding MenuItems}\"">\n\n    <ListView.Header>\n        <StackLayout VerticalOptions=\""FillAndExpand\""\n            Orientation=\""Vertical\"">\n\n            <Rock:LoginStatus Padding=\""20, 70, 20, 50\"" \n                ImageSize=\""120\"" \n                ImageBorderColor=\""rgba(255, 255, 255, 0.4)\"" \n                ImageBorderSize=\""5\"" />\n\n            <BoxView HeightRequest=\""1\"" BackgroundColor=\""rgba(255, 255, 255, 0.2)\""\n                HorizontalOptions=\""FillAndExpand\""/>\n\n        </StackLayout>\n    </ListView.Header>\n\n    <ListView.ItemTemplate>\n        <DataTemplate>\n            <Rock:ViewCell SelectedBackgroundColor=\""rgba(255, 255, 255, 0.2)\"">\n            \n                <StackLayout VerticalOptions=\""FillAndExpand\"" \n                    Orientation=\""Vertical\"">\n\n                    <ContentView StyleClass=\""pt-16, pb-12\"">\n                        <Label StyleClass=\""text-white, ml-32, flyout-menu-item\""\n                            Text=\""{Binding Title}\"" \n                            VerticalOptions=\""Center\"" \n                            HorizontalOptions=\""FillAndExpand\"" />\n                    </ContentView>\n\n                    <BoxView HeightRequest=\""1\""\n                        BackgroundColor=\""rgba(255, 255, 255, 0.4)\""\n                        HorizontalOptions=\""FillAndExpand\"" />\n\n                </StackLayout>\n\n            </Rock:ViewCell>\n        </DataTemplate>\n    </ListView.ItemTemplate>\n\n</ListView>"",""ToastXaml"":""<StackLayout>\n <Frame HasShadow=\""False\"">\n <StackLayout>\n {% if ToastTitle != '' %}\n <Label StyleClass=\""title\"" Text=\""{Binding ToastTitle}\"" />\n {% endif %}\n <Label Text=\""{Binding ToastMessage}\"" />\n </StackLayout>\n </Frame>\n</StackLayout>"",""LockedPhoneOrientation"":1,""LockedTabletOrientation"":0,""DownhillSettings"":{""SpacingValues"":{""0"":""0"",""1"":""1"",""2"":""2"",""4"":""4"",""8"":""8"",""12"":""12"",""16"":""16"",""24"":""24"",""32"":""32"",""64"":""64""},""SpacingUnits"":"""",""FontSizes"":{""xs"":0.75,""sm"":0.875,""base"":1.0,""lg"":1.125,""xl"":1.25,""2xl"":1.5,""3xl"":1.875,""4xl"":2.25,""5xl"":3.0,""6xl"":4.0},""BorderWidths"":[0,1,2,4,8],""Platform"":0,""BorderUnits"":"""",""FontUnits"":"""",""FontSizeDefault"":16.0,""ApplicationColors"":{""Primary"":""#6f9bb4"",""Secondary"":""#6c757d"",""Success"":""#28a745"",""Danger"":""#dc3545"",""Warning"":""#ffc107"",""Info"":""#17a2b8"",""Light"":""#f8f9fa"",""Dark"":""#343a40"",""White"":""#ffffff"",""Brand"":""#6f9bb4""},""RadiusBase"":0.0,""TextColor"":""#676767"",""HeadingColor"":""#709bb5"",""BackgroundColor"":""#ffffff"",""AdditionalCssToParse"":{}},""NavigationBarActionXaml"":""<Rock:LoginStatusPhoto StyleClass=\""p-8\"" NotLoggedInCommand=\""{Binding PushPage}\""\n NotLoggedInCommandParameter=\""641c23ae-c04e-4ea6-85e3-b33f2062f36d\"" LoggedInCommand=\""{Binding PushPage}\""\n LoggedInCommandParameter=\""058f59cd-86d7-420b-81f0-2efa2543cddc\"" ProfilePhotoCircle=\""true\"" ProfilePhotoStrokeWidth=\""1\"" />"",""HomepageRoutingLogic"":"""",""CampusFilterDataViewId"":null,""CommunicationViewPageId"":'+ @CommunicationViewPageId + ',""EnableNotificationsAutomatically"":true,""PushTokenUpdateValue"":"""",""IsDeepLinkingEnabled"":false,""BundleIdentifier"":null,""TeamIdentifier"":null,""PackageName"":null,""CertificateFingerprint"":null,""DeepLinkPathPrefix"":null,""DeepLinkRoutes"":[],""DeepLinkDomains"":null,""IsPackageCompressionEnabled"":true,""Auth0Domain"":"""",""Auth0ClientId"":"""",""EntraClientId"":"""",""EntraTenantId"":"""",""EntraAuthenticationComponent"":null}' WHERE [Guid] = '1DEF6B4D-F796-45E5-9535-BC1A5A1EA327'" );
+                   UPDATE [Site] SET [AdditionalSettings] = '{""LastDeploymentDate"":null,""LastDeploymentVersionId"":null,""PhoneUpdatePackageUrl"":null,""TabletUpdatePackageUrl"":null,""ShellType"":2,""TabLocation"":1,""CssStyle"":"".tab-bar {\n -xf-bar-background-color: #709bb5;\n -rock-selected-tab-color: #ffffff;\n -rock-unselected-tab-color: #99ffffff;\n}"",""ApiKeyId"":null,""ProfilePageId"":'+ CAST(@ProfilePageId AS VARCHAR) + ',""PersonAttributeCategories"":[0],""BarBackgroundColor"":""#709bb5"",""MenuButtonColor"":""#ffffff"",""ActivityIndicatorColor"":""#709bb5"",""FlyoutXaml"":""<ListView SeparatorVisibility=\""None\"" \n    HasUnevenRows=\""true\"" \n    ItemsSource=\""{Binding MenuItems}\"">\n\n    <ListView.Header>\n        <StackLayout VerticalOptions=\""FillAndExpand\""\n            Orientation=\""Vertical\"">\n\n            <Rock:LoginStatus Padding=\""20, 70, 20, 50\"" \n                ImageSize=\""120\"" \n                ImageBorderColor=\""rgba(255, 255, 255, 0.4)\"" \n                ImageBorderSize=\""5\"" />\n\n            <BoxView HeightRequest=\""1\"" BackgroundColor=\""rgba(255, 255, 255, 0.2)\""\n                HorizontalOptions=\""FillAndExpand\""/>\n\n        </StackLayout>\n    </ListView.Header>\n\n    <ListView.ItemTemplate>\n        <DataTemplate>\n            <Rock:ViewCell SelectedBackgroundColor=\""rgba(255, 255, 255, 0.2)\"">\n            \n                <StackLayout VerticalOptions=\""FillAndExpand\"" \n                    Orientation=\""Vertical\"">\n\n                    <ContentView StyleClass=\""pt-16, pb-12\"">\n                        <Label StyleClass=\""text-white, ml-32, flyout-menu-item\""\n                            Text=\""{Binding Title}\"" \n                            VerticalOptions=\""Center\"" \n                            HorizontalOptions=\""FillAndExpand\"" />\n                    </ContentView>\n\n                    <BoxView HeightRequest=\""1\""\n                        BackgroundColor=\""rgba(255, 255, 255, 0.4)\""\n                        HorizontalOptions=\""FillAndExpand\"" />\n\n                </StackLayout>\n\n            </Rock:ViewCell>\n        </DataTemplate>\n    </ListView.ItemTemplate>\n\n</ListView>"",""ToastXaml"":""<StackLayout>\n <Frame HasShadow=\""False\"">\n <StackLayout>\n {% if ToastTitle != '' %}\n <Label StyleClass=\""title\"" Text=\""{Binding ToastTitle}\"" />\n {% endif %}\n <Label Text=\""{Binding ToastMessage}\"" />\n </StackLayout>\n </Frame>\n</StackLayout>"",""LockedPhoneOrientation"":1,""LockedTabletOrientation"":0,""DownhillSettings"":{""SpacingValues"":{""0"":""0"",""1"":""1"",""2"":""2"",""4"":""4"",""8"":""8"",""12"":""12"",""16"":""16"",""24"":""24"",""32"":""32"",""64"":""64""},""SpacingUnits"":"""",""FontSizes"":{""xs"":0.75,""sm"":0.875,""base"":1.0,""lg"":1.125,""xl"":1.25,""2xl"":1.5,""3xl"":1.875,""4xl"":2.25,""5xl"":3.0,""6xl"":4.0},""BorderWidths"":[0,1,2,4,8],""Platform"":0,""BorderUnits"":"""",""FontUnits"":"""",""FontSizeDefault"":16.0,""ApplicationColors"":{""Primary"":""#6f9bb4"",""Secondary"":""#6c757d"",""Success"":""#28a745"",""Danger"":""#dc3545"",""Warning"":""#ffc107"",""Info"":""#17a2b8"",""Light"":""#f8f9fa"",""Dark"":""#343a40"",""White"":""#ffffff"",""Brand"":""#6f9bb4""},""RadiusBase"":0.0,""TextColor"":""#676767"",""HeadingColor"":""#709bb5"",""BackgroundColor"":""#ffffff"",""AdditionalCssToParse"":{}},""NavigationBarActionXaml"":""<Rock:LoginStatusPhoto StyleClass=\""p-8\"" NotLoggedInCommand=\""{Binding PushPage}\""\n NotLoggedInCommandParameter=\""641c23ae-c04e-4ea6-85e3-b33f2062f36d\"" LoggedInCommand=\""{Binding PushPage}\""\n LoggedInCommandParameter=\""058f59cd-86d7-420b-81f0-2efa2543cddc\"" ProfilePhotoCircle=\""true\"" ProfilePhotoStrokeWidth=\""1\"" />"",""HomepageRoutingLogic"":"""",""CampusFilterDataViewId"":null,""CommunicationViewPageId"":'+ CAST(@CommunicationViewPageId AS VARCHAR) + ',""EnableNotificationsAutomatically"":true,""PushTokenUpdateValue"":"""",""IsDeepLinkingEnabled"":false,""BundleIdentifier"":null,""TeamIdentifier"":null,""PackageName"":null,""CertificateFingerprint"":null,""DeepLinkPathPrefix"":null,""DeepLinkRoutes"":[],""DeepLinkDomains"":null,""IsPackageCompressionEnabled"":true,""Auth0Domain"":"""",""Auth0ClientId"":"""",""EntraClientId"":"""",""EntraTenantId"":"""",""EntraAuthenticationComponent"":null}' WHERE [Guid] = '1DEF6B4D-F796-45E5-9535-BC1A5A1EA327'" );
 
             // Add Block 
             //  Block Name: Content
