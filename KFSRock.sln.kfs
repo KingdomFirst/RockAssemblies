@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "RockWeb", "RockWeb\", "{E43B5D55-BED0-4E74-BF97-9327F9A9D656}"
 	ProjectSection(WebsiteProperties) = preProject
@@ -200,6 +200,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.ClickBid", "KFSRockAssemblies\rocks.kfs.ClickBid\rocks.kfs.ClickBid.csproj", "{84237621-CC75-45A7-B633-D0C7B4CC476B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rocks.kfs.CyberSource", "KFSRockAssemblies\rocks.kfs.CyberSource\rocks.kfs.CyberSource.csproj", "{6B1E701E-E7F6-4932-8D5D-D8F45EC6F20B}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "rocks.kfs.JavaScript.Obsidian", "KFSRockAssemblies\rocks.kfs.JavaScript.Obsidian\rocks.kfs.JavaScript.Obsidian.esproj", "{9FF04EC6-7240-43FF-BB75-D4277ACFFF91}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -527,6 +529,12 @@ Global
 		{84237621-CC75-45A7-B633-D0C7B4CC476B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84237621-CC75-45A7-B633-D0C7B4CC476B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{84237621-CC75-45A7-B633-D0C7B4CC476B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FF04EC6-7240-43FF-BB75-D4277ACFFF91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FF04EC6-7240-43FF-BB75-D4277ACFFF91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FF04EC6-7240-43FF-BB75-D4277ACFFF91}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{9FF04EC6-7240-43FF-BB75-D4277ACFFF91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FF04EC6-7240-43FF-BB75-D4277ACFFF91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FF04EC6-7240-43FF-BB75-D4277ACFFF91}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,649 @@
+<!-- Copyright by Kingdom First Solutions; Licensed under the Apache License -->
+<template>
+    <div>
+        <div v-if="loading" class="text-center">
+            <LoadingIndicator />
+        </div>
+
+        <div v-show="!loading && !failedToLoad" style="max-width: 600px;">
+            <div :id="controlId" class="js-cybersource-payment-inputs cybersource-payment-inputs" ref="paymentInputs">
+                <div class="gateway-address-container js-gateway-address-container">
+                    <h4>Billing</h4>
+                    <AddressControl label="Address" v-model="address" :disabled="isSaving" :rules="'required'" />
+                </div>
+                <div class="gateway-creditcard-container gateway-payment-container js-gateway-creditcard-container" >
+                    <h4>Payment</h4>
+                    <div class="form-group position-relative">
+                        <label class="control-label">Card Number</label>
+                        <div class="form-control js-credit-card-input iframe-input credit-card-input"></div>
+                        <i id="cardDisplay" style="position: absolute; right: 10px; bottom: 3px;"></i>
+                    </div>
+                    <div class="break"></div>
+                    <div class="row">
+                        <div class="col-xs-6 exp-col">
+                            <div class="iframe-input credit-card-exp-input js-credit-card-exp-input"></div>
+                            <DatePartsPicker label="Expiration Date" :isRequired="true" :startYear="nowYear" :futureYearCount="15" v-model="ccexpvalue" :showBlankItem="false" :multiple="false" :hideDay="true" :disabled="isSaving" />
+                        </div>
+                        <div class="col-xs-6 cvv-col">
+                            <div class="form-group">
+                                <label class="control-label credit-card-cvv-label">{{ FlexJS?.config.fields.cvv.title }}</label>
+                                <div id="divCVV" class="form-control js-credit-card-cvv-input iframe-input credit-card-cvv-input input-width-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" style="display: none;" class="payment-button js-payment-button"></button>
+            </div>
+        </div>
+
+        <div v-show="validationMessage" class="alert alert-validation js-payment-input-validation">
+            <span class='js-validation-message'>
+                {{ validationMessage }}
+                <p v-show="validationMessageShowReload"><a href="javascript:location.reload();" class="btn btn-warning mt-3" onclick="Rock.controls.bootstrapButton.showLoading(this);" data-loading-text="Reloading...">Reload Page</a></p>
+            </span>
+        </div>
+    </div>
+</template>
+
+<script lang="ts">
+    // #region MicroForm Types
+
+    type InputField = {
+        selector: string;
+        title: string;
+        placeholder: string;
+    };
+
+    type HideableInputField = InputField & {
+        display?: "show" | "hide" | "required";
+    };
+
+    type InputFields = {
+        ccnumber?: InputField;
+        ccexp?: InputField;
+        cvv?: HideableInputField;
+
+        [index: string]: InputField | undefined;
+    };
+
+    type MonthYearDay = {
+        month: number;
+        year: number;
+        day: number;
+    }
+
+    /**
+     * Commented out by KFS for now, I would love to handle validation and timeout the same way as other Gateway's,
+     * but Cybersource is not as great at returning invalid states of their fields. Need to look into it, but going to comment out code for now.
+     */
+    //type TimeoutCallback = () => void;
+    //type ValidationCallback = (field: string, validated: boolean, message: string) => void;
+
+    type MicroformOptions = {
+        paymentSelector: string;
+
+        variant: "inline";
+
+        fields: InputFields;
+
+        styleSniffer: boolean;
+
+        customStyles: Record<string, Record<string, string>>;
+
+        cardIcons: Record<string, string>
+
+        timeoutDuration?: number;
+
+        initialLoadTimeout?: number;
+
+        //timeoutCallback?: TimeoutCallback;
+
+        //validationCallback?: ValidationCallback;
+
+        //callback: ResponseCallback;
+
+        flexTimeout?: number;
+
+        flexTimeLoaded?: number;
+    };
+
+    type MicroformCard = {
+        name: string;
+        securityCode: { name:string }
+    }
+
+    type MicroformResponse = {
+        card: Array<MicroformCard>;
+        message: string;
+    }
+    type MicroformField = {
+        _config: object;
+
+        _iframe: HTMLIFrameElement;
+
+        _loaded: boolean;
+
+        load: (selector: string) => void;
+
+        on: (selector: string, callback:(data:MicroformResponse) => void) => void;
+    };
+
+    type Microform = {
+        createField: (type:string, options?:object) => MicroformField;
+        createToken: (options:object, callback:(data:MicroformResponse, token:string) => void) => void;
+    }
+
+    type FlexJS = {
+        config: MicroformOptions;
+
+        captureContext: string;
+
+        microform: Microform;
+
+        inSubmission: boolean;
+
+        number:MicroformField;
+
+        securityCode:MicroformField;
+
+        loadCheckInterval: ReturnType<typeof setInterval>;
+    };
+
+    /* eslint-disable-next-line */
+    let FlexJS: FlexJS | undefined;
+
+    /* eslint-disable-next-line */
+    declare function Flex(jwk:string): void | undefined;
+
+    // #endregion
+
+</script>
+
+<script setup lang="ts">
+    import { computed, onMounted, PropType, ref } from "vue";
+    import LoadingIndicator from "@Obsidian/Controls/loadingIndicator.obs";
+    import DatePartsPicker from "@Obsidian/Controls/datePartsPicker.obs";
+    import AddressControl from "@Obsidian/Controls/addressControl.obs";
+    import { newGuid } from "@Obsidian/Utility/guid";
+    import { onSubmitPayment } from "@Obsidian/Core/Controls/financialGateway";
+    import { GatewayEmitStrings } from "@Obsidian/Enums/Controls/gatewayEmitStrings";
+    import { FormError } from "@Obsidian/Utility/form";
+    import { AddressControlBag } from "@Obsidian/ViewModels/Controls/addressControlBag";
+
+
+    /**
+     * The settings we expect to receive from the web server.
+     */
+    type Settings = {
+        gatewayUrl: string;
+        microFormJsPath: string;
+        microFormJWK: string;
+        jwkGeneratedTime: number;
+        address?: AddressControlBag | null;
+    };
+
+    /**
+     * Commented out by KFS for now, I would love to handle validation the same way as other Gateway's,
+     * but Cybersource is not as great at returning invalid states of their fields. Need to look into it, but going to comment out code for now.
+     * 
+     * The field validation state for the various input fields.
+     */
+    //type ValidationField = {
+    //    /** The name of the field. */
+    //    field: string;
+
+    //    /** true if the field is valid; otherwise false. */
+    //    status: boolean;
+
+    //    /** If status if false this will contain the error message; otherwise an empty string. */
+    //    message: string;
+    //};
+
+    const standardStyling = ``;
+    const isSaving = ref<boolean>(false);
+
+    const props = defineProps({
+        settings: {
+            type: Object as PropType<Settings>,
+            required: true
+        }
+    });
+
+    const emit = defineEmits<{
+        (e: typeof GatewayEmitStrings.Success, value: string): void;
+        (e: typeof GatewayEmitStrings.Validation, value: FormError[]): void;
+        (e: typeof GatewayEmitStrings.Error, value: string): void;
+    }>();
+
+    let hasAttemptedSubmit = false;
+
+    /** true if we have received a token back from Cybersource. */
+    let hasReceivedToken = false;
+
+    const creditCardButtonClasses = ["btn", "btn-default", "active", "payment-creditcard"];
+
+    const nowYear = computed((): number => { return new Date().getFullYear(); });
+
+    /** true while we are still loading data; otherwise false. */
+    const loading = ref(true);
+
+    /** true if we failed to load the Microform content. */
+    const failedToLoad = ref(false);
+
+    /** Contains the current validation message to be displayed. */
+    const validationMessage = ref("");
+    const validationMessageShowReload = ref(false);
+
+    /** true if we have already sent a token response to the server; otherwise false. */
+    const tokenResponseSent = ref(false);
+
+    let ccexpvalue: MonthYearDay = { month: 0, year: 0, day: 0 };
+
+    /** In order for the AddressControl to allow our code to be compiled I had to add
+     *  // @ts-ignore above each line in the addressControl.obs file that generated an exception.
+     */
+    const address = ref<AddressControlBag | undefined>(props.settings.address ?? undefined);
+
+    /**
+     * Contains a unique identifier that we can use to allow MicroformJS
+     * to find our input fields.
+     */
+    const controlId = `cyberSource_${newGuid()}`;
+
+    const paymentInputs = ref<HTMLElement | null>(null);
+
+        /**
+     * Ensures the Cybersource Flex Microform script is loaded into the browser.
+     *
+     * @param microFormJWK The microform jwk key that will be used to initialize the script.
+     */
+    async function loadMicroformJsAsync(microFormJWK: string): Promise<boolean> {
+        if (typeof Flex === "undefined") {
+            const script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = props.settings.microFormJsPath;
+            script.setAttribute("data-variant", "inline");
+            document.getElementsByTagName("head")[0].appendChild(script);
+
+            try {
+                await new Promise<void>((resolve, reject) => {
+                    script.addEventListener("load", () => resolve());
+                    script.addEventListener("error", () => reject());
+                });
+            }
+            catch {
+                return false;
+            }
+        }
+
+        return typeof Flex !== "undefined";
+    }
+
+    /**
+     * Loads styles into the head.
+     */
+    async function loadStandardStyleTagAsync(): Promise<void> {
+        const style = document.createElement("style");
+        style.type = "text/css";
+        style.innerText = standardStyling;
+
+        await new Promise<void>((resolve, reject) => {
+            style.addEventListener("load", () => resolve());
+            style.addEventListener("error", () => reject());
+
+            document.getElementsByTagName("head")[0].appendChild(style);
+        });
+    }
+
+    /**
+     * Get the standard Microform options. This is primarily all the custom CSS
+     * and control references.
+     *
+     * @param controlId The identifier of the parent control that contains all the input fields.
+     *
+     * @returns An object that contains the FlexJS options.
+     */
+     function getFlexJSOptions(controlId: string): MicroformOptions {
+        // Populate our custom CSS to make the fields mostly match standard Rock
+        // input fields.
+        const customStyles: Record<string, Record<string, string>> = {
+            ':disabled': { 'cursor': 'not-allowed' },
+            'valid': { 'color': '#3c763d' },
+            'invalid': { 'color': '#a94442' }
+        };
+
+        const cardIcons: Record<string, string> = {
+            "visa": 'fab fa-cc-visa', 
+            "mastercard": 'fab fa-cc-mastercard', 
+            "amex": 'fab fa-cc-amex',
+            "discover": 'fab fa-cc-discover',
+            "dinersclub": 'fab fa-cc-diners-club',
+            "jcb": 'fab fa-cc-jcb'
+        };
+
+        // Build the Microform options.
+        const options: MicroformOptions = {
+            paymentSelector: `${controlId} .js-payment-button`,
+            variant: "inline",
+            fields: {
+                ccnumber: {
+                    selector: `#${controlId} .js-credit-card-input`,
+                    title: "Card Number",
+                    placeholder: "0000 0000 0000 0000"
+                },
+                ccexp: {
+                    selector: `#${controlId} .js-credit-card-exp-input`,
+                    title: "Expiration Date",
+                    placeholder: "MM / YY"
+                },
+                cvv: {
+                    display: "show",
+                    selector: `#${controlId} .js-credit-card-cvv-input`,
+                    title: "Security Code",
+                    placeholder: "CVV"
+                } as InputField
+            },
+            styleSniffer: false,
+            customStyles,
+            cardIcons,
+            timeoutDuration: 10000,
+            initialLoadTimeout: 30000,
+            flexTimeout: 900000,
+            flexTimeLoaded: props.settings.jwkGeneratedTime
+        };
+
+        return options;
+    }
+
+    /**
+     * Commented out by KFS for now, I would love to handle validation the same way as other Gateway's,
+     * but Cybersource is not as great at returning invalid states of their fields. Need to look into it, but going to comment out code for now.
+     * 
+     * Translates the Cybersource field name into a user friendly one.
+     *
+     * @param field The field name as provided by Cybersource.
+     *
+     * @returns A user friendly name for the field.
+     */
+    // function getFieldFriendlyName(field: string): string {
+    //    if (field === "ccnumber") {
+    //        return "Card Number";
+    //    }
+    //    else if (field === "ccexp") {
+    //        return "Expiration Date";
+    //    }
+    //    else if (field === "cvv") {
+    //        return "Security Code";
+    //    }
+    //    else {
+    //        return "Payment Information";
+    //    }
+    //}
+    
+     function checkCybersourceFieldsLoaded(clearTimer:boolean = true): void {
+         var currentTime = new Date().getTime();
+         var timeDiff = currentTime - FlexJS?.config?.flexTimeLoaded ?? 0;
+         if (FlexJS?.config?.flexTimeout && timeDiff >= FlexJS?.config?.flexTimeout) {
+             if (clearTimer) {
+                 clearInterval(FlexJS?.loadCheckInterval);
+             }
+
+            validationMessage.value = 'We\'re sorry your payment session has timed out. Please reload the page to try again.';
+            validationMessageShowReload.value = true;
+
+            var actionBtn = document.querySelector('.btn-give-now, .js-submit-hostedpaymentinfo, .navigation.actions .btn, .registration-entry .actions .btn-primary');
+            if (actionBtn != null) {
+                actionBtn.classList.add('disabled');
+                actionBtn.removeAttribute('href');
+                actionBtn.setAttribute('disabled', 'disabled');
+            }
+         }
+     }
+
+     function initCybersourceMicroFormFields():void {
+         if (FlexJS?.number == undefined && FlexJS?.securityCode == undefined) {
+             FlexJS.number = FlexJS?.microform?.createField('number', { placeholder: '0000 0000 0000 0000' });
+             FlexJS.securityCode = FlexJS?.microform?.createField('securityCode');
+         }
+
+         FlexJS?.number?.load('.cybersource-payment-inputs .js-credit-card-input');
+         FlexJS?.securityCode?.load('.cybersource-payment-inputs .js-credit-card-cvv-input');
+
+         FlexJS?.number?.on('error', function(data) {
+             console.error(data);
+             loading.value = false;
+             validationMessage.value = data.message;
+         });
+
+         FlexJS?.number?.on('load', function(data) { 
+            loading.value = false; 
+        });
+
+         var cardIcon = document.querySelector('#cardDisplay');
+         var cardSecurityCodeLabel = document.querySelector('label.credit-card-cvv-label');
+
+         FlexJS?.number?.on('change', function(data) {
+           if (data.card.length === 1) {
+             cardIcon.className = 'fa-2x ' + FlexJS?.config?.cardIcons[data.card[0].name];
+             cardSecurityCodeLabel.textContent = data.card[0].securityCode.name;
+             FlexJS.config.fields.cvv.title = data.card[0].securityCode.name;
+           } else {
+             cardIcon.className = 'fa-2x fas fa-credit-card';
+           }
+         });
+
+         checkCybersourceFieldsLoaded(false);
+
+         setTimeout(function () {
+             if (loading.value) {
+                 loading.value = false;
+                 failedToLoad.value = true;
+                 FlexJS.config.flexTimeLoaded -= FlexJS.config.flexTimeout;
+                 checkCybersourceFieldsLoaded(false);
+             }
+         }, FlexJS?.config?.initialLoadTimeout);
+     };
+
+     function submitCybersourceMicroFormInfo():void {
+         isSaving.value = true;
+
+         var options = {
+             expirationMonth: ('00'+ccexpvalue.month).slice(-2),
+             expirationYear: ccexpvalue.year
+         };
+
+         FlexJS.inSubmission = true;
+
+         FlexJS?.microform?.createToken(options, function (err, token) {
+             if (err) {
+                 // handle error
+                 console.error(err);
+                 isSaving.value = false;
+                 emit(GatewayEmitStrings.Error, err.message);
+             } else {
+                 hasReceivedToken = true;
+                 let addressToken = {
+                     billingAddress: address.value,
+                     originalToken: token
+                 }
+                 emit(GatewayEmitStrings.Success, JSON.stringify(addressToken) ?? "");
+             }
+         });
+     };
+
+    /**
+     * Commented out by KFS for now, I would love to handle validation the same way as other Gateway's,
+     * but Cybersource is not as great at returning invalid states of their fields. Need to look into it, but going to comment out code for now.
+     * 
+     * Contains all the field validation states. */
+    //const validationFieldStatus: Record<string, ValidationField> = {
+    //    ccnumber: { field: getFieldFriendlyName("ccnumber"), status: false, message: "is required" },
+    //    ccexp: { field: getFieldFriendlyName("ccexp"), status: false, message: "is required" },
+    //    cvv: { field: getFieldFriendlyName("cvv"), status: false, message: "is required" }
+    //};
+
+    /**
+     * Commented out by KFS for now, I would love to handle validation the same way as other Gateway's,
+     * but Cybersource is not as great at returning invalid states of their fields. Need to look into it, but going to comment out code for now.
+     * 
+     * Validates all the inputs from MicroformJS to see if any visible input
+     * fields are invalid.
+     *
+     * @returns An object that describes if all the inputs are valid.
+     */
+    //function validateInputs(): FormError[] {
+    //    const errors: FormError[] = [];
+
+    //    for (const validationFieldKey in validationFieldStatus) {
+    //        const validationField = validationFieldStatus[validationFieldKey];
+
+    //        const inputField = document.querySelector(FlexJS.config.fields[validationFieldKey].selector ?? "") as HTMLElement;
+    //        const fieldVisible = (inputField?.offsetWidth ?? 0) !== 0 || (inputField?.offsetHeight ?? 0) !== 0;
+
+    //        if (fieldVisible && !validationField.status) {
+    //            const validationFieldTitle = getFieldFriendlyName(validationFieldKey);
+
+    //            errors.push({
+    //                name: validationFieldTitle,
+    //                text: validationField.message || "unknown validation error"
+    //            });
+    //        }
+    //    }
+
+    //    return errors;
+    //}
+
+    /**
+     * Commented out by KFS for now, I would love to handle timeout the same way as other Gateway's,
+     * but Cybersource is not as great at returning invalid states of their fields. Need to look into it, but going to comment out code for now.
+     * 
+     * Callback function that handles the timeout scenario of Cybersource.
+     */
+    //const timeoutCallback: TimeoutCallback = () => {
+    //    // If we got a timeout after sending the response then ignore the error.
+    //    if (tokenResponseSent.value) {
+    //        return;
+    //    }
+
+    //    // A timeout callback will fire due to a timeout or incomplete
+    //    // input fields (Cybersource doesn't tell us why).
+    //    console.log("The tokenization didn't respond in the expected timeframe. This could be due to an invalid or incomplete field or poor connectivity - " + Date());
+
+    //    // Since we don't know exactly what happened, lets see if it might
+    //    // be invalid inputs by checking them all manually.
+    //    const validationErrors = validateInputs();
+
+    //    if (validationErrors.length > 0) {
+    //        emit(GatewayEmitStrings.Validation, validationErrors);
+    //    }
+    //    else {
+    //        // Inputs seem to be valid, so show a message to let them
+    //        // know what seems to be happening.
+    //        console.log("Timeout happened for unknown reason, probably poor connectivity since we already validated inputs.");
+
+    //        emit(GatewayEmitStrings.Validation, [
+    //            {
+    //                name: "Payment Timeout",
+    //                text: "Response from gateway timed out. This could be do to poor connectivity or invalid payment values."
+    //            }
+    //        ]);
+    //    }
+    //};
+
+    /**
+     * Commented out by KFS for now, I would love to handle validation the same way as other Gateway's,
+     * but Cybersource is not as great at returning invalid states of their fields. Need to look into it, but going to comment out code for now.
+     * 
+     * Callback function that handles field validation results from the
+     * Microform back-end.
+     *
+     * @param field The name of the field being validated.
+     * @param validated true if the field is valid; otherwise false.
+     * @param message A message that describes the reason for the validation failure.
+     */
+    //const validationCallback: ValidationCallback = (field: string, validated: boolean, message: string): void => {
+    //    // if there is a validation error, keep the message and field that
+    //    // has the error. Then we'll check it before starting the payment
+    //    // submission.
+
+    //    if (message === "Field is empty") {
+    //        message = "is required";
+    //    }
+
+    //    validationFieldStatus[field] = {
+    //        field: field,
+    //        status: validated,
+    //        message: message
+    //    };
+
+    //    const validationErrors = validateInputs();
+
+    //    if (hasAttemptedSubmit && !(FlexJS?.inSubmission ?? false) && !hasReceivedToken) {
+    //        isSaving.value = false;
+    //        emit(GatewayEmitStrings.Validation, validationErrors);
+    //    }
+    //};
+
+    // Add a callback when the submit payment button is pressed.
+    onSubmitPayment(() => {
+        if (loading.value || failedToLoad.value) {
+            return;
+        }
+
+        tokenResponseSent.value = false;
+
+        // The delay allows field validation when losing field focus.
+        setTimeout(() => {
+            //const validationErrors = validateInputs();
+
+            hasAttemptedSubmit = true;
+            //if (validationErrors.length === 0) {
+                submitCybersourceMicroFormInfo();
+            //}
+            //else {
+            //    emit(GatewayEmitStrings.Validation, validationErrors);
+            //}
+        }, 0);
+    });
+
+    // Additional processing once our template has been processed and mounted
+    // into the DOM. Initialize the Cybersource Microform fields.
+    onMounted(async () => {
+        await loadStandardStyleTagAsync();
+
+        if (!(await loadMicroformJsAsync(props.settings.microFormJWK ?? ""))) {
+            emit(GatewayEmitStrings.Error, "Error configuring hosted gateway. This could be due to an invalid or missing API Key. Please verify that API Key is configured correctly in gateway settings.");
+            return;
+        }
+
+        if (paymentInputs.value) {
+            paymentInputs.value.querySelectorAll(".iframe-input").forEach(el => {
+                el.innerHTML = "";
+            });
+        }
+
+        try {
+            const options = getFlexJSOptions(controlId);
+
+            var flex = new Flex(props.settings.microFormJWK);
+
+            FlexJS = {
+                config: options,
+                captureContext: props.settings.microFormJWK,
+                inSubmission: false,
+                microform: flex.microform({ styles: options.customStyles }),
+                loadCheckInterval: setInterval(checkCybersourceFieldsLoaded,1000),
+                number: undefined,
+                securityCode: undefined
+            };
+
+            initCybersourceMicroFormFields();
+        }
+        catch {
+            failedToLoad.value = true;
+            emit(GatewayEmitStrings.Error, "Error configuring hosted gateway. This could be due to an invalid or missing API Key. Please verify that API Key is configured correctly in gateway settings.");
+            return;
+        }
+    });
+</script>
