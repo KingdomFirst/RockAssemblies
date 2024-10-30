@@ -1,6 +1,6 @@
 /* eslint-disable */
 const path = require("path");
-const { defineConfigs } = require("../../Rock15/Rock.JavaScript.Obsidian/Build/build-tools");
+const { defineConfigs } = require("../../Rock16/Rock.JavaScript.Obsidian/Build/build-tools");
 
 const workspacePath = path.resolve(__dirname);
 const srcPath = path.join(workspacePath, "src");

@@ -6,7 +6,7 @@ const projects = [
     "."
 ];
 
-const execPath = path.join(__dirname, "..", "..", "..", "Rock15", "Rock.JavaScript.Obsidian", "Build", "obs-tsc.js");
+const execPath = path.join(__dirname, "..", "..", "..", "Rock16", "Rock.JavaScript.Obsidian", "Build", "obs-tsc.js");
 
 for (const project of projects) {
     try {
