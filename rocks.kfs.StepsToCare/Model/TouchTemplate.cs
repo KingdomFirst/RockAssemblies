@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 //
+using System.Collections.Generic;
 using Rock.Lava;
 
 namespace rocks.kfs.StepsToCare.Model
@@ -26,6 +27,7 @@ namespace rocks.kfs.StepsToCare.Model
         public int MinimumCareTouchHours { get; set; }
         public bool NotifyAll { get; set; }
         public bool Recurring { get; set; }
+        public List<int> AssignToGroups { get; set; }
         public int Order { get; set; } = 0;
 
         public override string ToString()

@@ -72,7 +72,9 @@ namespace rocks.kfs.StepsToCare.Model
         Worker,
         GroupRole,
         Geofence,
-        Manual
+        Manual,
+        TouchTemplateGroup,
+        CategoryGroup
     }
 
     #region Entity Configuration

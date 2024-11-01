@@ -162,7 +162,7 @@ namespace rocks.kfs.StepsToCare.Model
                         {
                             var careNeedNotes = new NoteService( rockContext )
                                 .GetByNoteTypeId( noteType.Id ).AsNoTracking()
-                                .Where( n => n.EntityId == Id && n.Caption != "Action" );
+                                .Where( n => n.EntityId == Id && ( n.Caption == null || !n.Caption.StartsWith( "Action" ) ) );
 
                             _touchCount = careNeedNotes.Count();
                         }
