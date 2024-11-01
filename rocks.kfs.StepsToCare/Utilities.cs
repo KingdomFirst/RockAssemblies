@@ -604,6 +604,7 @@ namespace rocks.kfs.StepsToCare
             return tempQuery.Select( cw => new WorkerResult
             {
                 Count = cw.AssignedPersons.Where( ap => ap.CareNeed != null && ap.CareNeed.StatusValueId != closedId ).Count(),
+                LastAssignmentDate = cw.AssignedPersons.Where( ap => ap.CareNeed != null && ap.CareNeed.StatusValueId != closedId ).OrderByDescending( ap => ap.CreatedDateTime ).Select( ap => ap.CreatedDateTime ).FirstOrDefault(),
                 Worker = cw,
                 HasCategory = includeCategory,
                 HasCampus = includeCampus,
@@ -612,6 +613,7 @@ namespace rocks.kfs.StepsToCare
             }
                                     )
                                     .OrderBy( cw => cw.Count )
+                                    .ThenBy( cw => cw.LastAssignmentDate )
                                     .ThenBy( cw => cw.Worker.CategoryValues.Contains( careNeed.CategoryValueId.ToString() ) )
                                     .ThenBy( cw => cw.Worker.Campuses.Contains( careNeed.CampusId.ToString() ) );
         }
