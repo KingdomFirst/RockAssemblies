@@ -431,12 +431,112 @@ namespace rocks.kfs.StepsToCare
                     }
                 }
             }
+
+            if ( careNeed.CategoryValueId.HasValue )
+            {
+                Guid matrixGuid = Guid.Empty;
+                if ( careNeed.Category != null )
+                {
+                    matrixGuid = careNeed.Category.GetAttributeValue( "CareTouchTemplates" ).AsGuid();
+                }
+                else
+                {
+                    var catCache = DefinedValueCache.Get( careNeed.CategoryValueId.Value );
+                    matrixGuid = catCache.GetAttributeValue( "CareTouchTemplates" ).AsGuid();
+                }
+                var touchTemplates = new List<TouchTemplate>();
+                if ( matrixGuid != Guid.Empty )
+                {
+                    var matrix = new AttributeMatrixService( rockContext ).Get( matrixGuid );
+                    if ( matrix != null )
+                    {
+                        foreach ( var matrixItem in matrix.AttributeMatrixItems )
+                        {
+                            matrixItem.LoadAttributes();
+
+                            var noteTemplateGuid = matrixItem.GetAttributeValue( "NoteTemplate" ).AsGuid();
+                            var noteTemplate = new NoteTemplateService( rockContext ).Get( noteTemplateGuid );
+
+                            if ( noteTemplate != null )
+                            {
+                                // only load the properties we need to use in the following code, hopefully lighten the attribute call.
+                                var touchTemplate = new TouchTemplate();
+                                touchTemplate.NoteTemplate = noteTemplate;
+                                touchTemplate.MinimumCareTouches = matrixItem.GetAttributeValue( "MinimumCareTouches" ).AsInteger();
+                                touchTemplate.AssignToGroups = matrixItem.GetAttributeValues( "AssignToGroups" ).AsIntegerList();
+                                touchTemplate.Order = matrixItem.Order;
+
+                                touchTemplates.Add( touchTemplate );
+                            }
+                        }
+                    }
+                }
+
+                if ( touchTemplates.Any( t => t.AssignToGroups.Any() ) )
+                {
+                    foreach ( var touchTemplate in touchTemplates.Where( t => t.AssignToGroups.Any() ).OrderBy( t => t.Order ) )
+                    {
+                        foreach ( var groupId in touchTemplate.AssignToGroups )
+                        {
+                            AssignToGroupMember( careNeed, enableLogging, assignedPeople, rockContext, careAssigneeService, addedWorkerAliasIds, closedStatusId, groupId, touchTemplate );
+                        }
+                    }
+
+                }
+            }
+
             if ( !previewAssigned )
             {
                 careAssigneeService.AddRange( assignedPeople );
                 rockContext.SaveChanges();
             }
             return assignedPeople;
+        }
+
+        private static void AssignToGroupMember( CareNeed careNeed, bool enableLogging, List<AssignedPerson> assignedPeople, RockContext rockContext, AssignedPersonService careAssigneeService, List<int?> addedWorkerAliasIds, int closedStatusId, int groupId, TouchTemplate touchTemplate = null )
+        {
+            var groupMemberService = new GroupMemberService( rockContext );
+
+            var currentlyAssignedPeople = new AssignedPersonService( rockContext ).Queryable().Where( ap => ap.CareNeed.StatusValueId != closedStatusId );
+
+            var groupMembers = groupMemberService
+                .GetByGroupId( groupId )
+                .AsNoTracking()
+                .Where( gm => !gm.IsArchived
+                              && gm.GroupMemberStatus == GroupMemberStatus.Active )
+                .OrderBy( gm => currentlyAssignedPeople.Count( ap => ap.PersonAlias.PersonId == gm.Person.Id ) )
+                .ThenBy( gm => currentlyAssignedPeople.Where( ap => ap.PersonAlias.PersonId == gm.Person.Id ).OrderByDescending( ap => ap.CreatedDateTime ).Select( ap => ap.CreatedDateTime ).FirstOrDefault() )
+                .ToList();
+
+            var groupMemberAssignedCount = 0;
+            foreach ( var gm in groupMembers )
+            {
+                if ( !addedWorkerAliasIds.Contains( gm.Person.PrimaryAliasId ) && gm.Person.PrimaryAlias != null && gm.Person.PrimaryAliasId != careNeed.PersonAliasId && careAssigneeService.GetByPersonAliasAndCareNeed( gm.Person.PrimaryAlias.Id, careNeed.Id ) == null )
+                {
+                    var careAssignee = new AssignedPerson { Id = 0 };
+                    careAssignee.CareNeed = careNeed;
+                    careAssignee.PersonAliasId = gm.Person.PrimaryAliasId;
+                    careAssignee.FollowUpWorker = false;
+                    if ( touchTemplate != null )
+                    {
+                        careAssignee.Type = AssignedType.TouchTemplateGroup;
+                        careAssignee.TypeQualifier = $"{touchTemplate.NoteTemplate.Note}^{touchTemplate.MinimumCareTouches}^{gm.Group.Id}^{gm.Group.Name}^{gm.Id}";
+                    }
+                    assignedPeople.Add( careAssignee );
+                    addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
+
+                    groupMemberAssignedCount++;
+                    if ( groupMemberAssignedCount >= touchTemplate.MinimumCareTouches )
+                    {
+                        break;
+                    }
+
+                    if ( enableLogging )
+                    {
+                        LogEvent( null, "AutoAssignWorkers", string.Format( "Care Need Guid: {0}, GroupMember.Id: {1}, PersonId: {2}", careNeed.Guid, gm.Id, gm.PersonId ), "TouchTemplate GroupMember Assigned" );
+                    }
+                }
+            }
         }
 
         public static void SendWorkerNotification( RockContext rockContext, CareNeed careNeed, bool isNew, List<AssignedPerson> newlyAssignedPersons, Guid? assignmentEmailTemplateGuid, RockPage rockPage = null, string detailPagePath = "", string dashboardPagePath = "", Person person = null )
