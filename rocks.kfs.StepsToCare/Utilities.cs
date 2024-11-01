@@ -54,6 +54,7 @@ namespace rocks.kfs.StepsToCare
             var careWorkers = careWorkerService.Queryable().AsNoTracking().Where( cw => cw.IsActive );
 
             var addedWorkerAliasIds = new List<int?>();
+            var closedStatusId = DefinedValueCache.Get( rocks.kfs.StepsToCare.SystemGuid.DefinedValue.CARE_NEED_STATUS_CLOSED ).Id;
 
             // auto assign Deacon/Worker by Geofence
             if ( autoAssignWorkerGeofence && !roundRobinOnly )
@@ -115,10 +116,9 @@ namespace rocks.kfs.StepsToCare
                 }
                 var careWorkersNoFence = careWorkers.Where( cw => cw.GeoFenceId == null );
                 var workerAssigned = false;
-                var closedId = DefinedValueCache.Get( rocks.kfs.StepsToCare.SystemGuid.DefinedValue.CARE_NEED_STATUS_CLOSED ).Id;
 
                 // Campus, Category, Ignore Age Range and Gender
-                var careWorkerCount1 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, true, true, true );
+                var careWorkerCount1 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, true, true, true );
 
                 if ( enableLogging )
                 {
@@ -126,7 +126,7 @@ namespace rocks.kfs.StepsToCare
                 }
 
                 // Category, Ignore Age Range and Gender
-                var careWorkerCount2 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, false, true, true );
+                var careWorkerCount2 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, false, true, true );
 
                 if ( enableLogging )
                 {
@@ -134,7 +134,7 @@ namespace rocks.kfs.StepsToCare
                 }
 
                 // Campus, Ignore Age Range and Gender
-                var careWorkerCount3 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, true, false, true );
+                var careWorkerCount3 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, true, false, true );
 
                 if ( enableLogging )
                 {
@@ -142,7 +142,7 @@ namespace rocks.kfs.StepsToCare
                 }
 
                 // None, doesn't include parameters for other values though.
-                var careWorkerCount4 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, false, false, true );
+                var careWorkerCount4 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, false, false, true );
 
                 if ( enableLogging )
                 {
@@ -168,52 +168,52 @@ namespace rocks.kfs.StepsToCare
                 if ( childAssignment )
                 {
                     // AgeRange, Gender, Campus, Category
-                    careWorkersCountChild1 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, true, true, true );
+                    careWorkersCountChild1 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, true, true, true );
 
                     // AgeRange, Gender, Category
-                    careWorkersCountChild2 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, true, false, true );
+                    careWorkersCountChild2 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, true, false, true );
 
                     // AgeRange, Gender, Campus
-                    careWorkersCountChild3 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, true, true, false );
+                    careWorkersCountChild3 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, true, true, false );
 
                     // AgeRange, Campus, Category
-                    careWorkersCountChild4 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, false, true, true );
+                    careWorkersCountChild4 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, false, true, true );
 
                     // Gender, Campus, Category
-                    careWorkersCountChild5 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, true, true, true );
+                    careWorkersCountChild5 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, true, true, true );
 
                     // AgeRange, Gender
-                    careWorkersCountChild6 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, true, false, false );
+                    careWorkersCountChild6 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, true, false, false );
 
                     // AgeRange, Category
-                    careWorkersCountChild7 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, false, false, true );
+                    careWorkersCountChild7 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, false, false, true );
 
                     // AgeRange, Campus
-                    careWorkersCountChild8 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, false, true, false );
+                    careWorkersCountChild8 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, false, true, false );
 
                     // Gender, Category
-                    careWorkersCountChild9 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, true, false, true );
+                    careWorkersCountChild9 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, true, false, true );
 
                     // Gender, Campus
-                    careWorkersCountChild10 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, true, true, false );
+                    careWorkersCountChild10 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, true, true, false );
 
                     // Campus, Category
-                    careWorkersCountChild11 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, true, true );
+                    careWorkersCountChild11 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, true, true );
 
                     // AgeRange
-                    careWorkersCountChild12 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, false, false, false );
+                    careWorkersCountChild12 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, false, false, false );
 
                     // Gender
-                    careWorkersCountChild13 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, true, false, false );
+                    careWorkersCountChild13 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, true, false, false );
 
                     // Category
-                    careWorkersCountChild14 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, false, true );
+                    careWorkersCountChild14 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, false, true );
 
                     // Campus
-                    careWorkersCountChild15 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, true, false );
+                    careWorkersCountChild15 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, true, false );
 
                     // None
-                    careWorkersCountChild16 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, false, false );
+                    careWorkersCountChild16 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, false, false );
                 }
 
                 var careWorkerCounts = careWorkerCount1;
