@@ -435,14 +435,17 @@ namespace rocks.kfs.StepsToCare
             if ( careNeed.CategoryValueId.HasValue )
             {
                 Guid matrixGuid = Guid.Empty;
+                var categoryGroups = new List<int>();
                 if ( careNeed.Category != null )
                 {
                     matrixGuid = careNeed.Category.GetAttributeValue( "CareTouchTemplates" ).AsGuid();
+                    categoryGroups = careNeed.Category.GetAttributeValues( "AssignToGroups" ).AsIntegerList();
                 }
                 else
                 {
                     var catCache = DefinedValueCache.Get( careNeed.CategoryValueId.Value );
                     matrixGuid = catCache.GetAttributeValue( "CareTouchTemplates" ).AsGuid();
+                    categoryGroups = catCache.GetAttributeValues( "AssignToGroups" ).AsIntegerList();
                 }
                 var touchTemplates = new List<TouchTemplate>();
                 if ( matrixGuid != Guid.Empty )
@@ -469,6 +472,14 @@ namespace rocks.kfs.StepsToCare
                                 touchTemplates.Add( touchTemplate );
                             }
                         }
+                    }
+                }
+
+                if ( categoryGroups.Any() )
+                {
+                    foreach ( var groupId in categoryGroups )
+                    {
+                        AssignToGroupMember( careNeed, enableLogging, assignedPeople, rockContext, careAssigneeService, addedWorkerAliasIds, closedStatusId, groupId );
                     }
                 }
 
@@ -522,11 +533,17 @@ namespace rocks.kfs.StepsToCare
                         careAssignee.Type = AssignedType.TouchTemplateGroup;
                         careAssignee.TypeQualifier = $"{touchTemplate.NoteTemplate.Note}^{touchTemplate.MinimumCareTouches}^{gm.Group.Id}^{gm.Group.Name}^{gm.Id}";
                     }
+                    else
+                    {
+                        careAssignee.Type = AssignedType.CategoryGroup;
+                        careAssignee.TypeQualifier = $"{careNeed.CategoryValueId}^{careNeed.Category?.Value ?? DefinedValueCache.Get( careNeed.CategoryValueId.Value ).Value}^{gm.Group.Id}^{gm.Group.Name}^{gm.Id}";
+
+                    }
                     assignedPeople.Add( careAssignee );
                     addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
 
                     groupMemberAssignedCount++;
-                    if ( groupMemberAssignedCount >= touchTemplate.MinimumCareTouches )
+                    if ( touchTemplate == null || groupMemberAssignedCount >= touchTemplate.MinimumCareTouches )
                     {
                         break;
                     }
