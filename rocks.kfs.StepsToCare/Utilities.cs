@@ -531,12 +531,12 @@ namespace rocks.kfs.StepsToCare
                     if ( touchTemplate != null )
                     {
                         careAssignee.Type = AssignedType.TouchTemplateGroup;
-                        careAssignee.TypeQualifier = $"{touchTemplate.NoteTemplate.Note}^{touchTemplate.MinimumCareTouches}^{gm.Group.Id}^{gm.Group.Name}^{gm.Id}";
+                        careAssignee.TypeQualifier = $"{touchTemplate.NoteTemplate.Note}^{touchTemplate.MinimumCareTouches}^{gm.Group.Id}^{gm.Group.Name}^{gm.Id}^{currentlyAssignedPeople.Count( ap => ap.PersonAlias.PersonId == gm.Person.Id )}";
                     }
                     else
                     {
                         careAssignee.Type = AssignedType.CategoryGroup;
-                        careAssignee.TypeQualifier = $"{careNeed.CategoryValueId}^{careNeed.Category?.Value ?? DefinedValueCache.Get( careNeed.CategoryValueId.Value ).Value}^{gm.Group.Id}^{gm.Group.Name}^{gm.Id}";
+                        careAssignee.TypeQualifier = $"{careNeed.CategoryValueId}^{careNeed.Category?.Value ?? DefinedValueCache.Get( careNeed.CategoryValueId.Value ).Value}^{gm.Group.Id}^{gm.Group.Name}^{gm.Id}^{currentlyAssignedPeople.Count( ap => ap.PersonAlias.PersonId == gm.Person.Id )}";
 
                     }
                     assignedPeople.Add( careAssignee );
