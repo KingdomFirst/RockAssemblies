@@ -65,10 +65,9 @@ namespace rocks.kfs.StepsToCare.Jobs
 
     [IntegerField(
         "Minimum Follow Up Care Touch Hours",
-        Description = "Minimum hours for the follow up worker to add a care touch before the need gets 'flagged'.",
+        Description = "Minimum hours for the follow up worker to add a care touch before the Care Touch Needed notification gets sent out.",
         DefaultIntegerValue = 24,
         IsRequired = true,
-        Order = 4,
         Key = AttributeKey.MinimumFollowUpTouchHours )]
 
     [IntegerField(

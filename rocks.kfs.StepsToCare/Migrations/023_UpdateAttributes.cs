@@ -69,10 +69,20 @@ namespace rocks.kfs.StepsToCare.Migrations
             RockMigrationHelper.AddAttributeQualifier( SystemGuid.Attribute.CATEGORY_ATTRIBUTE_ASSIGNTOGROUPS, "repeatColumns", "", "18F97937-8A3C-4099-9F02-491B1ACD684B" );
             RockMigrationHelper.AddAttributeQualifier( SystemGuid.Attribute.CATEGORY_ATTRIBUTE_ASSIGNTOGROUPS, "repeatDirection", "0", "0B1F2E6A-E9E6-479A-8D77-667CD17E1315" );
             RockMigrationHelper.AddAttributeQualifier( SystemGuid.Attribute.CATEGORY_ATTRIBUTE_ASSIGNTOGROUPS, "values", groupSelectSql, "B544C383-CCBA-4D80-B86E-F843F4AF0453" );
+
+            RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "AF14CB6C-F915-4449-9CB7-7C44B624B051", "A75DFC58-7A1B-4799-BF31-451B2BBE38FF", "Minimum Follow Up Care Touch Hours", "MinimumFollowUpTouchHours", "Minimum Follow Up Care Touch Hours", @"Minimum hours for the follow up worker to add a care touch before the need gets 'flagged'.", 4, @"24", "3D5545C1-29AF-4DF4-8C5C-8330651F4FEE" );
+            RockMigrationHelper.AddBlockAttributeValue( "3D5545C1-29AF-4DF4-8C5C-8330651F4FEE", "8945BE62-D065-4A19-89A8-B06CE51FFBFF", @"24" );
+
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.ServiceJob", "A75DFC58-7A1B-4799-BF31-451B2BBE38FF", "Class", "rocks.kfs.StepsToCare.Jobs.CareNeedAutomatedNotifications", "Minimum Follow Up Care Touch Hours", "Minimum Follow Up Care Touch Hours", @"Minimum hours for the follow up worker to add a care touch before the Care Touch Needed notification gets sent out.", 0, @"24", "A9B39207-F075-4208-B97E-43C8773F706D", "MinimumFollowUpTouchHours" );
+            RockMigrationHelper.AddAttributeValue( "A9B39207-F075-4208-B97E-43C8773F706D", -1, @"24", "5CC0532F-55A0-4329-A560-ECC6417F49BB" ); 
         }
 
         public override void Down()
         {
+            RockMigrationHelper.DeleteAttribute( "A9B39207-F075-4208-B97E-43C8773F706D" );
+
+            RockMigrationHelper.DeleteAttribute( "3D5545C1-29AF-4DF4-8C5C-8330651F4FEE" );
+
             RockMigrationHelper.DeleteAttribute( SystemGuid.Attribute.CATEGORY_ATTRIBUTE_ASSIGNTOGROUPS );
 
             RockMigrationHelper.DeleteAttribute( SystemGuid.Attribute.MATRIX_ATTRIBUTE_ASSIGNTOGROUPS );
