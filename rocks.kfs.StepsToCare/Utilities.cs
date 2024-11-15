@@ -475,11 +475,13 @@ namespace rocks.kfs.StepsToCare
                     }
                 }
 
+                var currentlyAssignedPeople = careAssigneeService.Queryable().AsNoTracking().Where( ap => ap.CareNeed.StatusValueId != closedStatusId );
+
                 if ( categoryGroups.Any() )
                 {
                     foreach ( var groupId in categoryGroups )
                     {
-                        AssignToGroupMember( careNeed, enableLogging, assignedPeople, rockContext, careAssigneeService, addedWorkerAliasIds, closedStatusId, groupId );
+                        AssignToGroupMember( careNeed, enableLogging, assignedPeople, rockContext, careAssigneeService, addedWorkerAliasIds, closedStatusId, groupId, currentlyAssignedPeople );
                     }
                 }
 
@@ -489,10 +491,9 @@ namespace rocks.kfs.StepsToCare
                     {
                         foreach ( var groupId in touchTemplate.AssignToGroups )
                         {
-                            AssignToGroupMember( careNeed, enableLogging, assignedPeople, rockContext, careAssigneeService, addedWorkerAliasIds, closedStatusId, groupId, touchTemplate );
+                            AssignToGroupMember( careNeed, enableLogging, assignedPeople, rockContext, careAssigneeService, addedWorkerAliasIds, closedStatusId, groupId, currentlyAssignedPeople, touchTemplate );
                         }
                     }
-
                 }
             }
 
@@ -504,11 +505,9 @@ namespace rocks.kfs.StepsToCare
             return assignedPeople;
         }
 
-        private static void AssignToGroupMember( CareNeed careNeed, bool enableLogging, List<AssignedPerson> assignedPeople, RockContext rockContext, AssignedPersonService careAssigneeService, List<int?> addedWorkerAliasIds, int closedStatusId, int groupId, TouchTemplate touchTemplate = null )
+        private static void AssignToGroupMember( CareNeed careNeed, bool enableLogging, List<AssignedPerson> assignedPeople, RockContext rockContext, AssignedPersonService careAssigneeService, List<int?> addedWorkerAliasIds, int closedStatusId, int groupId, IQueryable<AssignedPerson> currentlyAssignedPeople, TouchTemplate touchTemplate = null )
         {
             var groupMemberService = new GroupMemberService( rockContext );
-
-            var currentlyAssignedPeople = new AssignedPersonService( rockContext ).Queryable().Where( ap => ap.CareNeed.StatusValueId != closedStatusId );
 
             var groupMembers = groupMemberService
                 .GetByGroupId( groupId )
@@ -532,6 +531,7 @@ namespace rocks.kfs.StepsToCare
                     {
                         careAssignee.Type = AssignedType.TouchTemplateGroup;
                         careAssignee.TypeQualifier = $"{touchTemplate.NoteTemplate.Note}^{touchTemplate.MinimumCareTouches}^{gm.Group.Id}^{gm.Group.Name}^{gm.Id}^{currentlyAssignedPeople.Count( ap => ap.PersonAlias.PersonId == gm.Person.Id )}";
+                        // This TypeQualifier could have a tighter connection to the attribute matrix touch template if we somehow identified the touch template, such as using an attribute or attribute value id.
                     }
                     else
                     {
