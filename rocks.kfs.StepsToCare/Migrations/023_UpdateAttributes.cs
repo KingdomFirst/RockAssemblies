@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 //
+using System;
 using Rock;
 using Rock.Data;
 using Rock.Model;
@@ -73,8 +74,39 @@ namespace rocks.kfs.StepsToCare.Migrations
             RockMigrationHelper.AddOrUpdateBlockTypeAttribute( "AF14CB6C-F915-4449-9CB7-7C44B624B051", "A75DFC58-7A1B-4799-BF31-451B2BBE38FF", "Minimum Follow Up Care Touch Hours", "MinimumFollowUpTouchHours", "Minimum Follow Up Care Touch Hours", @"Minimum hours for the follow up worker to add a care touch before the need gets 'flagged'.", 4, @"24", "3D5545C1-29AF-4DF4-8C5C-8330651F4FEE" );
             RockMigrationHelper.AddBlockAttributeValue( "3D5545C1-29AF-4DF4-8C5C-8330651F4FEE", "8945BE62-D065-4A19-89A8-B06CE51FFBFF", @"24" );
 
-            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.ServiceJob", "A75DFC58-7A1B-4799-BF31-451B2BBE38FF", "Class", "rocks.kfs.StepsToCare.Jobs.CareNeedAutomatedNotifications", "Minimum Follow Up Care Touch Hours", "Minimum Follow Up Care Touch Hours", @"Minimum hours for the follow up worker to add a care touch before the Care Touch Needed notification gets sent out.", 0, @"24", "A9B39207-F075-4208-B97E-43C8773F706D", "MinimumFollowUpTouchHours" );
-            RockMigrationHelper.AddAttributeValue( "A9B39207-F075-4208-B97E-43C8773F706D", -1, @"24", "5CC0532F-55A0-4329-A560-ECC6417F49BB" ); 
+            var attributeGuid = "A9B39207-F075-4208-B97E-43C8773F706D";
+            var attributeValueGuid = "5CC0532F-55A0-4329-A560-ECC6417F49BB";
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.ServiceJob", "A75DFC58-7A1B-4799-BF31-451B2BBE38FF", "Class", "rocks.kfs.StepsToCare.Jobs.CareNeedAutomatedNotifications", "Minimum Follow Up Care Touch Hours", "Minimum Follow Up Care Touch Hours", @"Minimum hours for the follow up worker to add a care touch before the Care Touch Needed notification gets sent out.", 0, @"24", attributeGuid, "MinimumFollowUpTouchHours" );
+
+            // copied and modified from RockMigrationHelper.AddAttributeValue method to use the value from another attribute.
+            Sql( $@"
+                DECLARE @AttributeId INT = (SELECT [Id] FROM [Attribute] WHERE [Guid] = '{attributeGuid}')
+                DECLARE @AttributeValueGuid UNIQUEIDENTIFIER = NEWID()
+                DECLARE @JobId int = ( SELECT TOP 1 [Id] FROM [ServiceJob] WHERE [Guid] = '895C301C-02D1-4D9C-9FC4-DA7257368208' )
+                DECLARE @DefaultValue NVARCHAR(MAX) = ( SELECT TOP 1 [Value] FROM [AttributeValue] av JOIN [Attribute] a ON av.AttributeId = a.Id WHERE a.[Guid] = 'AF3ECA88-C715-4E2D-9D9B-C4CC3141C6EC' AND EntityId = @JobId)
+
+                -- A GUID was provided, try to use it if it is available
+                IF NOT EXISTS(SELECT * FROM [AttributeValue] WHERE [Guid] = '{attributeValueGuid}')
+                BEGIN
+	                SET @AttributeValueGuid = '{attributeValueGuid}'
+                END
+
+                -- Now check if the attribute/entity pair already has a row and insert it if not
+                IF NOT EXISTS(SELECT [Id] FROM [dbo].[AttributeValue] WHERE [AttributeId] = @AttributeId AND [EntityId] = @JobId)
+                BEGIN
+                    INSERT INTO [AttributeValue] (
+                          [IsSystem]
+		                , [AttributeId]
+		                , [EntityId]
+		                , [Value]
+		                , [Guid])
+                    VALUES(
+                          1
+		                , @AttributeId
+		                , @JobId
+		                , @DefaultValue
+		                , @AttributeValueGuid)
+                END" );
         }
 
         public override void Down()
