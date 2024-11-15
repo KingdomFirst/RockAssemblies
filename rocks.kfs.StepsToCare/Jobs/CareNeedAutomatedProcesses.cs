@@ -368,9 +368,6 @@ namespace rocks.kfs.StepsToCare.Jobs
                 linkedPages.Add( "CareDetail", detailPagePath );
                 linkedPages.Add( "CareDashboard", dashboardPagePath );
 
-                var errors = new List<string>();
-                var errorsSms = new List<string>();
-
                 // Update status to follow up and email follow up messages
                 foreach ( var careNeed in careNeedFollowUp )
                 {
@@ -386,6 +383,9 @@ namespace rocks.kfs.StepsToCare.Jobs
                     {
                         var emailMessage = new RockEmailMessage( followUpSystemCommunication );
                         var smsMessage = new RockSMSMessage( followUpSystemCommunication );
+
+                        var errors = new List<string>();
+                        var errorsSms = new List<string>();
 
                         foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ap.FollowUpWorker ) )
                         {
@@ -435,29 +435,30 @@ namespace rocks.kfs.StepsToCare.Jobs
                         if ( emailMessage.GetRecipients().Count > 0 )
                         {
                             emailMessage.Send( out errors );
+
+                            if ( errors.Any() )
+                            {
+                                errorCount += errors.Count;
+                                errorMessages.AddRange( errors );
+                            }
+                            else
+                            {
+                                assignedPersonEmails++;
+                            }
                         }
                         if ( smsMessage.GetRecipients().Count > 0 )
                         {
                             smsMessage.Send( out errorsSms );
-                        }
 
-                        if ( errors.Any() )
-                        {
-                            errorCount += errors.Count;
-                            errorMessages.AddRange( errors );
-                        }
-                        else
-                        {
-                            assignedPersonEmails++;
-                        }
-                        if ( errorsSms.Any() )
-                        {
-                            errorCount += errorsSms.Count;
-                            errorMessages.AddRange( errorsSms );
-                        }
-                        else
-                        {
-                            assignedPersonSms++;
+                            if ( errorsSms.Any() )
+                            {
+                                errorCount += errorsSms.Count;
+                                errorMessages.AddRange( errorsSms );
+                            }
+                            else
+                            {
+                                assignedPersonSms++;
+                            }
                         }
                     }
                 }
@@ -478,6 +479,8 @@ namespace rocks.kfs.StepsToCare.Jobs
                         var smsMessage = new RockSMSMessage( careTouchNeededCommunication );
                         //var pushMessage = new RockPushMessage( careTouchNeededCommunication );
                         var recipients = new List<RockMessageRecipient>();
+                        var errors = new List<string>();
+                        var errorsSms = new List<string>();
 
                         foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ( ap.FollowUpWorker ) || ( flagNeed.TouchTemplate != null && flagNeed.TouchTemplate.NotifyAll ) ) )
                         {
@@ -531,30 +534,32 @@ namespace rocks.kfs.StepsToCare.Jobs
                         if ( emailMessage.GetRecipients().Count > 0 )
                         {
                             emailMessage.Send( out errors );
+
+                            if ( errors.Any() )
+                            {
+                                errorCount += errors.Count;
+                                errorMessages.AddRange( errors );
+                            }
+                            else
+                            {
+                                assignedPersonEmails++;
+                            }
                         }
                         if ( smsMessage.GetRecipients().Count > 0 )
                         {
                             smsMessage.Send( out errorsSms );
+
+                            if ( errorsSms.Any() )
+                            {
+                                errorCount += errorsSms.Count;
+                                errorMessages.AddRange( errorsSms );
+                            }
+                            else
+                            {
+                                assignedPersonSms++;
+                            }
                         }
 
-                        if ( errors.Any() )
-                        {
-                            errorCount += errors.Count;
-                            errorMessages.AddRange( errors );
-                        }
-                        else
-                        {
-                            assignedPersonEmails++;
-                        }
-                        if ( errorsSms.Any() )
-                        {
-                            errorCount += errorsSms.Count;
-                            errorMessages.AddRange( errorsSms );
-                        }
-                        else
-                        {
-                            assignedPersonSms++;
-                        }
                     }
                 }
 
@@ -589,6 +594,9 @@ namespace rocks.kfs.StepsToCare.Jobs
 
                         if ( assignedNeeds.Any() )
                         {
+                            var errors = new List<string>();
+                            var errorsSms = new List<string>();
+
                             assigned.PersonAlias.Person.LoadAttributes();
 
                             var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, assigned.PersonAlias.Person );
@@ -626,29 +634,30 @@ namespace rocks.kfs.StepsToCare.Jobs
                             if ( emailMessage.GetRecipients().Count > 0 )
                             {
                                 emailMessage.Send( out errors );
+
+                                if ( errors.Any() )
+                                {
+                                    errorCount += errors.Count;
+                                    errorMessages.AddRange( errors );
+                                }
+                                else
+                                {
+                                    assignedPersonEmails++;
+                                }
                             }
                             if ( smsMessage.GetRecipients().Count > 0 )
                             {
                                 smsMessage.Send( out errorsSms );
-                            }
 
-                            if ( errors.Any() )
-                            {
-                                errorCount += errors.Count;
-                                errorMessages.AddRange( errors );
-                            }
-                            else
-                            {
-                                assignedPersonEmails++;
-                            }
-                            if ( errorsSms.Any() )
-                            {
-                                errorCount += errorsSms.Count;
-                                errorMessages.AddRange( errorsSms );
-                            }
-                            else
-                            {
-                                assignedPersonSms++;
+                                if ( errorsSms.Any() )
+                                {
+                                    errorCount += errorsSms.Count;
+                                    errorMessages.AddRange( errorsSms );
+                                }
+                                else
+                                {
+                                    assignedPersonSms++;
+                                }
                             }
                         }
                     }
