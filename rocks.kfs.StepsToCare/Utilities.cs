@@ -466,6 +466,7 @@ namespace rocks.kfs.StepsToCare
                                 var touchTemplate = new TouchTemplate();
                                 touchTemplate.NoteTemplate = noteTemplate;
                                 touchTemplate.MinimumCareTouches = matrixItem.GetAttributeValue( "MinimumCareTouches" ).AsInteger();
+                                touchTemplate.MinimumCareTouchHours = matrixItem.GetAttributeValue( "MinimumCareTouchHours" ).AsInteger();
                                 touchTemplate.AssignToGroups = matrixItem.GetAttributeValues( "AssignToGroups" ).AsIntegerList();
                                 touchTemplate.Order = matrixItem.Order;
 
@@ -530,7 +531,7 @@ namespace rocks.kfs.StepsToCare
                     if ( touchTemplate != null )
                     {
                         careAssignee.Type = AssignedType.TouchTemplateGroup;
-                        careAssignee.TypeQualifier = $"{touchTemplate.NoteTemplate.Note}^{touchTemplate.MinimumCareTouches}^{gm.Group.Id}^{gm.Group.Name}^{gm.Id}^{currentlyAssignedPeople.Count( ap => ap.PersonAlias.PersonId == gm.Person.Id )}";
+                        careAssignee.TypeQualifier = $"{touchTemplate.NoteTemplate.Note}^{touchTemplate.MinimumCareTouches}^{gm.Group.Id}^{gm.Group.Name}^{gm.Id}^{currentlyAssignedPeople.Count( ap => ap.PersonAlias.PersonId == gm.Person.Id )}^{touchTemplate.MinimumCareTouchHours}";
                         // This TypeQualifier could have a tighter connection to the attribute matrix touch template if we somehow identified the touch template, such as using an attribute or attribute value id.
                     }
                     else
