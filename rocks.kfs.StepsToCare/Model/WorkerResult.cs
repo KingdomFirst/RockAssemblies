@@ -14,11 +14,14 @@
 // limitations under the License.
 // </copyright>
 //
+using System;
+
 namespace rocks.kfs.StepsToCare.Model
 {
     public partial class WorkerResult
     {
         public int Count { get; set; }
+        public DateTime? LastAssignmentDate { get; set; }
         public CareWorker Worker { get; set; }
         public bool HasCategory { get; set; } = false;
         public bool HasCampus { get; set; } = false;
