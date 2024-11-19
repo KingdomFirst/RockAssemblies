@@ -35,11 +35,11 @@ namespace rocks.kfs.StepsToCare.Migrations
 
             var groupSelectSql = @"SELECT 
         CASE WHEN ggpg.Name IS NOT NULL THEN
-	        CONCAT(ggpg.name, ' > ',gpg.Name,' > ',pg.Name,' > ', g.Name)
+	        CONCAT(ggpg.name, '' > '',gpg.Name,'' > '',pg.Name,'' > '', g.Name)
         WHEN gpg.Name IS NOT NULL THEN
-	        CONCAT(gpg.Name,' > ',pg.Name,' > ', g.Name)
+	        CONCAT(gpg.Name,'' > '',pg.Name,'' > '', g.Name)
         WHEN pg.Name IS NOT NULL THEN
-	        CONCAT(pg.Name,' > ', g.Name)
+	        CONCAT(pg.Name,'' > '', g.Name)
         ELSE
 	        g.Name 
         END as Text, g.Id as Value
@@ -50,11 +50,11 @@ namespace rocks.kfs.StepsToCare.Migrations
         WHERE g.GroupTypeId NOT IN (1,10,11,12,19,20,21,22) 
         ORDER BY 
             CASE WHEN ggpg.Name IS NOT NULL THEN
-	            CONCAT(ggpg.name, ' > ',gpg.Name,' > ',pg.Name,' > ', g.Name)
+	            CONCAT(ggpg.name, '' > '',gpg.Name,'' > '',pg.Name,'' > '', g.Name)
             WHEN gpg.Name IS NOT NULL THEN
-	            CONCAT(gpg.Name,' > ',pg.Name,' > ', g.Name)
+	            CONCAT(gpg.Name,'' > '',pg.Name,'' > '', g.Name)
             WHEN pg.Name IS NOT NULL THEN
-	            CONCAT(pg.Name,' > ', g.Name)
+	            CONCAT(pg.Name,'' > '', g.Name)
             ELSE
                 g.Name 
         END";
