@@ -107,6 +107,14 @@ namespace rocks.kfs.CyberSource
         DefaultBooleanValue = false,
         Order = 7 )]
 
+    [CustomDropdownListField(
+        "Event Registration Address Mode",
+        Key = AttributeKey.EventRegistrationAddressMode,
+        Description = @"The mode for address input on the Gateway with event registrations. In order to use 'Hide' or 'Optional' you must have Relaxed AVS enabled by the processor.",
+        ListSource = "Hide,Optional,Required",
+        DefaultValue = "Required",
+        Order = 7 )]
+
     #endregion
 
     /// <summary>
@@ -130,6 +138,7 @@ namespace rocks.kfs.CyberSource
             public const string BatchPrefix = "BatchPrefix";
             public const string Mode = "Mode";
             public const string CapturePayment = "CapturePayment";
+            public const string EventRegistrationAddressMode = "EventRegistrationAddressMode";
 
             /// <summary>
             /// The credit card fee coverage percentage
@@ -1555,6 +1564,7 @@ namespace rocks.kfs.CyberSource
             return new
             {
                 gatewayUrl = GetGatewayUrl( financialGateway ),
+                addressMode = financialGateway.GetAttributeValue( AttributeKey.EventRegistrationAddressMode ),
                 microFormJsPath,
                 microFormJWK,
                 jwkGeneratedTime = millisecondsSinceEpoch
