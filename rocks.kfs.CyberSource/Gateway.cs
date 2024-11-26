@@ -113,7 +113,7 @@ namespace rocks.kfs.CyberSource
         Description = @"The mode for address input on the Gateway with event registrations. In order to use 'Hide' or 'Optional' you must have Relaxed AVS enabled by the processor.",
         ListSource = "Hide,Optional,Required",
         DefaultValue = "Required",
-        Order = 7 )]
+        Order = 8 )]
 
     #endregion
 
