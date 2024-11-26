@@ -7,9 +7,9 @@
 
         <div v-show="!loading && !failedToLoad" style="max-width: 600px;">
             <div :id="controlId" class="js-cybersource-payment-inputs cybersource-payment-inputs" ref="paymentInputs">
-                <div class="gateway-address-container js-gateway-address-container">
+                <div class="gateway-address-container js-gateway-address-container" ref="addressContainer" v-show="showAddress">
                     <h4>Billing</h4>
-                    <AddressControl label="Address" v-model="address" :disabled="isSaving" :rules="'required'" />
+                    <AddressControl label="Address" v-model="address" :disabled="isSaving" :rules="addressRules" />
                 </div>
                 <div class="gateway-creditcard-container gateway-payment-container js-gateway-creditcard-container" >
                     <h4>Payment</h4>
@@ -177,6 +177,7 @@
      */
     type Settings = {
         gatewayUrl: string;
+        addressMode: string;
         microFormJsPath: string;
         microFormJWK: string;
         jwkGeneratedTime: number;
@@ -244,6 +245,8 @@
      *  // @ts-ignore above each line in the addressControl.obs file that generated an exception.
      */
     const address = ref<AddressControlBag | undefined>(props.settings.address ?? undefined);
+    const showAddress = ref(true);
+    const addressRules = ref("");
 
     /**
      * Contains a unique identifier that we can use to allow MicroformJS
@@ -637,6 +640,12 @@
                 number: undefined,
                 securityCode: undefined
             };
+
+            showAddress.value = props.settings.addressMode != "Hide";
+
+            if (props.settings.addressMode == "Required") {
+                addressRules.value = "required";
+            }
 
             initCybersourceMicroFormFields();
         }
