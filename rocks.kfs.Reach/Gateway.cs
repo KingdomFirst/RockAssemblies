@@ -302,7 +302,7 @@ namespace rocks.kfs.Reach
                                 var project = projects.FirstOrDefault( c => c.id == donationItem.referral_id );
                                 if ( project != null )
                                 {
-                                    reachAccountName = string.Format("PROJECT {0}", project.title.Trim() );
+                                    reachAccountName = string.Format( "PROJECT {0}", project.title.Trim() );
                                 }
                             }
                             else
@@ -394,6 +394,16 @@ namespace rocks.kfs.Reach
                         {
                             skippedTransactionCount++;
                         }
+
+                        if ( errorMessage.IsNotNullOrWhiteSpace() )
+                        {
+                            errorMessages.Add( errorMessage );
+                        }
+                    }
+
+                    if ( errorMessage.IsNotNullOrWhiteSpace() )
+                    {
+                        errorMessages.Add( errorMessage );
                     }
                 }
                 else
@@ -444,7 +454,8 @@ namespace rocks.kfs.Reach
 
             if ( errorMessages.Any() )
             {
-                errorMessage = string.Join( "<br>", errorMessages );
+                //errorMessage = string.Join( "<br>", errorMessages );
+                ExceptionLogService.LogException( new Exception( $"Reach Import errors: <br>{string.Join( "<br>", errorMessages )}" ) );
             }
 
             return new List<Payment>();
