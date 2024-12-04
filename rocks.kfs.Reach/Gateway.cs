@@ -335,6 +335,11 @@ namespace rocks.kfs.Reach
                                 }
                             }
 
+                            if ( reachAccountName.IsNullOrWhiteSpace() )
+                            {
+                                reachAccountName = donation.purpose;
+                            }
+
                             int? rockAccountId = defaultAccount.Id;
                             var accountMapping = reachAccountMaps.FirstOrDefault( v => v.Value.Equals( reachAccountName, StringComparison.CurrentCultureIgnoreCase ) );
                             if ( accountMapping != null )
@@ -455,7 +460,7 @@ namespace rocks.kfs.Reach
             if ( errorMessages.Any() )
             {
                 //errorMessage = string.Join( "<br>", errorMessages );
-                ExceptionLogService.LogException( new Exception( $"Reach Import errors: <br>{string.Join( "<br>", errorMessages )}" ) );
+                ExceptionLogService.LogException( new Exception( $"Reach import errors: \r\n{string.Join( "\r\n", errorMessages )}" ) );
             }
 
             return new List<Payment>();
