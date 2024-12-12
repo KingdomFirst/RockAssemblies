@@ -287,7 +287,7 @@ namespace rocks.kfs.Reach
 
                             var reachAccountName = string.Empty;
                             var donationItem = donation.line_items.FirstOrDefault();
-                            if ( donationItem != null && donationItem.referral_type.Equals( "DonationOption", StringComparison.InvariantCultureIgnoreCase ) )
+                            if ( donationItem != null && donationItem.referral_type.IsNotNullOrWhiteSpace() && donationItem.referral_type.Equals( "DonationOption", StringComparison.InvariantCultureIgnoreCase ) )
                             {
                                 // one-time gift, should match a known category
                                 var category = categories.FirstOrDefault( c => c.id == donationItem.referral_id );
@@ -296,10 +296,28 @@ namespace rocks.kfs.Reach
                                     reachAccountName = category.title.Trim();
                                 }
                             }
-                            else if ( donationItem != null && donationItem.referral_type.Equals( "Project", StringComparison.InvariantCultureIgnoreCase ) )
+                            else if ( donationItem != null && donationItem.referral_type.IsNotNullOrWhiteSpace() && donationItem.referral_type.Equals( "Project", StringComparison.InvariantCultureIgnoreCase ) )
                             {
                                 // one-time gift, should match a known project
                                 var project = projects.FirstOrDefault( c => c.id == donationItem.referral_id );
+                                if ( project != null )
+                                {
+                                    reachAccountName = string.Format( "PROJECT {0}", project.title.Trim() );
+                                }
+                            }
+                            else if ( donation.referral_type.IsNotNullOrWhiteSpace() && donation.referral_type.Equals( "DonationOption", StringComparison.InvariantCultureIgnoreCase ) )
+                            {
+                                // one-time gift, should match a known category
+                                var category = categories.FirstOrDefault( c => c.id == donation.referral_id );
+                                if ( category != null )
+                                {
+                                    reachAccountName = category.title.Trim();
+                                }
+                            }
+                            else if ( donation.referral_type.IsNotNullOrWhiteSpace() && donation.referral_type.Equals( "Project", StringComparison.InvariantCultureIgnoreCase ) )
+                            {
+                                // one-time gift, should match a known project
+                                var project = projects.FirstOrDefault( c => c.id == donation.referral_id );
                                 if ( project != null )
                                 {
                                     reachAccountName = string.Format( "PROJECT {0}", project.title.Trim() );
@@ -362,8 +380,8 @@ namespace rocks.kfs.Reach
                             }
 
                             // create the transaction
-                            var summary = string.Format( "Reach Donation for {0} from {1} using {2} on {3} ({4})",
-                                reachAccountName, donation.name, donation.payment_method, donation.updated_at, donation.token );
+                            var summary = string.Format( "Reach Donation for {0} from {1} on {2} ({3})",
+                                reachAccountName, donation.name, donation.updated_at, donation.id );
                             transaction = new FinancialTransaction
                             {
                                 TransactionDateTime = donation.updated_at,
