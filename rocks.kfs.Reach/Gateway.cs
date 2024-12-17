@@ -423,11 +423,6 @@ namespace rocks.kfs.Reach
                             errorMessages.Add( errorMessage );
                         }
                     }
-
-                    if ( errorMessage.IsNotNullOrWhiteSpace() )
-                    {
-                        errorMessages.Add( errorMessage );
-                    }
                 }
                 else
                 {
@@ -477,7 +472,6 @@ namespace rocks.kfs.Reach
 
             if ( errorMessages.Any() )
             {
-                //errorMessage = string.Join( "<br>", errorMessages );
                 ExceptionLogService.LogException( new Exception( $"Reach import errors: \r\n{string.Join( "\r\n", errorMessages )}" ) );
             }
 
