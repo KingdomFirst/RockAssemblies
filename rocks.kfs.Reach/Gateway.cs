@@ -270,6 +270,10 @@ namespace rocks.kfs.Reach
 
                 // to_date doesn't have a timestamp, so it includes transactions posted after the cutoff
                 var donationResult = Api.PostRequest( donationUrl, authenticator, parameters, out errorMessage );
+                if ( errorMessage.IsNotNullOrWhiteSpace() )
+                {
+                    errorMessages.Add( errorMessage );
+                }
                 var donations = JsonConvert.DeserializeObject<List<Donation>>( donationResult.ToStringSafe() );
                 if ( donations != null && donations.Any() && errorMessage.IsNullOrWhiteSpace() )
                 {
