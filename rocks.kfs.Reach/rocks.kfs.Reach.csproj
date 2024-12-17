@@ -87,6 +87,7 @@
     <Compile Include="Reporting\Project.cs" />
     <Compile Include="Reporting\Category.cs" />
     <Compile Include="Reporting\Donation.cs" />
+    <Compile Include="Reporting\ErrorResponse.cs" />
     <Compile Include="Reporting\Supporter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
