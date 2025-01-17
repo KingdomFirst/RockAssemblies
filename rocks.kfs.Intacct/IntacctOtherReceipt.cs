@@ -36,16 +36,22 @@ namespace rocks.kfs.Intacct
         /// Creates the XML to submit to Intacct for a new Other Receipt entry.
         /// </summary>
         /// <param name="AuthCreds">The IntacctAuth object with authentication. <see cref="IntacctAuth"/></param>
-        /// <param name="Batch">The Rock FinancialBatch that a Journal Entry will be created from. <see cref="FinancialBatch"/></param>
+        /// <param name="BatchId">The BatchId of the Rock FinancialBatch that a Journal Entry will be created from.</param>
+        /// <param name="debugLava">Boolean string indicating whether to display lava merge fields for debug purposes.</param>
+        /// <param name="paymentMethod">The payment method to use for the other receipt. <see cref="PaymentMethod"/></param>
+        /// <param name="groupingMode">The mode for handling grouping of GL accounts. NOTE: DebitLinesOnly mode is unsupported for Other Receipts. <see cref="GLAccountGroupingMode"/></param>
+        /// <param name="bankAccountId">The GL bank account to use in the other receipt.</param>
+        /// <param name="unDepGLAccountId">The GL undeposited funds account to use in the other receipt.</param>
+        /// <param name="DescriptionLava">Lava code to use for the description of each line of the other receipt.</param>
         /// <returns>Returns the XML needed to create an Intacct Other Receipt.</returns>
-        public XmlDocument CreateOtherReceiptXML( IntacctAuth AuthCreds, int BatchId, ref string debugLava, PaymentMethod paymentMethod, string bankAccountId = null, string unDepGLAccountId = null, string DescriptionLava = "" )
+        public XmlDocument CreateOtherReceiptXML( IntacctAuth AuthCreds, int BatchId, ref string debugLava, PaymentMethod paymentMethod, GLAccountGroupingMode groupingMode, string bankAccountId = null, string unDepGLAccountId = null, string DescriptionLava = "" )
         {
             var doc = new XmlDocument();
             var financialBatch = new FinancialBatchService( new RockContext() ).Get( BatchId );
 
             if ( financialBatch.Id > 0 )
             {
-                var otherReceipt = BuildOtherReceipt( financialBatch, ref debugLava, paymentMethod, bankAccountId, unDepGLAccountId, DescriptionLava );
+                var otherReceipt = BuildOtherReceipt( financialBatch, ref debugLava, paymentMethod, groupingMode, bankAccountId, unDepGLAccountId, DescriptionLava );
                 if ( otherReceipt.ReceiptItems.Any() )
                 {
                     using ( var writer = doc.CreateNavigator().AppendChild() )
@@ -165,13 +171,16 @@ namespace rocks.kfs.Intacct
                             {
                                 writer.WriteElementString( "classid", item.ClassId );
                             }
-                            if ( item.CustomFields.Count > 0 )
-                            {
-                                foreach ( KeyValuePair<string, dynamic> customField in item.CustomFields )
-                                {
-                                    writer.WriteElementString( customField.Key, customField.Value ?? string.Empty );
-                                }
-                            }
+
+                            // Intacct api documentation shows support for custom fields, but we are unable to get them to work. Disabling for now.
+
+                            //if ( item.CustomFields.Count > 0 )
+                            //{
+                            //    foreach ( KeyValuePair<string, dynamic> customField in item.CustomFields )
+                            //    {
+                            //        writer.WriteElementString( customField.Key, customField.Value ?? string.Empty );
+                            //    }
+                            //}
                             writer.WriteEndElement();  // close lineitem
                         }
 
@@ -197,7 +206,7 @@ namespace rocks.kfs.Intacct
             return doc;
         }
 
-        private OtherReceipt BuildOtherReceipt( FinancialBatch financialBatch, ref string debugLava, PaymentMethod paymentMethod, string bankAccountId = null, string unDepGLAccountId = null, string DescriptionLava = "" )
+        private OtherReceipt BuildOtherReceipt( FinancialBatch financialBatch, ref string debugLava, PaymentMethod paymentMethod, GLAccountGroupingMode groupingMode, string bankAccountId = null, string unDepGLAccountId = null, string DescriptionLava = "" )
         {
             if ( string.IsNullOrWhiteSpace( DescriptionLava ) )
             {
@@ -222,18 +231,19 @@ namespace rocks.kfs.Intacct
             };
             List<RegistrationInstance> registrationLinks;
             List<GroupMember> groupMemberLinks;
-            var receiptTransactions = TransactionHelpers.GetTransactionSummary( financialBatch, rockContext, out registrationLinks, out groupMemberLinks );
+            var receiptTransactions = TransactionHelpers.GetTransactionSummary( financialBatch, rockContext, out registrationLinks, out groupMemberLinks, groupingMode );
 
             //
             // Get the Dimensions from the Account since the Transaction Details have been Grouped already
             //
             var customDimensions = TransactionHelpers.GetCustomDimensions();
+            var lineItemList = new List<ReceiptLineItem>();
 
             // Create Receipt Item for each entry within a grouping
             foreach ( var bTran in receiptTransactions )
             {
                 var account = new FinancialAccountService( rockContext ).Get( bTran.FinancialAccountId );
-                var customDimensionValues = new Dictionary<string, dynamic>();
+                var customDimensionValues = new SortedDictionary<string, dynamic>();
                 account.LoadAttributes();
                 var mergeFieldObjects = new MergeFieldObjects
                 {
@@ -246,6 +256,9 @@ namespace rocks.kfs.Intacct
                 };
                 Dictionary<string, object> mergeFields = TransactionHelpers.GetMergeFieldsAndDimensions( ref debugLava, customDimensionValues, mergeFieldObjects );
 
+                // We want to include any attribute dimensions with "_credit" in the key, or neither "_debit" nor "_credit". It is cleanest to do this by just excluding "_debit". 
+                var creditDimensions = TransactionHelpers.GetFilteredDimensions( customDimensionValues, "_debit", "_credit" );
+
                 var classId = account.GetAttributeValue( "rocks.kfs.Intacct.CLASSID" );
                 var departmentId = account.GetAttributeValue( "rocks.kfs.Intacct.DEPARTMENT" );
                 var locationId = account.GetAttributeValue( "rocks.kfs.Intacct.LOCATION" );
@@ -257,11 +270,12 @@ namespace rocks.kfs.Intacct
                     Memo = DescriptionLava.ResolveMergeFields( mergeFields ),
                     LocationId = locationId,
                     DepartmentId = departmentId,
-                    ProjectId = bTran.Project,
+                    ProjectId = bTran.CreditProject,
                     ClassId = classId,
-                    CustomFields = customDimensionValues
+                    CustomFields = creditDimensions,
+                    CustomFieldsString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) )
                 };
-                otherReceipt.ReceiptItems.Add( receiptItem );
+                lineItemList.Add( receiptItem );
 
                 if ( bTran.ProcessTransactionFees == 2 )
                 {
@@ -272,12 +286,34 @@ namespace rocks.kfs.Intacct
                         Memo = "Transaction Fees",
                         LocationId = locationId,
                         DepartmentId = departmentId,
-                        ProjectId = bTran.Project,
-                        ClassId = classId
+                        ProjectId = bTran.CreditProject,
+                        ClassId = classId,
+                        CustomFields = creditDimensions,
+                        CustomFieldsString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) )
                     };
-                    otherReceipt.ReceiptItems.Add( feeLineItem );
+                    lineItemList.Add( feeLineItem );
                 }
             }
+
+            if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.CreditLinesOnly )
+            {
+                lineItemList = lineItemList
+                    .GroupBy( d => new { d.ClassId, d.DepartmentId, d.LocationId, d.ProjectId, d.GlAccountNo, d.CustomFieldsString } )
+                    .Select( s => new ReceiptLineItem
+                    {
+                        Amount = s.Sum( f => f.Amount ),
+                        GlAccountNo = s.Key.GlAccountNo,
+                        ClassId = s.Key.ClassId,
+                        DepartmentId = s.Key.DepartmentId,
+                        LocationId = s.Key.LocationId,
+                        ProjectId = s.Key.ProjectId,
+                        Memo = s.First().Memo,
+                        CustomFields = s.First().CustomFields
+                    } )
+                    .ToList();
+            }
+
+            otherReceipt.ReceiptItems.AddRange( lineItemList );
 
             return otherReceipt;
         }

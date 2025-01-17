@@ -488,16 +488,22 @@ namespace com.kfs.Security.ExternalAuthentication
                             person.EmailPreference = EmailPreference.EmailAllowed;
                             person.Gender = Gender.Unknown;
 
-                            var phoneNumber = new PhoneNumber { NumberTypeValueId = phoneNumberTypeId };
-                            person.PhoneNumbers.Add( phoneNumber );
-                            phoneNumber.Number = PhoneNumber.CleanNumber( oauthUser.contact.phone.AsNumeric() );
-
-                            var birthday = oauthUser.contact.birthday.Split( ( new char[] { '-' } ) );
-                            if ( birthday.Length == 3 )
+                            if ( oauthUser.contact != null && !string.IsNullOrWhiteSpace( oauthUser.contact.phone ) )
                             {
-                                person.BirthYear = birthday[0].AsIntegerOrNull();
-                                person.BirthMonth = birthday[1].AsIntegerOrNull();
-                                person.BirthDay = birthday[2].AsIntegerOrNull();
+                                var phoneNumber = new PhoneNumber { NumberTypeValueId = phoneNumberTypeId };
+                                person.PhoneNumbers.Add( phoneNumber );
+                                phoneNumber.Number = PhoneNumber.CleanNumber( oauthUser.contact.phone.AsNumeric() );
+                            }
+
+                            if ( oauthUser.contact != null && !string.IsNullOrWhiteSpace( oauthUser.contact.birthday ) )
+                            {
+                                var birthday = oauthUser.contact.birthday.Split( ( new char[] { '-' } ) );
+                                if ( birthday.Length == 3 )
+                                {
+                                    person.BirthYear = birthday[0].AsIntegerOrNull();
+                                    person.BirthMonth = birthday[1].AsIntegerOrNull();
+                                    person.BirthDay = birthday[2].AsIntegerOrNull();
+                                }
                             }
 
                             var gender = oauthUser.contact.gender_id.AsIntegerOrNull();
@@ -511,31 +517,34 @@ namespace com.kfs.Security.ExternalAuthentication
                                 PersonService.SaveNewPerson( person, rockContext, null, false );
                             }
 
-                            // save address
-                            var personLocation = new LocationService( rockContext )
-                                                    .Get( oauthUser.address.street1, oauthUser.address.street2,
-                                                        oauthUser.address.city, oauthUser.address.state, oauthUser.address.zip, oauthUser.address.country );
-                            if ( personLocation != null )
+                            if ( oauthUser.address != null && !string.IsNullOrWhiteSpace( oauthUser.address.street1 ) )
                             {
-                                Guid locationTypeGuid = Rock.SystemGuid.DefinedValue.GROUP_LOCATION_TYPE_HOME.AsGuid();
-                                if ( locationTypeGuid != Guid.Empty )
+                                // save address
+                                var personLocation = new LocationService( rockContext )
+                                                        .Get( oauthUser.address.street1, oauthUser.address.street2,
+                                                            oauthUser.address.city, oauthUser.address.state, oauthUser.address.zip, oauthUser.address.country );
+                                if ( personLocation != null )
                                 {
-                                    Guid familyGroupTypeGuid = Rock.SystemGuid.GroupType.GROUPTYPE_FAMILY.AsGuid();
-                                    GroupService groupService = new GroupService( rockContext );
-                                    GroupLocationService groupLocationService = new GroupLocationService( rockContext );
-                                    var family = groupService.Queryable().Where( g => g.GroupType.Guid == familyGroupTypeGuid && g.Members.Any( m => m.PersonId == person.Id ) ).FirstOrDefault();
+                                    Guid locationTypeGuid = Rock.SystemGuid.DefinedValue.GROUP_LOCATION_TYPE_HOME.AsGuid();
+                                    if ( locationTypeGuid != Guid.Empty )
+                                    {
+                                        Guid familyGroupTypeGuid = Rock.SystemGuid.GroupType.GROUPTYPE_FAMILY.AsGuid();
+                                        GroupService groupService = new GroupService( rockContext );
+                                        GroupLocationService groupLocationService = new GroupLocationService( rockContext );
+                                        var family = groupService.Queryable().Where( g => g.GroupType.Guid == familyGroupTypeGuid && g.Members.Any( m => m.PersonId == person.Id ) ).FirstOrDefault();
 
-                                    var groupLocation = new GroupLocation();
-                                    groupLocation.GroupId = family.Id;
-                                    groupLocationService.Add( groupLocation );
+                                        var groupLocation = new GroupLocation();
+                                        groupLocation.GroupId = family.Id;
+                                        groupLocationService.Add( groupLocation );
 
-                                    groupLocation.Location = personLocation;
+                                        groupLocation.Location = personLocation;
 
-                                    groupLocation.GroupLocationTypeValueId = DefinedValueCache.Get( locationTypeGuid ).Id;
-                                    groupLocation.IsMailingLocation = true;
-                                    groupLocation.IsMappedLocation = true;
+                                        groupLocation.GroupLocationTypeValueId = DefinedValueCache.Get( locationTypeGuid ).Id;
+                                        groupLocation.IsMailingLocation = true;
+                                        groupLocation.IsMappedLocation = true;
 
-                                    rockContext.SaveChanges();
+                                        rockContext.SaveChanges();
+                                    }
                                 }
                             }
                         }

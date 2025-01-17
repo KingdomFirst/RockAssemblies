@@ -14,8 +14,6 @@
 // limitations under the License.
 // </copyright>
 //
-using System.Collections.Generic;
-using Rock;
 using Rock.Plugin;
 
 namespace rocks.kfs.StepsToCare.Migrations
@@ -48,7 +46,7 @@ VALUES (N'KFS Note Popover', N'Use this shortcode to add person note popover/qui
           });
         });
     });
-    
+
     function addNoteAjax(prefix = """", message, id) {
         $(''#updateProgress'').show();
         var prefixPlus = """";
@@ -57,7 +55,7 @@ VALUES (N'KFS Note Popover', N'Use this shortcode to add person note popover/qui
         }
         $.ajax({
             type: ""POST"",
-            url: ""/api/Notes"", 
+            url: ""/api/Notes"",
             contentType:""application/json"",
             data: JSON.stringify({
                 IsSystem: false,
@@ -94,4 +92,4 @@ END" );
             Sql( @"DELETE LavaShortcode WHERE [Guid] = 'AB79EC07-F404-43DC-8F79-9A2AF87F04C6'" );
         }
     }
-}                                                                                                                                                                         
+}

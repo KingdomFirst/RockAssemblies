@@ -522,12 +522,10 @@ namespace rocks.kfs.StepsToCare.Migrations
 
             // Add/Update PageContext for Page:Care Entry, Entity: rocks.kfs.StepsToCare.Model.CareNeed, Parameter: CareNeedId
             RockMigrationHelper.UpdatePageContext( "27953B65-21E2-4CA9-8461-3AFAD46D9BC8", "rocks.kfs.StepsToCare.Model.CareNeed", "CareNeedId", "6AE31281-2175-4BB9-B5A2-DF29092E85EC" );
-
         }
 
         public override void Down()
         {
-
             // Enable Launch Workflow Attribute for BlockType: Care Dashboard
             RockMigrationHelper.DeleteAttribute( "7FEA3B48-CEA9-4902-B2BC-579D64221355" );
 

@@ -24,7 +24,7 @@ namespace ZoomDotNetFramework.Entities
         public string Name { get; set; }
         public RoomType Type { get; set; }
         public string Activation_Code { get; set; }
-        public string Status { get; set; }
+        public RoomStatus Status { get; set; }
         public string Room_Id { get; set; }
         public string Location_Id { get; set; }
     }

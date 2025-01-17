@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>rocks.kfs.StepsToCare</RootNamespace>
     <AssemblyName>rocks.kfs.StepsToCare</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>false</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -44,12 +45,25 @@
     <Reference Include="Microsoft.AspNetCore.Http.Abstractions">
       <HintPath>..\..\RockWeb\Bin\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
     </Reference>
+    <Reference Include="NuGet.Core, Version=2.11.1.812, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\NuGet.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Quartz">
       <HintPath>..\..\RockWeb\Bin\Quartz.dll</HintPath>
     </Reference>
     <Reference Include="Rock, Version=1.12.3.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
+    </Reference>
+    <Reference Include="Rock.Common">
+      <HintPath>..\..\RockWeb\Bin\Rock.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Rock.Enums">
+      <HintPath>..\..\RockWeb\Bin\Rock.Enums.dll</HintPath>
+    </Reference>
+    <Reference Include="Rock.Lava.Shared">
+      <HintPath>..\..\RockWeb\Bin\Rock.Lava.Shared.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -65,7 +79,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Jobs\CareNeedAutomatedNotifications.cs" />
+    <Compile Include="Field\Types\CareNeedFieldType.cs" />
+    <Compile Include="Field\Types\NoteTemplateFieldType.cs" />
+    <Compile Include="Jobs\CareNeedAutomatedProcesses.cs" />
+    <Compile Include="Migrations\022_UpdateCommunications.cs" />
+    <Compile Include="Migrations\021_DefaultValue.cs" />
+    <Compile Include="Migrations\020_NewCommunications.cs" />
+    <Compile Include="Migrations\019_AddFieldTypeAndAttributeMatrix.cs" />
+    <Compile Include="Migrations\023_UpdateAttributes.cs" />
+    <Compile Include="Migrations\018_AddDefinedValueAndProperty.cs" />
+    <Compile Include="Migrations\017_AddColumn.cs" />
+    <Compile Include="Migrations\016_NewAttribute.cs" />
+    <Compile Include="Migrations\015_UpdateJob.cs" />
+    <Compile Include="Migrations\014_NewPageAndAttributes.cs" />
+    <Compile Include="Migrations\013_NewPermissions.cs" />
     <Compile Include="Migrations\012_NewBlockSettings.cs" />
     <Compile Include="Migrations\011_AddWorkerColumns.cs" />
     <Compile Include="Migrations\010_AddParentNeedId.cs" />
@@ -84,9 +111,15 @@
     <Compile Include="Model\CareNeedService.cs" />
     <Compile Include="Model\CareWorker.cs" />
     <Compile Include="Model\CareWorkerService.cs" />
+    <Compile Include="Model\FlaggedNeed.cs" />
     <Compile Include="Model\NoteTemplate.cs" />
     <Compile Include="Model\NoteTemplateService.cs" />
+    <Compile Include="Model\TouchTemplate.cs" />
+    <Compile Include="Model\WorkerResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SystemGuid\FieldType.cs" />
+    <Compile Include="SystemGuid\Attribute.cs" />
+    <Compile Include="Utilities.cs" />
     <Compile Include="SystemGuid\PersonAttribute.cs" />
     <Compile Include="SystemGuid\SystemCommunication.cs" />
     <Compile Include="SystemGuid\DefinedValue.cs" />

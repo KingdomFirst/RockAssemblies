@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2022 by Kingdom First Solutions
+// Copyright 2023 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 // </copyright>
 //
-using JWT.Algorithms;
-using JWT.Builder;
+
 using Rock.Data;
 using Rock.Model;
 using Rock.Security;
@@ -23,16 +22,17 @@ using Rock.Web.Cache;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ZoomDotNetFramework;
 
 namespace rocks.kfs.Zoom
 {
     public class Settings
     {
         /// <summary>
-        /// Builds a JSON Web Token value.
+        /// Gets and OAuth token from Zoom API.
         /// </summary>
         /// <returns></returns>
-        public static string GetJwtString()
+        public static string GetOauthString()
         {
             string tokenString = null;
             using ( RockContext rockContext = new RockContext() )
@@ -40,58 +40,67 @@ namespace rocks.kfs.Zoom
                 var settings = GetSettings( rockContext );
                 if ( settings != null )
                 {
-                    var zoomApiKey = GetSettingValue( settings, "rocks.kfs.ZoomApiKey", true );
-                    var zoomApiSecret = GetSettingValue( settings, "rocks.kfs.ZoomApiSecret", true );
-                    if ( !String.IsNullOrWhiteSpace( zoomApiKey ) && !String.IsNullOrWhiteSpace( zoomApiKey ) )
-                    {
-                        tokenString = JwtBuilder.Create()
-                            .WithAlgorithm( new HMACSHA256Algorithm() )
-                            .WithSecret( zoomApiSecret )
-                            .AddClaim( "aud", null )
-                            .AddClaim( "iss", zoomApiKey )
-                            .AddClaim( "exp", DateTimeOffset.UtcNow.AddHours( 1 ).Subtract( new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc ) ).TotalSeconds )  // Replace .Subtract() with  .ToUnixTimeSeconds() once assembly is moved to .NET 4.6+
-                            .AddClaim( "iat", DateTimeOffset.UtcNow.Subtract( new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc ) ).TotalSeconds )  // Replace .Subtract() with  .ToUnixTimeSeconds() once assembly is moved to .NET 4.6+
-                            .Encode();
-                    }
+                    var zoomAppAccountId = GetSettingValue( settings, "rocks.kfs.ZoomAppAccountId", true );
+                    var zoomAppClientId = GetSettingValue( settings, "rocks.kfs.ZoomAppClientId", true );
+                    var zoomAppSecret = GetSettingValue( settings, "rocks.kfs.ZoomAppClientSecret", true );
+                    tokenString = ZoomApi.GetOauthToken( zoomAppAccountId, zoomAppClientId, zoomAppSecret );
                 }
             }
             return tokenString;
         }
 
         /// <summary>
-        /// Gets the API Key value.
+        /// Gets the App Account Id value.
         /// </summary>
         /// <returns></returns>
-        public static string GetApiKey()
+        public static string GetAppAccountId()
         {
-            string zoomApiKey = null;
+            string appAccountId = null;
             using ( RockContext rockContext = new RockContext() )
             {
                 var settings = GetSettings( rockContext );
                 if ( settings != null )
                 {
-                    zoomApiKey = GetSettingValue( settings, "rocks.kfs.ZoomApiKey", true );
+                    appAccountId = GetSettingValue( settings, "rocks.kfs.ZoomAppAccountId", true );
                 }
             }
-            return zoomApiKey;
+            return appAccountId;
         }
 
         /// <summary>
-        /// Gets the API Secret value.
+        /// Gets the App Client Id value.
         /// </summary>
         /// <returns></returns>
-        public static string GetApiSecret()
+        public static string GetAppClientId()
         {
-            string zoomApiSecret = null;
+            string appClientId = null;
             using ( RockContext rockContext = new RockContext() )
             {
                 var settings = GetSettings( rockContext );
                 if ( settings != null )
                 {
-                    zoomApiSecret = GetSettingValue( settings, "rocks.kfs.ZoomApiSecret", true );
+                    appClientId = GetSettingValue( settings, "rocks.kfs.ZoomAppClientId", true );
                 }
             }
-            return zoomApiSecret;
+            return appClientId;
+        }
+
+        /// <summary>
+        /// Gets the App Client Secret value.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetAppClientSecret()
+        {
+            string zoomAppClientSecret = null;
+            using ( RockContext rockContext = new RockContext() )
+            {
+                var settings = GetSettings( rockContext );
+                if ( settings != null )
+                {
+                    zoomAppClientSecret = GetSettingValue( settings, "rocks.kfs.ZoomAppClientSecret", true );
+                }
+            }
+            return zoomAppClientSecret;
         }
 
         /// <summary>
@@ -110,18 +119,20 @@ namespace rocks.kfs.Zoom
         }
 
         /// <summary>
-        /// Saves the API Key and API Secret.
+        /// Saves the App Account ID, Client ID, and Client Secret attribute values.
         /// </summary>
-        /// <param name="apiKey">The api key.</param>
-        /// <param name="apiSecret">The api secret.</param>
+        /// <param name="appAccountId">The Account Id.</param>
+        /// <param name="appClientId">The Client Id.</param>
+        /// <param name="appClientSecret">The Client Secret.</param>
 
-        public static void SaveApiSettings( string apiKey, string apiSecret )
+        public static void SaveApiSettings( string appAccountId, string appClientId, string appClientSecret )
         {
             using ( var rockContext = new RockContext() )
             {
                 var settings = GetSettings( rockContext );
-                SetSettingValue( rockContext, settings, "rocks.kfs.ZoomApiKey", apiKey, true );
-                SetSettingValue( rockContext, settings, "rocks.kfs.ZoomApiSecret", apiSecret, true );
+                SetSettingValue( rockContext, settings, "rocks.kfs.ZoomAppAccountId", appAccountId, true );
+                SetSettingValue( rockContext, settings, "rocks.kfs.ZoomAppClientId", appClientId, true );
+                SetSettingValue( rockContext, settings, "rocks.kfs.ZoomAppClientSecret", appClientSecret, true );
 
                 rockContext.SaveChanges();
             }

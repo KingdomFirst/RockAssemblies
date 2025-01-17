@@ -27,10 +27,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct( "rocks.kfs.Workflow.Action.Core" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
-[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions, Inc. 2020" )]
+[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions, Inc. 2022" )]
 
 // Auto increment assembly versions
-[assembly: AssemblyVersion( "1.0.*" )]
+[assembly: AssemblyVersion( "1.1.*" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from

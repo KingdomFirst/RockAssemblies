@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>rocks.kfs.Zoom</RootNamespace>
     <AssemblyName>rocks.kfs.Zoom</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>false</Deterministic>
     <TargetFrameworkProfile />
@@ -53,10 +53,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Ical.Net.dll</HintPath>
     </Reference>
-    <Reference Include="Ical.Net.Collections, Version=2.1.0.20780, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\RockWeb\Bin\Ical.Net.Collections.dll</HintPath>
-    </Reference>
     <Reference Include="JWT, Version=8.0.0.0, Culture=neutral, PublicKeyToken=6f98bca0f40f2ecf, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\JWT.8.4.2\lib\net40\JWT.dll</HintPath>
@@ -80,6 +76,15 @@
     <Reference Include="Rock">
       <HintPath>..\..\RockWeb\Bin\Rock.dll</HintPath>
     </Reference>
+    <Reference Include="Rock.Common">
+      <HintPath>..\..\RockWeb\Bin\Rock.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Rock.Enums">
+      <HintPath>..\..\RockWeb\Bin\Rock.Enums.dll</HintPath>
+    </Reference>
+    <Reference Include="Rock.Lava.Shared">
+      <HintPath>..\..\RockWeb\Bin\Rock.Lava.Shared.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -101,6 +106,8 @@
     <Compile Include="Enums\ZoomMeetingRequestStatus.cs" />
     <Compile Include="Jobs\ZoomMeetingGroupReminder.cs" />
     <Compile Include="Jobs\ZoomRoomSchedulingAndMaintenance.cs" />
+    <Compile Include="Migrations\009_UpdateApiAttributesForOauth.cs" />
+    <Compile Include="Migrations\008_MakeCommunicationsEditable.cs" />
     <Compile Include="Migrations\007_DataViewsAndReports.cs" />
     <Compile Include="Migrations\006_PageAndBlocks.cs" />
     <Compile Include="Migrations\003_CreateAttributeQualifiers.cs" />

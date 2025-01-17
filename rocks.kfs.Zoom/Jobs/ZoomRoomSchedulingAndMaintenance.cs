@@ -15,28 +15,29 @@
 // </copyright>
 //
 using Ical.Net;
+using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
-using Ical.Net.Serialization.iCalendar.Serializers;
+using Ical.Net.Serialization;
 using Quartz;
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
+using Rock.Jobs;
 using Rock.Model;
 using Rock.Web.Cache;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Text;
 
 using com.bemaservices.RoomManagement.Model;
+using rocks.kfs.Zoom.Enums;
 using rocks.kfs.Zoom.Model;
 using rocks.kfs.Zoom.ZoomGuid;
+using ZoomDotNetFramework;
 using ZoomDotNetFramework.Entities;
 using ZoomDotNetFramework.Enums;
-using rocks.kfs.Zoom.Enums;
-using System.Text;
-using Rock.Jobs;
-using ZoomDotNetFramework;
 
 namespace rocks.kfs.Zoom.Jobs
 {
@@ -82,7 +83,6 @@ namespace rocks.kfs.Zoom.Jobs
         }
 
         private List<ZoomRoomOfflineResult> zoomRoomOfflineResultList = new List<ZoomRoomOfflineResult>();
-        private int zrOfflineRequests = 0;
         private string webhookBaseUrl;
         private int reservationLocationEntityTypeId;
         private bool verboseLogging;
@@ -145,6 +145,10 @@ namespace rocks.kfs.Zoom.Jobs
                 {
                     loc.LoadAttributes();
                     var zoomRoomDV = DefinedValueCache.Get( loc.GetAttributeValue( "rocks.kfs.ZoomRoom" ).AsGuid() );
+                    if ( zoomRoomDV == null )
+                    {
+                        throw new Exception( string.Format( "An invalid Zoom Room attribute value is set on the {0} ({1}) location.", loc.Name, loc.Id ) );
+                    }
                     linkedZoomRoomLocations.Add( loc.Id, zoomRoomDV.Value );
                 }
 
@@ -194,7 +198,6 @@ namespace rocks.kfs.Zoom.Jobs
                 // Delete any active Room Occurrences tied to Zoom Meetings that no longer exist.
                 var linkedOccurrences = zrOccurrenceService
                                         .Queryable()
-                                        .AsNoTracking()
                                         .Where( ro => ro.EntityTypeId == reservationLocationEntityTypeId
                                             && ro.ZoomMeetingId > 0
                                             && !ro.IsCompleted
@@ -225,7 +228,6 @@ namespace rocks.kfs.Zoom.Jobs
                 {
                     var rLoc = reservationLocationService.Queryable( "Location" ).FirstOrDefault( rl => rl.Id == rOcc.EntityId );
                     rLoc.Location.LoadAttributes();
-                    rOcc.ZoomMeetingRequestStatus = ZoomMeetingRequestStatus.Requested;
                     var zoomRoomDV = DefinedValueCache.Get( rLoc.Location.GetAttributeValue( "rocks.kfs.ZoomRoom" ).AsGuid() );
                     CreateOccurrenceZoomMeeting( rOcc, zoomRoomDV, zoom );
                 }
@@ -257,7 +259,7 @@ namespace rocks.kfs.Zoom.Jobs
                             {
                                 // Build the iCal string as it is a required property on the Schedule for Room Reservation block to display the Reservation
                                 var meetingLocalTime = meeting.Start_Time.UtcDateTime.ToLocalTime();
-                                var calendarEvent = new Event
+                                var calendarEvent = new CalendarEvent
                                 {
                                     DtStart = new CalDateTime( meetingLocalTime ),
                                     DtEnd = new CalDateTime( meetingLocalTime.AddMinutes( meeting.Duration ) ),
@@ -514,16 +516,28 @@ namespace rocks.kfs.Zoom.Jobs
             }
             try
             {
-                var callbackUrl = string.Format( "{0}?token={1}", webhookBaseUrl, occurrence.Id );
-
                 if ( verboseLogging )
                 {
-                    LogEvent( null, "Zoom Room Reservation Sync", "Schedule Zoom Room Meeting", "Started" );
+                    LogEvent( null, "Zoom Room Reservation Sync", "Create Zoom Room Meeting", "Started" );
                 }
-                var success = zoomApi.ScheduleZoomRoomMeeting( zoomRoomDV.Value, occurrence.Password, callbackUrl, occurrence.Topic, occurrence.StartTime.ToRockDateTimeOffset(), string.Empty, occurrence.Duration, joinBeforeHost );
+                var meetingData = new Meeting
+                {
+                    Password = occurrence.Password,
+                    Type = MeetingType.Scheduled,
+                    Topic = occurrence.Topic,
+                    Start_Time = occurrence.StartTime.ToRockDateTimeOffset(),
+                    Duration = occurrence.Duration,
+                    Join_Before_Host = joinBeforeHost
+                };
+                var newMeeting = zoomApi.CreateMeeting( zoomRoomDV.Value, meetingData );
+                if ( newMeeting != null && newMeeting.Id > 0 )
+                {
+                    occurrence.ZoomMeetingId = newMeeting.Id;
+                    occurrence.ZoomMeetingJoinUrl = newMeeting.Join_Url;
+                }
                 if ( verboseLogging )
                 {
-                    LogEvent( null, "Zoom Room Reservation Sync", string.Format( "Create new Zoom Meeting {0}: ZoomRoom {1} - {2}", success ? "succeeded" : "failed", zoomRoomDV.Value, occurrence.StartTime.ToShortDateTimeString() ) );
+                    LogEvent( null, "Zoom Room Reservation Sync", string.Format( "Create new Zoom Meeting {0}: ZoomRoom {1} - {2}", newMeeting != null ? "succeeded" : "failed", zoomRoomDV.Value, occurrence.StartTime.ToShortDateTimeString() ) );
                 }
             }
             catch ( Exception ex )

@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ZoomDotNetFramework</RootNamespace>
     <AssemblyName>ZoomDotNetFramework</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
@@ -38,8 +38,8 @@
     <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.1.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.IdentityModel.Tokens.5.1.5\lib\net451\Microsoft.IdentityModel.Tokens.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\RestSharp.105.2.3\lib\net452\RestSharp.dll</HintPath>
@@ -59,6 +59,7 @@
     <Compile Include="Entities\User.cs" />
     <Compile Include="Enums\RecurrenceType.cs" />
     <Compile Include="Enums\MeetingType.cs" />
+    <Compile Include="Enums\RoomStatus.cs" />
     <Compile Include="Enums\UserPronounsOption.cs" />
     <Compile Include="Enums\UserLoginType.cs" />
     <Compile Include="Enums\UserAccountStatus.cs" />
@@ -67,8 +68,11 @@
     <Compile Include="Enums\MeetingListType.cs" />
     <Compile Include="Enums\UserType.cs" />
     <Compile Include="Enums\RoomType.cs" />
+    <Compile Include="Responses\ListRoomsResponse.cs" />
+    <Compile Include="Responses\OauthTokenResponse.cs" />
     <Compile Include="Responses\ListMeetingsResponse.cs" />
     <Compile Include="Responses\RoomsResponse.cs" />
+    <Compile Include="Responses\OauthErrorResponse.cs" />
     <Compile Include="Responses\ZRScheduleMeetingWebhookResponse.cs" />
     <Compile Include="Responses\ZoomBaseResponse.cs" />
     <Compile Include="Responses\ZRBaseMeetingInfo.cs" />

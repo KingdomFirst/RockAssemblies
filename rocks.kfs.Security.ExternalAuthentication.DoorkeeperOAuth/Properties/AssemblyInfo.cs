@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2019 by Kingdom First Solutions
+// Copyright 2022 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle( "rocks.kfs.Security.ExternalAuthentication.DoorkeeperOAuth" )]
 [assembly: AssemblyProduct( "rocks.kfs.Security.ExternalAuthentication.DoorkeeperOAuth" )]
-[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2021" )]
+[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2022" )]
 
 // Auto increment assembly versions
-[assembly: AssemblyVersion( "2.2.*" )]
+[assembly: AssemblyVersion( "2.4.*" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
