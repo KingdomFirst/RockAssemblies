@@ -31,7 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
+    <Reference Include="JetBrains.Annotations, Version=2020.3.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\JetBrains.Annotations.2020.3.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -47,8 +50,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="VimeoDotNet, Version=0.8.3.50, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\VimeoDotNet.0.8.3.50\lib\net45\VimeoDotNet.dll</HintPath>
+    <Reference Include="VimeoDotNet, Version=2.2020.522.0, Culture=neutral, PublicKeyToken=5bf7ec1d1f3f7066, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\VimeoDotNet.2.2.0\lib\net45\VimeoDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -64,7 +67,7 @@
     <PostBuildEvent>xcopy /Y /R "$(TargetPath)" "$(SolutionDir)RockWeb\bin"
 xcopy /Y /R "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)RockWeb\bin"
 xcopy /Y /R "$(ProjectDir)bin\Debug\VimeoDotNet.dll" "$(SolutionDir)RockWeb\bin"
-xcopy /Y /R "$(ProjectDir)bin\Debug\VimeoDotNet.pdb" "$(SolutionDir)RockWeb\bin"
+xcopy /Y /R "$(ProjectDir)bin\Debug\JetBrains.Annotations.dll" "$(SolutionDir)RockWeb\bin"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
