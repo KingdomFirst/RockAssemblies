@@ -25,6 +25,7 @@ using Rock;
 using Rock.Attribute;
 using Rock.Communication;
 using Rock.Data;
+using Rock.Jobs;
 using Rock.Model;
 using Rock.Web.Cache;
 using rocks.kfs.StepsToCare.Model;
@@ -143,7 +144,7 @@ namespace rocks.kfs.StepsToCare.Jobs
         Key = AttributeKey.VerboseLogging )]
 
     [DisallowConcurrentExecution]
-    public class CareNeedAutomatedProcesses : IJob
+    public class CareNeedAutomatedProcesses : RockJob
     {
         /// <summary>
         /// Attribute Keys
@@ -192,14 +193,13 @@ namespace rocks.kfs.StepsToCare.Jobs
         /// Executes the specified context.
         /// </summary>
         /// <param name="context">The context.</param>
-        public virtual void Execute( IJobExecutionContext context )
+        public override void Execute()
         {
-            var dataMap = context.JobDetail.JobDataMap;
             var JobStartDateTime = RockDateTime.Now;
-            var minimumCareTouches = dataMap.GetIntegerFromString( AttributeKey.MinimumCareTouches );
-            var minimumCareTouchesHours = dataMap.GetIntegerFromString( AttributeKey.MinimumCareTouches );
-            var minimumFollowUpCareTouchesHours = dataMap.GetIntegerFromString( AttributeKey.MinimumFollowUpTouchHours );
-            var followUpDays = dataMap.GetIntegerFromString( AttributeKey.FollowUpDays );
+            var minimumCareTouches = GetAttributeValue( AttributeKey.MinimumCareTouches ).ToIntSafe();
+            var minimumCareTouchesHours = GetAttributeValue( AttributeKey.MinimumCareTouches ).ToIntSafe();
+            var minimumFollowUpCareTouchesHours = GetAttributeValue( AttributeKey.MinimumFollowUpTouchHours ).ToIntSafe();
+            var followUpDays = GetAttributeValue( AttributeKey.FollowUpDays ).ToIntSafe();
 
             using ( var rockContext = new RockContext() )
             {
@@ -207,7 +207,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                 DateTime? lastStartDateTime = null;
 
                 // get job type id
-                int jobId = context.JobDetail.Description.AsInteger();
+                int jobId = ServiceJobId;
 
                 // load job
                 var job = new ServiceJobService( rockContext )
@@ -220,16 +220,16 @@ namespace rocks.kfs.StepsToCare.Jobs
                 var beginDateTime = lastStartDateTime ?? JobStartDateTime.AddDays( -1 );
                 //beginDateTime = JobStartDateTime.AddDays( -3 );
 
-                var detailPageParts = dataMap.GetString( AttributeKey.CareDetailPage ).SplitDelimitedValues( "," );
+                var detailPageParts = GetAttributeValue( AttributeKey.CareDetailPage ).SplitDelimitedValues( "," );
                 var detailPage = PageCache.Get( detailPageParts[0] );
                 var detailPageRoute = detailPage?.PageRoutes.FirstOrDefault( r => detailPageParts.Length == 1 || ( detailPageParts.Length > 1 && r.Guid == detailPageParts[1].AsGuid() ) );
                 var detailPagePath = detailPageRoute != null ? "/" + detailPageRoute.Route : "/page/" + detailPage.Id;
-                var dashboardPageParts = dataMap.GetString( AttributeKey.CareDashboardPage ).SplitDelimitedValues( "," );
+                var dashboardPageParts = GetAttributeValue( AttributeKey.CareDashboardPage ).SplitDelimitedValues( "," );
                 var dashboardPage = PageCache.Get( dashboardPageParts[0] );
                 var dashboardPageRoute = dashboardPage?.PageRoutes.FirstOrDefault( r => dashboardPageParts.Length == 1 || ( dashboardPageParts.Length > 1 && r.Guid == dashboardPageParts[1].AsGuid() ) );
                 var dashboardPagePath = dashboardPageRoute != null ? "/" + dashboardPageRoute.Route : "/page/" + dashboardPage.Id;
 
-                AssignWorkersToNeeds( rockContext, beginDateTime, dataMap, detailPagePath, dashboardPagePath );
+                AssignWorkersToNeeds( rockContext, beginDateTime, detailPagePath, dashboardPagePath );
 
                 var careNeedService = new CareNeedService( rockContext );
                 var assignedPersonService = new AssignedPersonService( rockContext );
@@ -357,9 +357,9 @@ namespace rocks.kfs.StepsToCare.Jobs
                     }
                 }
 
-                var followUpSystemCommunicationGuid = dataMap.GetString( AttributeKey.FollowUpSystemCommunication ).AsGuid();
-                var careTouchNeededCommunicationGuid = dataMap.GetString( AttributeKey.CareTouchNeededCommunication ).AsGuid();
-                var outstandingNeedsCommunicationGuid = dataMap.GetString( AttributeKey.OutstandingNeedsCommunication ).AsGuid();
+                var followUpSystemCommunicationGuid = GetAttributeValue( AttributeKey.FollowUpSystemCommunication ).AsGuid();
+                var careTouchNeededCommunicationGuid = GetAttributeValue( AttributeKey.CareTouchNeededCommunication ).AsGuid();
+                var outstandingNeedsCommunicationGuid = GetAttributeValue( AttributeKey.OutstandingNeedsCommunication ).AsGuid();
                 var followUpSystemCommunication = new SystemCommunicationService( rockContext ).Get( followUpSystemCommunicationGuid );
                 var careTouchNeededCommunication = new SystemCommunicationService( rockContext ).Get( careTouchNeededCommunicationGuid );
                 var outstandingNeedsCommunication = new SystemCommunicationService( rockContext ).Get( outstandingNeedsCommunicationGuid );
@@ -566,7 +566,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                 // Send Outstanding needs daily notification
                 if ( outstandingNeedsCommunication != null && outstandingNeedsCommunication.Id > 0 )
                 {
-                    var outstandingNeedsIncludeSnoozed = dataMap.GetString( AttributeKey.OutstandingNeedsIncludeSnoozed );
+                    var outstandingNeedsIncludeSnoozed = GetAttributeValue( AttributeKey.OutstandingNeedsIncludeSnoozed );
 
                     var careAssigned = assignedPersonService.Queryable()
                         .Where( ap => ap.PersonAliasId != null && ap.NeedId != null && ap.CareNeed.StatusValueId != closedValueId && ( outstandingNeedsIncludeSnoozed == "Yes" || outstandingNeedsIncludeSnoozed == "Other" || ( outstandingNeedsIncludeSnoozed == "No" && ap.CareNeed.StatusValueId != snoozedValueId ) ) )
@@ -664,7 +664,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                 }
 
             }
-            context.Result = string.Format( "{0} emails sent \n{1} SMS messages sent", assignedPersonEmails, assignedPersonSms );
+            Result = string.Format( "{0} emails sent \n{1} SMS messages sent", assignedPersonEmails, assignedPersonSms );
             if ( errorMessages.Any() )
             {
                 StringBuilder sb = new StringBuilder();
@@ -672,7 +672,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                 sb.Append( string.Format( "{0} Errors: ", errorCount ) );
                 errorMessages.ForEach( e => { sb.AppendLine(); sb.Append( e ); } );
                 string errors = sb.ToString();
-                context.Result += errors;
+                Result += errors;
                 var exception = new Exception( errors );
                 HttpContext context2 = HttpContext.Current;
                 ExceptionLogService.LogException( exception, context2 );
@@ -680,16 +680,16 @@ namespace rocks.kfs.StepsToCare.Jobs
             }
         }
 
-        private void AssignWorkersToNeeds( RockContext rockContext, DateTime beginDateTime, JobDataMap dataMap, string detailPagePath, string dashboardPagePath )
+        private void AssignWorkersToNeeds( RockContext rockContext, DateTime beginDateTime, string detailPagePath, string dashboardPagePath )
         {
-            var autoAssignWorker = dataMap.GetBooleanFromString( AttributeKey.AutoAssignWorker );
-            var autoAssignWorkerGeofence = dataMap.GetBooleanFromString( AttributeKey.AutoAssignWorkerGeofence );
-            var loadBalanceType = dataMap.GetString( AttributeKey.LoadBalanceWorkersType );
-            var enableLogging = dataMap.GetBooleanFromString( AttributeKey.VerboseLogging );
-            var leaderRoleGuids = dataMap.GetString( AttributeKey.GroupTypeAndRole ).SplitDelimitedValues().AsGuidList();
-            var futureThresholdDays = dataMap.GetDoubleFromString( AttributeKey.FutureThresholdDays );
-            var assignmentEmailTemplateGuid = dataMap.GetString( AttributeKey.NewAssignmentNotification ).AsGuidOrNull();
-            var adultFamilyWorkers = dataMap.GetString( AttributeKey.AdultFamilyWorkers );
+            var autoAssignWorker = GetAttributeValue( AttributeKey.AutoAssignWorker ).AsBoolean();
+            var autoAssignWorkerGeofence = GetAttributeValue( AttributeKey.AutoAssignWorkerGeofence ).AsBoolean();
+            var loadBalanceType = GetAttributeValue( AttributeKey.LoadBalanceWorkersType );
+            var enableLogging = GetAttributeValue( AttributeKey.VerboseLogging ).AsBoolean();
+            var leaderRoleGuids = GetAttributeValue( AttributeKey.GroupTypeAndRole ).SplitDelimitedValues().AsGuidList();
+            var futureThresholdDays = GetAttributeValue( AttributeKey.FutureThresholdDays ).AsDouble();
+            var assignmentEmailTemplateGuid = GetAttributeValue( AttributeKey.NewAssignmentNotification ).AsGuidOrNull();
+            var adultFamilyWorkers = GetAttributeValue( AttributeKey.AdultFamilyWorkers );
             var newlyAssignedPersons = new List<AssignedPerson>();
 
             var careNeedService = new CareNeedService( rockContext );
