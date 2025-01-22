@@ -268,6 +268,7 @@ namespace rocks.kfs.Intacct
             var feeCreditTransactions = transactionItems.Where( f => ( f.TransactionFeeAmount > 0.0M || f.TransactionFeeAmount < 0.0M ) && !string.IsNullOrWhiteSpace( f.TransactionFeeAccount ) && f.ProcessTransactionFees == 2 ).Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
 
             // Condition and prepare debit entries
+            var itemIndex = 0;
             foreach ( var t in debitTransactions )
             {
                 t.Amount = ( ( decimal? ) t.Amount ?? 0.0M ) - ( t.ProcessTransactionFees == 1 ? t.TransactionFeeAmount : 0.0M );
@@ -276,7 +277,12 @@ namespace rocks.kfs.Intacct
                 var debitDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_credit", "_debit" );
                 t.CustomDimensions = debitDimensions;
                 t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( debitDimensions ) );
+                t.ItemIndex = itemIndex;
+
+                itemIndex++;
             }
+
+            itemIndex = 0;
             foreach ( var t in feeDebitTransactions )
             {
                 t.Amount = ( decimal? ) t.TransactionFeeAmount ?? 0.0M;
@@ -286,6 +292,10 @@ namespace rocks.kfs.Intacct
                 var debitDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_credit", "_debit" );
                 t.CustomDimensions = debitDimensions;
                 t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( debitDimensions ) );
+                t.ItemIndex = itemIndex;
+                t.FeeItemIndex = itemIndex;
+
+                itemIndex++;
             }
 
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.DebitLinesOnly )
@@ -301,7 +311,8 @@ namespace rocks.kfs.Intacct
                         DebitLocation = s.Key.DebitLocation,
                         DebitProject = s.Key.DebitProject,
                         Description = s.First().Description,
-                        CustomDimensions = s.First().CustomDimensions
+                        CustomDimensions = s.First().CustomDimensions,
+                        ItemIndex = s.First().ItemIndex
                     } )
                     .ToList();
 
@@ -316,12 +327,15 @@ namespace rocks.kfs.Intacct
                         DebitLocation = s.Key.DebitLocation,
                         DebitProject = s.Key.DebitProject,
                         Description = s.First().Description,
-                        CustomDimensions = s.First().CustomDimensions
+                        CustomDimensions = s.First().CustomDimensions,
+                        ItemIndex = s.First().ItemIndex,
+                        FeeItemIndex = s.First().FeeItemIndex
                     } )
                     .ToList();
             }
 
             // Condition and prepare credit entries
+            itemIndex = 0;
             foreach ( var t in creditTransactions )
             {
                 t.Amount = ( ( decimal? ) t.Amount ?? 0.0M ) * -1;
@@ -330,7 +344,12 @@ namespace rocks.kfs.Intacct
                 var creditDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_debit", "_credit" );
                 t.CustomDimensions = creditDimensions;
                 t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) );
+                t.ItemIndex = itemIndex;
+
+                itemIndex++;
             }
+
+            itemIndex = 0;
             foreach ( var t in feeCreditTransactions )
             {
                 t.Amount = ( ( decimal? ) t.TransactionFeeAmount ?? 0.0M ) * -1;
@@ -339,6 +358,10 @@ namespace rocks.kfs.Intacct
                 var creditDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_debit", "_credit" );
                 t.CustomDimensions = creditDimensions;
                 t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) );
+                t.ItemIndex = itemIndex;
+                t.FeeItemIndex = itemIndex;
+
+                itemIndex++;
             }
 
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.CreditLinesOnly )
@@ -354,7 +377,8 @@ namespace rocks.kfs.Intacct
                         CreditLocation = s.Key.CreditLocation,
                         CreditProject = s.Key.CreditProject,
                         Description = s.First().Description,
-                        CustomDimensions = s.First().CustomDimensions
+                        CustomDimensions = s.First().CustomDimensions,
+                        ItemIndex = s.First().ItemIndex
                     } )
                     .ToList();
 
@@ -369,7 +393,9 @@ namespace rocks.kfs.Intacct
                         CreditLocation = s.Key.CreditLocation,
                         CreditProject = s.Key.CreditProject,
                         Description = s.First().Description,
-                        CustomDimensions = s.First().CustomDimensions
+                        CustomDimensions = s.First().CustomDimensions,
+                        ItemIndex = s.First().ItemIndex,
+                        FeeItemIndex = s.First().FeeItemIndex
                     } )
                     .ToList();
             }
@@ -388,7 +414,9 @@ namespace rocks.kfs.Intacct
                     LocationId = debitTransaction.DebitLocation,
                     ProjectId = debitTransaction.DebitProject,
                     Memo = debitTransaction.Description,
-                    CustomFields = debitTransaction.CustomDimensions
+                    CustomFields = debitTransaction.CustomDimensions,
+                    ItemIndex = debitTransaction.ItemIndex,
+                    FeeItemIndex = debitTransaction.FeeItemIndex,
                 };
 
                 returnList.Add( debitLine );
@@ -405,10 +433,16 @@ namespace rocks.kfs.Intacct
                     LocationId = creditTransaction.CreditLocation,
                     ProjectId = creditTransaction.CreditProject,
                     Memo = creditTransaction.Description,
-                    CustomFields = creditTransaction.CustomDimensions
+                    CustomFields = creditTransaction.CustomDimensions,
+                    ItemIndex = creditTransaction.ItemIndex,
+                    FeeItemIndex = creditTransaction.FeeItemIndex,
                 };
 
                 returnList.Add( creditLine );
+            }
+            if ( groupingMode == GLAccountGroupingMode.NoGrouping || groupingMode == GLAccountGroupingMode.DebitAndCreditByFinancialAccount )
+            {
+                returnList = returnList.OrderBy( i => i.ItemIndex ).ThenBy( i => i.FeeItemIndex ).ThenByDescending( i => i.TransactionAmount ).ToList();
             }
 
             return returnList;
