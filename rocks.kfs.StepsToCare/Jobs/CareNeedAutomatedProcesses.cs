@@ -192,7 +192,6 @@ namespace rocks.kfs.StepsToCare.Jobs
         /// <summary>
         /// Executes the specified context.
         /// </summary>
-        /// <param name="context">The context.</param>
         public override void Execute()
         {
             var JobStartDateTime = RockDateTime.Now;
