@@ -262,13 +262,20 @@ namespace rocks.kfs.Intacct
         private List<JournalEntryLine> GenerateLineItems( List<GLBatchTotals> transactionItems, GLAccountGroupingMode groupingMode )
         {
             var returnList = new List<JournalEntryLine>();
+
+            var itemIndex = 0;
+            foreach ( var transactionItem in transactionItems )
+            {
+                transactionItem.ItemIndex = itemIndex;
+                itemIndex++;
+            }
+
             var debitTransactions = transactionItems.Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
             var creditTransactions = transactionItems.Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
             var feeDebitTransactions = transactionItems.Where( f => ( f.TransactionFeeAmount > 0.0M || f.TransactionFeeAmount < 0.0M ) && !string.IsNullOrWhiteSpace( f.TransactionFeeAccount ) && f.ProcessTransactionFees > 0 ).Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
             var feeCreditTransactions = transactionItems.Where( f => ( f.TransactionFeeAmount > 0.0M || f.TransactionFeeAmount < 0.0M ) && !string.IsNullOrWhiteSpace( f.TransactionFeeAccount ) && f.ProcessTransactionFees == 2 ).Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
 
             // Condition and prepare debit entries
-            var itemIndex = 0;
             foreach ( var t in debitTransactions )
             {
                 t.Amount = ( ( decimal? ) t.Amount ?? 0.0M ) - ( t.ProcessTransactionFees == 1 ? t.TransactionFeeAmount : 0.0M );
@@ -277,12 +284,8 @@ namespace rocks.kfs.Intacct
                 var debitDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_credit", "_debit" );
                 t.CustomDimensions = debitDimensions;
                 t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( debitDimensions ) );
-                t.ItemIndex = itemIndex;
-
-                itemIndex++;
             }
 
-            itemIndex = 0;
             foreach ( var t in feeDebitTransactions )
             {
                 t.Amount = ( decimal? ) t.TransactionFeeAmount ?? 0.0M;
@@ -292,10 +295,7 @@ namespace rocks.kfs.Intacct
                 var debitDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_credit", "_debit" );
                 t.CustomDimensions = debitDimensions;
                 t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( debitDimensions ) );
-                t.ItemIndex = itemIndex;
-                t.FeeItemIndex = itemIndex;
-
-                itemIndex++;
+                t.FeeItemIndex = t.ItemIndex;
             }
 
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.DebitLinesOnly )
@@ -335,7 +335,6 @@ namespace rocks.kfs.Intacct
             }
 
             // Condition and prepare credit entries
-            itemIndex = 0;
             foreach ( var t in creditTransactions )
             {
                 t.Amount = ( ( decimal? ) t.Amount ?? 0.0M ) * -1;
@@ -344,12 +343,8 @@ namespace rocks.kfs.Intacct
                 var creditDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_debit", "_credit" );
                 t.CustomDimensions = creditDimensions;
                 t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) );
-                t.ItemIndex = itemIndex;
-
-                itemIndex++;
             }
 
-            itemIndex = 0;
             foreach ( var t in feeCreditTransactions )
             {
                 t.Amount = ( ( decimal? ) t.TransactionFeeAmount ?? 0.0M ) * -1;
@@ -358,10 +353,7 @@ namespace rocks.kfs.Intacct
                 var creditDimensions = TransactionHelpers.GetFilteredDimensions( t.CustomDimensions, "_debit", "_credit" );
                 t.CustomDimensions = creditDimensions;
                 t.CustomDimensionString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) );
-                t.ItemIndex = itemIndex;
-                t.FeeItemIndex = itemIndex;
-
-                itemIndex++;
+                t.FeeItemIndex = t.ItemIndex;
             }
 
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.CreditLinesOnly )
