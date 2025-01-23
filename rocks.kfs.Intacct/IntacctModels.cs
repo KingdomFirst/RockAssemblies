@@ -40,6 +40,8 @@ namespace rocks.kfs.Intacct
         public DateTime? ExchangeRateDate;
         public decimal? ExchangeRateValue;
         public string ExchangeRateType;
+        public int ItemIndex;
+        public int FeeItemIndex;
     }
 
     public class GlEntry
@@ -257,6 +259,8 @@ namespace rocks.kfs.Intacct
         public SortedDictionary<string, dynamic> CustomDimensions;
         public string CustomDimensionString;
         public int ProcessTransactionFees;
+        public int ItemIndex = -1;
+        public int FeeItemIndex = -1;
 
         public object Clone()
         {

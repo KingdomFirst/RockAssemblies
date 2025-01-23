@@ -27,6 +27,7 @@ using Quartz;
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
+using Rock.Jobs;
 using Rock.Model;
 using Rock.Web.Cache;
 
@@ -38,7 +39,7 @@ namespace rocks.kfs.PersonAudience.Jobs
     /// Job to set the audience attribute value on every person record.
     /// </summary>
     [DisallowConcurrentExecution]
-    public class SetPersonAudience : IJob
+    public class SetPersonAudience : RockJob
     {
         /// <summary>
         /// Empty constructor for job initialization
@@ -52,16 +53,11 @@ namespace rocks.kfs.PersonAudience.Jobs
         }
 
         /// <summary>
-        /// Job to inactivate groups based on group attribute values.
-        ///
-        /// Called by the <see cref="IScheduler" /> when a
-        /// <see cref="ITrigger" /> fires that is associated with
-        /// the <see cref="IJob" />.
+        /// Executes this instance.
         /// </summary>
-        public virtual void Execute( IJobExecutionContext context )
+        public override void Execute()
         {
-            JobDataMap dataMap = context.JobDetail.JobDataMap;
-            var commandTimeout = dataMap.GetString( "CommandTimeout" ).AsIntegerOrNull() ?? 180;
+            var commandTimeout = GetAttributeValue( "CommandTimeout" ).AsIntegerOrNull() ?? 180;
             var results = new StringBuilder();
 
             var personAudiencesDictionary = new Dictionary<int, HashSet<Guid>>();
@@ -245,7 +241,7 @@ namespace rocks.kfs.PersonAudience.Jobs
                 }
             }
 
-            context.Result = results.ToString();
+            Result = results.ToString();
         }
 
         /// <summary>
