@@ -29,6 +29,7 @@ using Quartz;
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
+using Rock.Jobs;
 using Rock.Model;
 using Rock.Security;
 using Rock.Web.Cache;
@@ -112,7 +113,7 @@ namespace rocks.kfs.Microsoft365Utilities.Jobs
     /// Job to create workflow using Exchange Web Services.
     /// </summary>
     [DisallowConcurrentExecution]
-    public class LaunchWorkflowFromEWSAccount : IJob
+    public class LaunchWorkflowFromEWSAccount : RockJob
     {
         private static class AttributeKey
         {
@@ -142,18 +143,13 @@ namespace rocks.kfs.Microsoft365Utilities.Jobs
         }
 
         /// <summary>
-        /// Job that will send scheduled group emails.
-        ///
-        /// Called by the <see cref="IScheduler" /> when a
-        /// <see cref="ITrigger" /> fires that is associated with
-        /// the <see cref="IJob" />.
+        /// Job that will launch workflows from an exchange account.
         /// </summary>
-        public virtual void Execute( IJobExecutionContext context )
+        public override void Execute()
         {
-            var dataMap = context.JobDetail.JobDataMap;
             var messages = new List<string>();
             var workflowsStarted = 0;
-            var workflowTypeGuid = dataMap.GetString( AttributeKey.WorkflowType ).AsGuidOrNull();
+            var workflowTypeGuid = GetAttributeValue( AttributeKey.WorkflowType ).AsGuidOrNull();
 
             if ( workflowTypeGuid.HasValue )
             {
@@ -161,23 +157,23 @@ namespace rocks.kfs.Microsoft365Utilities.Jobs
 
                 if ( workflowType != null )
                 {
-                    var applicationId = Encryption.DecryptString( dataMap.GetString( AttributeKey.ApplicationId ) );
-                    var tenantId = Encryption.DecryptString( dataMap.GetString( AttributeKey.TenantId ) );
-                    var appSecret = Encryption.DecryptString( dataMap.GetString( AttributeKey.ApplicationSecret ) );
-                    var emailAddress = dataMap.GetString( AttributeKey.EmailAddress );
-                    var impersonate = dataMap.GetString( AttributeKey.ImpersonateUser );
+                    var applicationId = Encryption.DecryptString( GetAttributeValue( AttributeKey.ApplicationId ) );
+                    var tenantId = Encryption.DecryptString( GetAttributeValue( AttributeKey.TenantId ) );
+                    var appSecret = Encryption.DecryptString( GetAttributeValue( AttributeKey.ApplicationSecret ) );
+                    var emailAddress = GetAttributeValue( AttributeKey.EmailAddress );
+                    var impersonate = GetAttributeValue( AttributeKey.ImpersonateUser );
                     if ( impersonate.IsNullOrWhiteSpace() )
                     {
                         impersonate = emailAddress;
                     }
-                    var url = new Uri( dataMap.GetString( AttributeKey.ServerUrl ) );
-                    var maxEmails = dataMap.GetString( AttributeKey.MaxEmails ).AsInteger();
-                    var onePer = dataMap.GetString( AttributeKey.OneWorkflowPerConversation ).AsBoolean();
-                    var launchWith = dataMap.GetString( AttributeKey.LaunchWorkflowsWith ).StringToIntList();
-                    var markWith = dataMap.GetString( AttributeKey.MarkEmailsBy ).StringToIntList();
+                    var url = new Uri( GetAttributeValue( AttributeKey.ServerUrl ) );
+                    var maxEmails = GetAttributeValue( AttributeKey.MaxEmails ).AsInteger();
+                    var onePer = GetAttributeValue( AttributeKey.OneWorkflowPerConversation ).AsBoolean();
+                    var launchWith = GetAttributeValue( AttributeKey.LaunchWorkflowsWith ).StringToIntList();
+                    var markWith = GetAttributeValue( AttributeKey.MarkEmailsBy ).StringToIntList();
 
                     Dictionary<string, string> attributeKeyMap = null;
-                    var workflowAttributeKeys = dataMap.GetString( AttributeKey.WorkflowAttributes );
+                    var workflowAttributeKeys = GetAttributeValue( AttributeKey.WorkflowAttributes );
                     if ( workflowAttributeKeys.IsNotNullOrWhiteSpace() )
                     {
                         attributeKeyMap = workflowAttributeKeys.AsDictionaryOrNull();
@@ -418,7 +414,7 @@ namespace rocks.kfs.Microsoft365Utilities.Jobs
                             {
                                 results.AppendLine( message );
                             }
-                            context.Result = results.ToString();
+                            Result = results.ToString();
                         }
                     }
                     catch ( System.Exception ex )
@@ -430,12 +426,12 @@ namespace rocks.kfs.Microsoft365Utilities.Jobs
                 }
                 else
                 {
-                    context.Result = "No valid workflow type found.";
+                    Result = "No valid workflow type found.";
                 }
             }
             else
             {
-                context.Result = "Valid workflow type guid was not set.";
+                Result = "Valid workflow type guid was not set.";
             }
         }
 

@@ -75,7 +75,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
         IsRequired = false,
         Key = AttributeKey.CommandTimeoutOverride )]
     [DisallowConcurrentExecution]
-    public class FundraisingParticipantSummary : IJob
+    public class FundraisingParticipantSummary : RockJob
     {
         /// <summary>
         /// Attribute Keys
@@ -107,19 +107,17 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
         /// <summary>
         /// Executes the specified context.
         /// </summary>
-        /// <param name="context">The context.</param>
-        public virtual void Execute( IJobExecutionContext context )
+        public override void Execute()
         {
-            var dataMap = context.JobDetail.JobDataMap;
             var JobStartDateTime = RockDateTime.Now;
             var systemCommunicationGuid = Guid.Empty;
             var groupTypes = new List<int>();
             var groups = new List<Group>();
-            var showAddress = dataMap.GetBooleanFromString( AttributeKey.ShowAddress );
-            var showAmount = dataMap.GetBooleanFromString( AttributeKey.ShowAmount );
-            var sendZero = dataMap.GetBooleanFromString( AttributeKey.SendZeroDonations );
-            var enableLogging = dataMap.GetBooleanFromString( AttributeKey.VerboseLogging );
-            var commandTimeout = dataMap.GetString( AttributeKey.CommandTimeoutOverride ).AsIntegerOrNull();
+            var showAddress = GetAttributeValue( AttributeKey.ShowAddress ).AsBoolean();
+            var showAmount = GetAttributeValue( AttributeKey.ShowAmount ).AsBoolean();
+            var sendZero = GetAttributeValue( AttributeKey.SendZeroDonations ).AsBoolean();
+            var enableLogging = GetAttributeValue( AttributeKey.VerboseLogging ).AsBoolean();
+            var commandTimeout = GetAttributeValue( AttributeKey.CommandTimeoutOverride ).AsIntegerOrNull();
 
             using ( var rockContext = new RockContext() )
             {
@@ -131,7 +129,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                 DateTime? lastStartDateTime = null;
 
                 // get job type id
-                int jobId = context.JobDetail.Description.AsInteger();
+                int jobId = ServiceJobId;
 
                 // load job
                 var job = new ServiceJobService( rockContext )
@@ -148,7 +146,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                 var groupMemberService = new GroupMemberService( rockContext );
                 var groupService = new GroupService( rockContext );
 
-                var selectedGroupTypes = dataMap.GetString( AttributeKey.GroupTypes ).Split( new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries );
+                var selectedGroupTypes = GetAttributeValue( AttributeKey.GroupTypes ).Split( new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries );
 
                 LogEvent( null, "GroupTypes", string.Format( "Selected Group Types: {0}", selectedGroupTypes.Count() ), "Get selected GroupTypes.", enableLogging );
                 if ( selectedGroupTypes.Any() )
@@ -157,11 +155,11 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                 }
                 LogEvent( null, "GroupTypes", string.Format( "GroupTypes: {0}", groupTypes.Count() ), "Finished getting selected GroupTypes.", enableLogging );
 
-                var groupGuid = dataMap.GetString( AttributeKey.Group ).AsGuidOrNull();
+                var groupGuid = GetAttributeValue( AttributeKey.Group ).AsGuidOrNull();
 
                 if ( ( groupTypes == null || groupTypes.Count == 0 ) && !groupGuid.HasValue )
                 {
-                    context.Result = "Job failed. Unable to find group type or selected group. Check your settings.";
+                    Result = "Job failed. Unable to find group type or selected group. Check your settings.";
                     throw new Exception( "No group type found or group found." );
                 }
                 Group groupSetting = null;
@@ -182,7 +180,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                     LogEvent( null, "GroupInfo", string.Format( "Groups: {0}", groups.Count() ), "Finished getting Groups from group type setting.", enableLogging );
                 }
 
-                systemCommunicationGuid = dataMap.GetString( AttributeKey.SystemCommunication ).AsGuid();
+                systemCommunicationGuid = GetAttributeValue( AttributeKey.SystemCommunication ).AsGuid();
 
                 LogEvent( null, "GroupInfo", string.Format( "Groups: {0}", groups.Count() ), "Start processing Groups.", enableLogging );
                 foreach ( var group in groups )
@@ -297,7 +295,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
             }
             var redIcon = "<i class='fa fa-circle text-danger'></i>";
             var greenIcon = "<i class='fa fa-circle text-success'></i>";
-            context.Result = $"{greenIcon} {groupMemberEmails} {"Email".PluralizeIf( groupMemberEmails != 1 )} sent.";
+            Result = $"{greenIcon} {groupMemberEmails} {"Email".PluralizeIf( groupMemberEmails != 1 )} sent.";
 
             if ( emailSendErrorMessages.Any() || generalErrorMessages.Any() )
             {
@@ -324,7 +322,7 @@ namespace rocks.kfs.FundraisingParticipantSummary.Jobs
                     sbErrors.Append( $"{redIcon} {errorsCombined.Count()} {"Error".PluralizeIf( errorsCombined.Count() > 1 )}:" );
                     errorsCombined.ForEach( e => { sbErrors.AppendLine(); sbErrors.Append( $"{e}" ); } );
                     string errors = sbErrors.ToString();
-                    context.Result += errors;
+                    Result += errors;
                     var ex = new AggregateException( "Fundraising Participant Summary completed with errors.", exception );
                     throw new RockJobWarningException( "Fundraising Participant Summary completed with errors.", ex );
                 }
