@@ -79,6 +79,8 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
             {
                 using ( var rockContext = new RockContext() )
                 {
+                    rockContext.Database.CommandTimeout = commandTimeout;
+
                     // get the last run date or yesterday
                     DateTime? lastStartDateTime = null;
 
