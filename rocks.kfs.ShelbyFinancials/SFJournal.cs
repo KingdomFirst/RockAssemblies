@@ -37,10 +37,14 @@ namespace rocks.kfs.ShelbyFinancials
 {
     public class SFJournal
     {
-        public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava, string DescriptionLava, GLEntryGroupingMode groupingMode )
+        public GLEntryGroupingMode GroupingMode { get; set; }
+
+        public string JournalMemoLava { get; set; }
+
+        public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava )
         {
             var glExcelLines = new List<GLExcelLine>();
-            var glEntries = GetGlEntries( rockContext, financialBatch, journalCode, period, ref debugLava, DescriptionLava, groupingMode: groupingMode  );
+            var glEntries = GetGlEntries( rockContext, financialBatch, journalCode, period, ref debugLava );
             foreach ( var entry in glEntries )
             {
                 glExcelLines.Add( new GLExcelLine()
@@ -68,11 +72,11 @@ namespace rocks.kfs.ShelbyFinancials
             return glExcelLines;
         }
 
-        private List<JournalEntryLine> GetGlEntries( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava, string DescriptionLava, GLEntryGroupingMode groupingMode )
+        private List<JournalEntryLine> GetGlEntries( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava )
         {
-            if ( string.IsNullOrWhiteSpace( DescriptionLava ) )
+            if ( string.IsNullOrWhiteSpace( JournalMemoLava ) )
             {
-                DescriptionLava = "{{ Batch.Id }}: {{ Batch.Name }}";
+                JournalMemoLava = "{{ Batch.Id }}: {{ Batch.Name }}";
             }
             //
             // Group/Sum Transactions by Account and Project since Project can come from Account or Transaction Details
@@ -172,7 +176,7 @@ namespace rocks.kfs.ShelbyFinancials
 
             var batchTransactionsSummary = new List<GLTransaction>();
 
-            if ( groupingMode == GLEntryGroupingMode.DebitAndCreditByFinancialAccount )
+            if ( GroupingMode == GLEntryGroupingMode.DebitAndCreditByFinancialAccount )
             {
                 batchTransactionsSummary = batchTransactions
                     .GroupBy( d => new { d.FinancialAccountId, d.Project, d.TransactionFeeAccount, d.ProcessTransactionFees } )
@@ -243,10 +247,10 @@ namespace rocks.kfs.ShelbyFinancials
                 batchSummary.Add( batchSummaryItem );
             }
 
-            return GenerateLineItems( batchSummary, groupingMode );
+            return GenerateLineItems( batchSummary );
         }
 
-        private List<JournalEntryLine> GenerateLineItems( List<GLBatchTotals> transactionItems, GLEntryGroupingMode groupingMode )
+        private List<JournalEntryLine> GenerateLineItems( List<GLBatchTotals> transactionItems )
         {
             var returnList = new List<JournalEntryLine>();
             var debitTransactions = transactionItems.Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
@@ -269,7 +273,7 @@ namespace rocks.kfs.ShelbyFinancials
                 t.Note += " Transaction Fees";
             }
 
-            if ( groupingMode == GLEntryGroupingMode.DebitAndCreditLines || groupingMode == GLEntryGroupingMode.DebitLinesOnly )
+            if ( GroupingMode == GLEntryGroupingMode.DebitAndCreditLines || GroupingMode == GLEntryGroupingMode.DebitLinesOnly )
             {
                 debitTransactions = debitTransactions
                     .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.SuperFundNumber, d.CostCenterDebitNumber, d.DebitAccountNumber, d.DebitAccountSub, d.FundNumber, d.Project, d.LocationNumber, d.ProcessTransactionFees } )
@@ -328,7 +332,7 @@ namespace rocks.kfs.ShelbyFinancials
                 t.Note += " Transaction Fees";
             }
 
-            if ( groupingMode == GLEntryGroupingMode.DebitAndCreditLines || groupingMode == GLEntryGroupingMode.CreditLinesOnly )
+            if ( GroupingMode == GLEntryGroupingMode.DebitAndCreditLines || GroupingMode == GLEntryGroupingMode.CreditLinesOnly )
             {
                 creditTransactions = creditTransactions
                     .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.DepartmentNumber, d.CreditAccountNumber, d.RevenueAccountSub, d.SuperFundNumber, d.CostCenterCreditNumber, d.FundNumber, d.Project, d.LocationNumber } )
