@@ -39,6 +39,8 @@ namespace rocks.kfs.ShelbyFinancials
     {
         public GLEntryGroupingMode GroupingMode { get; set; }
 
+        public GLEntryProjectMode ProjectMode { get; set; }
+
         public string JournalMemoLava { get; set; }
 
         public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava )
@@ -278,6 +280,10 @@ namespace rocks.kfs.ShelbyFinancials
             {
                 t.Amount = ( ( decimal? ) t.Amount ?? 0.0M ) - ( t.ProcessTransactionFees == 1 ? t.TransactionFeeAmount : 0.0M );
                 t.DepartmentNumber = "0";
+                if ( ProjectMode == GLEntryProjectMode.CreditLinesOnly )
+                {
+                    t.DebitProject = string.Empty;
+                }
             }
 
             foreach ( var t in feeDebitTransactions )
@@ -286,6 +292,10 @@ namespace rocks.kfs.ShelbyFinancials
                 t.DepartmentNumber = "0";
                 t.DebitAccountNumber = t.TransactionFeeAccount;
                 t.Note += " Transaction Fees";
+                if ( ProjectMode == GLEntryProjectMode.CreditLinesOnly )
+                {
+                    t.DebitProject = string.Empty;
+                }
             }
 
             if ( GroupingMode == GLEntryGroupingMode.DebitAndCreditLines || GroupingMode == GLEntryGroupingMode.DebitLinesOnly )
@@ -338,6 +348,10 @@ namespace rocks.kfs.ShelbyFinancials
             foreach ( var t in creditTransactions )
             {
                 t.Amount = ( ( decimal? ) t.Amount ?? 0.0M ) * -1;
+                if ( ProjectMode == GLEntryProjectMode.DebitLinesOnly )
+                {
+                    t.CreditProject = string.Empty;
+                }
             }
             foreach ( var t in feeCreditTransactions )
             {
@@ -345,6 +359,10 @@ namespace rocks.kfs.ShelbyFinancials
                 t.CreditAccountNumber = t.DebitAccountNumber;
                 t.RevenueAccountSub = t.DebitAccountSub;
                 t.Note += " Transaction Fees";
+                if ( ProjectMode == GLEntryProjectMode.DebitLinesOnly )
+                {
+                    t.CreditProject = string.Empty;
+                }
             }
 
             if ( GroupingMode == GLEntryGroupingMode.DebitAndCreditLines || GroupingMode == GLEntryGroupingMode.CreditLinesOnly )
@@ -1005,5 +1023,12 @@ namespace rocks.kfs.ShelbyFinancials
         CreditLinesOnly = 2,
         DebitAndCreditByFinancialAccount = 3,
         NoGrouping = 4
+    }
+
+    public enum GLEntryProjectMode
+    {
+        DebitAndCreditLines = 0,
+        DebitLinesOnly = 1,
+        CreditLinesOnly = 2
     }
 }
