@@ -16,6 +16,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -160,79 +161,86 @@ namespace rocks.kfs.ClickBid.Reporting
                         // create the person since they don't exist
                         using ( var rockContext = new RockContext() )
                         {
-                            person = new Person
+                            try
                             {
-                                Guid = Guid.NewGuid(),
-                                Gender = Gender.Unknown,
-                                FirstName = sale.first_name,
-                                LastName = sale.last_name,
-                                Email = sale.emails,
-                                IsEmailActive = true,
-                                EmailPreference = EmailPreference.EmailAllowed,
-                                RecordStatusValueId = recordStatusPendingId,
-                                RecordTypeValueId = recordTypePersonId,
-                                ConnectionStatusValueId = connectionStatusId,
-                                ForeignId = sale.bidder_number
-                            };
-
-                            // save so the person alias is attributed for the search key
-                            PersonService.SaveNewPerson( person, rockContext );
-
-                            // add the person phone number
-                            if ( sale.phones.IsNotNullOrWhiteSpace() )
-                            {
-                                person.PhoneNumbers.Add( new PhoneNumber
+                                person = new Person
                                 {
-                                    Number = sale.phones,
-                                    NumberTypeValueId = homePhoneValueId,
                                     Guid = Guid.NewGuid(),
-                                    CreatedDateTime = sale.checkout_time,
-                                    ModifiedDateTime = sale.checkout_time
-                                } );
-                            }
+                                    Gender = Gender.Unknown,
+                                    FirstName = sale.first_name,
+                                    LastName = sale.last_name,
+                                    Email = sale.emails,
+                                    IsEmailActive = true,
+                                    EmailPreference = EmailPreference.EmailAllowed,
+                                    RecordStatusValueId = recordStatusPendingId,
+                                    RecordTypeValueId = recordTypePersonId,
+                                    ConnectionStatusValueId = connectionStatusId,
+                                    ForeignId = sale.bidder_number
+                                };
 
-                            // add the person address
-                            if ( sale.address.IsNotNullOrWhiteSpace() )
-                            {
-                                var familyGroup = person.GetFamily( rockContext );
+                                // save so the person alias is attributed for the search key
+                                PersonService.SaveNewPerson( person, rockContext );
 
-                                // current API does not support countries, so hard code to US for now.
-                                var countryValue = "US";
-                                var countryDV = DefinedTypeCache.Get( Rock.SystemGuid.DefinedType.LOCATION_COUNTRIES.AsGuid() )
-                                                .GetDefinedValueFromValue( countryValue );
-                                //if ( countryDV == null )
-                                //{
-                                //    var countriesDT = DefinedTypeCache.Get( Rock.SystemGuid.DefinedType.LOCATION_COUNTRIES.AsGuid() );
-                                //    countryDV = countriesDT.DefinedValues.FirstOrDefault( dv => dv.Description.Contains( countryValue ) );
-                                //    if ( countryDV != null && countryDV.Value.IsNotNullOrWhiteSpace() )
-                                //    {
-                                //        countryValue = countryDV.Value;
-                                //    }
-                                //}
-
-                                var location = new LocationService( rockContext ).Get( sale.address, sale.address2, sale.city, sale.state, sale.zip, countryValue );
-                                if ( familyGroup != null && location != null )
+                                // add the person phone number
+                                if ( sale.phones.IsNotNullOrWhiteSpace() )
                                 {
-                                    familyGroup.GroupLocations.Add( new GroupLocation
+                                    person.PhoneNumbers.Add( new PhoneNumber
                                     {
-                                        GroupLocationTypeValueId = homeLocationValueId,
-                                        LocationId = location.Id,
-                                        IsMailingLocation = true,
-                                        IsMappedLocation = true
+                                        Number = sale.phones,
+                                        NumberTypeValueId = homePhoneValueId,
+                                        Guid = Guid.NewGuid(),
+                                        CreatedDateTime = sale.checkout_time,
+                                        ModifiedDateTime = sale.checkout_time
                                     } );
                                 }
+
+                                // add the person address
+                                if ( sale.address.IsNotNullOrWhiteSpace() )
+                                {
+                                    var familyGroup = person.GetFamily( rockContext );
+
+                                    // current API does not support countries, so hard code to US for now.
+                                    var countryValue = "US";
+                                    var countryDV = DefinedTypeCache.Get( Rock.SystemGuid.DefinedType.LOCATION_COUNTRIES.AsGuid() )
+                                                    .GetDefinedValueFromValue( countryValue );
+                                    //if ( countryDV == null )
+                                    //{
+                                    //    var countriesDT = DefinedTypeCache.Get( Rock.SystemGuid.DefinedType.LOCATION_COUNTRIES.AsGuid() );
+                                    //    countryDV = countriesDT.DefinedValues.FirstOrDefault( dv => dv.Description.Contains( countryValue ) );
+                                    //    if ( countryDV != null && countryDV.Value.IsNotNullOrWhiteSpace() )
+                                    //    {
+                                    //        countryValue = countryDV.Value;
+                                    //    }
+                                    //}
+
+                                    var location = new LocationService( rockContext ).Get( sale.address, sale.address2, sale.city, sale.state, sale.zip, countryValue );
+                                    if ( familyGroup != null && location != null )
+                                    {
+                                        familyGroup.GroupLocations.Add( new GroupLocation
+                                        {
+                                            GroupLocationTypeValueId = homeLocationValueId,
+                                            LocationId = location.Id,
+                                            IsMailingLocation = true,
+                                            IsMappedLocation = true
+                                        } );
+                                    }
+                                }
+
+                                // add the search key
+                                new PersonSearchKeyService( rockContext ).Add( new PersonSearchKey
+                                {
+                                    SearchTypeValueId = searchTypeAltIdValueId,
+                                    SearchValue = clickbidSearchKey,
+                                    PersonAliasId = person.PrimaryAliasId
+                                } );
+                                rockContext.SaveChanges();
+
+                                primaryAliasId = person.PrimaryAliasId;
                             }
-
-                            // add the search key
-                            new PersonSearchKeyService( rockContext ).Add( new PersonSearchKey
+                            catch ( Exception e )
                             {
-                                SearchTypeValueId = searchTypeAltIdValueId,
-                                SearchValue = clickbidSearchKey,
-                                PersonAliasId = person.PrimaryAliasId
-                            } );
-                            rockContext.SaveChanges();
-
-                            primaryAliasId = person.PrimaryAliasId;
+                                ExceptionLogService.LogException( e );
+                            }
                         }
                     }
                 }
