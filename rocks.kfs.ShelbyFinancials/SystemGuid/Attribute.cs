@@ -33,6 +33,16 @@ namespace rocks.kfs.ShelbyFinancials.SystemGuid
         /// </summary>
         public const string FINANCIAL_ACCOUNT_FEE_ACCOUNT = "0E114DBD-F23C-4C03-99C0-896ACECE2054";
 
+        /// <summary>
+        /// The Project to use for credits.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_PROJECT_CREDIT = "85422EA2-AC4E-44E5-99B9-30C131116734";
+
+        /// <summary>
+        /// The Project to use for debits.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_PROJECT_DEBIT = "C97CC925-73D1-432C-961F-D1EA0E4F0791";
+
         #endregion
 
         #region Financial Gateway Attributes
