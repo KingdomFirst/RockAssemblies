@@ -235,6 +235,10 @@ namespace rocks.kfs.Eventbrite
             {
                 foreach ( var attendee in order.Attendees )
                 {
+                    if ( attendee.Profile.Email == "Info Requested" || attendee.Profile.First_Name == "Info Requested" || attendee.Profile.Last_Name == "Info Requested" )
+                    {
+                        continue;
+                    }
                     HttpContext.Current.Server.ScriptTimeout = HttpContext.Current.Server.ScriptTimeout + 2;
                     SyncAttendee( rockContext, attendee, order, group, groupMemberService, personAliasService, occ, evntid, IsRSVPEvent, gmPersonAttributeKey, updatePrimaryEmail, recordStatusId, connectionStatusId, EnableLogging, addedMembers );
                 }
