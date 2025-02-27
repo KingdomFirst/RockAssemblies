@@ -37,10 +37,16 @@ namespace rocks.kfs.ShelbyFinancials
 {
     public class SFJournal
     {
-        public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava, string DescriptionLava, GLEntryGroupingMode groupingMode )
+        public GLEntryGroupingMode GroupingMode { get; set; }
+
+        public GLEntryProjectMode ProjectMode { get; set; }
+
+        public string JournalMemoLava { get; set; }
+
+        public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava )
         {
             var glExcelLines = new List<GLExcelLine>();
-            var glEntries = GetGlEntries( rockContext, financialBatch, journalCode, period, ref debugLava, DescriptionLava, groupingMode: groupingMode  );
+            var glEntries = GetGlEntries( rockContext, financialBatch, journalCode, period, ref debugLava );
             foreach ( var entry in glEntries )
             {
                 glExcelLines.Add( new GLExcelLine()
@@ -68,11 +74,11 @@ namespace rocks.kfs.ShelbyFinancials
             return glExcelLines;
         }
 
-        private List<JournalEntryLine> GetGlEntries( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava, string DescriptionLava, GLEntryGroupingMode groupingMode )
+        private List<JournalEntryLine> GetGlEntries( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava )
         {
-            if ( string.IsNullOrWhiteSpace( DescriptionLava ) )
+            if ( string.IsNullOrWhiteSpace( JournalMemoLava ) )
             {
-                DescriptionLava = "{{ Batch.Id }}: {{ Batch.Name }}";
+                JournalMemoLava = "{{ Batch.Id }}: {{ Batch.Name }}";
             }
             //
             // Group/Sum Transactions by Account and Project since Project can come from Account or Transaction Details
@@ -104,7 +110,8 @@ namespace rocks.kfs.ShelbyFinancials
 
                     var detailProject = transactionDetail.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Project" ).AsGuidOrNull();
                     var transactionProject = transaction.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Project" ).AsGuidOrNull();
-                    var accountProject = transactionDetail.Account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Project" ).AsGuidOrNull();
+                    var accountProjectCredit = transactionDetail.Account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.Project" ).AsGuidOrNull();
+                    var accountProjectDebit = transactionDetail.Account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.DebitProject" ).AsGuidOrNull();
                     var transactionFeeAccount = transactionDetail.Account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.FEEACCOUNTNO" );
 
                     if ( string.IsNullOrWhiteSpace( transactionFeeAccount ) )
@@ -112,18 +119,29 @@ namespace rocks.kfs.ShelbyFinancials
                         transactionFeeAccount = gatewayDefaultFeeAccount;
                     }
 
-                    var projectCode = string.Empty;
+                    var creditProjectCode = string.Empty;
+                    var debitProjectCode = string.Empty;
                     if ( detailProject != null )
                     {
-                        projectCode = DefinedValueCache.Get( ( Guid ) detailProject ).Value;
+                        creditProjectCode = DefinedValueCache.Get( ( Guid ) detailProject ).Value;
+                        debitProjectCode = creditProjectCode;
                     }
                     else if ( transactionProject != null )
                     {
-                        projectCode = DefinedValueCache.Get( ( Guid ) transactionProject ).Value;
+                        creditProjectCode = DefinedValueCache.Get( ( Guid ) transactionProject ).Value;
+                        debitProjectCode = creditProjectCode;
                     }
-                    else if ( accountProject != null )
+                    else
                     {
-                        projectCode = DefinedValueCache.Get( ( Guid ) accountProject ).Value;
+                        if ( accountProjectDebit != null )
+                        {
+                            debitProjectCode = DefinedValueCache.Get( ( Guid ) accountProjectDebit ).Value;
+                        }
+
+                        if ( accountProjectCredit != null )
+                        {
+                            creditProjectCode = DefinedValueCache.Get( ( Guid ) accountProjectCredit ).Value;
+                        }
                     }
 
                     if ( transactionDetail.EntityTypeId.HasValue )
@@ -160,7 +178,8 @@ namespace rocks.kfs.ShelbyFinancials
                     {
                         Amount = transactionDetail.Amount,
                         FinancialAccountId = transactionDetail.AccountId,
-                        Project = projectCode,
+                        CreditProject = creditProjectCode,
+                        DebitProject = debitProjectCode,
                         TransactionFeeAmount = transactionDetail.FeeAmount != null && transactionDetail.FeeAmount.Value > 0 ? transactionDetail.FeeAmount.Value : 0.0M,
                         TransactionFeeAccount = transactionFeeAccount,
                         ProcessTransactionFees = processTransactionFees
@@ -172,14 +191,15 @@ namespace rocks.kfs.ShelbyFinancials
 
             var batchTransactionsSummary = new List<GLTransaction>();
 
-            if ( groupingMode == GLEntryGroupingMode.DebitAndCreditByFinancialAccount )
+            if ( GroupingMode == GLEntryGroupingMode.DebitAndCreditByFinancialAccount )
             {
                 batchTransactionsSummary = batchTransactions
-                    .GroupBy( d => new { d.FinancialAccountId, d.Project, d.TransactionFeeAccount, d.ProcessTransactionFees } )
+                    .GroupBy( d => new { d.FinancialAccountId, d.DebitProject, d.CreditProject, d.TransactionFeeAccount, d.ProcessTransactionFees } )
                     .Select( s => new GLTransaction
                     {
                         FinancialAccountId = s.Key.FinancialAccountId,
-                        Project = s.Key.Project,
+                        CreditProject = s.Key.CreditProject,
+                        DebitProject = s.Key.DebitProject,
                         Amount = s.Sum( f => ( decimal? ) f.Amount ) ?? 0.0M,
                         TransactionFeeAmount = s.Sum( f => ( decimal? ) f.TransactionFeeAmount ) ?? 0.0M,
                         TransactionFeeAccount = s.Key.TransactionFeeAccount,
@@ -225,9 +245,10 @@ namespace rocks.kfs.ShelbyFinancials
                     RevenueAccountSub = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.AccountSub" ),
                     DebitAccountSub = account.GetAttributeValue( "rocks.kfs.ShelbyFinancials.DebitAccountSub" ),
                     Amount = summary.Amount,
-                    Project = summary.Project,
+                    CreditProject = summary.CreditProject,
+                    DebitProject = summary.DebitProject,
                     JournalNumber = financialBatch.Id,
-                    JournalDescription = DescriptionLava.ResolveMergeFields( mergeFields ),
+                    JournalDescription = JournalMemoLava.ResolveMergeFields( mergeFields ),
                     Date = financialBatch.BatchStartDateTime ?? RockDateTime.Now,
                     Note = financialBatch.Note,
                     TransactionFeeAmount = summary.TransactionFeeAmount,
@@ -243,10 +264,10 @@ namespace rocks.kfs.ShelbyFinancials
                 batchSummary.Add( batchSummaryItem );
             }
 
-            return GenerateLineItems( batchSummary, groupingMode );
+            return GenerateLineItems( batchSummary );
         }
 
-        private List<JournalEntryLine> GenerateLineItems( List<GLBatchTotals> transactionItems, GLEntryGroupingMode groupingMode )
+        private List<JournalEntryLine> GenerateLineItems( List<GLBatchTotals> transactionItems )
         {
             var returnList = new List<JournalEntryLine>();
             var debitTransactions = transactionItems.Select( ti => ( GLBatchTotals ) ti.Clone() ).ToList();
@@ -259,6 +280,10 @@ namespace rocks.kfs.ShelbyFinancials
             {
                 t.Amount = ( ( decimal? ) t.Amount ?? 0.0M ) - ( t.ProcessTransactionFees == 1 ? t.TransactionFeeAmount : 0.0M );
                 t.DepartmentNumber = "0";
+                if ( ProjectMode == GLEntryProjectMode.CreditLinesOnly )
+                {
+                    t.DebitProject = string.Empty;
+                }
             }
 
             foreach ( var t in feeDebitTransactions )
@@ -267,12 +292,16 @@ namespace rocks.kfs.ShelbyFinancials
                 t.DepartmentNumber = "0";
                 t.DebitAccountNumber = t.TransactionFeeAccount;
                 t.Note += " Transaction Fees";
+                if ( ProjectMode == GLEntryProjectMode.CreditLinesOnly )
+                {
+                    t.DebitProject = string.Empty;
+                }
             }
 
-            if ( groupingMode == GLEntryGroupingMode.DebitAndCreditLines || groupingMode == GLEntryGroupingMode.DebitLinesOnly )
+            if ( GroupingMode == GLEntryGroupingMode.DebitAndCreditLines || GroupingMode == GLEntryGroupingMode.DebitLinesOnly )
             {
                 debitTransactions = debitTransactions
-                    .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.SuperFundNumber, d.CostCenterDebitNumber, d.DebitAccountNumber, d.DebitAccountSub, d.FundNumber, d.Project, d.LocationNumber, d.ProcessTransactionFees } )
+                    .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.SuperFundNumber, d.CostCenterDebitNumber, d.DebitAccountNumber, d.DebitAccountSub, d.FundNumber, d.DebitProject, d.LocationNumber, d.ProcessTransactionFees } )
                     .Select( s => new GLBatchTotals
                     {
                         CompanyNumber = s.Key.CompanyNumber,
@@ -285,7 +314,7 @@ namespace rocks.kfs.ShelbyFinancials
                         DebitAccountNumber = s.Key.DebitAccountNumber,
                         DebitAccountSub = s.Key.DebitAccountSub,
                         Amount = s.Sum( f => f.Amount ),
-                        Project = s.Key.Project,
+                        DebitProject = s.Key.DebitProject,
                         JournalNumber = s.First().JournalNumber,
                         JournalDescription = s.First().JournalDescription,
                         Date = s.First().Date,
@@ -294,7 +323,7 @@ namespace rocks.kfs.ShelbyFinancials
                     .ToList();
 
                 feeDebitTransactions = feeDebitTransactions
-                    .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.SuperFundNumber, d.CostCenterDebitNumber, d.DebitAccountNumber, d.FundNumber, d.Project, d.LocationNumber } )
+                    .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.SuperFundNumber, d.CostCenterDebitNumber, d.DebitAccountNumber, d.FundNumber, d.DebitProject, d.LocationNumber } )
                     .Select( s => new GLBatchTotals
                     {
                         CompanyNumber = s.Key.CompanyNumber,
@@ -306,7 +335,7 @@ namespace rocks.kfs.ShelbyFinancials
                         DebitAccountNumber = s.Key.DebitAccountNumber,
                         DepartmentNumber = s.First().DepartmentNumber,
                         Amount = s.Sum( f => f.Amount ),
-                        Project = s.Key.Project,
+                        DebitProject = s.Key.DebitProject,
                         JournalNumber = s.First().JournalNumber,
                         JournalDescription = s.First().JournalDescription,
                         Date = s.First().Date,
@@ -319,6 +348,10 @@ namespace rocks.kfs.ShelbyFinancials
             foreach ( var t in creditTransactions )
             {
                 t.Amount = ( ( decimal? ) t.Amount ?? 0.0M ) * -1;
+                if ( ProjectMode == GLEntryProjectMode.DebitLinesOnly )
+                {
+                    t.CreditProject = string.Empty;
+                }
             }
             foreach ( var t in feeCreditTransactions )
             {
@@ -326,12 +359,16 @@ namespace rocks.kfs.ShelbyFinancials
                 t.CreditAccountNumber = t.DebitAccountNumber;
                 t.RevenueAccountSub = t.DebitAccountSub;
                 t.Note += " Transaction Fees";
+                if ( ProjectMode == GLEntryProjectMode.DebitLinesOnly )
+                {
+                    t.CreditProject = string.Empty;
+                }
             }
 
-            if ( groupingMode == GLEntryGroupingMode.DebitAndCreditLines || groupingMode == GLEntryGroupingMode.CreditLinesOnly )
+            if ( GroupingMode == GLEntryGroupingMode.DebitAndCreditLines || GroupingMode == GLEntryGroupingMode.CreditLinesOnly )
             {
                 creditTransactions = creditTransactions
-                    .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.DepartmentNumber, d.CreditAccountNumber, d.RevenueAccountSub, d.SuperFundNumber, d.CostCenterCreditNumber, d.FundNumber, d.Project, d.LocationNumber } )
+                    .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.DepartmentNumber, d.CreditAccountNumber, d.RevenueAccountSub, d.SuperFundNumber, d.CostCenterCreditNumber, d.FundNumber, d.CreditProject, d.LocationNumber } )
                     .Select( s => new GLBatchTotals
                     {
                         CompanyNumber = s.Key.CompanyNumber,
@@ -344,7 +381,7 @@ namespace rocks.kfs.ShelbyFinancials
                         CreditAccountNumber = s.Key.CreditAccountNumber,
                         RevenueAccountSub = s.Key.RevenueAccountSub,
                         Amount = s.Sum( f => f.Amount ),
-                        Project = s.Key.Project,
+                        CreditProject = s.Key.CreditProject,
                         JournalNumber = s.First().JournalNumber,
                         JournalDescription = s.First().JournalDescription,
                         Date = s.First().Date,
@@ -353,7 +390,7 @@ namespace rocks.kfs.ShelbyFinancials
                     .ToList();
 
                 feeCreditTransactions = feeCreditTransactions
-                    .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.DepartmentNumber, d.CreditAccountNumber, d.RevenueAccountSub, d.SuperFundNumber, d.CostCenterCreditNumber, d.FundNumber, d.Project, d.LocationNumber } )
+                    .GroupBy( d => new { d.CompanyNumber, d.RegionNumber, d.DepartmentNumber, d.CreditAccountNumber, d.RevenueAccountSub, d.SuperFundNumber, d.CostCenterCreditNumber, d.FundNumber, d.CreditProject, d.LocationNumber } )
                     .Select( s => new GLBatchTotals
                     {
                         CompanyNumber = s.Key.CompanyNumber,
@@ -366,7 +403,7 @@ namespace rocks.kfs.ShelbyFinancials
                         CreditAccountNumber = s.Key.CreditAccountNumber,
                         RevenueAccountSub = s.Key.RevenueAccountSub,
                         Amount = s.Sum( f => f.Amount ),
-                        Project = s.Key.Project,
+                        CreditProject = s.Key.CreditProject,
                         JournalNumber = s.First().JournalNumber,
                         JournalDescription = s.First().JournalDescription,
                         Date = s.First().Date,
@@ -392,7 +429,7 @@ namespace rocks.kfs.ShelbyFinancials
                     AccountNumber = debitTransaction.DebitAccountNumber,
                     AccountSub = debitTransaction.DebitAccountSub,
                     Amount = debitTransaction.Amount,
-                    Project = debitTransaction.Project,
+                    Project = debitTransaction.DebitProject,
                     JournalNumber = debitTransaction.JournalNumber,
                     JournalDescription = debitTransaction.JournalDescription,
                     Date = debitTransaction.Date,
@@ -416,7 +453,7 @@ namespace rocks.kfs.ShelbyFinancials
                     AccountNumber = creditTransaction.CreditAccountNumber,
                     AccountSub = creditTransaction.RevenueAccountSub,
                     Amount = creditTransaction.Amount,
-                    Project = creditTransaction.Project,
+                    Project = creditTransaction.CreditProject,
                     JournalNumber = creditTransaction.JournalNumber,
                     JournalDescription = creditTransaction.JournalDescription,
                     Date = creditTransaction.Date,
@@ -787,7 +824,10 @@ namespace rocks.kfs.ShelbyFinancials
             public int FinancialAccountId { get; set; }
 
             [LavaInclude]
-            public string Project { get; set; }
+            public string CreditProject { get; set; }
+
+            [LavaInclude]
+            public string DebitProject { get; set; }
 
             [LavaInclude]
             public decimal TransactionFeeAmount;
@@ -904,7 +944,8 @@ namespace rocks.kfs.ShelbyFinancials
             public string RevenueAccountSub;
             public string DebitAccountSub;
             public decimal Amount;
-            public string Project;
+            public string CreditProject;
+            public string DebitProject;
             public int JournalNumber;
             public string JournalDescription;
             public DateTime Date;
@@ -982,5 +1023,12 @@ namespace rocks.kfs.ShelbyFinancials
         CreditLinesOnly = 2,
         DebitAndCreditByFinancialAccount = 3,
         NoGrouping = 4
+    }
+
+    public enum GLEntryProjectMode
+    {
+        DebitAndCreditLines = 0,
+        DebitLinesOnly = 1,
+        CreditLinesOnly = 2
     }
 }

@@ -73,6 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\006_AddDebitAccountAttributes.cs" />
     <Compile Include="Migrations\005_AddContextAttribute.cs" />
     <Compile Include="Migrations\004_AddTransactionFeeAttributes.cs" />
     <Compile Include="Migrations\003_AddCreditCostCenter.cs" />
