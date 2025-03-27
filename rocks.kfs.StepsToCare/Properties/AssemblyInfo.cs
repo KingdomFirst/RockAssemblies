@@ -22,10 +22,10 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle( "rocks.kfs.StepsToCare" )]
 [assembly: AssemblyProduct( "rocks.kfs.StepsToCare" )]
-[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2024" )]
+[assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2025" )]
 
 // Auto increment assembly versions
-[assembly: AssemblyVersion( "2.0.1.*" )]
+[assembly: AssemblyVersion( "2.0.2.*" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
