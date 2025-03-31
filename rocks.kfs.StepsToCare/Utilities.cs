@@ -476,7 +476,7 @@ namespace rocks.kfs.StepsToCare
                     }
                 }
 
-                var currentlyAssignedPeople = careAssigneeService.Queryable().AsNoTracking().Where( ap => ap.CareNeed.StatusValueId != closedStatusId );
+                var currentlyAssignedPeople = careAssigneeService.Queryable().AsNoTracking();
 
                 if ( categoryGroups.Any() )
                 {
@@ -515,7 +515,7 @@ namespace rocks.kfs.StepsToCare
                 .AsNoTracking()
                 .Where( gm => !gm.IsArchived
                               && gm.GroupMemberStatus == GroupMemberStatus.Active )
-                .OrderBy( gm => currentlyAssignedPeople.Count( ap => ap.PersonAlias.PersonId == gm.Person.Id ) )
+                .OrderBy( gm => currentlyAssignedPeople.Count( ap => ap.PersonAlias.PersonId == gm.Person.Id && ap.CareNeed.StatusValueId != closedStatusId ) )
                 .ThenBy( gm => currentlyAssignedPeople.Where( ap => ap.PersonAlias.PersonId == gm.Person.Id ).OrderByDescending( ap => ap.CreatedDateTime ).Select( ap => ap.CreatedDateTime ).FirstOrDefault() )
                 .ToList();
 
