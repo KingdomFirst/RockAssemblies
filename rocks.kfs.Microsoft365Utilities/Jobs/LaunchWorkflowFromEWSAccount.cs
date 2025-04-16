@@ -269,7 +269,7 @@ namespace rocks.kfs.Microsoft365Utilities.Jobs
                                             .AsNoTracking()
                                             .FirstOrDefault( w => w.ActivatedDateTime.HasValue && !w.CompletedDateTime.HasValue && w.ForeignKey.Equals( foreignKey, StringComparison.Ordinal ) );
 
-                                        createWorkflow = existingWorkflow.IsNull();
+                                        createWorkflow = existingWorkflow == null;
                                     }
                                     else
                                     {

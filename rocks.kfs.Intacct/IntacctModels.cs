@@ -18,6 +18,8 @@ using System;
 using System.Collections.Generic;
 using Rock;
 using Rock.Data;
+using Rock.Lava;
+
 using rocks.kfs.Intacct.Enums;
 
 namespace rocks.kfs.Intacct
@@ -123,42 +125,33 @@ namespace rocks.kfs.Intacct
         public decimal TotalTrxAmount;
     }
 
-    public class GLTransaction : Rock.Lava.ILiquidizable
+    public class GLTransaction : ILavaDataDictionary, ILiquidizable
     {
-        [LavaInclude]
-        public decimal Amount;
+        [LavaVisible]
+        public decimal Amount { get; set; }
 
-        [LavaInclude]
-        public int FinancialAccountId;
+        [LavaVisible]
+        public int FinancialAccountId { get; set; }
 
-        [LavaInclude]
-        public string CreditProject;
+        [LavaVisible]
+        public string CreditProject { get; set; }
 
-        [LavaInclude]
-        public string DebitProject;
+        [LavaVisible]
+        public string DebitProject { get; set; }
 
-        [LavaInclude]
-        public decimal TransactionFeeAmount;
+        [LavaVisible]
+        public decimal TransactionFeeAmount { get; set; }
 
-        [LavaInclude]
-        public string TransactionFeeAccount;
+        [LavaVisible]
+        public string TransactionFeeAccount { get; set; }
 
-        [LavaInclude]
-        public int ProcessTransactionFees;
+        [LavaVisible]
+        public int ProcessTransactionFees { get; set; }
 
-        [LavaInclude]
-        public string Payer;
+        [LavaVisible]
+        public string Payer { get; set; }
 
-        #region ILiquidizable
-
-        /// <summary>
-        /// Creates a DotLiquid compatible dictionary that represents the current entity object. 
-        /// </summary>
-        /// <returns>DotLiquid compatible dictionary.</returns>
-        public object ToLiquid()
-        {
-            return this;
-        }
+        #region ILavaDataDictionary implementation
 
         /// <summary>
         /// Gets the available keys (for debugging info).
@@ -166,7 +159,7 @@ namespace rocks.kfs.Intacct
         /// <value>
         /// The available keys.
         /// </value>
-        [LavaIgnore]
+        [LavaHidden]
         public virtual List<string> AvailableKeys
         {
             get
@@ -190,7 +183,20 @@ namespace rocks.kfs.Intacct
         /// </value>
         /// <param name="key">The key.</param>
         /// <returns></returns>
-        [LavaIgnore]
+        public object GetValue( string key )
+        {
+            return this[key];
+        }
+
+        /// <summary>
+        /// Gets the <see cref="System.Object"/> with the specified key.
+        /// </summary>
+        /// <value>
+        /// The <see cref="System.Object"/>.
+        /// </value>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
+        [LavaHidden]
         public virtual object this[object key]
         {
             get
@@ -229,12 +235,52 @@ namespace rocks.kfs.Intacct
         /// </summary>
         /// <param name="key">The key.</param>
         /// <returns></returns>
+        public bool ContainsKey( string key )
+        {
+            string propertyKey = key.ToStringSafe();
+            var propInfo = GetType().GetProperty( propertyKey );
+
+            return propInfo != null;
+        }
+
+        #endregion
+
+        #region ILiquidizable
+
+        /// <summary>
+        /// Determines whether the specified key contains key.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
         public virtual bool ContainsKey( object key )
         {
             string propertyKey = key.ToStringSafe();
             var propInfo = GetType().GetProperty( propertyKey );
 
             return propInfo != null;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="System.Object"/> with the specified key.
+        /// </summary>
+        /// <value>
+        /// The <see cref="System.Object"/>.
+        /// </value>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
+        public object GetValue( object key )
+        {
+            return this[key];
+        }
+
+        /// <summary>
+        /// To the liquid.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="System.NotImplementedException"></exception>
+        public object ToLiquid()
+        {
+            return this;
         }
 
         #endregion
