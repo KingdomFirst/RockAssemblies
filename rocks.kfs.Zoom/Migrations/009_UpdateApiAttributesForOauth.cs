@@ -19,7 +19,7 @@ using Rock.Plugin;
 
 namespace rocks.kfs.Zoom.Migrations
 {
-    [MigrationNumber( 9, "1.12.4" )]
+    [MigrationNumber( 9, "1.13" )]
     public partial class UpdateApiAttributesForOauth : Migration
     {
         /// <summary>
