@@ -82,7 +82,7 @@ namespace rocks.kfs.CyberSource
 
             gateway.LoadAttributes();
 
-            var allowedCardNetworks = gateway.GetAttributeValues( Gateway.AttributeKey.AllowedCardNetworks );
+            var allowedCardNetworks = gateway.GetAttributeValues( Gateway.AttributeKey.AllowedCardNetworks ).Distinct().ToList();
 
             string clientVersion = "v2.0";
 
