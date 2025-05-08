@@ -1566,6 +1566,16 @@ namespace rocks.kfs.CyberSource
         {
             var microFormJWK = "";
             var microFormJsPath = Configuration.GetMicroFormJWK( financialGateway, out microFormJWK );
+            var clientIntegrity = "";
+
+            var microFormParameters = microFormJsPath.Split( '|' );
+
+            if ( microFormParameters.Length > 1 && microFormParameters[1].IsNotNullOrWhiteSpace() )
+            {
+                clientIntegrity = microFormParameters[1];
+            }
+
+            microFormJsPath = microFormParameters[0];
 
             DateTime epoch = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
             DateTime now = DateTime.UtcNow;
@@ -1577,7 +1587,8 @@ namespace rocks.kfs.CyberSource
                 addressMode = financialGateway.GetAttributeValue( AttributeKey.EventRegistrationAddressMode ),
                 microFormJsPath,
                 microFormJWK,
-                jwkGeneratedTime = millisecondsSinceEpoch
+                jwkGeneratedTime = millisecondsSinceEpoch,
+                integrity = clientIntegrity
             };
         }
 
