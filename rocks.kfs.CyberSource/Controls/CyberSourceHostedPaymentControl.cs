@@ -15,6 +15,7 @@
 // </copyright>
 //
 using System;
+using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
@@ -237,7 +238,19 @@ namespace rocks.kfs.CyberSource.Controls
 
             microFormJsPath = Configuration.GetMicroFormJWK( CyberSourceGateway, out microformJWK );
 
-            RockPage.AddScriptSrcToHead( this.Page, "MicroformJSV2", microFormJsPath );
+            var microFormParameters = microFormJsPath.Split( '|' );
+
+            var additionalParameters = new Dictionary<string, string>
+            {
+                { "crossorigin", "anonymous" }
+            };
+
+            if ( microFormParameters.Length > 1 && microFormParameters[1].IsNotNullOrWhiteSpace() )
+            {
+                additionalParameters.Add( "integrity", microFormParameters[1] );
+            }
+
+            RockPage.AddScriptSrcToHead( this.Page, "MicroformJSV2", microFormParameters[0], additionalParameters );
         }
 
         /// <summary>

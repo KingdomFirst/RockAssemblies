@@ -63,5 +63,7 @@ namespace rocks.kfs.CyberSource.Model
         public string[] allowedCardNetworks { get; set; }
 
         public string[] targetOrigins { get; set; }
+
+        public string clientLibraryIntegrity { get; set; }
     }
 }
