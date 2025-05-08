@@ -115,6 +115,15 @@ namespace rocks.kfs.CyberSource
         DefaultValue = "Required",
         Order = 8 )]
 
+    [ValueListField(
+        "Allowed Card Networks",
+        customValues: "VISA,MASTERCARD,AMEX,CARNET,CARTESBANCAIRES,CUP,DINERSCLUB,DISCOVER,EFTPOS,ELO,JCB,JCREW,MADA,MAESTRO,MEEZA",
+        Key = AttributeKey.AllowedCardNetworks,
+        Description = "The allowed card networks supported by this gateway.",
+        IsRequired = true,
+        DefaultValue = "VISA|MASTERCARD|AMEX|CARNET|CARTESBANCAIRES|CUP|DINERSCLUB|DISCOVER|EFTPOS|ELO|JCB|JCREW|MADA|MAESTRO|MEEZA",
+        Order = 9 )]
+
     #endregion
 
     /// <summary>
@@ -139,6 +148,7 @@ namespace rocks.kfs.CyberSource
             public const string Mode = "Mode";
             public const string CapturePayment = "CapturePayment";
             public const string EventRegistrationAddressMode = "EventRegistrationAddressMode";
+            public const string AllowedCardNetworks = "AllowedCardNetworks";
 
             /// <summary>
             /// The credit card fee coverage percentage
