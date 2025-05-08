@@ -181,6 +181,7 @@
         microFormJsPath: string;
         microFormJWK: string;
         jwkGeneratedTime: number;
+        integrity: string;
         address?: AddressControlBag | null;
     };
 
@@ -267,6 +268,8 @@
             script.type = "text/javascript";
             script.src = props.settings.microFormJsPath;
             script.setAttribute("data-variant", "inline");
+            script.setAttribute("crossorigin", "anonymous");
+            script.setAttribute("integrity", props.settings.integrity);
             document.getElementsByTagName("head")[0].appendChild(script);
 
             try {
