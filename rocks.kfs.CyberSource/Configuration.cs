@@ -39,7 +39,6 @@ namespace rocks.kfs.CyberSource
 
         public Dictionary<string, string> GetConfiguration( FinancialGateway cyberSourceGateway )
         {
-            cyberSourceGateway.LoadAttributes();
             var orgId = cyberSourceGateway.GetAttributeValue( Gateway.AttributeKey.OrganizationId );
             _configurationDictionary.Add( "authenticationType", "HTTP_SIGNATURE" );
             _configurationDictionary.Add( "merchantID", orgId );
@@ -81,19 +80,9 @@ namespace rocks.kfs.CyberSource
                 GlobalAttributesCache.Get().GetValue( "InternalApplicationRoot" ).ReplaceIfEndsWith("/","")
             };
 
-            List<String> allowedCardNetworks = new List<String>()
-            {
-                "VISA",
-                "MAESTRO",
-                "MASTERCARD",
-                "AMEX",
-                "DISCOVER",
-                "DINERSCLUB",
-                "JCB",
-                "CUP",
-                "CARTESBANCAIRES",
-                "CARNET"
-            };
+            gateway.LoadAttributes();
+
+            var allowedCardNetworks = gateway.GetAttributeValues( Gateway.AttributeKey.AllowedCardNetworks );
 
             string clientVersion = "v2.0";
 
@@ -121,7 +110,9 @@ namespace rocks.kfs.CyberSource
 
                     if ( parseToObject != null && parseToObject.ctx?.FirstOrDefault().data != null )
                     {
-                        microFormJsPath = parseToObject.ctx.FirstOrDefault().data.clientLibrary;
+                        var microFormData = parseToObject.ctx.FirstOrDefault().data;
+                        microFormJsPath = $"{microFormData.clientLibrary}|{microFormData.clientLibraryIntegrity}";
+
                     }
                 }
                 catch ( Exception ex )
