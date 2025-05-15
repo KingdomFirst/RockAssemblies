@@ -115,6 +115,15 @@ namespace rocks.kfs.CyberSource
         DefaultValue = "Required",
         Order = 8 )]
 
+    [ValueListField(
+        "Allowed Card Networks",
+        customValues: "VISA,MASTERCARD,AMEX,CARNET,CARTESBANCAIRES,CUP,DINERSCLUB,DISCOVER,EFTPOS,ELO,JCB,JCREW,MADA,MAESTRO,MEEZA",
+        Key = AttributeKey.AllowedCardNetworks,
+        Description = "Select the card networks to allow for this gateway. Selections must be supported by your Cybersource configuration.",
+        IsRequired = true,
+        DefaultValue = "VISA|MASTERCARD",
+        Order = 9 )]
+
     #endregion
 
     /// <summary>
@@ -139,6 +148,7 @@ namespace rocks.kfs.CyberSource
             public const string Mode = "Mode";
             public const string CapturePayment = "CapturePayment";
             public const string EventRegistrationAddressMode = "EventRegistrationAddressMode";
+            public const string AllowedCardNetworks = "AllowedCardNetworks";
 
             /// <summary>
             /// The credit card fee coverage percentage
@@ -1556,6 +1566,16 @@ namespace rocks.kfs.CyberSource
         {
             var microFormJWK = "";
             var microFormJsPath = Configuration.GetMicroFormJWK( financialGateway, out microFormJWK );
+            var clientIntegrity = "";
+
+            var microFormParameters = microFormJsPath.Split( '|' );
+
+            if ( microFormParameters.Length > 1 && microFormParameters[1].IsNotNullOrWhiteSpace() )
+            {
+                clientIntegrity = microFormParameters[1];
+            }
+
+            microFormJsPath = microFormParameters[0];
 
             DateTime epoch = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
             DateTime now = DateTime.UtcNow;
@@ -1567,7 +1587,8 @@ namespace rocks.kfs.CyberSource
                 addressMode = financialGateway.GetAttributeValue( AttributeKey.EventRegistrationAddressMode ),
                 microFormJsPath,
                 microFormJWK,
-                jwkGeneratedTime = millisecondsSinceEpoch
+                jwkGeneratedTime = millisecondsSinceEpoch,
+                integrity = clientIntegrity
             };
         }
 
