@@ -119,9 +119,9 @@ namespace rocks.kfs.CyberSource
         "Allowed Card Networks",
         customValues: "VISA,MASTERCARD,AMEX,CARNET,CARTESBANCAIRES,CUP,DINERSCLUB,DISCOVER,EFTPOS,ELO,JCB,JCREW,MADA,MAESTRO,MEEZA",
         Key = AttributeKey.AllowedCardNetworks,
-        Description = "The allowed card networks supported by this gateway.",
+        Description = "Select the card networks to allow for this gateway. Selections must be supported by your Cybersource configuration.",
         IsRequired = true,
-        DefaultValue = "VISA|MASTERCARD|AMEX|CARNET|CARTESBANCAIRES|CUP|DINERSCLUB|DISCOVER|EFTPOS|ELO|JCB|JCREW|MADA|MAESTRO|MEEZA",
+        DefaultValue = "VISA|MASTERCARD",
         Order = 9 )]
 
     #endregion
