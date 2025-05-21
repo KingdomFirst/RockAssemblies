@@ -14,18 +14,21 @@
 // limitations under the License.
 // </copyright>
 //
+using System.Runtime.InteropServices;
+
 namespace rocks.kfs.StepsToCare.SystemGuid
 {
     /// <summary>
-    /// Custom KFS Attributes for Steps to Care plugin
+    /// Custom KFS Categories for Steps to Care plugin
     /// </summary>
-    public class Attribute
+    public class Category
     {
-        public const string MATRIX_ATTRIBUTE_TOUCH_NOTE_TEMPLATE = "B0E43BE0-223E-4135-9A10-E75EA7995048";
-        public const string MATRIX_ATTRIBUTE_TOUCH_MINIMUM_TOUCHES = "15900A01-A407-47BC-A770-BF1E620AA7FF";
-        public const string MATRIX_ATTRIBUTE_TOUCH_MINIMUM_HOURS = "40433C65-E693-48CB-85FE-A2F54E8511B5";
-        public const string MATRIX_ATTRIBUTE_TOUCH_NOTIFY_ALL = "C6AD82BE-C51A-48E7-B0AC-DA87EC8DA775";
-        public const string MATRIX_ATTRIBUTE_TOUCH_RECURRING = "E595A2F7-5FF5-42F3-8AAF-9BF5BB154BF4";
-        public const string MATRIX_ATTRIBUTE_ASSIGNTOGROUPS = "2BC5F3D1-C9B1-4CD1-91DD-DB0B0651C502";
+        /// <summary>
+        /// The Care Need category guids.
+        /// </summary>
+        public const string MATRIX_CARE_TOUCHES = "CE6B7E82-05BB-443A-B277-AE15165D9310";
+        public const string ATTRIBUTE_ASSIGNTOGROUPS = "182FDE86-05B4-44E1-BD4E-B570AA639B40";
+        public const string HISTORY_CARE_NEED = "4C4B37D6-6966-4864-AB06-FF92ECE501BB";
+        public const string HISTORY_PERSON_STEPS_TO_CARE = "653F2B13-E828-4263-B12B-C419A1833197";
     }
 }
