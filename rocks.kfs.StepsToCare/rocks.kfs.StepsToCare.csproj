@@ -86,6 +86,7 @@
     <Compile Include="Migrations\021_DefaultValue.cs" />
     <Compile Include="Migrations\020_NewCommunications.cs" />
     <Compile Include="Migrations\019_AddFieldTypeAndAttributeMatrix.cs" />
+    <Compile Include="Migrations\024_AddHistory.cs" />
     <Compile Include="Migrations\023_UpdateAttributes.cs" />
     <Compile Include="Migrations\018_AddDefinedValueAndProperty.cs" />
     <Compile Include="Migrations\017_AddColumn.cs" />
