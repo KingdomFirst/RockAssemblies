@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2024 by Kingdom First Solutions
+// Copyright 2025 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -804,6 +804,11 @@ namespace rocks.kfs.StepsToCare
         public static DefinedValue DefinedValueFromCache( string definedValueGuid )
         {
             var definedValueCache = DefinedValueCache.Get( definedValueGuid );
+
+            if ( definedValueCache == null )
+            {
+                return new DefinedValue();
+            }
             var definedValue = new DefinedValue
             {
                 Id = definedValueCache.Id,
@@ -819,7 +824,7 @@ namespace rocks.kfs.StepsToCare
         public static DefinedValue DefinedValueFromCache( int? definedValueId )
         {
             var definedValueCache = DefinedValueCache.Get( definedValueId ?? 0 );
-            return DefinedValueFromCache( definedValueCache.Guid.ToString() );
+            return DefinedValueFromCache( definedValueCache?.Guid.ToString() );
         }
 
         private static PageReference GetParentPage( int pageId )
