@@ -801,6 +801,27 @@ namespace rocks.kfs.StepsToCare
             }
         }
 
+        public static DefinedValue DefinedValueFromCache( string definedValueGuid )
+        {
+            var definedValueCache = DefinedValueCache.Get( definedValueGuid );
+            var definedValue = new DefinedValue()
+            {
+                Id = definedValueCache.Id,
+                Guid = definedValueCache.Guid,
+                Value = definedValueCache.Value,
+                Description = definedValueCache.Description,
+                Order = definedValueCache.Order,
+                IsActive = definedValueCache.IsActive
+            };
+            return definedValue;
+        }
+
+        public static DefinedValue DefinedValueFromCache( int? definedValueId )
+        {
+            var definedValueCache = DefinedValueCache.Get( definedValueId ?? 0 );
+            return DefinedValueFromCache( definedValueCache.Guid.ToString() );
+        }
+
         private static PageReference GetParentPage( int pageId )
         {
             var pageCache = PageCache.Get( pageId );
