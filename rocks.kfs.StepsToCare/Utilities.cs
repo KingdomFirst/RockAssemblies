@@ -804,7 +804,7 @@ namespace rocks.kfs.StepsToCare
         public static DefinedValue DefinedValueFromCache( string definedValueGuid )
         {
             var definedValueCache = DefinedValueCache.Get( definedValueGuid );
-            var definedValue = new DefinedValue()
+            var definedValue = new DefinedValue
             {
                 Id = definedValueCache.Id,
                 Guid = definedValueCache.Guid,

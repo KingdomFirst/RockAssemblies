@@ -27,8 +27,8 @@ namespace rocks.kfs.StepsToCare.Migrations
     {
         public override void Up()
         {
-            RockMigrationHelper.UpdateCategory( Rock.SystemGuid.EntityType.HISTORY, "Steps to Care - Care Need", "fa fa-hand-holding", "History entries for the plugin Steps to Care Care Need entity.", SystemGuid.Category.HISTORY_CARE_NEED );
-            RockMigrationHelper.UpdateCategory( Rock.SystemGuid.EntityType.HISTORY, "Steps to Care", "fa fa-hand-holding", "History entries for the plugin Steps to Care under Person history (assign workers or other history directly related to a person).", SystemGuid.Category.HISTORY_PERSON_STEPS_TO_CARE, 0, Rock.SystemGuid.Category.HISTORY_PERSON );
+            RockMigrationHelper.UpdateCategory( Rock.SystemGuid.EntityType.HISTORY, "Steps to Care - Care Need", "fa fa-hand-holding", "Care Need entity history entries for the Steps to Care plugin.", SystemGuid.Category.HISTORY_CARE_NEED );
+            RockMigrationHelper.UpdateCategory( Rock.SystemGuid.EntityType.HISTORY, "Steps to Care", "fa fa-hand-holding", "Person History entries from Steps to Care plugin (assign workers or other history directly related to a person).", SystemGuid.Category.HISTORY_PERSON_STEPS_TO_CARE, 0, Rock.SystemGuid.Category.HISTORY_PERSON );
             Sql( $@"
                 DECLARE 
                     @AttributeId int,
@@ -96,6 +96,7 @@ namespace rocks.kfs.StepsToCare.Migrations
             RockMigrationHelper.DeletePage( "653F2B13-E828-4263-B12B-C419A1833197" );
 
             RockMigrationHelper.DeleteAttribute( "9C990D50-769F-4BFD-8AFE-02092C76B68C" );
+            RockMigrationHelper.DeleteAttribute( "69F3EC39-E754-4E94-85F9-3DC2ED6099C4" );
         }
     }
 }
