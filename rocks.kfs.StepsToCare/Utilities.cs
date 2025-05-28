@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2024 by Kingdom First Solutions
+// Copyright 2025 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ namespace rocks.kfs.StepsToCare
             var careNeedService = new CareNeedService( rockContext );
             var careWorkerService = new CareWorkerService( rockContext );
             var careAssigneeService = new AssignedPersonService( rockContext );
+            var careNeedHistory = new History.HistoryChangeList();
 
             // reload careNeed to fully populate child properties
             if ( !previewAssigned )
@@ -94,6 +95,10 @@ namespace rocks.kfs.StepsToCare
 
                             assignedPeople.Add( careAssignee );
                             addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
+
+                            string newStringValue = History.GetValue<PersonAlias>( worker.PersonAlias, worker.PersonAliasId, rockContext, "" );
+                            careNeedHistory.AddChange( History.HistoryVerb.Add, History.HistoryChangeType.Record, "Assign Person", null, newStringValue ).SourceOfChange = "Geofence Assignment";
+                            AddPersonHistory( rockContext, careNeed, careNeed.PersonAlias.Person, worker.PersonAlias, "ASSIGNED", "Geofence Assignment" );
                         }
                     }
                     else if ( homeLocation != null && homeLocation.GeoPoint == null )
@@ -378,6 +383,11 @@ namespace rocks.kfs.StepsToCare
                         assignedPeople.Add( careAssignee );
                         addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
 
+                        string sourceOfChange = $"Worker Assignment [Count: {workerCount.Count}]";
+                        string newStringValue = History.GetValue<PersonAlias>( worker.PersonAlias, worker.PersonAliasId, rockContext, "" );
+                        careNeedHistory.AddChange( History.HistoryVerb.Add, History.HistoryChangeType.Record, "Assign Person", null, newStringValue ).SourceOfChange = sourceOfChange;
+                        AddPersonHistory( rockContext, careNeed, careNeed.PersonAlias.Person, worker.PersonAlias, "ASSIGNED", sourceOfChange );
+
                         workerAssigned = true;
 
                         if ( enableLogging )
@@ -422,6 +432,11 @@ namespace rocks.kfs.StepsToCare
 
                                 assignedPeople.Add( careAssignee );
                                 addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
+
+                                string sourceOfChange = $"Group Role Assignment - {member.Group.GroupType.Name} > {member.Group.Name} [{member.GroupId}] > {member.GroupRole.Name}";
+                                string newStringValue = History.GetValue<PersonAlias>( member.Person.PrimaryAlias, member.Person.PrimaryAliasId, rockContext, "" );
+                                careNeedHistory.AddChange( History.HistoryVerb.Add, History.HistoryChangeType.Record, "Assign Person", null, newStringValue ).SourceOfChange = sourceOfChange;
+                                AddPersonHistory( rockContext, careNeed, careNeed.PersonAlias.Person, member.Person.PrimaryAlias, "ASSIGNED", sourceOfChange );
                             }
                         }
                         if ( enableLogging )
@@ -482,7 +497,7 @@ namespace rocks.kfs.StepsToCare
                 {
                     foreach ( var groupId in categoryGroups )
                     {
-                        AssignToGroupMember( careNeed, enableLogging, assignedPeople, rockContext, careAssigneeService, addedWorkerAliasIds, closedStatusId, groupId, currentlyAssignedPeople );
+                        AssignToGroupMember( careNeed, enableLogging, assignedPeople, rockContext, careAssigneeService, addedWorkerAliasIds, closedStatusId, groupId, currentlyAssignedPeople, careNeedHistory: careNeedHistory );
                     }
                 }
 
@@ -492,7 +507,7 @@ namespace rocks.kfs.StepsToCare
                     {
                         foreach ( var groupId in touchTemplate.AssignToGroups )
                         {
-                            AssignToGroupMember( careNeed, enableLogging, assignedPeople, rockContext, careAssigneeService, addedWorkerAliasIds, closedStatusId, groupId, currentlyAssignedPeople, touchTemplate );
+                            AssignToGroupMember( careNeed, enableLogging, assignedPeople, rockContext, careAssigneeService, addedWorkerAliasIds, closedStatusId, groupId, currentlyAssignedPeople, touchTemplate, careNeedHistory: careNeedHistory );
                         }
                     }
                 }
@@ -501,13 +516,36 @@ namespace rocks.kfs.StepsToCare
             if ( !previewAssigned )
             {
                 careAssigneeService.AddRange( assignedPeople );
-                rockContext.SaveChanges();
+                rockContext.WrapTransaction( () =>
+                {
+                    if ( rockContext.SaveChanges() > 0 )
+                    {
+                        if ( careNeedHistory.Any() )
+                        {
+                            HistoryService.SaveChanges(
+                                rockContext,
+                                typeof( CareNeed ),
+                                SystemGuid.Category.HISTORY_CARE_NEED.AsGuid(),
+                                careNeed.Id,
+                                careNeedHistory,
+                                "Auto Assign People",
+                                null,
+                                null
+                            );
+                        }
+                    }
+                } );
             }
             return assignedPeople;
         }
 
-        private static void AssignToGroupMember( CareNeed careNeed, bool enableLogging, List<AssignedPerson> assignedPeople, RockContext rockContext, AssignedPersonService careAssigneeService, List<int?> addedWorkerAliasIds, int closedStatusId, int groupId, IQueryable<AssignedPerson> currentlyAssignedPeople, TouchTemplate touchTemplate = null )
+        private static void AssignToGroupMember( CareNeed careNeed, bool enableLogging, List<AssignedPerson> assignedPeople, RockContext rockContext, AssignedPersonService careAssigneeService, List<int?> addedWorkerAliasIds, int closedStatusId, int groupId, IQueryable<AssignedPerson> currentlyAssignedPeople, TouchTemplate touchTemplate = null, History.HistoryChangeList careNeedHistory = null )
         {
+            if ( careNeedHistory == null )
+            {
+                careNeedHistory = new History.HistoryChangeList();
+            }
+
             var groupMemberService = new GroupMemberService( rockContext );
 
             var groupMembers = groupMemberService
@@ -524,6 +562,7 @@ namespace rocks.kfs.StepsToCare
             {
                 if ( !addedWorkerAliasIds.Contains( gm.Person.PrimaryAliasId ) && gm.Person.PrimaryAlias != null && gm.Person.PrimaryAliasId != careNeed.PersonAliasId && careAssigneeService.GetByPersonAliasAndCareNeed( gm.Person.PrimaryAlias.Id, careNeed.Id ) == null )
                 {
+                    var sourceOfChange = "";
                     var careAssignee = new AssignedPerson { Id = 0 };
                     careAssignee.CareNeed = careNeed;
                     careAssignee.PersonAliasId = gm.Person.PrimaryAliasId;
@@ -533,15 +572,21 @@ namespace rocks.kfs.StepsToCare
                         careAssignee.Type = AssignedType.TouchTemplateGroup;
                         careAssignee.TypeQualifier = $"{touchTemplate.NoteTemplate.Note}^{touchTemplate.MinimumCareTouches}^{gm.Group.Id}^{gm.Group.Name}^{gm.Id}^{currentlyAssignedPeople.Count( ap => ap.PersonAlias.PersonId == gm.Person.Id )}^{touchTemplate.MinimumCareTouchHours}";
                         // This TypeQualifier could have a tighter connection to the attribute matrix touch template if we somehow identified the touch template, such as using an attribute or attribute value id.
+                        sourceOfChange = $"Touch Template Assignment - {touchTemplate.NoteTemplate.Note} ({gm.Group.Name} [{gm.GroupId}])";
                     }
                     else
                     {
                         careAssignee.Type = AssignedType.CategoryGroup;
                         careAssignee.TypeQualifier = $"{careNeed.CategoryValueId}^{careNeed.Category?.Value ?? DefinedValueCache.Get( careNeed.CategoryValueId.Value ).Value}^{gm.Group.Id}^{gm.Group.Name}^{gm.Id}^{currentlyAssignedPeople.Count( ap => ap.PersonAlias.PersonId == gm.Person.Id )}";
+                        sourceOfChange = $"Category Assignment - {careNeed.Category?.Value ?? DefinedValueCache.Get( careNeed.CategoryValueId.Value ).Value} ({gm.Group.Name} [{gm.GroupId}])";
 
                     }
                     assignedPeople.Add( careAssignee );
                     addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
+
+                    string newStringValue = History.GetValue<PersonAlias>( gm.Person.PrimaryAlias, gm.Person.PrimaryAliasId, rockContext, "" );
+                    careNeedHistory.AddChange( History.HistoryVerb.Add, History.HistoryChangeType.Record, "Assign Person", null, newStringValue ).SourceOfChange = sourceOfChange;
+                    AddPersonHistory( rockContext, careNeed, careNeed.PersonAlias.Person, gm.Person.PrimaryAlias, "ASSIGNED", sourceOfChange );
 
                     groupMemberAssignedCount++;
                     if ( touchTemplate == null || groupMemberAssignedCount >= touchTemplate.MinimumCareTouches )
@@ -734,6 +779,52 @@ namespace rocks.kfs.StepsToCare
                                     .ThenBy( cw => cw.LastAssignmentDate )
                                     .ThenBy( cw => cw.Worker.CategoryValues.Contains( careNeed.CategoryValueId.ToString() ) )
                                     .ThenBy( cw => cw.Worker.Campuses.Contains( careNeed.CampusId.ToString() ) );
+        }
+
+
+        public static void AddPersonHistory( RockContext rockContext, CareNeed careNeed, Person person, PersonAlias assignedPersonAlias, string historyVerb, string sourceOfChange = null, bool commitSave = false )
+        {
+            var assignedPersonHistory = new History.HistoryChangeList();
+            assignedPersonHistory.AddCustom( historyVerb, "Record", $"{assignedPersonAlias.Person.FullName} [{assignedPersonAlias.PersonId}]</span> {( ( historyVerb == "ASSIGNED" ) ? "to" : "from" )} Care Need [{careNeed.Id}] for <span class='field-value'>{person.FullName}</span><span class='field-value'>" ).SourceOfChange = sourceOfChange;
+            if ( assignedPersonHistory.Any() )
+            {
+                HistoryService.SaveChanges(
+                    rockContext,
+                    typeof( Person ),
+                    SystemGuid.Category.HISTORY_PERSON_STEPS_TO_CARE.AsGuid(),
+                    assignedPersonAlias.PersonId,
+                    assignedPersonHistory,
+                    $"Care Need for {person.FullName}",
+                    typeof( CareNeed ),
+                    careNeed.Id,
+                    commitSave );
+            }
+        }
+
+        public static DefinedValue DefinedValueFromCache( string definedValueGuid )
+        {
+            var definedValueCache = DefinedValueCache.Get( definedValueGuid );
+
+            if ( definedValueCache == null )
+            {
+                return new DefinedValue();
+            }
+            var definedValue = new DefinedValue
+            {
+                Id = definedValueCache.Id,
+                Guid = definedValueCache.Guid,
+                Value = definedValueCache.Value,
+                Description = definedValueCache.Description,
+                Order = definedValueCache.Order,
+                IsActive = definedValueCache.IsActive
+            };
+            return definedValue;
+        }
+
+        public static DefinedValue DefinedValueFromCache( int? definedValueId )
+        {
+            var definedValueCache = DefinedValueCache.Get( definedValueId ?? 0 );
+            return DefinedValueFromCache( definedValueCache?.Guid.ToString() );
         }
 
         private static PageReference GetParentPage( int pageId )
