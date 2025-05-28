@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2024 by Kingdom First Solutions
+// Copyright 2025 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright( "Copyright © Kingdom First Solutions 2025" )]
 
 // Auto increment assembly versions
-[assembly: AssemblyVersion( "2.0.3.*" )]
+[assembly: AssemblyVersion( "2.1.0.*" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
