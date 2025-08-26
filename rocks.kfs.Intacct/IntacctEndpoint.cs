@@ -157,7 +157,8 @@ namespace rocks.kfs.Intacct
                         }
                     }
                 }
-            } catch ( Exception e ) { }
+            }
+            catch ( Exception e ) { }
 
             return false;
         }
@@ -208,6 +209,10 @@ namespace rocks.kfs.Intacct
                                     }
                                 }
                             }
+                        }
+                        else
+                        {
+                            ExceptionLogService.LogException( new Exception( $"Error retrieving Checking Accounts from Intacct. Response: \r\n {xResultXml.ToString()}" ), null );
                         }
                     }
                 }
