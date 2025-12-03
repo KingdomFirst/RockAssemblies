@@ -1,3 +1,8 @@
+rmdir .\KFSRockAssemblies
+rmdir .\RockAttendedCheckin
+rmdir .\RockWeb\Plugins\rocks_kfs
+rmdir .\RockWeb\Plugins\cc_newspring 
+rmdir .\RockWeb\Content\KFSRockAssets
 mklink /J KFSRockAssemblies c:\KFSRepo\Rock\KFSRockAssemblies
 mklink /J RockAttendedCheckin c:\KFSRepo\Rock\RockAttendedCheckin 
 mklink /J RockWeb\Plugins\rocks_kfs c:\KFSRepo\Rock\KFSRockBlocks
