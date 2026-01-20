@@ -26,6 +26,7 @@ using System.Web;
 
 using Microsoft.Exchange.WebServices.Data;
 using Microsoft.Identity.Client;
+
 using Rock;
 using Rock.Data;
 using Rock.Lava;
@@ -39,10 +40,10 @@ namespace rocks.kfs.Microsoft365Utilities.Shortcodes
     /// Lava shortcode for displaying calendar items from a Microsoft Exchange mailbox.
     /// </summary>
     [LavaShortcodeMetadata(
-        name: "KFS - EWS Calendar Items",
-        tagName: "ewscalendaritems",
-        description: "Retrieves a list of calendar items from a specified Microsoft Exchange shared calendar mailbox.",
-        documentation: @"<p>The KFS - EWS calendar items shortcode allows you to access calendar items from a specified Microsoft Exchange shared mailbox using the EWS managed API. Below is an example of how to use it.
+        Name = "KFS - EWS Calendar Items",
+        TagName = "ewscalendaritems",
+        Description = "Retrieves a list of calendar items from a specified Microsoft Exchange shared calendar mailbox.",
+        Documentation = @"<p>The KFS - EWS calendar items shortcode allows you to access calendar items from a specified Microsoft Exchange shared mailbox using the EWS managed API. Below is an example of how to use it.
             </p>
             <pre>{% assign applicationid = 'Global' | Attribute:'rocks.kfs.EWSAppApplicationId' %}
 {% assign tenantid = 'Global' | Attribute:'rocks.kfs.EWSAppTenantId' %}
@@ -81,9 +82,9 @@ namespace rocks.kfs.Microsoft365Utilities.Shortcodes
             <li><strong>DisplayCc</strong> - A text summarization of the CC recipients.</li>
             <li><strong>IsRecurring</strong> - A boolean indicating if the calendar item is part of a recurring series.</li>
         </ul>",
-        parameters: "applicationid,tenantid,appsecret,calendarmailbox,impersonate,serverurl,order,daysback,daysforward",
-        enabledCommands: ""
+        Parameters = "applicationid,tenantid,appsecret,calendarmailbox,impersonate,serverurl,order,daysback,daysforward"
     )]
+
     public class EWSCalendarItemsShortcode : LavaShortcodeBase, ILavaBlock
 
     {
@@ -135,8 +136,8 @@ namespace rocks.kfs.Microsoft365Utilities.Shortcodes
 
             var endTagFound = false;
 
-            var startTag = $@"{{\[\s*{ _tagName }\s*\]}}";
-            var endTag = $@"{{\[\s*end{ _tagName }\s*\]}}";
+            var startTag = $@"{{\[\s*{_tagName}\s*\]}}";
+            var endTag = $@"{{\[\s*end{_tagName}\s*\]}}";
 
             var childTags = 0;
 

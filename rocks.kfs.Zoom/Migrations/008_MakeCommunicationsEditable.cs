@@ -20,7 +20,7 @@ using Rock.Plugin;
 
 namespace rocks.kfs.Zoom.Migrations
 {
-    [MigrationNumber( 8, "1.12.4" )]
+    [MigrationNumber( 8, "1.13" )]
     public partial class MakeCommunicationsEditable : Migration
     {
         public override void Up()

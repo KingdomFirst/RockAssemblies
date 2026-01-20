@@ -25,6 +25,7 @@ using Rock;
 using Rock.Attribute;
 using Rock.Communication;
 using Rock.Data;
+using Rock.Jobs;
 using Rock.Model;
 using Rock.Web.Cache;
 using rocks.kfs.StepsToCare.Model;
@@ -64,11 +65,24 @@ namespace rocks.kfs.StepsToCare.Jobs
         Key = AttributeKey.MinimumCareTouchesHours )]
 
     [IntegerField(
+        "Minimum Follow Up Care Touch Hours",
+        Description = "Minimum hours for the follow up worker to add a care touch before the Care Touch Needed notification gets sent out.",
+        DefaultIntegerValue = 24,
+        IsRequired = true,
+        Key = AttributeKey.MinimumFollowUpTouchHours )]
+
+    [IntegerField(
         "Follow Up Days",
         Description = "Days after a Care Need has been entered before it changes status to Follow Up.",
         DefaultIntegerValue = 10,
         IsRequired = true,
         Key = AttributeKey.FollowUpDays )]
+
+    [CustomDropdownListField( "Outstanding Needs Include Snoozed",
+        Description = "How should snoozed needs be handled in the Outstanding Needs notification?",
+        ListSource = "No^Do not include,Other^If other statuses are assigned,Yes^Always include",
+        DefaultValue = "No",
+        Key = AttributeKey.OutstandingNeedsIncludeSnoozed )]
 
     [LinkedPage( "Care Dashboard Page",
         Description = "Page used to populate 'LinkedPages.CareDashboard' lava field in notification.",
@@ -130,7 +144,7 @@ namespace rocks.kfs.StepsToCare.Jobs
         Key = AttributeKey.VerboseLogging )]
 
     [DisallowConcurrentExecution]
-    public class CareNeedAutomatedProcesses : IJob
+    public class CareNeedAutomatedProcesses : RockJob
     {
         /// <summary>
         /// Attribute Keys
@@ -142,6 +156,7 @@ namespace rocks.kfs.StepsToCare.Jobs
             public const string CareTouchNeededCommunication = "CareTouchNeededCommunication";
             public const string MinimumCareTouches = "MinimumCareTouches";
             public const string MinimumCareTouchesHours = "MinimumCareTouchesHours";
+            public const string MinimumFollowUpTouchHours = "MinimumFollowUpTouchHours";
             public const string FollowUpDays = "FollowUpDays";
             public const string CareDashboardPage = "CareDashboardPage";
             public const string CareDetailPage = "CareDetailPage";
@@ -153,6 +168,7 @@ namespace rocks.kfs.StepsToCare.Jobs
             public const string AdultFamilyWorkers = "AdultFamilyWorkers";
             public const string LoadBalanceWorkersType = "LoadBalanceWorkersType";
             public const string FutureThresholdDays = "FutureThresholdDays";
+            public const string OutstandingNeedsIncludeSnoozed = "OutstandingNeedsIncludeSnoozed";
         }
 
         private static class CategoryKey
@@ -176,14 +192,13 @@ namespace rocks.kfs.StepsToCare.Jobs
         /// <summary>
         /// Executes the specified context.
         /// </summary>
-        /// <param name="context">The context.</param>
-        public virtual void Execute( IJobExecutionContext context )
+        public override void Execute()
         {
-            var dataMap = context.JobDetail.JobDataMap;
             var JobStartDateTime = RockDateTime.Now;
-            var minimumCareTouches = dataMap.GetIntegerFromString( AttributeKey.MinimumCareTouches );
-            var minimumCareTouchesHours = dataMap.GetIntegerFromString( AttributeKey.MinimumCareTouches );
-            var followUpDays = dataMap.GetIntegerFromString( AttributeKey.FollowUpDays );
+            var minimumCareTouches = GetAttributeValue( AttributeKey.MinimumCareTouches ).ToIntSafe();
+            var minimumCareTouchesHours = GetAttributeValue( AttributeKey.MinimumCareTouches ).ToIntSafe();
+            var minimumFollowUpCareTouchesHours = GetAttributeValue( AttributeKey.MinimumFollowUpTouchHours ).ToIntSafe();
+            var followUpDays = GetAttributeValue( AttributeKey.FollowUpDays ).ToIntSafe();
 
             using ( var rockContext = new RockContext() )
             {
@@ -191,7 +206,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                 DateTime? lastStartDateTime = null;
 
                 // get job type id
-                int jobId = context.JobDetail.Description.AsInteger();
+                int jobId = ServiceJobId;
 
                 // load job
                 var job = new ServiceJobService( rockContext )
@@ -204,14 +219,16 @@ namespace rocks.kfs.StepsToCare.Jobs
                 var beginDateTime = lastStartDateTime ?? JobStartDateTime.AddDays( -1 );
                 //beginDateTime = JobStartDateTime.AddDays( -3 );
 
-                var detailPage = PageCache.Get( dataMap.GetString( AttributeKey.CareDetailPage ) );
-                var detailPageRoute = detailPage.PageRoutes.FirstOrDefault();
+                var detailPageParts = GetAttributeValue( AttributeKey.CareDetailPage ).SplitDelimitedValues( "," );
+                var detailPage = PageCache.Get( detailPageParts[0] );
+                var detailPageRoute = detailPage?.PageRoutes.FirstOrDefault( r => detailPageParts.Length == 1 || ( detailPageParts.Length > 1 && r.Guid == detailPageParts[1].AsGuid() ) );
                 var detailPagePath = detailPageRoute != null ? "/" + detailPageRoute.Route : "/page/" + detailPage.Id;
-                var dashboardPage = PageCache.Get( dataMap.GetString( AttributeKey.CareDashboardPage ) );
-                var dashboardPageRoute = dashboardPage.PageRoutes.FirstOrDefault();
+                var dashboardPageParts = GetAttributeValue( AttributeKey.CareDashboardPage ).SplitDelimitedValues( "," );
+                var dashboardPage = PageCache.Get( dashboardPageParts[0] );
+                var dashboardPageRoute = dashboardPage?.PageRoutes.FirstOrDefault( r => dashboardPageParts.Length == 1 || ( dashboardPageParts.Length > 1 && r.Guid == dashboardPageParts[1].AsGuid() ) );
                 var dashboardPagePath = dashboardPageRoute != null ? "/" + dashboardPageRoute.Route : "/page/" + dashboardPage.Id;
 
-                AssignWorkersToNeeds( rockContext, beginDateTime, dataMap, detailPagePath, dashboardPagePath );
+                AssignWorkersToNeeds( rockContext, beginDateTime, detailPagePath, dashboardPagePath );
 
                 var careNeedService = new CareNeedService( rockContext );
                 var assignedPersonService = new AssignedPersonService( rockContext );
@@ -259,21 +276,18 @@ namespace rocks.kfs.StepsToCare.Jobs
                                     touchTemplates.Add( touchTemplate );
                                 }
                             }
-                            allTouchTemplates.AddOrIgnore( needCategory.Id, touchTemplates );
+                            allTouchTemplates.AddOrReplace( needCategory.Id, touchTemplates );
                         }
                     }
                 }
 
                 var careNeeds = careNeedService.Queryable( "PersonAlias,SubmitterPersonAlias" ).Where( n => n.StatusValueId != closedValueId );
-                var careAssigned = assignedPersonService.Queryable()
-                    .Where( ap => ap.PersonAliasId != null && ap.NeedId != null && ap.CareNeed.StatusValueId != closedValueId )
-                    .DistinctBy( ap => ap.PersonAliasId );
 
                 var careNeedFollowUp = careNeeds
                     .Where( n =>
                         ( !n.CustomFollowUp && n.StatusValueId == openValueId && n.DateEntered <= DbFunctions.AddDays( RockDateTime.Now, -followUpDays ) )
                         ||
-                        ( n.CustomFollowUp && ( n.StatusValueId == openValueId || n.StatusValueId == snoozedValueId ) && ( n.RenewMaxCount == null || n.RenewCurrentCount <= n.RenewMaxCount )
+                        ( ( n.StatusValueId == openValueId || n.StatusValueId == snoozedValueId ) && ( n.RenewMaxCount == null || n.RenewCurrentCount <= n.RenewMaxCount )
                             && (
                                 ( n.SnoozeDate == null && n.DateEntered <= DbFunctions.AddDays( RockDateTime.Now, -n.RenewPeriodDays ) )
                                 ||
@@ -284,33 +298,45 @@ namespace rocks.kfs.StepsToCare.Jobs
 
                 var careNeed24Hrs = careNeeds
                     .Where( n => n.StatusValueId == openValueId && DbFunctions.DiffHours( n.DateEntered.Value, RockDateTime.Now ) >= minimumCareTouchesHours );
-                var careNeedFlagged = careNeed24Hrs
-                    .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && cn.AssignedPersons.Any( ap => ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value && ap.PersonAliasId == n.CreatedByPersonAliasId ) ).DefaultIfEmpty(),
+                var careNeedFollowUpWorkerHrs = careNeeds
+                    .Where( n => n.StatusValueId == openValueId && DbFunctions.DiffHours( n.DateEntered.Value, RockDateTime.Now ) >= minimumFollowUpCareTouchesHours );
+                var careNeedFlagged1 = careNeed24Hrs
+                    .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && cn.AssignedPersons.Any( ap => ap.FollowUpWorker && ap.PersonAliasId == n.CreatedByPersonAliasId ) ).DefaultIfEmpty(),
                     ( cn, n ) => new FlaggedNeed
                     {
                         CareNeed = cn,
                         HasFollowUpWorkerNote = n != null,
-                        TouchCount = careNeedNotesQry.Where( note => note.EntityId == cn.Id && n.Caption != "Action" ).Count()
+                        TouchCount = careNeedNotesQry.Where( note => note.EntityId == cn.Id && ( n.Caption == null || !n.Caption.StartsWith( "Action" ) ) ).Count()
                     } )
-                    .Where( f => !f.HasFollowUpWorkerNote || f.TouchCount <= minimumCareTouches )
-                    .ToList();
+                    .Where( f => f.TouchCount < minimumCareTouches );
+                var careNeedFlagged2 = careNeedFollowUpWorkerHrs
+                    .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && cn.AssignedPersons.Any( ap => ap.FollowUpWorker && ap.PersonAliasId == n.CreatedByPersonAliasId ) ).DefaultIfEmpty(),
+                    ( cn, n ) => new FlaggedNeed
+                    {
+                        CareNeed = cn,
+                        HasFollowUpWorkerNote = n != null,
+                        TouchCount = careNeedNotesQry.Where( note => note.EntityId == cn.Id && ( n.Caption == null || !n.Caption.StartsWith( "Action" ) ) ).Count()
+                    } )
+                    .Where( f => !f.HasFollowUpWorkerNote );
+
+                var careNeedFlagged = careNeedFlagged1.Concat( careNeedFlagged2 ).DistinctBy( cn => cn.CareNeed.Id ).ToList();
 
                 if ( allTouchTemplates.Count() > 0 )
                 {
                     foreach ( var catTemplate in allTouchTemplates )
                     {
-                        var careNeedsInCategory = careNeeds.Where( n => n.StatusValueId != closedValueId && n.CategoryValueId.HasValue && n.CategoryValueId == catTemplate.Key );
+                        var careNeedsInCategory = careNeeds.Where( n => n.StatusValueId != closedValueId && n.StatusValueId != snoozedValueId && n.CategoryValueId.HasValue && n.CategoryValueId == catTemplate.Key );
                         foreach ( var template in catTemplate.Value )
                         {
                             var currentFlaggedTemplatesQry = careNeedsInCategory
-                                .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && ( ( n.Text == template.NoteTemplate.Note && template.Recurring && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ) || DbFunctions.DiffHours( cn.DateEntered, RockDateTime.Now ) >= template.MinimumCareTouchHours ) ),
+                                .SelectMany( cn => careNeedNotesQry.Where( n => n.EntityId == cn.Id && ( ( ( n.Text == template.NoteTemplate.Note || n.ForeignGuid == template.NoteTemplate.Guid ) && template.Recurring && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ) || DbFunctions.DiffHours( cn.DateEntered, RockDateTime.Now ) >= template.MinimumCareTouchHours ) ),
                                     ( cn, n ) => new FlaggedNeed
                                     {
                                         CareNeed = cn,
                                         Note = n,
-                                        HasNoteOlderThanHours = ( n.Text == template.NoteTemplate.Note && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ),
-                                        NoteTouchCount = careNeedNotesQry.Count( note => note.EntityId == cn.Id && ( note.Text == template.NoteTemplate.Note && ( !template.Recurring || ( template.Recurring && DbFunctions.DiffHours( note.CreatedDateTime, RockDateTime.Now ) <= template.MinimumCareTouchHours ) ) ) ),
-                                        TouchCount = careNeedNotesQry.Where( note => note.EntityId == cn.Id && n.Caption != "Action" ).Count()
+                                        HasNoteOlderThanHours = ( ( n.Text == template.NoteTemplate.Note || n.ForeignGuid == template.NoteTemplate.Guid ) && DbFunctions.DiffHours( n.CreatedDateTime, RockDateTime.Now ) >= template.MinimumCareTouchHours ),
+                                        NoteTouchCount = careNeedNotesQry.Count( note => note.EntityId == cn.Id && ( ( note.Text == template.NoteTemplate.Note || note.ForeignGuid == template.NoteTemplate.Guid ) && ( !template.Recurring || ( template.Recurring && DbFunctions.DiffHours( note.CreatedDateTime, RockDateTime.Now ) <= template.MinimumCareTouchHours ) ) ) ),
+                                        TouchCount = careNeedNotesQry.Where( note => note.EntityId == cn.Id && ( n.Caption == null || !n.Caption.StartsWith( "Action" ) ) ).Count()
                                     } )
                                 .Where( f => f.NoteTouchCount < template.MinimumCareTouches );
                             var currentFlaggedTemplates = currentFlaggedTemplatesQry.ToList();
@@ -330,9 +356,9 @@ namespace rocks.kfs.StepsToCare.Jobs
                     }
                 }
 
-                var followUpSystemCommunicationGuid = dataMap.GetString( AttributeKey.FollowUpSystemCommunication ).AsGuid();
-                var careTouchNeededCommunicationGuid = dataMap.GetString( AttributeKey.CareTouchNeededCommunication ).AsGuid();
-                var outstandingNeedsCommunicationGuid = dataMap.GetString( AttributeKey.OutstandingNeedsCommunication ).AsGuid();
+                var followUpSystemCommunicationGuid = GetAttributeValue( AttributeKey.FollowUpSystemCommunication ).AsGuid();
+                var careTouchNeededCommunicationGuid = GetAttributeValue( AttributeKey.CareTouchNeededCommunication ).AsGuid();
+                var outstandingNeedsCommunicationGuid = GetAttributeValue( AttributeKey.OutstandingNeedsCommunication ).AsGuid();
                 var followUpSystemCommunication = new SystemCommunicationService( rockContext ).Get( followUpSystemCommunicationGuid );
                 var careTouchNeededCommunication = new SystemCommunicationService( rockContext ).Get( careTouchNeededCommunicationGuid );
                 var outstandingNeedsCommunication = new SystemCommunicationService( rockContext ).Get( outstandingNeedsCommunicationGuid );
@@ -341,15 +367,12 @@ namespace rocks.kfs.StepsToCare.Jobs
                 linkedPages.Add( "CareDetail", detailPagePath );
                 linkedPages.Add( "CareDashboard", dashboardPagePath );
 
-                var errors = new List<string>();
-                var errorsSms = new List<string>();
-
                 // Update status to follow up and email follow up messages
                 foreach ( var careNeed in careNeedFollowUp )
                 {
                     careNeed.StatusValueId = followUpValue.Id;
                     careNeed.FollowUpDate = RockDateTime.Now;
-                    if ( careNeed.CustomFollowUp )
+                    if ( careNeed.CustomFollowUp || careNeed.SnoozeDate.HasValue )
                     {
                         careNeed.RenewCurrentCount++;
                     }
@@ -360,7 +383,10 @@ namespace rocks.kfs.StepsToCare.Jobs
                         var emailMessage = new RockEmailMessage( followUpSystemCommunication );
                         var smsMessage = new RockSMSMessage( followUpSystemCommunication );
 
-                        foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value ) )
+                        var errors = new List<string>();
+                        var errorsSms = new List<string>();
+
+                        foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ap.FollowUpWorker ) )
                         {
                             assignee.PersonAlias.Person.LoadAttributes();
 
@@ -408,29 +434,30 @@ namespace rocks.kfs.StepsToCare.Jobs
                         if ( emailMessage.GetRecipients().Count > 0 )
                         {
                             emailMessage.Send( out errors );
+
+                            if ( errors.Any() )
+                            {
+                                errorCount += errors.Count;
+                                errorMessages.AddRange( errors );
+                            }
+                            else
+                            {
+                                assignedPersonEmails++;
+                            }
                         }
                         if ( smsMessage.GetRecipients().Count > 0 )
                         {
                             smsMessage.Send( out errorsSms );
-                        }
 
-                        if ( errors.Any() )
-                        {
-                            errorCount += errors.Count;
-                            errorMessages.AddRange( errors );
-                        }
-                        else
-                        {
-                            assignedPersonEmails++;
-                        }
-                        if ( errorsSms.Any() )
-                        {
-                            errorCount += errorsSms.Count;
-                            errorMessages.AddRange( errorsSms );
-                        }
-                        else
-                        {
-                            assignedPersonSms++;
+                            if ( errorsSms.Any() )
+                            {
+                                errorCount += errorsSms.Count;
+                                errorMessages.AddRange( errorsSms );
+                            }
+                            else
+                            {
+                                assignedPersonSms++;
+                            }
                         }
                     }
                 }
@@ -451,8 +478,10 @@ namespace rocks.kfs.StepsToCare.Jobs
                         var smsMessage = new RockSMSMessage( careTouchNeededCommunication );
                         //var pushMessage = new RockPushMessage( careTouchNeededCommunication );
                         var recipients = new List<RockMessageRecipient>();
+                        var errors = new List<string>();
+                        var errorsSms = new List<string>();
 
-                        foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ( ap.FollowUpWorker.HasValue && ap.FollowUpWorker.Value ) || ( flagNeed.TouchTemplate != null && flagNeed.TouchTemplate.NotifyAll ) ) )
+                        foreach ( var assignee in careNeed.AssignedPersons.Where( ap => ( ap.FollowUpWorker ) || ( flagNeed.TouchTemplate != null && flagNeed.TouchTemplate.NotifyAll ) ) )
                         {
                             assignee.PersonAlias.Person.LoadAttributes();
 
@@ -504,36 +533,44 @@ namespace rocks.kfs.StepsToCare.Jobs
                         if ( emailMessage.GetRecipients().Count > 0 )
                         {
                             emailMessage.Send( out errors );
+
+                            if ( errors.Any() )
+                            {
+                                errorCount += errors.Count;
+                                errorMessages.AddRange( errors );
+                            }
+                            else
+                            {
+                                assignedPersonEmails++;
+                            }
                         }
                         if ( smsMessage.GetRecipients().Count > 0 )
                         {
                             smsMessage.Send( out errorsSms );
+
+                            if ( errorsSms.Any() )
+                            {
+                                errorCount += errorsSms.Count;
+                                errorMessages.AddRange( errorsSms );
+                            }
+                            else
+                            {
+                                assignedPersonSms++;
+                            }
                         }
 
-                        if ( errors.Any() )
-                        {
-                            errorCount += errors.Count;
-                            errorMessages.AddRange( errors );
-                        }
-                        else
-                        {
-                            assignedPersonEmails++;
-                        }
-                        if ( errorsSms.Any() )
-                        {
-                            errorCount += errorsSms.Count;
-                            errorMessages.AddRange( errorsSms );
-                        }
-                        else
-                        {
-                            assignedPersonSms++;
-                        }
                     }
                 }
 
                 // Send Outstanding needs daily notification
                 if ( outstandingNeedsCommunication != null && outstandingNeedsCommunication.Id > 0 )
                 {
+                    var outstandingNeedsIncludeSnoozed = GetAttributeValue( AttributeKey.OutstandingNeedsIncludeSnoozed );
+
+                    var careAssigned = assignedPersonService.Queryable()
+                        .Where( ap => ap.PersonAliasId != null && ap.NeedId != null && ap.CareNeed.StatusValueId != closedValueId && ( outstandingNeedsIncludeSnoozed == "Yes" || outstandingNeedsIncludeSnoozed == "Other" || ( outstandingNeedsIncludeSnoozed == "No" && ap.CareNeed.StatusValueId != snoozedValueId ) ) )
+                        .DistinctBy( ap => ap.PersonAliasId );
+
                     foreach ( var assigned in careAssigned )
                     {
                         var smsNumber = assigned.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber();
@@ -547,74 +584,86 @@ namespace rocks.kfs.StepsToCare.Jobs
                         //var pushMessage = new RockPushMessage( outstandingNeedsCommunication );
                         var recipients = new List<RockMessageRecipient>();
 
-                        var assignedNeeds = careNeeds.Where( cn => cn.AssignedPersons.Any( ap => ap.PersonAliasId == assigned.PersonAliasId ) );
+                        var assignedNeeds = careNeeds.Where( cn => cn.AssignedPersons.Any( ap => ap.PersonAliasId == assigned.PersonAliasId ) ).ToList();
 
-                        assigned.PersonAlias.Person.LoadAttributes();
-
-                        var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, assigned.PersonAlias.Person );
-                        mergeFields.Add( "CareNeeds", assignedNeeds );
-                        mergeFields.Add( "LinkedPages", linkedPages );
-                        mergeFields.Add( "AssignedPerson", assigned );
-                        mergeFields.Add( "Person", assigned.PersonAlias.Person );
-                        mergeFields.Add( "NoteTemplates", noteTemplates );
-
-                        var notificationType = assigned.PersonAlias.Person.GetAttributeValue( SystemGuid.PersonAttribute.NOTIFICATION.AsGuid() );
-
-                        if ( notificationType == null || notificationType == "Email" || notificationType == "Both" )
+                        if ( outstandingNeedsIncludeSnoozed == "No" || ( outstandingNeedsIncludeSnoozed == "Other" && !assignedNeeds.Any( cn => cn.StatusValueId != snoozedValueId ) ) )
                         {
-                            if ( !assigned.PersonAlias.Person.CanReceiveEmail( false ) )
+                            assignedNeeds = assignedNeeds.Where( cn => cn.StatusValueId != snoozedValueId ).ToList();
+                        }
+
+                        if ( assignedNeeds.Any() )
+                        {
+                            var errors = new List<string>();
+                            var errorsSms = new List<string>();
+
+                            assigned.PersonAlias.Person.LoadAttributes();
+
+                            var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, assigned.PersonAlias.Person );
+                            mergeFields.Add( "CareNeeds", assignedNeeds );
+                            mergeFields.Add( "LinkedPages", linkedPages );
+                            mergeFields.Add( "AssignedPerson", assigned );
+                            mergeFields.Add( "Person", assigned.PersonAlias.Person );
+                            mergeFields.Add( "NoteTemplates", noteTemplates );
+
+                            var notificationType = assigned.PersonAlias.Person.GetAttributeValue( SystemGuid.PersonAttribute.NOTIFICATION.AsGuid() );
+
+                            if ( notificationType == null || notificationType == "Email" || notificationType == "Both" )
                             {
-                                errorCount += 1;
-                                errorMessages.Add( string.Format( "{0} does not have a valid email address.", assigned.PersonAlias.Person.FullName ) );
+                                if ( !assigned.PersonAlias.Person.CanReceiveEmail( false ) )
+                                {
+                                    errorCount += 1;
+                                    errorMessages.Add( string.Format( "{0} does not have a valid email address.", assigned.PersonAlias.Person.FullName ) );
+                                }
+                                else
+                                {
+                                    emailMessage.AddRecipient( new RockEmailMessageRecipient( assigned.PersonAlias.Person, mergeFields ) );
+                                }
                             }
-                            else
+                            if ( notificationType == "SMS" || notificationType == "Both" )
                             {
-                                emailMessage.AddRecipient( new RockEmailMessageRecipient( assigned.PersonAlias.Person, mergeFields ) );
+                                if ( string.IsNullOrWhiteSpace( smsNumber ) )
+                                {
+                                    errorCount += 1;
+                                    errorMessages.Add( string.Format( "No SMS number could be found for {0}.", assigned.PersonAlias.Person.FullName ) );
+                                }
+                                smsMessage.AddRecipient( new RockSMSMessageRecipient( assigned.PersonAlias.Person, smsNumber, mergeFields ) );
                             }
-                        }
-                        if ( notificationType == "SMS" || notificationType == "Both" )
-                        {
-                            if ( string.IsNullOrWhiteSpace( smsNumber ) )
+                            //pushMessage.AddRecipient( new RockPushMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.Devices, mergeFields ) );
+
+                            if ( emailMessage.GetRecipients().Count > 0 )
                             {
-                                errorCount += 1;
-                                errorMessages.Add( string.Format( "No SMS number could be found for {0}.", assigned.PersonAlias.Person.FullName ) );
+                                emailMessage.Send( out errors );
+
+                                if ( errors.Any() )
+                                {
+                                    errorCount += errors.Count;
+                                    errorMessages.AddRange( errors );
+                                }
+                                else
+                                {
+                                    assignedPersonEmails++;
+                                }
                             }
-                            smsMessage.AddRecipient( new RockSMSMessageRecipient( assigned.PersonAlias.Person, smsNumber, mergeFields ) );
-                        }
-                        //pushMessage.AddRecipient( new RockPushMessageRecipient( assignee.PersonAlias.Person, assignee.PersonAlias.Person.Devices, mergeFields ) );
+                            if ( smsMessage.GetRecipients().Count > 0 )
+                            {
+                                smsMessage.Send( out errorsSms );
 
-                        if ( emailMessage.GetRecipients().Count > 0 )
-                        {
-                            emailMessage.Send( out errors );
-                        }
-                        if ( smsMessage.GetRecipients().Count > 0 )
-                        {
-                            smsMessage.Send( out errorsSms );
-                        }
-
-                        if ( errors.Any() )
-                        {
-                            errorCount += errors.Count;
-                            errorMessages.AddRange( errors );
-                        }
-                        else
-                        {
-                            assignedPersonEmails++;
-                        }
-                        if ( errorsSms.Any() )
-                        {
-                            errorCount += errorsSms.Count;
-                            errorMessages.AddRange( errorsSms );
-                        }
-                        else
-                        {
-                            assignedPersonSms++;
+                                if ( errorsSms.Any() )
+                                {
+                                    errorCount += errorsSms.Count;
+                                    errorMessages.AddRange( errorsSms );
+                                }
+                                else
+                                {
+                                    assignedPersonSms++;
+                                }
+                            }
                         }
                     }
                 }
 
             }
-            context.Result = string.Format( "{0} emails sent \n{1} SMS messages sent", assignedPersonEmails, assignedPersonSms );
+            Result = string.Format( "{0} emails sent \n{1} SMS messages sent", assignedPersonEmails, assignedPersonSms );
             if ( errorMessages.Any() )
             {
                 StringBuilder sb = new StringBuilder();
@@ -622,7 +671,7 @@ namespace rocks.kfs.StepsToCare.Jobs
                 sb.Append( string.Format( "{0} Errors: ", errorCount ) );
                 errorMessages.ForEach( e => { sb.AppendLine(); sb.Append( e ); } );
                 string errors = sb.ToString();
-                context.Result += errors;
+                Result += errors;
                 var exception = new Exception( errors );
                 HttpContext context2 = HttpContext.Current;
                 ExceptionLogService.LogException( exception, context2 );
@@ -630,16 +679,16 @@ namespace rocks.kfs.StepsToCare.Jobs
             }
         }
 
-        private void AssignWorkersToNeeds( RockContext rockContext, DateTime beginDateTime, JobDataMap dataMap, string detailPagePath, string dashboardPagePath )
+        private void AssignWorkersToNeeds( RockContext rockContext, DateTime beginDateTime, string detailPagePath, string dashboardPagePath )
         {
-            var autoAssignWorker = dataMap.GetBooleanFromString( AttributeKey.AutoAssignWorker );
-            var autoAssignWorkerGeofence = dataMap.GetBooleanFromString( AttributeKey.AutoAssignWorkerGeofence );
-            var loadBalanceType = dataMap.GetString( AttributeKey.LoadBalanceWorkersType );
-            var enableLogging = dataMap.GetBooleanFromString( AttributeKey.VerboseLogging );
-            var leaderRoleGuids = dataMap.GetString( AttributeKey.GroupTypeAndRole ).SplitDelimitedValues().AsGuidList();
-            var futureThresholdDays = dataMap.GetDoubleFromString( AttributeKey.FutureThresholdDays );
-            var assignmentEmailTemplateGuid = dataMap.GetString( AttributeKey.NewAssignmentNotification ).AsGuidOrNull();
-            var adultFamilyWorkers = dataMap.GetString( AttributeKey.AdultFamilyWorkers );
+            var autoAssignWorker = GetAttributeValue( AttributeKey.AutoAssignWorker ).AsBoolean();
+            var autoAssignWorkerGeofence = GetAttributeValue( AttributeKey.AutoAssignWorkerGeofence ).AsBoolean();
+            var loadBalanceType = GetAttributeValue( AttributeKey.LoadBalanceWorkersType );
+            var enableLogging = GetAttributeValue( AttributeKey.VerboseLogging ).AsBoolean();
+            var leaderRoleGuids = GetAttributeValue( AttributeKey.GroupTypeAndRole ).SplitDelimitedValues().AsGuidList();
+            var futureThresholdDays = GetAttributeValue( AttributeKey.FutureThresholdDays ).AsDouble();
+            var assignmentEmailTemplateGuid = GetAttributeValue( AttributeKey.NewAssignmentNotification ).AsGuidOrNull();
+            var adultFamilyWorkers = GetAttributeValue( AttributeKey.AdultFamilyWorkers );
             var newlyAssignedPersons = new List<AssignedPerson>();
 
             var careNeedService = new CareNeedService( rockContext );

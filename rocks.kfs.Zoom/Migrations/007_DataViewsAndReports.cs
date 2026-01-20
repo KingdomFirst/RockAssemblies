@@ -19,7 +19,7 @@ using Rock.Plugin;
 
 namespace rocks.kfs.Zoom.Migrations
 {
-    [MigrationNumber( 7, "1.12.4" )]
+    [MigrationNumber( 7, "1.13" )]
     public partial class DataViewsAndReports : Migration
     {
         /// <summary>

@@ -21,7 +21,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-
+using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Authenticators;
 
@@ -84,7 +84,12 @@ namespace rocks.kfs.Reach.Reporting
                 }
                 else
                 {
+                    var errorResponse = JsonConvert.DeserializeObject<ErrorResponse>( response.Content.ToStringSafe() );
                     errorMessage = $"Error with API request: {response.ErrorMessage} {response.StatusDescription}";
+                    if ( errorResponse.response_type != null && errorResponse.response_type == "error" )
+                    {
+                        errorMessage += $". API Response: {errorResponse.response.JoinStrings( ", " )} (URL: {url})";
+                    }
                     return null;
                 }
             }

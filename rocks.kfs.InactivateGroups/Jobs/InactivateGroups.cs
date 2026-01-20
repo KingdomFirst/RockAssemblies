@@ -23,6 +23,7 @@ using Quartz;
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
+using Rock.Jobs;
 using Rock.Model;
 using Rock.Web.Cache;
 
@@ -36,7 +37,7 @@ namespace rocks.kfs.InactivateGroups.Jobs
     /// Job to inactivate groups based on group attribute values.
     /// </summary>
     [DisallowConcurrentExecution]
-    public class InactivateGroups : IJob
+    public class InactivateGroups : RockJob
     {
         /// <summary>
         /// Empty constructor for job initialization
@@ -51,36 +52,30 @@ namespace rocks.kfs.InactivateGroups.Jobs
 
         /// <summary>
         /// Job to inactivate groups based on group attribute values.
-        ///
-        /// Called by the <see cref="IScheduler" /> when a
-        /// <see cref="ITrigger" /> fires that is associated with
-        /// the <see cref="IJob" />.
         /// </summary>
-        public virtual void Execute( IJobExecutionContext context )
+        public override void Execute()
         {
             var rockContext = new RockContext();
             var groupService = new GroupService( rockContext );
             var groupsInactivated = 0;
             var groupsActivated = 0;
 
-            JobDataMap dataMap = context.JobDetail.JobDataMap;
-
             // Get Job Settings
-            Guid? StartDateAttributeGuid = dataMap.GetString( "StartDateAttribute" ).AsGuidOrNull();
+            Guid? StartDateAttributeGuid = GetAttributeValue( "StartDateAttribute" ).AsGuidOrNull();
             if ( !StartDateAttributeGuid.HasValue )
             {
                 return;
             }
             var StartDateAttribute = AttributeCache.Get( StartDateAttributeGuid.Value, rockContext );
 
-            Guid? EndDateAttributeGuid = dataMap.GetString( "EndDateAttribute" ).AsGuidOrNull();
+            Guid? EndDateAttributeGuid = GetAttributeValue( "EndDateAttribute" ).AsGuidOrNull();
             if ( !EndDateAttributeGuid.HasValue )
             {
                 return;
             }
             var EndDateAttribute = AttributeCache.Get( EndDateAttributeGuid.Value, rockContext );
 
-            Guid groupTypeGuid = dataMap.GetString( "LimitGroupType" ).AsGuid();
+            Guid groupTypeGuid = GetAttributeValue( "LimitGroupType" ).AsGuid();
 
             var groupQryActive = groupService
                 .Queryable()
@@ -112,7 +107,7 @@ namespace rocks.kfs.InactivateGroups.Jobs
                     groupsInactivated++;
                 }
             }
-            
+
             foreach ( var group in groupListNotActive )
             {
                 group.LoadAttributes();
@@ -135,11 +130,11 @@ namespace rocks.kfs.InactivateGroups.Jobs
 
             if ( groupsInactivated > 0 || groupsActivated > 0 )
             {
-                context.Result = string.Format( "Inactivated {0} {1}. Activated {2} {3}.", groupsInactivated, "group".PluralizeIf( groupsInactivated == 0 || groupsInactivated > 1 ), groupsActivated, "group".PluralizeIf( groupsActivated == 0 || groupsActivated > 1 ) );
+                Result = string.Format( "Inactivated {0} {1}. Activated {2} {3}.", groupsInactivated, "group".PluralizeIf( groupsInactivated == 0 || groupsInactivated > 1 ), groupsActivated, "group".PluralizeIf( groupsActivated == 0 || groupsActivated > 1 ) );
             }
             else
             {
-                context.Result = "No groups changed.";
+                Result = "No groups changed.";
             }
         }
     }

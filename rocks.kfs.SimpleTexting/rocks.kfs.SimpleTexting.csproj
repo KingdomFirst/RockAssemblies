@@ -49,6 +49,9 @@
     <Reference Include="Rock.Common">
       <HintPath>..\..\RockWeb\Bin\Rock.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Rock.Enums">
+      <HintPath>..\..\RockWeb\Bin\Rock.Enums.dll</HintPath>
+    </Reference>
     <Reference Include="SimpleTextingDotNet, Version=1.0.8354.33013, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SimpleTextingDotNet.1.0.8354.33013\lib\net452\SimpleTextingDotNet.dll</HintPath>
     </Reference>

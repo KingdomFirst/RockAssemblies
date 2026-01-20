@@ -231,6 +231,10 @@ namespace rocks.kfs.Intacct
                                 }
                             }
                         }
+                        else
+                        {
+                            ExceptionLogService.LogException( new Exception( $"Error retrieving Checking Accounts from Intacct. Response: \r\n {xResultXml.ToString()}" ), null );
+                        }
                     }
                 }
             }

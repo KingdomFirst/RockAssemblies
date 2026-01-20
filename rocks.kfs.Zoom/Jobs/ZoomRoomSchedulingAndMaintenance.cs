@@ -70,7 +70,7 @@ namespace rocks.kfs.Zoom.Jobs
         Key = AttributeKey.ImportMeetings )]
 
     [DisallowConcurrentExecution]
-    public class ZoomRoomSchedulingAndMaintenance : IJob
+    public class ZoomRoomSchedulingAndMaintenance : RockJob
     {
         /// <summary>
         /// Attribute Keys
@@ -99,13 +99,12 @@ namespace rocks.kfs.Zoom.Jobs
         /// <summary>
         /// Executes the specified context.
         /// </summary>
-        /// <param name="context">The context.</param>
-        public virtual void Execute( IJobExecutionContext context )
+        public override void Execute()
         {
             // Check Api connection first.
             if ( !Zoom.ZoomAuthCheck() )
             {
-                context.Result = "Zoom API authentication error. Check API settings for Zoom Room plugin or try again later.";
+                Result = "Zoom API authentication error. Check API settings for Zoom Room plugin or try again later.";
                 throw new Exception( "Authentication failed for Zoom API. Please verify the API settings configured in the Zoom Room plugin are valid and correct." );
             }
 
@@ -113,7 +112,7 @@ namespace rocks.kfs.Zoom.Jobs
             {
                 #region Setup Variables
 
-                int jobId = context.JobDetail.Description.AsInteger();
+                int jobId = ServiceJobId;
                 var job = new ServiceJobService( rockContext ).GetNoTracking( jobId );
                 var JobStartDateTime = RockDateTime.Now;
                 DateTime? lastSuccessRunDateTime = null;
@@ -125,11 +124,10 @@ namespace rocks.kfs.Zoom.Jobs
                 // get the last run date or yesterday
                 var beginDateTime = lastSuccessRunDateTime ?? JobStartDateTime.AddDays( -1 );
 
-                var dataMap = context.JobDetail.JobDataMap;
-                var daysOut = dataMap.GetIntegerFromString( AttributeKey.SyncDaysOut );
+                var daysOut = GetAttributeValue( AttributeKey.SyncDaysOut ).AsInteger();
                 webhookBaseUrl = Settings.GetWebhookUrl();
-                var importMeetings = dataMap.GetBooleanFromString( AttributeKey.ImportMeetings );
-                verboseLogging = dataMap.GetBooleanFromString( AttributeKey.VerboseLogging );
+                var importMeetings = GetAttributeValue( AttributeKey.ImportMeetings ).AsBoolean();
+                verboseLogging = GetAttributeValue( AttributeKey.VerboseLogging ).AsBoolean();
                 var zrOccurrencesCancel = new List<RoomOccurrence>();
                 reservationLocationEntityTypeId = new EntityTypeService( rockContext ).GetNoTracking( com.bemaservices.RoomManagement.SystemGuid.EntityType.RESERVATION_LOCATION.AsGuid() ).Id;
 
@@ -484,7 +482,7 @@ namespace rocks.kfs.Zoom.Jobs
                 {
                     errorSummaryBuilder.AppendLine( GetFormattedResult( result ) );
                 }
-                context.Result = errorSummaryBuilder.ToString();
+                Result = errorSummaryBuilder.ToString();
 
                 var jobExceptions = zoomRoomOfflineResultList.Where( a => a.Exception != null ).Select( a => a.Exception ).ToList();
 

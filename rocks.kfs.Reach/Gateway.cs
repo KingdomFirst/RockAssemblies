@@ -270,6 +270,10 @@ namespace rocks.kfs.Reach
 
                 // to_date doesn't have a timestamp, so it includes transactions posted after the cutoff
                 var donationResult = Api.PostRequest( donationUrl, authenticator, parameters, out errorMessage );
+                if ( errorMessage.IsNotNullOrWhiteSpace() )
+                {
+                    errorMessages.Add( errorMessage );
+                }
                 var donations = JsonConvert.DeserializeObject<List<Donation>>( donationResult.ToStringSafe() );
                 if ( donations != null && donations.Any() && errorMessage.IsNullOrWhiteSpace() )
                 {
@@ -287,7 +291,7 @@ namespace rocks.kfs.Reach
 
                             var reachAccountName = string.Empty;
                             var donationItem = donation.line_items.FirstOrDefault();
-                            if ( donationItem != null && donationItem.referral_type.Equals( "DonationOption", StringComparison.InvariantCultureIgnoreCase ) )
+                            if ( donationItem != null && donationItem.referral_type.IsNotNullOrWhiteSpace() && donationItem.referral_type.Equals( "DonationOption", StringComparison.InvariantCultureIgnoreCase ) )
                             {
                                 // one-time gift, should match a known category
                                 var category = categories.FirstOrDefault( c => c.id == donationItem.referral_id );
@@ -296,13 +300,31 @@ namespace rocks.kfs.Reach
                                     reachAccountName = category.title.Trim();
                                 }
                             }
-                            else if ( donationItem != null && donationItem.referral_type.Equals( "Project", StringComparison.InvariantCultureIgnoreCase ) )
+                            else if ( donationItem != null && donationItem.referral_type.IsNotNullOrWhiteSpace() && donationItem.referral_type.Equals( "Project", StringComparison.InvariantCultureIgnoreCase ) )
                             {
                                 // one-time gift, should match a known project
                                 var project = projects.FirstOrDefault( c => c.id == donationItem.referral_id );
                                 if ( project != null )
                                 {
-                                    reachAccountName = string.Format("PROJECT {0}", project.title.Trim() );
+                                    reachAccountName = string.Format( "PROJECT {0}", project.title.Trim() );
+                                }
+                            }
+                            else if ( donation.referral_type.IsNotNullOrWhiteSpace() && donation.referral_type.Equals( "DonationOption", StringComparison.InvariantCultureIgnoreCase ) )
+                            {
+                                // one-time gift, should match a known category
+                                var category = categories.FirstOrDefault( c => c.id == donation.referral_id );
+                                if ( category != null )
+                                {
+                                    reachAccountName = category.title.Trim();
+                                }
+                            }
+                            else if ( donation.referral_type.IsNotNullOrWhiteSpace() && donation.referral_type.Equals( "Project", StringComparison.InvariantCultureIgnoreCase ) )
+                            {
+                                // one-time gift, should match a known project
+                                var project = projects.FirstOrDefault( c => c.id == donation.referral_id );
+                                if ( project != null )
+                                {
+                                    reachAccountName = string.Format( "PROJECT {0}", project.title.Trim() );
                                 }
                             }
                             else
@@ -335,6 +357,11 @@ namespace rocks.kfs.Reach
                                 }
                             }
 
+                            if ( reachAccountName.IsNullOrWhiteSpace() )
+                            {
+                                reachAccountName = donation.purpose;
+                            }
+
                             int? rockAccountId = defaultAccount.Id;
                             var accountMapping = reachAccountMaps.FirstOrDefault( v => v.Value.Equals( reachAccountName, StringComparison.CurrentCultureIgnoreCase ) );
                             if ( accountMapping != null )
@@ -357,8 +384,8 @@ namespace rocks.kfs.Reach
                             }
 
                             // create the transaction
-                            var summary = string.Format( "Reach Donation for {0} from {1} using {2} on {3} ({4})",
-                                reachAccountName, donation.name, donation.payment_method, donation.updated_at, donation.token );
+                            var summary = string.Format( "Reach Donation for {0} from {1} on {2} ({3})",
+                                reachAccountName, donation.name, donation.updated_at, donation.id );
                             transaction = new FinancialTransaction
                             {
                                 TransactionDateTime = donation.updated_at,
@@ -393,6 +420,11 @@ namespace rocks.kfs.Reach
                         else if ( transaction != null )
                         {
                             skippedTransactionCount++;
+                        }
+
+                        if ( errorMessage.IsNotNullOrWhiteSpace() )
+                        {
+                            errorMessages.Add( errorMessage );
                         }
                     }
                 }
@@ -444,7 +476,7 @@ namespace rocks.kfs.Reach
 
             if ( errorMessages.Any() )
             {
-                errorMessage = string.Join( "<br>", errorMessages );
+                ExceptionLogService.LogException( new Exception( $"Reach import errors: \r\n{string.Join( "\r\n", errorMessages )}" ) );
             }
 
             return new List<Payment>();

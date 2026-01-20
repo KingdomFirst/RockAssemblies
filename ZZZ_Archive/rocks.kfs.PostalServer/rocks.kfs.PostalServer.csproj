@@ -45,6 +45,9 @@
     <Reference Include="Rock.Common">
       <HintPath>..\..\RockWeb\Bin\Rock.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Rock.Enums">
+      <HintPath>..\..\RockWeb\Bin\Rock.Enums.dll</HintPath>
+    </Reference>
     <Reference Include="UAParser, Version=3.1.44.0, Culture=neutral, PublicKeyToken=f7377bf021646069, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\UAParser.dll</HintPath>

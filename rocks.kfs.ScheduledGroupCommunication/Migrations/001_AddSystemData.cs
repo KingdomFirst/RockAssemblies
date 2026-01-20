@@ -16,10 +16,12 @@
 //
 using System;
 using System.Linq;
+
 using Rock;
 using Rock.Data;
 using Rock.Model;
 using Rock.Plugin;
+
 using KFSConst = rocks.kfs.ScheduledGroupCommunication.SystemGuid;
 
 namespace rocks.kfs.ScheduledGroupCommunication.Migrations
@@ -106,13 +108,14 @@ namespace rocks.kfs.ScheduledGroupCommunication.Migrations
                 };
 
                 var rockContextEmail = new RockContext();
+                var attributeMatrixTemplateService = new AttributeMatrixTemplateService( rockContextEmail );
                 rockContextEmail.WrapTransaction( () =>
                 {
-                    rockContextEmail.AttributeMatrixTemplates.Add( attributeMatrixTemplateEmail );
+                    attributeMatrixTemplateService.Add( attributeMatrixTemplateEmail );
                     rockContextEmail.SaveChanges();
                 } );
 
-                var attributeMatrixTemplateEmailId = new AttributeMatrixTemplateService( rockContextEmail ).Get( KFSConst.Attribute.ATTRIBUTE_MATRIX_TEMPLATE_SCHEDULED_EMAILS.AsGuid() ).Id.ToString();
+                var attributeMatrixTemplateEmailId = attributeMatrixTemplateService.Get( KFSConst.Attribute.ATTRIBUTE_MATRIX_TEMPLATE_SCHEDULED_EMAILS.AsGuid() ).Id.ToString();
 
                 // send date time
                 RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.AttributeMatrixItem", Rock.SystemGuid.FieldType.DATE_TIME, "AttributeMatrixTemplateId", attributeMatrixTemplateEmailId, "Send Date Time", "", 0, "", KFSConst.Attribute.MATRIX_ATTRIBUTE_EMAIL_SEND_DATE, "rocks.kfs.ScheduledGroupCommunication.EmailSendDateTime" );
@@ -209,13 +212,14 @@ namespace rocks.kfs.ScheduledGroupCommunication.Migrations
                 };
 
                 var rockContextSMS = new RockContext();
+                var attributeMatrixTemplateServiceSMS = new AttributeMatrixTemplateService( rockContextSMS );
                 rockContextSMS.WrapTransaction( () =>
                 {
-                    rockContextSMS.AttributeMatrixTemplates.Add( attributeMatrixTemplateSMS );
+                    attributeMatrixTemplateServiceSMS.Add( attributeMatrixTemplateSMS );
                     rockContextSMS.SaveChanges();
                 } );
 
-                var attributeMatrixTemplateSMSId = new AttributeMatrixTemplateService( rockContextSMS ).Get( KFSConst.Attribute.ATTRIBUTE_MATRIX_TEMPLATE_SCHEDULED_SMS.AsGuid() ).Id.ToString();
+                var attributeMatrixTemplateSMSId = attributeMatrixTemplateServiceSMS.Get( KFSConst.Attribute.ATTRIBUTE_MATRIX_TEMPLATE_SCHEDULED_SMS.AsGuid() ).Id.ToString();
 
                 // send date time
                 RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.AttributeMatrixItem", Rock.SystemGuid.FieldType.DATE_TIME, "AttributeMatrixTemplateId", attributeMatrixTemplateSMSId, "Send Date Time", "", 0, "", KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_SEND_DATE, "rocks.kfs.ScheduledGroupCommunication.SMSSendDateTime" );
@@ -275,12 +279,13 @@ namespace rocks.kfs.ScheduledGroupCommunication.Migrations
             RockMigrationHelper.DeleteAttribute( KFSConst.Attribute.MATRIX_ATTRIBUTE_SMS_MESSAGE );
 
             var rockContext = new RockContext();
-            var attributeMatrixTemplateEmail = new AttributeMatrixTemplateService( rockContext ).Get( KFSConst.Attribute.ATTRIBUTE_MATRIX_TEMPLATE_SCHEDULED_EMAILS.AsGuid() );
-            var attributeMatrixTemplateSMS = new AttributeMatrixTemplateService( rockContext ).Get( KFSConst.Attribute.ATTRIBUTE_MATRIX_TEMPLATE_SCHEDULED_SMS.AsGuid() );
+            var attributeMatrixTemplateService = new AttributeMatrixTemplateService( rockContext );
+            var attributeMatrixTemplateEmail = attributeMatrixTemplateService.Get( KFSConst.Attribute.ATTRIBUTE_MATRIX_TEMPLATE_SCHEDULED_EMAILS.AsGuid() );
+            var attributeMatrixTemplateSMS = attributeMatrixTemplateService.Get( KFSConst.Attribute.ATTRIBUTE_MATRIX_TEMPLATE_SCHEDULED_SMS.AsGuid() );
             rockContext.WrapTransaction( () =>
             {
-                rockContext.AttributeMatrixTemplates.Remove( attributeMatrixTemplateEmail );
-                rockContext.AttributeMatrixTemplates.Remove( attributeMatrixTemplateSMS );
+                attributeMatrixTemplateService.Delete( attributeMatrixTemplateEmail );
+                attributeMatrixTemplateService.Delete( attributeMatrixTemplateSMS );
                 rockContext.SaveChanges();
             } );
         }

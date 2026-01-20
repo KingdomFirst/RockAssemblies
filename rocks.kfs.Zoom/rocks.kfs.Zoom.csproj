@@ -79,6 +79,9 @@
     <Reference Include="Rock.Common">
       <HintPath>..\..\RockWeb\Bin\Rock.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Rock.Enums">
+      <HintPath>..\..\RockWeb\Bin\Rock.Enums.dll</HintPath>
+    </Reference>
     <Reference Include="Rock.Lava.Shared">
       <HintPath>..\..\RockWeb\Bin\Rock.Lava.Shared.dll</HintPath>
     </Reference>

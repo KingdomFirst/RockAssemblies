@@ -62,7 +62,11 @@ namespace rocks.kfs.Zoom
                 LogEvent( rockContext, "SyncZoom", "Sync Zoom Rooms Defined Type", "Started" );
             }
             var zoom = Api();
-            var zrList = zoom.GetZoomRoomList( type: RoomType.ZoomRoom ).OrderBy( r => r.Name );
+            var zrList = zoom.GetZoomRoomList( type: RoomType.ZoomRoom )?.OrderBy( r => r.Name )?.ToList();
+            if ( zrList == null )
+            {
+                zrList = new List<ZoomRoom>();
+            }
             if ( enableLogging )
             {
                 LogEvent( rockContext, "SyncZoom", "Get Zoom Rooms using Zoom API", string.Format( "zoom.GetZoomRoomList() found {0} rooms.", zrList.Count() ) );

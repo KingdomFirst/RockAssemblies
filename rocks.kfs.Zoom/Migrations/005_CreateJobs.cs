@@ -20,7 +20,7 @@ using Rock.Plugin;
 
 namespace rocks.kfs.Zoom.Migrations
 {
-    [MigrationNumber( 5, "1.12.4" )]
+    [MigrationNumber( 5, "1.13" )]
     public partial class CreateJobs : Migration
     {
         /// <summary>

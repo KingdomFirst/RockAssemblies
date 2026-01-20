@@ -78,9 +78,14 @@ namespace rocks.kfs.ScheduledGroupCommunication.SystemGuid
         public const string MATRIX_ATTRIBUTE_SMS_SEND_RECURRENCE = "EC6D13F7-A256-4B03-A94B-3B713F26E62D";
 
         /// <summary>
-        /// The matrix attribute for SMS from address
+        /// The matrix attribute for SMS from phone number
         /// </summary>
         public const string MATRIX_ATTRIBUTE_SMS_FROM_NUMBER = "1984A561-C4A9-4D4F-B366-23AD54BDCFE8";
+
+        /// <summary>
+        /// The matrix attribute for SMS from System Phone Number
+        /// </summary>
+        public const string MATRIX_ATTRIBUTE_SMS_FROM_NUMBER_SYSTEM_PHONE = "A97CA985-53F5-4C0C-8827-FBB0B082162E";
 
         /// <summary>
         /// The matrix attribute for SMS message

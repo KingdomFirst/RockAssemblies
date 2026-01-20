@@ -25,6 +25,7 @@ using Quartz;
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
+using Rock.Jobs;
 using Rock.Model;
 
 namespace rocks.kfs.RoundRobinGroupAssignment.Jobs
@@ -116,7 +117,7 @@ namespace rocks.kfs.RoundRobinGroupAssignment.Jobs
 
 
     [DisallowConcurrentExecution]
-    public class RoundRobinGroupAssignment : IJob
+    public class RoundRobinGroupAssignment : RockJob
     {
         /// <summary>
         /// Attribute Keys
@@ -146,20 +147,18 @@ namespace rocks.kfs.RoundRobinGroupAssignment.Jobs
         /// <summary>
         /// Executes the specified context.
         /// </summary>
-        /// <param name="context">The context.</param>
-        public virtual void Execute( IJobExecutionContext context )
+        public override void Execute()
         {
-            JobDataMap dataMap = context.JobDetail.JobDataMap;
 
-            var dataViewGuid = dataMap.GetString( AttributeKey.PeopleToAddDataView ).AsGuidOrNull();
-            var groupIds = dataMap.GetString( AttributeKey.GroupsToCycleThrough ).StringToIntList().ToList();
-            var defaultGroupGuid = dataMap.GetString( AttributeKey.DefaultGroup ).AsGuidOrNull();
-            var defaultCampusGuid = dataMap.GetString( AttributeKey.DefaultCampus ).AsGuidOrNull();
-            var includeSelectedGroups = dataMap.GetBooleanFromString( AttributeKey.IncludeSelectedGroups );
-            var includeFamilyMembers = dataMap.GetString( AttributeKey.IncludeFamilyMembers );
-            var outputErrors = dataMap.GetBooleanFromString( AttributeKey.OutputErrors );
-            var useGroupCampus = dataMap.GetBooleanFromString( AttributeKey.UseGroupCampus );
-            var removeMembers = dataMap.GetBooleanFromString( AttributeKey.RemoveMembers );
+            var dataViewGuid = GetAttributeValue( AttributeKey.PeopleToAddDataView ).AsGuidOrNull();
+            var groupIds = GetAttributeValue( AttributeKey.GroupsToCycleThrough ).StringToIntList().ToList();
+            var defaultGroupGuid = GetAttributeValue( AttributeKey.DefaultGroup ).AsGuidOrNull();
+            var defaultCampusGuid = GetAttributeValue( AttributeKey.DefaultCampus ).AsGuidOrNull();
+            var includeSelectedGroups = GetAttributeValue( AttributeKey.IncludeSelectedGroups ).AsBoolean();
+            var includeFamilyMembers = GetAttributeValue( AttributeKey.IncludeFamilyMembers );
+            var outputErrors = GetAttributeValue( AttributeKey.OutputErrors ).AsBoolean();
+            var useGroupCampus = GetAttributeValue( AttributeKey.UseGroupCampus ).AsBoolean();
+            var removeMembers = GetAttributeValue( AttributeKey.RemoveMembers ).AsBoolean();
             var addedCount = 0;
             var peopleRemoved = 0;
 
@@ -336,10 +335,10 @@ namespace rocks.kfs.RoundRobinGroupAssignment.Jobs
                     }
                 }
             }
-            context.Result += string.Format( "{0} {1} added to groups.", addedCount, "person".PluralizeIf( addedCount > 1 ) );
+            Result += string.Format( "{0} {1} added to groups.", addedCount, "person".PluralizeIf( addedCount > 1 ) );
             if ( removeMembers )
             {
-                context.Result += string.Format( "<br>{0} {1} removed from groups.", peopleRemoved, "person".PluralizeIf( peopleRemoved > 1 ) );
+                Result += string.Format( "<br>{0} {1} removed from groups.", peopleRemoved, "person".PluralizeIf( peopleRemoved > 1 ) );
             }
 
             if ( errorMessages.Any() )
@@ -352,7 +351,7 @@ namespace rocks.kfs.RoundRobinGroupAssignment.Jobs
                 string errors = sb.ToString();
                 if ( outputErrors )
                 {
-                    context.Result += errors;
+                    Result += errors;
                 }
                 // Log errors as exceptions if addedCount == 0 or errors are not output to Job history.
                 if ( addedCount == 0 || !outputErrors )

@@ -316,6 +316,11 @@ namespace rocks.kfs.Eventbrite
 
         private static void SyncAttendee( RockContext rockContext, Attendee attendee, Order order, Group group, GroupMemberService groupMemberService, PersonAliasService personAliasService, AttendanceOccurrence occ, long evntid, bool IsRSVPEvent, string gmPersonAttributeKey, bool updatePrimaryEmail, int recordStatusId = 5, int connectionStatusId = 66, bool EnableLogging = false, List<string> groupMembersAdded = null )
         {
+            if ( attendee.Profile.Email == "Info Requested" || attendee.Profile.First_Name == "Info Requested" || attendee.Profile.Last_Name == "Info Requested" )
+            {
+                return;
+            }
+
             // If the groupMembersAdded list comes in as null we need to be able to identify it did, as in the case of a webhook call with an individual order. 
             if ( groupMembersAdded == null )
             {

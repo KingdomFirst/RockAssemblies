@@ -19,6 +19,7 @@ using Rock;
 using Rock.Attribute;
 using Rock.Communication;
 using Rock.Data;
+using Rock.Jobs;
 using Rock.Logging;
 using Rock.Model;
 using System;
@@ -74,7 +75,7 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
     #endregion Job Attributes
 
     [DisallowConcurrentExecution]
-    public class CustomMeetingGroupReminder : IJob
+    public class CustomMeetingGroupReminder : RockJob
     {
         /// <summary>
         /// Attribute Keys
@@ -104,11 +105,9 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
         /// <summary>
         /// Executes the specified context.
         /// </summary>
-        /// <param name="context">The context.</param>
-        public virtual void Execute( IJobExecutionContext context )
+        public override void Execute()
         {
             var rockContext = new RockContext();
-            var dataMap = context.JobDetail.JobDataMap;
             var groupsToNotify = new Dictionary<Group, List<DateTime>>();
 
             // Get the schedule dates that apply
@@ -117,7 +116,7 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
             //dates.Add( RockDateTime.Today );
             try
             {
-                List<int> reminderDays = dataMap.GetString( AttributeKey.DaysPrior ).Split( ',' ).Select( d => Convert.ToInt32( d.Trim() ) ).ToList();
+                List<int> reminderDays = GetAttributeValue( AttributeKey.DaysPrior ).Split( ',' ).Select( d => Convert.ToInt32( d.Trim() ) ).ToList();
                 foreach ( int reminderDay in reminderDays )
                 {
                     var reminderDate = RockDateTime.Today.AddDays( reminderDay );
@@ -132,8 +131,8 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
             var startDateSearch = dates.Min();
             var endDateSearch = dates.Max().AddDays( 1 );
 
-            var groupAttributeSetting = dataMap.GetString( AttributeKey.GroupAttributeSetting ).AsGuid();
-            var daysPrior = dataMap.GetDouble( AttributeKey.DaysPrior );
+            var groupAttributeSetting = GetAttributeValue( AttributeKey.GroupAttributeSetting ).AsGuid();
+            var daysPrior = GetAttributeValue( AttributeKey.DaysPrior ).AsDouble();
             var groupQuery = new GroupService( rockContext )
                             .Queryable( "Schedule" )
                             .Where( g =>
@@ -199,12 +198,12 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
                 }
             }
 
-            context.Result = "0 meeting reminders sent.";
+            Result = "0 meeting reminders sent.";
 
-            var systemCommunicationGuid = dataMap.GetString( AttributeKey.SystemCommunication ).AsGuid();
+            var systemCommunicationGuid = GetAttributeValue( AttributeKey.SystemCommunication ).AsGuid();
             var systemCommunication = new SystemCommunicationService( rockContext ).Get( systemCommunicationGuid );
 
-            var jobPreferredCommunicationType = ( CommunicationType ) dataMap.GetString( AttributeKey.SendUsing ).AsInteger();
+            var jobPreferredCommunicationType = ( CommunicationType ) GetAttributeValue( AttributeKey.SendUsing ).AsInteger();
             var isSmsEnabled = MediumContainer.HasActiveSmsTransport() && !string.IsNullOrWhiteSpace( systemCommunication.SMSMessage );
             var isPushEnabled = MediumContainer.HasActivePushTransport() && !string.IsNullOrWhiteSpace( systemCommunication.PushData );
 
@@ -215,7 +214,7 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
                 {
                     $"The job is setup to send via SMS but either SMS isn't enabled or no SMS message was found in system communication {systemCommunication.Title}."
                 };
-                HandleErrorMessages( context, errorMessages );
+                HandleErrorMessages( errorMessages );
             }
 
             if ( jobPreferredCommunicationType == CommunicationType.PushNotification && !isPushEnabled )
@@ -225,7 +224,7 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
                 {
                     $"The job is setup to send via Push Notification but either Push Notifications are not enabled or no Push message was found in system communication {systemCommunication.Title}."
                 };
-                HandleErrorMessages( context, errorMessages );
+                HandleErrorMessages( errorMessages );
             }
 
             var results = new StringBuilder();
@@ -250,17 +249,17 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
 
             if ( groupsToNotify.Any() )
             {
-                meetingRemindersResults = SendMeetingReminders( context, rockContext, groupsToNotify, systemCommunication, jobPreferredCommunicationType, isSmsEnabled, isPushEnabled );
+                meetingRemindersResults = SendMeetingReminders( rockContext, groupsToNotify, systemCommunication, jobPreferredCommunicationType, isSmsEnabled, isPushEnabled );
             }
 
 
-            results.AppendLine( $"{notificationEmails + notificationSms + notificationPush } meeting reminders sent." );
+            results.AppendLine( $"{notificationEmails + notificationSms + notificationPush} meeting reminders sent." );
 
             results.AppendLine( string.Format( "- {0} email(s)\n- {1} SMS message(s)\n- {2} push notification(s)", notificationEmails, notificationSms, notificationPush ) );
 
             //results.Append( FormatWarningMessages( meetingRemindersResults.Warnings ) );
 
-            context.Result = results.ToString();
+            Result = results.ToString();
             //HandleErrorMessages( context, meetingRemindersResults.Errors );
         }
 
@@ -275,8 +274,7 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
         /// <param name="isSmsEnabled">if set to <c>true</c> [is SMS enabled].</param>
         /// <param name="isPushEnabled">if set to <c>true</c> [is push enabled].</param>
         /// <returns></returns>
-        private SendMessageResult SendMeetingReminders( IJobExecutionContext context,
-                        RockContext rockContext,
+        private SendMessageResult SendMeetingReminders( RockContext rockContext,
                         Dictionary<Group, List<DateTime>> groups,
                         SystemCommunication systemCommunication,
                         CommunicationType jobPreferredCommunicationType,
@@ -411,7 +409,7 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
                 sb.Append( string.Format( "{0} Errors: ", errorCount ) );
                 errorMessages.ForEach( e => { sb.AppendLine(); sb.Append( e ); } );
                 string errors = sb.ToString();
-                context.Result += errors;
+                Result += errors;
                 var exception = new Exception( errors );
                 HttpContext context2 = HttpContext.Current;
                 ExceptionLogService.LogException( exception, context2 );
@@ -426,17 +424,17 @@ namespace rocks.kfs.CustomGroupCommunication.Jobs
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="errorMessages">The error messages.</param>
-        private void HandleErrorMessages( IJobExecutionContext context, List<string> errorMessages )
+        private void HandleErrorMessages( List<string> errorMessages )
         {
             if ( errorMessages.Any() )
             {
-                StringBuilder sb = new StringBuilder( context.Result.ToString() );
+                StringBuilder sb = new StringBuilder( Result.ToString() );
 
                 sb.Append( FormatMessages( errorMessages, "Error" ) );
 
                 var resultMessage = sb.ToString();
 
-                context.Result = resultMessage;
+                Result = resultMessage;
 
                 var exception = new Exception( resultMessage );
 

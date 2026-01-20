@@ -54,6 +54,9 @@
     <Reference Include="Rock.Common">
       <HintPath>..\..\RockWeb\Bin\Rock.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Rock.Enums">
+      <HintPath>..\..\RockWeb\Bin\Rock.Enums.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
@@ -67,6 +70,7 @@
   <ItemGroup>
     <Compile Include="Jobs\SendScheduledGroupEmail.cs" />
     <Compile Include="Jobs\SendScheduledGroupSMS.cs" />
+    <Compile Include="Migrations\004_SystemPhoneSupport.cs" />
     <Compile Include="Migrations\001_AddSystemData.cs" />
     <Compile Include="Migrations\003_AddDailyRecurrence.cs" />
     <Compile Include="Migrations\002_AddRecurrenceAttribute.cs" />

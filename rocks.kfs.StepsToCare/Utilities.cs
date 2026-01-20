@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2024 by Kingdom First Solutions
+// Copyright 2025 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ namespace rocks.kfs.StepsToCare
             var careNeedService = new CareNeedService( rockContext );
             var careWorkerService = new CareWorkerService( rockContext );
             var careAssigneeService = new AssignedPersonService( rockContext );
+            var careNeedHistory = new History.HistoryChangeList();
 
             // reload careNeed to fully populate child properties
             if ( !previewAssigned )
@@ -54,6 +55,7 @@ namespace rocks.kfs.StepsToCare
             var careWorkers = careWorkerService.Queryable().AsNoTracking().Where( cw => cw.IsActive );
 
             var addedWorkerAliasIds = new List<int?>();
+            var closedStatusId = DefinedValueCache.Get( rocks.kfs.StepsToCare.SystemGuid.DefinedValue.CARE_NEED_STATUS_CLOSED ).Id;
 
             // auto assign Deacon/Worker by Geofence
             if ( autoAssignWorkerGeofence && !roundRobinOnly )
@@ -89,9 +91,14 @@ namespace rocks.kfs.StepsToCare
                             careAssignee.PersonAliasId = worker.PersonAliasId;
                             careAssignee.WorkerId = worker.Id;
                             careAssignee.Type = AssignedType.Geofence;
+                            careAssignee.FollowUpWorker = false;
 
                             assignedPeople.Add( careAssignee );
                             addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
+
+                            string newStringValue = History.GetValue<PersonAlias>( worker.PersonAlias, worker.PersonAliasId, rockContext, "" );
+                            careNeedHistory.AddChange( History.HistoryVerb.Add, History.HistoryChangeType.Record, "Assign Person", null, newStringValue ).SourceOfChange = "Geofence Assignment";
+                            AddPersonHistory( rockContext, careNeed, careNeed.PersonAlias.Person, worker.PersonAlias, "ASSIGNED", "Geofence Assignment" );
                         }
                     }
                     else if ( homeLocation != null && homeLocation.GeoPoint == null )
@@ -114,10 +121,9 @@ namespace rocks.kfs.StepsToCare
                 }
                 var careWorkersNoFence = careWorkers.Where( cw => cw.GeoFenceId == null );
                 var workerAssigned = false;
-                var closedId = DefinedValueCache.Get( rocks.kfs.StepsToCare.SystemGuid.DefinedValue.CARE_NEED_STATUS_CLOSED ).Id;
 
                 // Campus, Category, Ignore Age Range and Gender
-                var careWorkerCount1 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, true, true, true );
+                var careWorkerCount1 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, true, true, true );
 
                 if ( enableLogging )
                 {
@@ -125,7 +131,7 @@ namespace rocks.kfs.StepsToCare
                 }
 
                 // Category, Ignore Age Range and Gender
-                var careWorkerCount2 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, false, true, true );
+                var careWorkerCount2 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, false, true, true );
 
                 if ( enableLogging )
                 {
@@ -133,7 +139,7 @@ namespace rocks.kfs.StepsToCare
                 }
 
                 // Campus, Ignore Age Range and Gender
-                var careWorkerCount3 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, true, false, true );
+                var careWorkerCount3 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, true, false, true );
 
                 if ( enableLogging )
                 {
@@ -141,7 +147,7 @@ namespace rocks.kfs.StepsToCare
                 }
 
                 // None, doesn't include parameters for other values though.
-                var careWorkerCount4 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, false, false, true );
+                var careWorkerCount4 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, false, false, true );
 
                 if ( enableLogging )
                 {
@@ -167,52 +173,52 @@ namespace rocks.kfs.StepsToCare
                 if ( childAssignment )
                 {
                     // AgeRange, Gender, Campus, Category
-                    careWorkersCountChild1 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, true, true, true );
+                    careWorkersCountChild1 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, true, true, true );
 
                     // AgeRange, Gender, Category
-                    careWorkersCountChild2 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, true, false, true );
+                    careWorkersCountChild2 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, true, false, true );
 
                     // AgeRange, Gender, Campus
-                    careWorkersCountChild3 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, true, true, false );
+                    careWorkersCountChild3 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, true, true, false );
 
                     // AgeRange, Campus, Category
-                    careWorkersCountChild4 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, false, true, true );
+                    careWorkersCountChild4 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, false, true, true );
 
                     // Gender, Campus, Category
-                    careWorkersCountChild5 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, true, true, true );
+                    careWorkersCountChild5 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, true, true, true );
 
                     // AgeRange, Gender
-                    careWorkersCountChild6 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, true, false, false );
+                    careWorkersCountChild6 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, true, false, false );
 
                     // AgeRange, Category
-                    careWorkersCountChild7 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, false, false, true );
+                    careWorkersCountChild7 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, false, false, true );
 
                     // AgeRange, Campus
-                    careWorkersCountChild8 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, false, true, false );
+                    careWorkersCountChild8 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, false, true, false );
 
                     // Gender, Category
-                    careWorkersCountChild9 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, true, false, true );
+                    careWorkersCountChild9 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, true, false, true );
 
                     // Gender, Campus
-                    careWorkersCountChild10 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, true, true, false );
+                    careWorkersCountChild10 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, true, true, false );
 
                     // Campus, Category
-                    careWorkersCountChild11 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, true, true );
+                    careWorkersCountChild11 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, true, true );
 
                     // AgeRange
-                    careWorkersCountChild12 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, true, false, false, false );
+                    careWorkersCountChild12 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, true, false, false, false );
 
                     // Gender
-                    careWorkersCountChild13 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, true, false, false );
+                    careWorkersCountChild13 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, true, false, false );
 
                     // Category
-                    careWorkersCountChild14 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, false, true );
+                    careWorkersCountChild14 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, false, true );
 
                     // Campus
-                    careWorkersCountChild15 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, true, false );
+                    careWorkersCountChild15 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, true, false );
 
                     // None
-                    careWorkersCountChild16 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedId, false, false, false, false );
+                    careWorkersCountChild16 = GenerateAgeQuery( careNeed, careWorkersNoFence, closedStatusId, false, false, false, false );
                 }
 
                 var careWorkerCounts = careWorkerCount1;
@@ -377,6 +383,11 @@ namespace rocks.kfs.StepsToCare
                         assignedPeople.Add( careAssignee );
                         addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
 
+                        string sourceOfChange = $"Worker Assignment [Count: {workerCount.Count}]";
+                        string newStringValue = History.GetValue<PersonAlias>( worker.PersonAlias, worker.PersonAliasId, rockContext, "" );
+                        careNeedHistory.AddChange( History.HistoryVerb.Add, History.HistoryChangeType.Record, "Assign Person", null, newStringValue ).SourceOfChange = sourceOfChange;
+                        AddPersonHistory( rockContext, careNeed, careNeed.PersonAlias.Person, worker.PersonAlias, "ASSIGNED", sourceOfChange );
+
                         workerAssigned = true;
 
                         if ( enableLogging )
@@ -416,10 +427,16 @@ namespace rocks.kfs.StepsToCare
                                 careAssignee.CareNeed = careNeed;
                                 careAssignee.PersonAliasId = member.Person.PrimaryAliasId;
                                 careAssignee.Type = AssignedType.GroupRole;
-                                careAssignee.TypeQualifier = $"{member.GroupRoleId}^{member.GroupTypeId}^{member.Group.GroupType.Name} > {member.GroupRole.Name}";
+                                careAssignee.TypeQualifier = $"{member.GroupRoleId}^{member.GroupTypeId}^{member.Group.GroupType.Name} > {member.GroupRole.Name}^{member.Group.Id}^{member.Group.GroupType.Name} > {member.Group.Name} > {member.GroupRole.Name}";
+                                careAssignee.FollowUpWorker = false;
 
                                 assignedPeople.Add( careAssignee );
                                 addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
+
+                                string sourceOfChange = $"Group Role Assignment - {member.Group.GroupType.Name} > {member.Group.Name} [{member.GroupId}] > {member.GroupRole.Name}";
+                                string newStringValue = History.GetValue<PersonAlias>( member.Person.PrimaryAlias, member.Person.PrimaryAliasId, rockContext, "" );
+                                careNeedHistory.AddChange( History.HistoryVerb.Add, History.HistoryChangeType.Record, "Assign Person", null, newStringValue ).SourceOfChange = sourceOfChange;
+                                AddPersonHistory( rockContext, careNeed, careNeed.PersonAlias.Person, member.Person.PrimaryAlias, "ASSIGNED", sourceOfChange );
                             }
                         }
                         if ( enableLogging )
@@ -429,12 +446,160 @@ namespace rocks.kfs.StepsToCare
                     }
                 }
             }
+
+            if ( careNeed.CategoryValueId.HasValue )
+            {
+                Guid matrixGuid = Guid.Empty;
+                var categoryGroups = new List<int>();
+                if ( careNeed.Category != null )
+                {
+                    matrixGuid = careNeed.Category.GetAttributeValue( "CareTouchTemplates" ).AsGuid();
+                    categoryGroups = careNeed.Category.GetAttributeValues( "AssignToGroups" ).AsIntegerList();
+                }
+                else
+                {
+                    var catCache = DefinedValueCache.Get( careNeed.CategoryValueId.Value );
+                    matrixGuid = catCache.GetAttributeValue( "CareTouchTemplates" ).AsGuid();
+                    categoryGroups = catCache.GetAttributeValues( "AssignToGroups" ).AsIntegerList();
+                }
+                var touchTemplates = new List<TouchTemplate>();
+                if ( matrixGuid != Guid.Empty )
+                {
+                    var matrix = new AttributeMatrixService( rockContext ).Get( matrixGuid );
+                    if ( matrix != null )
+                    {
+                        foreach ( var matrixItem in matrix.AttributeMatrixItems )
+                        {
+                            matrixItem.LoadAttributes();
+
+                            var noteTemplateGuid = matrixItem.GetAttributeValue( "NoteTemplate" ).AsGuid();
+                            var noteTemplate = new NoteTemplateService( rockContext ).Get( noteTemplateGuid );
+
+                            if ( noteTemplate != null )
+                            {
+                                // only load the properties we need to use in the following code, hopefully lighten the attribute call.
+                                var touchTemplate = new TouchTemplate();
+                                touchTemplate.NoteTemplate = noteTemplate;
+                                touchTemplate.MinimumCareTouches = matrixItem.GetAttributeValue( "MinimumCareTouches" ).AsInteger();
+                                touchTemplate.MinimumCareTouchHours = matrixItem.GetAttributeValue( "MinimumCareTouchHours" ).AsInteger();
+                                touchTemplate.AssignToGroups = matrixItem.GetAttributeValues( "AssignToGroups" ).AsIntegerList();
+                                touchTemplate.Order = matrixItem.Order;
+
+                                touchTemplates.Add( touchTemplate );
+                            }
+                        }
+                    }
+                }
+
+                var currentlyAssignedPeople = careAssigneeService.Queryable().AsNoTracking();
+
+                if ( categoryGroups.Any() )
+                {
+                    foreach ( var groupId in categoryGroups )
+                    {
+                        AssignToGroupMember( careNeed, enableLogging, assignedPeople, rockContext, careAssigneeService, addedWorkerAliasIds, closedStatusId, groupId, currentlyAssignedPeople, careNeedHistory: careNeedHistory );
+                    }
+                }
+
+                if ( touchTemplates.Any( t => t.AssignToGroups.Any() ) )
+                {
+                    foreach ( var touchTemplate in touchTemplates.Where( t => t.AssignToGroups.Any() ).OrderBy( t => t.Order ) )
+                    {
+                        foreach ( var groupId in touchTemplate.AssignToGroups )
+                        {
+                            AssignToGroupMember( careNeed, enableLogging, assignedPeople, rockContext, careAssigneeService, addedWorkerAliasIds, closedStatusId, groupId, currentlyAssignedPeople, touchTemplate, careNeedHistory: careNeedHistory );
+                        }
+                    }
+                }
+            }
+
             if ( !previewAssigned )
             {
                 careAssigneeService.AddRange( assignedPeople );
-                rockContext.SaveChanges();
+                rockContext.WrapTransaction( () =>
+                {
+                    if ( rockContext.SaveChanges() > 0 )
+                    {
+                        if ( careNeedHistory.Any() )
+                        {
+                            HistoryService.SaveChanges(
+                                rockContext,
+                                typeof( CareNeed ),
+                                SystemGuid.Category.HISTORY_CARE_NEED.AsGuid(),
+                                careNeed.Id,
+                                careNeedHistory,
+                                "Auto Assign People",
+                                null,
+                                null
+                            );
+                        }
+                    }
+                } );
             }
             return assignedPeople;
+        }
+
+        private static void AssignToGroupMember( CareNeed careNeed, bool enableLogging, List<AssignedPerson> assignedPeople, RockContext rockContext, AssignedPersonService careAssigneeService, List<int?> addedWorkerAliasIds, int closedStatusId, int groupId, IQueryable<AssignedPerson> currentlyAssignedPeople, TouchTemplate touchTemplate = null, History.HistoryChangeList careNeedHistory = null )
+        {
+            if ( careNeedHistory == null )
+            {
+                careNeedHistory = new History.HistoryChangeList();
+            }
+
+            var groupMemberService = new GroupMemberService( rockContext );
+
+            var groupMembers = groupMemberService
+                .GetByGroupId( groupId )
+                .AsNoTracking()
+                .Where( gm => !gm.IsArchived
+                              && gm.GroupMemberStatus == GroupMemberStatus.Active )
+                .OrderBy( gm => currentlyAssignedPeople.Count( ap => ap.PersonAlias.PersonId == gm.Person.Id && ap.CareNeed.StatusValueId != closedStatusId ) )
+                .ThenBy( gm => currentlyAssignedPeople.Where( ap => ap.PersonAlias.PersonId == gm.Person.Id ).OrderByDescending( ap => ap.CreatedDateTime ).Select( ap => ap.CreatedDateTime ).FirstOrDefault() )
+                .ToList();
+
+            var groupMemberAssignedCount = 0;
+            foreach ( var gm in groupMembers )
+            {
+                if ( !addedWorkerAliasIds.Contains( gm.Person.PrimaryAliasId ) && gm.Person.PrimaryAlias != null && gm.Person.PrimaryAliasId != careNeed.PersonAliasId && careAssigneeService.GetByPersonAliasAndCareNeed( gm.Person.PrimaryAlias.Id, careNeed.Id ) == null )
+                {
+                    var sourceOfChange = "";
+                    var careAssignee = new AssignedPerson { Id = 0 };
+                    careAssignee.CareNeed = careNeed;
+                    careAssignee.PersonAliasId = gm.Person.PrimaryAliasId;
+                    careAssignee.FollowUpWorker = false;
+                    if ( touchTemplate != null )
+                    {
+                        careAssignee.Type = AssignedType.TouchTemplateGroup;
+                        careAssignee.TypeQualifier = $"{touchTemplate.NoteTemplate.Note}^{touchTemplate.MinimumCareTouches}^{gm.Group.Id}^{gm.Group.Name}^{gm.Id}^{currentlyAssignedPeople.Count( ap => ap.PersonAlias.PersonId == gm.Person.Id )}^{touchTemplate.MinimumCareTouchHours}";
+                        // This TypeQualifier could have a tighter connection to the attribute matrix touch template if we somehow identified the touch template, such as using an attribute or attribute value id.
+                        sourceOfChange = $"Touch Template Assignment - {touchTemplate.NoteTemplate.Note} ({gm.Group.Name} [{gm.GroupId}])";
+                    }
+                    else
+                    {
+                        careAssignee.Type = AssignedType.CategoryGroup;
+                        careAssignee.TypeQualifier = $"{careNeed.CategoryValueId}^{careNeed.Category?.Value ?? DefinedValueCache.Get( careNeed.CategoryValueId.Value ).Value}^{gm.Group.Id}^{gm.Group.Name}^{gm.Id}^{currentlyAssignedPeople.Count( ap => ap.PersonAlias.PersonId == gm.Person.Id )}";
+                        sourceOfChange = $"Category Assignment - {careNeed.Category?.Value ?? DefinedValueCache.Get( careNeed.CategoryValueId.Value ).Value} ({gm.Group.Name} [{gm.GroupId}])";
+
+                    }
+                    assignedPeople.Add( careAssignee );
+                    addedWorkerAliasIds.Add( careAssignee.PersonAliasId );
+
+                    string newStringValue = History.GetValue<PersonAlias>( gm.Person.PrimaryAlias, gm.Person.PrimaryAliasId, rockContext, "" );
+                    careNeedHistory.AddChange( History.HistoryVerb.Add, History.HistoryChangeType.Record, "Assign Person", null, newStringValue ).SourceOfChange = sourceOfChange;
+                    AddPersonHistory( rockContext, careNeed, careNeed.PersonAlias.Person, gm.Person.PrimaryAlias, "ASSIGNED", sourceOfChange );
+
+                    groupMemberAssignedCount++;
+                    if ( touchTemplate == null || groupMemberAssignedCount >= touchTemplate.MinimumCareTouches )
+                    {
+                        break;
+                    }
+
+                    if ( enableLogging )
+                    {
+                        LogEvent( null, "AutoAssignWorkers", string.Format( "Care Need Guid: {0}, GroupMember.Id: {1}, PersonId: {2}", careNeed.Guid, gm.Id, gm.PersonId ), "TouchTemplate GroupMember Assigned" );
+                    }
+                }
+            }
         }
 
         public static void SendWorkerNotification( RockContext rockContext, CareNeed careNeed, bool isNew, List<AssignedPerson> newlyAssignedPersons, Guid? assignmentEmailTemplateGuid, RockPage rockPage = null, string detailPagePath = "", string dashboardPagePath = "", Person person = null )
@@ -602,6 +767,7 @@ namespace rocks.kfs.StepsToCare
             return tempQuery.Select( cw => new WorkerResult
             {
                 Count = cw.AssignedPersons.Where( ap => ap.CareNeed != null && ap.CareNeed.StatusValueId != closedId ).Count(),
+                LastAssignmentDate = cw.AssignedPersons.Where( ap => ap.CareNeed != null && ap.CareNeed.StatusValueId != closedId ).OrderByDescending( ap => ap.CreatedDateTime ).Select( ap => ap.CreatedDateTime ).FirstOrDefault(),
                 Worker = cw,
                 HasCategory = includeCategory,
                 HasCampus = includeCampus,
@@ -610,8 +776,55 @@ namespace rocks.kfs.StepsToCare
             }
                                     )
                                     .OrderBy( cw => cw.Count )
+                                    .ThenBy( cw => cw.LastAssignmentDate )
                                     .ThenBy( cw => cw.Worker.CategoryValues.Contains( careNeed.CategoryValueId.ToString() ) )
                                     .ThenBy( cw => cw.Worker.Campuses.Contains( careNeed.CampusId.ToString() ) );
+        }
+
+
+        public static void AddPersonHistory( RockContext rockContext, CareNeed careNeed, Person person, PersonAlias assignedPersonAlias, string historyVerb, string sourceOfChange = null, bool commitSave = false )
+        {
+            var assignedPersonHistory = new History.HistoryChangeList();
+            assignedPersonHistory.AddCustom( historyVerb, "Record", $"{assignedPersonAlias.Person.FullName} [{assignedPersonAlias.PersonId}]</span> {( ( historyVerb == "ASSIGNED" ) ? "to" : "from" )} Care Need [{careNeed.Id}] for <span class='field-value'>{person.FullName}</span><span class='field-value'>" ).SourceOfChange = sourceOfChange;
+            if ( assignedPersonHistory.Any() )
+            {
+                HistoryService.SaveChanges(
+                    rockContext,
+                    typeof( Person ),
+                    SystemGuid.Category.HISTORY_PERSON_STEPS_TO_CARE.AsGuid(),
+                    assignedPersonAlias.PersonId,
+                    assignedPersonHistory,
+                    $"Care Need for {person.FullName}",
+                    typeof( CareNeed ),
+                    careNeed.Id,
+                    commitSave );
+            }
+        }
+
+        public static DefinedValue DefinedValueFromCache( string definedValueGuid )
+        {
+            var definedValueCache = DefinedValueCache.Get( definedValueGuid );
+
+            if ( definedValueCache == null )
+            {
+                return new DefinedValue();
+            }
+            var definedValue = new DefinedValue
+            {
+                Id = definedValueCache.Id,
+                Guid = definedValueCache.Guid,
+                Value = definedValueCache.Value,
+                Description = definedValueCache.Description,
+                Order = definedValueCache.Order,
+                IsActive = definedValueCache.IsActive
+            };
+            return definedValue;
+        }
+
+        public static DefinedValue DefinedValueFromCache( int? definedValueId )
+        {
+            var definedValueCache = DefinedValueCache.Get( definedValueId ?? 0 );
+            return DefinedValueFromCache( definedValueCache?.Guid.ToString() );
         }
 
         private static PageReference GetParentPage( int pageId )

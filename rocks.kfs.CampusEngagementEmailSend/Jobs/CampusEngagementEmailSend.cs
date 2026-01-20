@@ -20,11 +20,14 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Web;
+
 using Quartz;
+
 using Rock;
 using Rock.Attribute;
 using Rock.Communication;
 using Rock.Data;
+using Rock.Jobs;
 using Rock.Model;
 using Rock.Web.Cache;
 using Rock.Web.UI.Controls;
@@ -39,7 +42,7 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
     [SystemCommunicationField( "System Email", "The system email to use when sending the campus engagement email.", true, "", "", 2 )]
 
     [DisallowConcurrentExecution]
-    public class CampusEngagementEmailSend : IJob
+    public class CampusEngagementEmailSend : RockJob
     {
         private int engagementEmailsSent = 0;
         private int errorCount = 0;
@@ -57,34 +60,28 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
         {
         }
 
-        /// <summary>
-        /// Executes the specified context.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        public virtual void Execute( IJobExecutionContext context )
+        public override void Execute()
         {
-            JobDataMap dataMap = context.JobDetail.JobDataMap;
-
             var groupTypeService = new GroupTypeService( new RockContext() );
 
-            groupTypes = new List<GroupType>( groupTypeService.GetByGuids( dataMap.Get( "GroupTypes" ).ToString().Split( ',' ).Select( Guid.Parse ).ToList() ) );
+            groupTypes = new List<GroupType>( groupTypeService.GetByGuids( GetAttributeValue( "GroupTypes" ).ToString().Split( ',' ).Select( Guid.Parse ).ToList() ) );
 
-            var requestDateRange = SlidingDateRangePicker.CalculateDateRangeFromDelimitedValues( dataMap.Get( "OccurrenceDateRange" ).ToString() ?? "-1||" );
+            var requestDateRange = SlidingDateRangePicker.CalculateDateRangeFromDelimitedValues( GetAttributeValue( "OccurrenceDateRange" ).ToString() ?? "-1||" );
 
             startDate = ( DateTime ) requestDateRange.Start;
             endDate = ( DateTime ) requestDateRange.End;
 
-            if ( groupTypes.IsNull() || groupTypes.Count == 0 )
+            if ( groupTypes == null || groupTypes.Count == 0 )
             {
-                context.Result = "Job failed. Unable to find group role/type";
+                Result = "Job failed. Unable to find group role/type";
                 throw new Exception( "No group role/type found" );
             }
 
-            systemEmailGuid = dataMap.GetString( "SystemEmail" ).AsGuid();
+            systemEmailGuid = GetAttributeValue( "SystemEmail" ).AsGuid();
 
             SendEmailToCampusPastors();
 
-            context.Result = string.Format( "{0} emails sent", engagementEmailsSent );
+            Result = string.Format( "{0} emails sent", engagementEmailsSent );
             if ( errorMessages.Any() )
             {
                 StringBuilder sb = new StringBuilder();
@@ -92,7 +89,7 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
                 sb.Append( string.Format( "{0} Errors: ", errorCount ) );
                 errorMessages.ForEach( e => { sb.AppendLine(); sb.Append( e ); } );
                 string errors = sb.ToString();
-                context.Result += errors;
+                Result += errors;
                 var exception = new Exception( errors );
                 HttpContext context2 = HttpContext.Current;
                 ExceptionLogService.LogException( exception, context2 );
@@ -103,14 +100,15 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
         private void SendEmailToCampusPastors()
         {
             var rockContext = new RockContext();
-            var campuses = rockContext.Campuses.ToList();
+            var campusService = new CampusService( rockContext );
+            var campuses = campusService.Queryable().AsNoTracking().ToList();
 
             foreach ( Campus campus in campuses )
             {
                 if ( campus.IsActive == true )
                 {
                     Person pastor = new Person();
-                    if ( campus.LeaderPersonAlias.IsNotNull() )
+                    if ( campus.LeaderPersonAlias != null )
                     {
                         pastor = campus.LeaderPersonAlias.Person;
                     }
@@ -167,8 +165,8 @@ namespace rocks.kfs.CampusEngagementEmailSend.Jobs
 
                     if ( email.IsNotNullOrWhiteSpace() )
                     {
-                        var mergeObjects = Rock.Lava.LavaHelper.GetCommonMergeFields( null, pastor.IsNotNull() ? pastor : null );
-                        mergeObjects.Add( "Person", pastor.IsNotNull() ? pastor : null );
+                        var mergeObjects = Rock.Lava.LavaHelper.GetCommonMergeFields( null, pastor != null ? pastor : null );
+                        mergeObjects.Add( "Person", pastor != null ? pastor : null );
                         mergeObjects.Add( "Groups", allCampusGroups );
                         mergeObjects.Add( "GroupAttendance", groupAttendanceOccurrences );
                         mergeObjects.Add( "Campus", campus );
