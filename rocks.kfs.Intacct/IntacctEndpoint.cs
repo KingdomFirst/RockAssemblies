@@ -121,7 +121,7 @@ namespace rocks.kfs.Intacct
 
                 if ( Log )
                 {
-                    ExceptionLogService.LogException( $"Intacct Exception generated with this request: {xmlDoc.InnerXml}" );
+                    ExceptionLogService.LogException( $"Intacct Exception generated with this request: {Regex.Replace( Regex.Replace( xmlDoc.InnerXml, "<login>.*</login>", "<login>HIDDEN</login>" ), "<password>.*</password>", "<password>HIDDEN</password>" )}" );
                 }
             }
 
