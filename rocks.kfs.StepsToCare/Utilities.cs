@@ -20,7 +20,9 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Web;
-using NuGet;
+
+using Microsoft.Extensions.Logging;
+
 using Rock;
 using Rock.Communication;
 using Rock.Data;
@@ -29,10 +31,12 @@ using Rock.Model;
 using Rock.Web;
 using Rock.Web.Cache;
 using Rock.Web.UI;
+
 using rocks.kfs.StepsToCare.Model;
 
 namespace rocks.kfs.StepsToCare
 {
+    [RockLoggingCategory]
     public class CareUtilities
     {
         public static List<AssignedPerson> AutoAssignWorkers( CareNeed careNeed, bool roundRobinOnly = false, bool childAssignment = false, bool autoAssignWorker = false, bool autoAssignWorkerGeofence = false, string loadBalanceType = "Exclusive", List<Guid> leaderRoleGuids = null, bool enableLogging = false, bool previewAssigned = false )
@@ -609,6 +613,8 @@ namespace rocks.kfs.StepsToCare
                 rockContext = new RockContext();
             }
 
+            var logger = RockLogger.LoggerFactory.CreateLogger<CareUtilities>();
+
             var assignedPersons = careNeed.AssignedPersons;
             if ( newlyAssignedPersons.Any() && !isNew )
             {
@@ -623,7 +629,10 @@ namespace rocks.kfs.StepsToCare
                 {
                     foreach ( var need in careNeed.ChildNeeds )
                     {
-                        assignedPersons.AddRange( need.AssignedPersons );
+                        foreach ( var ap in need.AssignedPersons )
+                        {
+                            assignedPersons.Add( ap );
+                        }
                     }
                 }
             }
@@ -650,10 +659,6 @@ namespace rocks.kfs.StepsToCare
                 {
                     assignee.PersonAlias.Person.LoadAttributes();
                     var smsNumber = assignee.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber();
-                    if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) && smsNumber.IsNullOrWhiteSpace() )
-                    {
-                        continue;
-                    }
 
                     var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( rockPage, ( rockPage != null ) ? rockPage.CurrentPerson : person );
                     mergeFields.Add( "CareNeed", careNeed );
@@ -669,7 +674,7 @@ namespace rocks.kfs.StepsToCare
                         if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) )
                         {
                             var emailWarningMessage = string.Format( "{0} does not have a valid email address.", assignee.PersonAlias.Person.FullName );
-                            RockLogger.Log.Warning( "RockWeb.Plugins.rocks_kfs.StepsToCare.CareEntry", emailWarningMessage );
+                            logger.LogWarning( emailWarningMessage );
                             errors.Add( emailWarningMessage );
                         }
                         else
@@ -683,7 +688,7 @@ namespace rocks.kfs.StepsToCare
                         if ( string.IsNullOrWhiteSpace( smsNumber ) )
                         {
                             var smsWarningMessage = string.Format( "No SMS number could be found for {0}.", assignee.PersonAlias.Person.FullName );
-                            RockLogger.Log.Warning( "RockWeb.Plugins.rocks_kfs.StepsToCare.CareEntry", smsWarningMessage );
+                            logger.LogWarning( smsWarningMessage );
                             errorsSms.Add( smsWarningMessage );
                         }
 
@@ -847,6 +852,9 @@ namespace rocks.kfs.StepsToCare
             {
                 rockContext = new RockContext();
             }
+
+            var logger = RockLogger.LoggerFactory.CreateLogger<CareUtilities>();
+            logger.LogInformation( "Steps To Care - {Type}: {Input} - {Result}", type, input, result );
 
             var rockLogger = new ServiceLogService( rockContext );
             ServiceLog serviceLog = new ServiceLog
