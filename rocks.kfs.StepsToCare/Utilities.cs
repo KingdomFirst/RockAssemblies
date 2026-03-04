@@ -20,9 +20,6 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Web;
-
-using Microsoft.Extensions.Logging;
-
 using Rock;
 using Rock.Communication;
 using Rock.Data;
@@ -36,7 +33,6 @@ using rocks.kfs.StepsToCare.Model;
 
 namespace rocks.kfs.StepsToCare
 {
-    [RockLoggingCategory]
     public class CareUtilities
     {
         public static List<AssignedPerson> AutoAssignWorkers( CareNeed careNeed, bool roundRobinOnly = false, bool childAssignment = false, bool autoAssignWorker = false, bool autoAssignWorkerGeofence = false, string loadBalanceType = "Exclusive", List<Guid> leaderRoleGuids = null, bool enableLogging = false, bool previewAssigned = false )
@@ -613,8 +609,6 @@ namespace rocks.kfs.StepsToCare
                 rockContext = new RockContext();
             }
 
-            var logger = RockLogger.LoggerFactory.CreateLogger<CareUtilities>();
-
             var assignedPersons = careNeed.AssignedPersons;
             if ( newlyAssignedPersons.Any() && !isNew )
             {
@@ -674,7 +668,7 @@ namespace rocks.kfs.StepsToCare
                         if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) )
                         {
                             var emailWarningMessage = string.Format( "{0} does not have a valid email address.", assignee.PersonAlias.Person.FullName );
-                            logger.LogWarning( emailWarningMessage );
+                            RockLogger.Log.Warning( emailWarningMessage );
                             errors.Add( emailWarningMessage );
                         }
                         else
@@ -688,7 +682,7 @@ namespace rocks.kfs.StepsToCare
                         if ( string.IsNullOrWhiteSpace( smsNumber ) )
                         {
                             var smsWarningMessage = string.Format( "No SMS number could be found for {0}.", assignee.PersonAlias.Person.FullName );
-                            logger.LogWarning( smsWarningMessage );
+                            RockLogger.Log.Warning( smsWarningMessage );
                             errorsSms.Add( smsWarningMessage );
                         }
 
@@ -852,9 +846,6 @@ namespace rocks.kfs.StepsToCare
             {
                 rockContext = new RockContext();
             }
-
-            var logger = RockLogger.LoggerFactory.CreateLogger<CareUtilities>();
-            logger.LogInformation( "Steps To Care - {Type}: {Input} - {Result}", type, input, result );
 
             var rockLogger = new ServiceLogService( rockContext );
             ServiceLog serviceLog = new ServiceLog
