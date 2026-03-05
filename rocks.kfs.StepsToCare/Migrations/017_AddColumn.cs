@@ -36,10 +36,10 @@ namespace rocks.kfs.StepsToCare.Migrations
                 BEGIN
                 INSERT [_rocks_kfs_StepsToCare_NoteTemplate] ([Icon], [Note], [IsActive], [Order], [Guid], [CreatedDateTime], [ModifiedDateTime])
                 VALUES
-                (N'fas fa-phone-square', N'Called', 1, 0, NEWID(), GETDATE(), GETDATE())
-                ,(N'far fa-comment', N'Text Message Sent', 1, 1, NEWID(), GETDATE(), GETDATE())
+                (N'fa fa-phone-square', N'Called', 1, 0, NEWID(), GETDATE(), GETDATE())
+                ,(N'fa fa-comment', N'Text Message Sent', 1, 1, NEWID(), GETDATE(), GETDATE())
                 ,(N'fa fa-envelope', N'Mail Sent', 1, 2, NEWID(), GETDATE(), GETDATE())
-                ,(N'fas fa-gift', N'Gift Given', 1, 3, NEWID(), GETDATE(), GETDATE())
+                ,(N'fa fa-gift', N'Gift Given', 1, 3, NEWID(), GETDATE(), GETDATE())
                 ,(N'fa fa-car', N'Visited', 1, 4, NEWID(), GETDATE(), GETDATE())
                 END" );
         }
