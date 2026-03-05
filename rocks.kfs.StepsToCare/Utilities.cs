@@ -20,7 +20,6 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Web;
-using NuGet;
 using Rock;
 using Rock.Communication;
 using Rock.Data;
@@ -29,6 +28,7 @@ using Rock.Model;
 using Rock.Web;
 using Rock.Web.Cache;
 using Rock.Web.UI;
+
 using rocks.kfs.StepsToCare.Model;
 
 namespace rocks.kfs.StepsToCare
@@ -623,7 +623,10 @@ namespace rocks.kfs.StepsToCare
                 {
                     foreach ( var need in careNeed.ChildNeeds )
                     {
-                        assignedPersons.AddRange( need.AssignedPersons );
+                        foreach ( var ap in need.AssignedPersons )
+                        {
+                            assignedPersons.Add( ap );
+                        }
                     }
                 }
             }
@@ -650,10 +653,6 @@ namespace rocks.kfs.StepsToCare
                 {
                     assignee.PersonAlias.Person.LoadAttributes();
                     var smsNumber = assignee.PersonAlias.Person.PhoneNumbers.GetFirstSmsNumber();
-                    if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) && smsNumber.IsNullOrWhiteSpace() )
-                    {
-                        continue;
-                    }
 
                     var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( rockPage, ( rockPage != null ) ? rockPage.CurrentPerson : person );
                     mergeFields.Add( "CareNeed", careNeed );
@@ -669,7 +668,7 @@ namespace rocks.kfs.StepsToCare
                         if ( !assignee.PersonAlias.Person.CanReceiveEmail( false ) )
                         {
                             var emailWarningMessage = string.Format( "{0} does not have a valid email address.", assignee.PersonAlias.Person.FullName );
-                            RockLogger.Log.Warning( "RockWeb.Plugins.rocks_kfs.StepsToCare.CareEntry", emailWarningMessage );
+                            RockLogger.Log.Warning( emailWarningMessage );
                             errors.Add( emailWarningMessage );
                         }
                         else
@@ -683,7 +682,7 @@ namespace rocks.kfs.StepsToCare
                         if ( string.IsNullOrWhiteSpace( smsNumber ) )
                         {
                             var smsWarningMessage = string.Format( "No SMS number could be found for {0}.", assignee.PersonAlias.Person.FullName );
-                            RockLogger.Log.Warning( "RockWeb.Plugins.rocks_kfs.StepsToCare.CareEntry", smsWarningMessage );
+                            RockLogger.Log.Warning( smsWarningMessage );
                             errorsSms.Add( smsWarningMessage );
                         }
 
