@@ -16,27 +16,90 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
 using System.Web.UI;
+
+#if WEBFORMS
+using System.Web.UI;
+#endif
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using EventbriteDotNetFramework;
 using Rock;
-using Rock.Data;
+using Rock.Attribute;
 using Rock.Field;
 using Rock.Reporting;
-using Rock.Web.UI.Controls;
-using rocks.kfs.Eventbrite.Utility.ExtensionMethods;
 
 namespace rocks.kfs.Eventbrite.Field.Types
 {
     [Serializable]
+    [RockPlatformSupport( Rock.Utility.RockPlatform.WebForms, Rock.Utility.RockPlatform.Obsidian )]
     public class EventbritePersonFieldType : FieldType
     {
+        #region Formatting
+
+        /// <inheritdoc/>
+        public override string GetTextValue( string privateValue, Dictionary<string, string> privateConfigurationValues )
+        {
+            string formattedValue = string.Empty;
+
+            var splitValues = privateValue.SplitDelimitedValues( "^" );
+            if ( splitValues.Length > 3 )
+            {
+                var ticketClasses = splitValues[1].SplitDelimitedValues( "||" );
+                var ticketQuantities = splitValues[3].SplitDelimitedValues( "||" );
+                if ( ticketClasses.Length > 1 )
+                {
+                    var ticketString = new StringBuilder();
+                    for ( var i = 0; i < ticketClasses.Length; i++ )
+                    {
+                        ticketString.AppendFormat( "{0} - Qty: {1}, ", ticketClasses[i], ticketQuantities[i] );
+                    }
+                    formattedValue = string.Format( "{1} <strong>Attendee id:</strong> {0}, <strong>Order id:</strong> {2}", splitValues[0], ticketString.ToString(), splitValues[2] );
+                }
+                else
+                {
+                    formattedValue = string.Format( "<strong>Ticket Qty:</strong> {3}, <strong>Ticket Class:</strong> {1}, <strong>Attendee id:</strong> {0}, <strong>Order id:</strong> {2}", splitValues[0], splitValues[1], splitValues[2], splitValues[3] );
+                }
+            }
+            else if ( splitValues.Length > 2 )
+            {
+                formattedValue = string.Format( "<strong>Ticket Class:</strong> {1}, <strong>Attendee id:</strong> {0}, <strong>Order id:</strong> {2}", splitValues[0], splitValues[1], splitValues[2] );
+            }
+            else
+            {
+                formattedValue = privateValue;
+            }
+
+            return formattedValue;
+        }
+
+        #endregion
 
         #region Edit Control
+
+        /// <inheritdoc/>
+        public override string GetPublicValue( string privateValue, Dictionary<string, string> privateConfigurationValues )
+        {
+            return GetTextValue( privateValue, privateConfigurationValues );
+        }
+
+        /// <inheritdoc/>
+        public override string GetPrivateEditValue( string publicValue, Dictionary<string, string> privateConfigurationValues )
+        {
+            return base.GetPrivateEditValue( publicValue, privateConfigurationValues );
+        }
+
+        /// <inheritdoc/>
+        public override string GetPublicEditValue( string privateValue, Dictionary<string, string> privateConfigurationValues )
+        {
+            return base.GetPublicEditValue( privateValue, privateConfigurationValues );
+        }
+
+        #endregion
+
+        #region WebForms
+#if WEBFORMS
+       #region Edit Control
 
         #region Formatting
 
@@ -294,6 +357,8 @@ namespace rocks.kfs.Eventbrite.Field.Types
         }
 
         #endregion
+#endif
+        #endregion WebForms
 
     }
 }
