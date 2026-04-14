@@ -36,9 +36,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\libs\com.bemaservices.RoomManagement.dll</HintPath>
     </Reference>
-    <Reference Include="DotLiquid">
-      <HintPath>..\..\RockWeb\Bin\DotLiquid.dll</HintPath>
-    </Reference>
     <Reference Include="EntityFramework">
       <HintPath>..\..\RockWeb\Bin\EntityFramework.dll</HintPath>
     </Reference>

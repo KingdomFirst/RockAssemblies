@@ -33,10 +33,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotLiquid">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\RockWeb\Bin\DotLiquid.dll</HintPath>
-    </Reference>
     <Reference Include="EntityFramework">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\EntityFramework.dll</HintPath>

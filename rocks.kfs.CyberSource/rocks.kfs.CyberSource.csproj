@@ -44,10 +44,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\libs\cybersource-rest-client-dotnet.dll</HintPath>
     </Reference>
-    <Reference Include="DotLiquid">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\RockWeb\Bin\DotLiquid.dll</HintPath>
-    </Reference>
     <Reference Include="EntityFramework">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\EntityFramework.dll</HintPath>
