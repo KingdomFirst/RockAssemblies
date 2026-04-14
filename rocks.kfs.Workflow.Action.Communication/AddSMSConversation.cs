@@ -43,7 +43,7 @@ namespace rocks.kfs.Workflow.Action.Communication
     [TextField( "Message in Conversation", "Message to display in conversation as though it was from the recipient. Default: Blank <span class='tip tip-lava'></span>", false, "" )]
     [BooleanField( "Mark as Read", "Flag indicating if the conversation should be marked as read when submitted. Default: No", defaultValue: false )]
     [WorkflowAttribute( "Person", "The workflow attribute of the person to be the recipient.", true, "", "", 0, null, new string[] { "Rock.Field.Types.PersonFieldType" } )]
-    [DefinedValueField( Rock.SystemGuid.DefinedType.COMMUNICATION_SMS_FROM, "SMS From Number", "The SMS number the conversation will appear under.", true, false, DisplayDescription = true )]
+    [SystemPhoneNumberField( "SMS From Number", "The SMS number the conversation will appear under.", true, false )]
     #endregion
 
     /// <summary>
@@ -111,7 +111,7 @@ namespace rocks.kfs.Workflow.Action.Communication
             }
 
             var smsMediumEntityTypeId = EntityTypeCache.GetId( Rock.SystemGuid.EntityType.COMMUNICATION_MEDIUM_SMS ).Value;
-            var smsDefinedValueId = DefinedValueCache.GetId( smsFromGuid ?? Guid.Empty );
+            var smsFromId = SystemPhoneNumberCache.GetId( smsFromGuid ?? Guid.Empty );
             var smsTransport = new Rock.Communication.Medium.Sms().Transport.EntityType.Id;
 
             var mergeFields = GetMergeFields( action );
@@ -124,7 +124,7 @@ namespace rocks.kfs.Workflow.Action.Communication
                 IsRead = isRead,
                 CreatedDateTime = RockDateTime.Now,
                 CreatedByPersonAliasId = conversationPersonAliasId,
-                RelatedSmsFromDefinedValueId = smsDefinedValueId,
+                RelatedSmsFromSystemPhoneNumberId = smsFromId,
                 RelatedTransportEntityTypeId = smsTransport,
                 RelatedMediumEntityTypeId = smsMediumEntityTypeId,
                 Response = message.ResolveMergeFields( mergeFields )

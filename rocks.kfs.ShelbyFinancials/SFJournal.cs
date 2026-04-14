@@ -816,7 +816,7 @@ namespace rocks.kfs.ShelbyFinancials
             return exportColumns;
         }
 
-        public class GLTransaction : ILavaDataDictionary, ILiquidizable
+        public class GLTransaction : ILavaDataDictionary
         {
             [LavaVisible]
             public decimal Amount { get; set; }

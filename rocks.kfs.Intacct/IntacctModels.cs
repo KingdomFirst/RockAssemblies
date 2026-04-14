@@ -16,8 +16,8 @@
 //
 using System;
 using System.Collections.Generic;
+
 using Rock;
-using Rock.Data;
 using Rock.Lava;
 
 using rocks.kfs.Intacct.Enums;
@@ -125,7 +125,7 @@ namespace rocks.kfs.Intacct
         public decimal TotalTrxAmount;
     }
 
-    public class GLTransaction : ILavaDataDictionary, ILiquidizable
+    public class GLTransaction : ILavaDataDictionary
     {
         [LavaVisible]
         public decimal Amount { get; set; }
