@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2023 by Kingdom First Solutions
+// Copyright 2026 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -816,7 +816,7 @@ namespace rocks.kfs.ShelbyFinancials
             return exportColumns;
         }
 
-        public class GLTransaction : ILavaDataDictionary, ILiquidizable
+        public class GLTransaction : ILavaDataDictionary
         {
             [LavaVisible]
             public decimal Amount { get; set; }
