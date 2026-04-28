@@ -16,23 +16,17 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Data;
+using System.Data.Entity;
 using System.Linq;
-using System.Text;
 using System.Web;
-
+using OfficeOpenXml;
 using Rock;
 using Rock.Data;
-using Rock.Model;
-using Rock.Web.Cache;
-using Rock.Utility;
-using OfficeOpenXml;
-using System.Data;
-using System.ComponentModel;
-using System.Data.Entity;
-
-using KFSConst = rocks.kfs.ShelbyFinancials.SystemGuid;
 using Rock.Lava;
+using Rock.Model;
+using Rock.Utility;
+using Rock.Web.Cache;
 
 namespace rocks.kfs.ShelbyFinancials
 {
