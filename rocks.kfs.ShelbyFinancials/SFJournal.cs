@@ -932,46 +932,6 @@ namespace rocks.kfs.ShelbyFinancials
             }
 
             #endregion
-
-            #region ILiquidizable
-
-            /// <summary>
-            /// Determines whether the specified key contains key.
-            /// </summary>
-            /// <param name="key">The key.</param>
-            /// <returns></returns>
-            public virtual bool ContainsKey( object key )
-            {
-                string propertyKey = key.ToStringSafe();
-                var propInfo = GetType().GetProperty( propertyKey );
-
-                return propInfo != null;
-            }
-
-            /// <summary>
-            /// Gets the <see cref="System.Object"/> with the specified key.
-            /// </summary>
-            /// <value>
-            /// The <see cref="System.Object"/>.
-            /// </value>
-            /// <param name="key">The key.</param>
-            /// <returns></returns>
-            public object GetValue( object key )
-            {
-                return this[key];
-            }
-
-            /// <summary>
-            /// To the liquid.
-            /// </summary>
-            /// <returns></returns>
-            /// <exception cref="System.NotImplementedException"></exception>
-            public object ToLiquid()
-            {
-                return this;
-            }
-
-            #endregion
         }
 
         public class GLBatchTotals : ICloneable
