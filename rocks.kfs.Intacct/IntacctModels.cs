@@ -44,6 +44,7 @@ namespace rocks.kfs.Intacct
         public string ExchangeRateType;
         public int ItemIndex;
         public int FeeItemIndex;
+        public string CreditOrDebit;
     }
 
     public class GlEntry

@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Xml;
 using OfficeOpenXml;
@@ -416,6 +417,7 @@ namespace rocks.kfs.Intacct
                     CustomFields = debitTransaction.CustomDimensions,
                     ItemIndex = debitTransaction.ItemIndex,
                     FeeItemIndex = debitTransaction.FeeItemIndex,
+                    CreditOrDebit = "Debit"
                 };
 
                 returnList.Add( debitLine );
@@ -435,6 +437,7 @@ namespace rocks.kfs.Intacct
                     CustomFields = creditTransaction.CustomDimensions,
                     ItemIndex = creditTransaction.ItemIndex,
                     FeeItemIndex = creditTransaction.FeeItemIndex,
+                    CreditOrDebit = "Credit"
                 };
 
                 returnList.Add( creditLine );
@@ -447,420 +450,251 @@ namespace rocks.kfs.Intacct
             return returnList;
         }
 
-        public List<GLExcelLine> GetGLExcelLines( RockContext rockContext, FinancialBatch financialBatch, string journalCode, int period, ref string debugLava )
+        public List<GLCsvLine> GetGLCsvLines( FinancialBatch financialBatch, string JournalId, ref string debugLava, string DescriptionLava, GLAccountGroupingMode groupingMode, JournalState journalState = JournalState.Posted )
         {
-            var glExcelLines = new List<GLExcelLine>();
-            var glEntries = GetGlEntries( rockContext, financialBatch, journalCode, period, ref debugLava );
+            var glCsvLines = new List<GLCsvLine>();
+            var batchDate = financialBatch.BatchStartDateTime == null ? RockDateTime.Now : ( ( System.DateTime ) financialBatch.BatchStartDateTime );
+            var glEntries = GetGlEntries( financialBatch, ref debugLava, DescriptionLava, groupingMode );
+            var journalLineNumber = 1;
+
             foreach ( var entry in glEntries )
             {
-                glExcelLines.Add( new GLExcelLine()
+                var csvLine = new GLCsvLine()
                 {
-                    CompanyNumber = entry.CompanyNumber,
-                    RegionNumber = entry.RegionNumber,
-                    SuperFundNumber = entry.SuperFundNumber,
-                    FundNumber = entry.FundNumber,
-                    LocationNumber = entry.LocationNumber,
-                    CostCenterNumber = entry.CostCenterNumber,
-                    DepartmentNumber = entry.DepartmentNumber,
-                    AccountNumber = entry.AccountNumber,
-                    AccountSub = entry.AccountSub,
-                    Amount = entry.Amount,
-                    Project = entry.Project,
-                    JournalNumber = entry.JournalNumber,
-                    JournalDescription = entry.JournalDescription,
-                    Date = entry.Date,
-                    Note = entry.Note,
-                    Period = period,
-                    JournalCode = journalCode
-                } );
+                    LineNumber = journalLineNumber,
+                    AccountNumber = entry.GlAccountNumber,
+                    LocationId = entry.LocationId,
+                    DepartmentId = entry.DepartmentId,
+                    Document = entry.DocumentNumber,
+                    Memo = entry.Memo,
+                    Debit = entry.CreditOrDebit == "Debit" ? entry.TransactionAmount : null,
+                    Credit = entry.CreditOrDebit == "Credit" ? entry.TransactionAmount * -1 : null,
+                    Currency = entry.TransactionCurrency,
+                    ExchangeRateDate = entry.ExchangeRateDate,
+                    ExchangeRateTypeId = entry.ExchangeRateType,
+                    ExchangeRate = entry.ExchangeRateValue,
+                    AllocationId = entry.AllocationId,
+                    ProjectId = entry.ProjectId,
+                    CustomerId = entry.CustomerId,
+                    VendorId = entry.VendorId,
+                    EmployeeId = entry.EmployeeId,
+                    ItemId = entry.ItemId,
+                    ClassId = entry.ClassId,
+                    CustomAllocationSplits = entry.CustomAllocationSplits,
+                    CustomFields = entry.CustomFields
+                };
+
+                // Only add Batch/Journal level info to first line of the journal.
+                if ( journalLineNumber == 1 )
+                {
+                    csvLine.Journal = JournalId;
+                    csvLine.Date = batchDate;
+                    csvLine.Description = financialBatch.Name;
+                    csvLine.ReferenceNumber = financialBatch.Id.ToString();
+                    csvLine.State = journalState.ToString();
+                }
+
+                glCsvLines.Add( csvLine );
+                journalLineNumber++;
             }
 
-            return glExcelLines;
+            return glCsvLines;
         }
 
-        public ExcelPackage GLExcelExport( List<GLExcelLine> items )
+        public void GLCsvExport( List<GLCsvLine> items, string fileId )
         {
-            var exportColumns = GetExportColumns( items );
-
-            // create default settings
-            string workSheetName = "Export";
-            string title = "RockExport";
-
-            ExcelPackage excel = new ExcelPackage();
-
-            excel.Workbook.Properties.Title = title;
-
-            // add author info
-            Rock.Model.UserLogin userLogin = Rock.Model.UserLoginService.GetCurrentUser();
-            if ( userLogin != null )
+            if ( HttpContext.Current.Session["IntacctCsvExport"] != null )
             {
-                excel.Workbook.Properties.Author = userLogin.Person.FullName;
+                HttpContext.Current.Session["IntacctCsvExport"] = string.Empty;
             }
-            else
+            if ( HttpContext.Current.Session["IntacctFileId"] != null )
             {
-                excel.Workbook.Properties.Author = "Rock";
+                HttpContext.Current.Session["IntacctFileId"] = string.Empty;
             }
 
-            // add the page that created this
-            excel.Workbook.Properties.SetCustomPropertyValue( "Source", HttpContext.Current.Request.Url.OriginalString );
-
-            ExcelWorksheet worksheet = excel.Workbook.Worksheets.Add( workSheetName );
-
-            var headerRows = 1;
-            int rowCounter = headerRows;
-            int columnCounter = 1;
-
-            worksheet.Cells[rowCounter, columnCounter].Value = "Amount";
-            worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.FormattedNumberFormat;
-            columnCounter++;
-            worksheet.Cells[rowCounter, columnCounter].Value = "JournalNumber";
-            worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.UnformattedNumberFormat;
-            columnCounter++;
-            worksheet.Cells[rowCounter, columnCounter].Value = "JournalDescription";
-            worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.GeneralFormat;
-            columnCounter++;
-            worksheet.Cells[rowCounter, columnCounter].Value = "Date";
-            worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.DateFormat;
-            columnCounter++;
-            worksheet.Cells[rowCounter, columnCounter].Value = "Period";
-            worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.UnformattedNumberFormat;
-            columnCounter++;
-            worksheet.Cells[rowCounter, columnCounter].Value = "JournalCode";
-            worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.GeneralFormat;
-
-            if ( exportColumns.CompanyNumber )
-            {
-                columnCounter++;
-                worksheet.Cells[rowCounter, columnCounter].Value = "CompanyNumber";
-                worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.UnformattedNumberFormat;
-            }
-
-            if ( exportColumns.RegionNumber )
-            {
-                columnCounter++;
-                worksheet.Cells[rowCounter, columnCounter].Value = "RegionNumber";
-                worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.UnformattedNumberFormat;
-            }
-
-            if ( exportColumns.SuperFundNumber )
-            {
-                columnCounter++;
-                worksheet.Cells[rowCounter, columnCounter].Value = "SuperFundNumber";
-                worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.UnformattedNumberFormat;
-            }
-
-            if ( exportColumns.FundNumber )
-            {
-                columnCounter++;
-                worksheet.Cells[rowCounter, columnCounter].Value = "FundNumber";
-                worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.UnformattedNumberFormat;
-            }
-
-            if ( exportColumns.LocationNumber )
-            {
-                columnCounter++;
-                worksheet.Cells[rowCounter, columnCounter].Value = "LocationNumber";
-                worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.UnformattedNumberFormat;
-            }
-
-            if ( exportColumns.CostCenterNumber )
-            {
-                columnCounter++;
-                worksheet.Cells[rowCounter, columnCounter].Value = "CostCenterNumber";
-                worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.UnformattedNumberFormat;
-            }
-
-            if ( exportColumns.DepartmentNumber )
-            {
-                columnCounter++;
-                worksheet.Cells[rowCounter, columnCounter].Value = "DepartmentNumber";
-                worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.UnformattedNumberFormat;
-            }
-
-            if ( exportColumns.AccountNumber )
-            {
-                columnCounter++;
-                worksheet.Cells[rowCounter, columnCounter].Value = "AccountNumber";
-                worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.UnformattedNumberFormat;
-            }
-
-            if ( exportColumns.AccountSub )
-            {
-                columnCounter++;
-                worksheet.Cells[rowCounter, columnCounter].Value = "AccountSub";
-                worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.UnformattedNumberFormat;
-            }
-
-            if ( exportColumns.Project )
-            {
-                columnCounter++;
-                worksheet.Cells[rowCounter, columnCounter].Value = "Project";
-                worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.UnformattedNumberFormat;
-            }
-
-            if ( exportColumns.Note )
-            {
-                columnCounter++;
-                worksheet.Cells[rowCounter, columnCounter].Value = "Note";
-                worksheet.Column( columnCounter ).Style.Numberformat.Format = ExcelHelper.GeneralFormat;
-            }
-
-            // print data
-            if ( items.Any() )
-            {
-                foreach ( var item in items )
-                {
-                    rowCounter++;
-
-                    var columnIndex = 1;
-                    ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.Amount );
-                    ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.Amount );
-                    columnIndex++;
-                    ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.JournalNumber );
-                    ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.JournalNumber );
-                    columnIndex++;
-                    ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.JournalDescription );
-                    ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.JournalDescription );
-                    columnIndex++;
-                    ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.Date );
-                    ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.Date );
-                    columnIndex++;
-                    ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.Period );
-                    ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.Period );
-                    columnIndex++;
-                    ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.JournalCode );
-                    ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.JournalCode );
-
-                    if ( exportColumns.CompanyNumber )
-                    {
-                        columnIndex++;
-                        ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.CompanyNumber );
-                        ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.CompanyNumber );
-                    }
-
-                    if ( exportColumns.RegionNumber )
-                    {
-                        columnIndex++;
-                        ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.RegionNumber );
-                        ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.RegionNumber );
-                    }
-
-                    if ( exportColumns.SuperFundNumber )
-                    {
-                        columnIndex++;
-                        ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.SuperFundNumber );
-                        ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.SuperFundNumber );
-                    }
-
-                    if ( exportColumns.FundNumber )
-                    {
-                        columnIndex++;
-                        ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.FundNumber );
-                        ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.FundNumber );
-                    }
-
-                    if ( exportColumns.LocationNumber )
-                    {
-                        columnIndex++;
-                        ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.LocationNumber );
-                        ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.LocationNumber );
-                    }
-
-                    if ( exportColumns.CostCenterNumber )
-                    {
-                        columnIndex++;
-                        ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.CostCenterNumber );
-                        ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.CostCenterNumber );
-                    }
-
-                    if ( exportColumns.DepartmentNumber )
-                    {
-                        columnIndex++;
-                        ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.DepartmentNumber );
-                        ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.DepartmentNumber );
-                    }
-
-                    if ( exportColumns.AccountNumber )
-                    {
-                        columnIndex++;
-                        ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.AccountNumber );
-                        ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.AccountNumber );
-                    }
-
-                    if ( exportColumns.AccountSub )
-                    {
-                        columnIndex++;
-                        ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.AccountSub );
-                        ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.AccountSub );
-                    }
-
-                    if ( exportColumns.Project )
-                    {
-                        columnIndex++;
-                        ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.Project );
-                        ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.Project );
-                    }
-
-                    if ( exportColumns.Note )
-                    {
-                        columnIndex++;
-                        ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], item.Note );
-                        ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, item.Note );
-                    }
-                }
-            }
-            else
-            {
-                rowCounter++;
-
-                var columnIndex = 1;
-                ExcelHelper.SetExcelValue( worksheet.Cells[rowCounter, columnIndex], string.Empty );
-                ExcelHelper.FinalizeColumnFormat( worksheet, columnIndex, string.Empty );
-            }
-
-            var range = worksheet.Cells[headerRows, 1, rowCounter, columnCounter];
-            var table = worksheet.Tables.Add( range, title );
-
-            // ensure each column in the table has a unique name
-            var columnNames = worksheet.Cells[headerRows, 1, headerRows, columnCounter].Select( a => new { OrigColumnName = a.Text, Cell = a } ).ToList();
-            columnNames.Reverse();
-            foreach ( var col in columnNames )
-            {
-                int duplicateSuffix = 0;
-                string uniqueName = col.OrigColumnName;
-
-                // increment the suffix by 1 until there is only one column with that name
-                while ( columnNames.Where( a => a.Cell.Text == uniqueName ).Count() > 1 )
-                {
-                    duplicateSuffix++;
-                    uniqueName = col.OrigColumnName + duplicateSuffix.ToString();
-                    col.Cell.Value = uniqueName;
-                }
-            }
-
-            table.ShowHeader = true;
-            table.ShowFilter = true;
-            table.TableStyle = OfficeOpenXml.Table.TableStyles.None;
-
-            // Format header range
-            using ( ExcelRange r = worksheet.Cells[headerRows, 1, headerRows, columnCounter] )
-            {
-                r.Style.Font.Bold = true;
-                r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-            }
-
-            // do AutoFitColumns on no more than the first 10000 rows (10000 can take 4-5 seconds, but could take several minutes if there are 100000+ rows )
-            int autoFitRows = Math.Min( rowCounter, 10000 );
-            var autoFitRange = worksheet.Cells[headerRows, 1, autoFitRows, columnCounter];
-
-            autoFitRange.AutoFitColumns();
-
-            // set some footer text
-            worksheet.HeaderFooter.OddHeader.CenteredText = title;
-            worksheet.HeaderFooter.OddFooter.RightAlignedText = string.Format( "Page {0} of {1}", ExcelHeaderFooter.PageNumber, ExcelHeaderFooter.NumberOfPages );
-
-            return excel;
-        }
-
-        private ExportColumns GetExportColumns( List<GLExcelLine> items )
-        {
+            var customFieldCols = items.SelectMany( i => i.CustomFields.Keys ).Distinct().ToList().OrderBy( k => k );
             var exportColumns = new ExportColumns();
+            exportColumns.CustomFieldKeys = customFieldCols.ToList();
+
+            var output = new StringBuilder();
+            output.Append( "Journal, Date, Description, Reference_No, Line_No, Acct_No, Location_Id, Dept_Id" );
+            if ( items.Any( i => !i.Document.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", Document" );
+                exportColumns.Document = true;
+            }
+            output.Append( ", Memo, Debit, Credit" );
+            if ( items.Any( i => !i.Currency.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", Currency" );
+                exportColumns.Currency = true;
+            }
+            if ( items.Any( i => i.ExchangeRateDate.HasValue ) )
+            {
+                output.Append( ", Exch_Rate_Date" );
+                exportColumns.ExchangeRateDate = true;
+            }
+            if ( items.Any( i => !i.ExchangeRateTypeId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", Exch_Rate_Type_Id" );
+                exportColumns.ExchangeRateTypeId = true;
+            }
+            if ( items.Any( i => i.ExchangeRate.HasValue ) )
+            {
+                output.Append( ", Exch_Rate" );
+                exportColumns.ExchangeRate = true;
+            }
+            output.Append( ", State" );
+            if ( items.Any( i => !i.AllocationId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", Allocation_Id" );
+                exportColumns.AllocationId = true;
+            }
+            foreach ( var customFieldCol in customFieldCols )
+            {
+                output.AppendFormat( ", {0}", customFieldCol );
+            }
+            var num = 0;
+            if ( items.Any( i => !i.ProjectId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_ProjectId" );
+                exportColumns.ProjectId = true;
+            }
+            if ( items.Any( i => !i.CustomerId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_CustomerId" );
+                exportColumns.CustomerId = true;
+            }
+            if ( items.Any( i => !i.VendorId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_VendorId" );
+                exportColumns.VendorId = true;
+            }
+            if ( items.Any( i => !i.EmployeeId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_EmployeeId" );
+                exportColumns.EmployeeId = true;
+            }
+            if ( items.Any( i => !i.ItemId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_ItemId" );
+                exportColumns.ItemId = true;
+            }
+            if ( items.Any( i => !i.ClassId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_ClassId" );
+                exportColumns.ClassId = true;
+            }
 
             foreach ( var item in items )
             {
-                if ( !string.IsNullOrWhiteSpace( item.CompanyNumber ) )
+                output.Append( Environment.NewLine );
+                output.AppendFormat( "{0},{1},{2},{3},{4},{5},{6},{7}", item.Journal, item.Date.HasValue ? item.Date.Value.ToShortDateString() : string.Empty, item.Description, item.ReferenceNumber, item.LineNumber, item.AccountNumber, item.LocationId, item.DepartmentId );
+                if ( exportColumns.Document )
                 {
-                    exportColumns.CompanyNumber = true;
+                    output.AppendFormat( ",{0}", item.Document ?? string.Empty );
                 }
-
-                if ( !string.IsNullOrWhiteSpace( item.RegionNumber ) )
+                output.AppendFormat( ",{0},{1},{2}", item.Memo, item.Debit, item.Credit );
+                if ( exportColumns.Currency )
                 {
-                    exportColumns.RegionNumber = true;
+                    output.AppendFormat( ",{0}", item.Currency ?? string.Empty );
                 }
-
-                if ( !string.IsNullOrWhiteSpace( item.SuperFundNumber ) )
+                if ( exportColumns.ExchangeRateDate )
                 {
-                    exportColumns.SuperFundNumber = true;
+                    output.AppendFormat( ",{0}", item.ExchangeRateDate.HasValue ? item.ExchangeRateDate.Value.ToShortDateString() : string.Empty );
                 }
-
-                if ( !string.IsNullOrWhiteSpace( item.FundNumber ) )
+                if ( exportColumns.ExchangeRateTypeId )
                 {
-                    exportColumns.FundNumber = true;
-                }
-
-                if ( !string.IsNullOrWhiteSpace( item.LocationNumber ) )
+                    output.AppendFormat( ",{0}", item.ExchangeRateTypeId ?? string.Empty );
+                } 
+                if ( exportColumns.ExchangeRate )
                 {
-                    exportColumns.LocationNumber = true;
+                    output.AppendFormat( ",{0}", item.ExchangeRate.HasValue ? item.ExchangeRate.Value.ToString() : string.Empty );
                 }
-
-                if ( !string.IsNullOrWhiteSpace( item.CostCenterNumber ) )
+                output.AppendFormat( ",{0}", item.State );
+                if ( exportColumns.AllocationId )
                 {
-                    exportColumns.CostCenterNumber = true;
+                    output.AppendFormat( ",{0}", item.AllocationId ?? string.Empty );
                 }
-
-                if ( !string.IsNullOrWhiteSpace( item.DepartmentNumber ) )
+                foreach ( var customFieldCol in exportColumns.CustomFieldKeys )
                 {
-                    exportColumns.DepartmentNumber = true;
+                    output.AppendFormat( ",{0}", item.CustomFields.ContainsKey( customFieldCol ) ? item.CustomFields[customFieldCol] : string.Empty );
                 }
-
-                if ( !string.IsNullOrWhiteSpace( item.AccountNumber ) )
+                if ( exportColumns.ProjectId )
                 {
-                    exportColumns.AccountNumber = true;
+                    output.AppendFormat( ",{0}", item.ProjectId ?? string.Empty );
                 }
-
-                if ( !string.IsNullOrWhiteSpace( item.AccountSub ) )
+                if ( exportColumns.CustomerId )
                 {
-                    exportColumns.AccountSub = true;
+                    output.AppendFormat( ",{0}", item.CustomerId ?? string.Empty );
                 }
-
-                if ( !string.IsNullOrWhiteSpace( item.Project ) )
+                if ( exportColumns.VendorId )
                 {
-                    exportColumns.Project = true;
+                    output.AppendFormat( ",{0}", item.VendorId ?? string.Empty );
                 }
-
-                if ( !string.IsNullOrWhiteSpace( item.Note ) )
+                if ( exportColumns.EmployeeId )
                 {
-                    exportColumns.Note = true;
+                    output.AppendFormat( ",{0}", item.EmployeeId ?? string.Empty );
                 }
+                if ( exportColumns.ItemId )
+                {
+                    output.AppendFormat( ",{0}", item.ItemId ?? string.Empty );
+                }
+                if ( exportColumns.ClassId )
+                {
+                    output.AppendFormat( ",{0}", item.ClassId ?? string.Empty );
+                }
+                num++;
             }
-
-            return exportColumns;
+            HttpContext.Current.Session["IntacctCsvExport"] = output.ToString();
+            HttpContext.Current.Session["IntacctFileId"] = fileId;
         }
 
-        public class GLExcelLine
+        public class GLCsvLine
         {
-            public string CompanyNumber;
-            public string RegionNumber;
-            public string SuperFundNumber;
-            public string FundNumber;
-            public string LocationNumber;
-            public string CostCenterNumber;
-            public string DepartmentNumber;
+            public string Journal;
+            public DateTime? Date;
+            public string Description;
+            public string ReferenceNumber;
+            public int LineNumber;
             public string AccountNumber;
-            public string AccountSub;
-            public decimal Amount;
-            public string Project;
-            public int JournalNumber;
-            public string JournalDescription;
-            public DateTime Date;
-            public string Note;
-            public int Period;
-            public string JournalCode;
+            public string LocationId;
+            public string DepartmentId;
+            public string Document;
+            public string Memo;
+            public decimal? Debit;
+            public decimal? Credit;
+            public string Currency;
+            public DateTime? ExchangeRateDate;
+            public string ExchangeRateTypeId;
+            public decimal? ExchangeRate;
+            public string State = string.Empty;
+            public string AllocationId;
+            public string ProjectId;
+            public string CustomerId;
+            public string VendorId;
+            public string EmployeeId;
+            public string ItemId;
+            public string ClassId;
+            public List<AllocationLine> CustomAllocationSplits = new List<AllocationLine>();
+            public SortedDictionary<string, dynamic> CustomFields = new SortedDictionary<string, object>();
         }
 
         public class ExportColumns
         {
-            public bool CompanyNumber;
-            public bool RegionNumber;
-            public bool SuperFundNumber;
-            public bool FundNumber;
-            public bool LocationNumber;
-            public bool CostCenterNumber;
-            public bool DepartmentNumber;
-            public bool AccountNumber;
-            public bool AccountSub;
-            public bool Project;
-            public bool Note;
+            public bool ExchangeRateDate = false;
+            public bool ExchangeRateTypeId = false;
+            public bool ExchangeRate = false;
+            public bool AllocationId = false;
+            public bool Document = false;
+            public bool Currency = false;
+            public List<string> CustomFieldKeys = new List<string>();
+            public bool ProjectId = false;
+            public bool CustomerId = false;
+            public bool VendorId = false;
+            public bool EmployeeId = false;
+            public bool ItemId = false;
+            public bool ClassId = false;
         }
     }
 
@@ -871,5 +705,11 @@ namespace rocks.kfs.Intacct
         CreditLinesOnly = 2,
         DebitAndCreditByFinancialAccount = 3,
         NoGrouping = 4
+    }
+
+    public enum JournalState
+    {
+        Posted,
+        Draft
     }
 }

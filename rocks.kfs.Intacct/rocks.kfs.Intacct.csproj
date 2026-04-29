@@ -51,6 +51,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\EntityFramework.Utilities.dll</HintPath>
     </Reference>
+    <Reference Include="EPPlus, Version=4.0.5.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RockWeb\Bin\EPPlus.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Owin">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RockWeb\Bin\Microsoft.Owin.dll</HintPath>
