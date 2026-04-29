@@ -44,7 +44,7 @@ namespace rocks.kfs.Intacct
         /// <param name="DescriptionLava">Lava code to use for the description of each line of the journal entry.</param>
         /// <param name="groupingMode">The mode for handling grouping of GL accounts. <see cref="GLAccountGroupingMode"/></param>
         /// <returns>Returns the XML needed to create an Intacct Journal Entry.</returns>
-        public XmlDocument CreateJournalEntryXML( IntacctAuth AuthCreds, int BatchId, string JournalId, ref string debugLava, string DescriptionLava, GLAccountGroupingMode groupingMode )
+        public XmlDocument CreateJournalEntryXML( IntacctAuth AuthCreds, int BatchId, string JournalId, ref string debugLava, string DescriptionLava, GLAccountGroupingMode groupingMode, JournalState journalState = JournalState.Posted )
         {
             var doc = new XmlDocument();
             var financialBatch = new FinancialBatchService( new RockContext() ).Get( BatchId );
@@ -89,6 +89,10 @@ namespace rocks.kfs.Intacct
                         writer.WriteElementString( "REFERENCENO", financialBatch.Id.ToString() );
                         writer.WriteElementString( "BATCH_DATE", batchDate );
                         writer.WriteElementString( "BATCH_TITLE", financialBatch.Name );
+                        if ( journalState == JournalState.Draft )
+                        {
+                            writer.WriteElementString( "STATE", journalState.ToString() );
+                        }
                         writer.WriteElementString( "HISTORY_COMMENT", "Imported from RockRMS" );
                         writer.WriteStartElement( "ENTRIES" );
 
