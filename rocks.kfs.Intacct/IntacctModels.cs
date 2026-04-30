@@ -82,6 +82,36 @@ namespace rocks.kfs.Intacct
         public string WarehouseId;
     }
 
+    public class GLJournalCsvLine
+    {
+        public string Journal;
+        public DateTime? Date;
+        public string Description;
+        public string ReferenceNumber;
+        public int LineNumber;
+        public string AccountNumber;
+        public string LocationId;
+        public string DepartmentId;
+        public string Document;
+        public string Memo;
+        public decimal? Debit;
+        public decimal? Credit;
+        public string Currency;
+        public DateTime? ExchangeRateDate;
+        public string ExchangeRateTypeId;
+        public decimal? ExchangeRate;
+        public string State = string.Empty;
+        public string AllocationId;
+        public string ProjectId;
+        public string CustomerId;
+        public string VendorId;
+        public string EmployeeId;
+        public string ItemId;
+        public string ClassId;
+        public List<AllocationLine> CustomAllocationSplits = new List<AllocationLine>();
+        public SortedDictionary<string, dynamic> CustomFields = new SortedDictionary<string, object>();
+    }
+
     public class OtherReceipt
     {
         public DateTime PaymentDate;

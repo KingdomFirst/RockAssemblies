@@ -450,16 +450,16 @@ namespace rocks.kfs.Intacct
             return returnList;
         }
 
-        public List<GLCsvLine> GetGLCsvLines( FinancialBatch financialBatch, string JournalId, ref string debugLava, string DescriptionLava, GLAccountGroupingMode groupingMode, JournalState journalState = JournalState.Posted )
+        public List<GLJournalCsvLine> GetGLCsvLines( FinancialBatch financialBatch, string JournalId, ref string debugLava, string DescriptionLava, GLAccountGroupingMode groupingMode, JournalState journalState = JournalState.Posted )
         {
-            var glCsvLines = new List<GLCsvLine>();
+            var glCsvLines = new List<GLJournalCsvLine>();
             var batchDate = financialBatch.BatchStartDateTime == null ? RockDateTime.Now : ( ( System.DateTime ) financialBatch.BatchStartDateTime );
             var glEntries = GetGlEntries( financialBatch, ref debugLava, DescriptionLava, groupingMode );
             var journalLineNumber = 1;
 
             foreach ( var entry in glEntries )
             {
-                var csvLine = new GLCsvLine()
+                var csvLine = new GLJournalCsvLine()
                 {
                     LineNumber = journalLineNumber,
                     AccountNumber = entry.GlAccountNumber,
@@ -501,7 +501,7 @@ namespace rocks.kfs.Intacct
             return glCsvLines;
         }
 
-        public void GLCsvExport( List<GLCsvLine> items, string fileId )
+        public void GLCsvExport( List<GLJournalCsvLine> items, string fileId )
         {
             if ( HttpContext.Current.Session["IntacctCsvExport"] != null )
             {
@@ -648,36 +648,6 @@ namespace rocks.kfs.Intacct
             }
             HttpContext.Current.Session["IntacctCsvExport"] = output.ToString();
             HttpContext.Current.Session["IntacctFileId"] = fileId;
-        }
-
-        public class GLCsvLine
-        {
-            public string Journal;
-            public DateTime? Date;
-            public string Description;
-            public string ReferenceNumber;
-            public int LineNumber;
-            public string AccountNumber;
-            public string LocationId;
-            public string DepartmentId;
-            public string Document;
-            public string Memo;
-            public decimal? Debit;
-            public decimal? Credit;
-            public string Currency;
-            public DateTime? ExchangeRateDate;
-            public string ExchangeRateTypeId;
-            public decimal? ExchangeRate;
-            public string State = string.Empty;
-            public string AllocationId;
-            public string ProjectId;
-            public string CustomerId;
-            public string VendorId;
-            public string EmployeeId;
-            public string ItemId;
-            public string ClassId;
-            public List<AllocationLine> CustomAllocationSplits = new List<AllocationLine>();
-            public SortedDictionary<string, dynamic> CustomFields = new SortedDictionary<string, object>();
         }
 
         public class ExportColumns
