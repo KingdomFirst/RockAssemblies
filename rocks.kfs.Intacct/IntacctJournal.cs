@@ -28,6 +28,7 @@ using Rock.Data;
 using Rock.Model;
 using Rock.Utility;
 using Rock.Web.Cache;
+using rocks.kfs.Intacct.Enums;
 using rocks.kfs.Intacct.Utils;
 using KFSConst = rocks.kfs.Intacct.SystemGuid;
 
@@ -666,20 +667,5 @@ namespace rocks.kfs.Intacct
             public bool ItemId = false;
             public bool ClassId = false;
         }
-    }
-
-    public enum GLAccountGroupingMode
-    {
-        DebitAndCreditLines = 0,
-        DebitLinesOnly = 1,
-        CreditLinesOnly = 2,
-        DebitAndCreditByFinancialAccount = 3,
-        NoGrouping = 4
-    }
-
-    public enum JournalState
-    {
-        Posted,
-        Draft
     }
 }
