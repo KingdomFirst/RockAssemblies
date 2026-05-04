@@ -16,19 +16,15 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Web;
 using System.Xml;
-
 using Rock;
 using Rock.Data;
 using Rock.Model;
-using Rock.Web.Cache;
 using rocks.kfs.Intacct.Enums;
 using rocks.kfs.Intacct.Utils;
-using KFSConst = rocks.kfs.Intacct.SystemGuid;
 
 namespace rocks.kfs.Intacct
 {

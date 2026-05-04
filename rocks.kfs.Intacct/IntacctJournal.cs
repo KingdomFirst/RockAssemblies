@@ -555,7 +555,6 @@ namespace rocks.kfs.Intacct
             {
                 output.AppendFormat( ", {0}", customFieldCol );
             }
-            var num = 0;
             if ( items.Any( i => !i.ProjectId.IsNullOrWhiteSpace() ) )
             {
                 output.Append( ", GLEntry_ProjectId" );
@@ -645,7 +644,6 @@ namespace rocks.kfs.Intacct
                 {
                     output.AppendFormat( ",{0}", item.ClassId ?? string.Empty );
                 }
-                num++;
             }
             HttpContext.Current.Session["IntacctCsvExport"] = output.ToString();
             HttpContext.Current.Session["IntacctFileId"] = fileId;
