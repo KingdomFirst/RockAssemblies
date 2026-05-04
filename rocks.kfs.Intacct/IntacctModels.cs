@@ -138,7 +138,7 @@ namespace rocks.kfs.Intacct
     public class ReceiptLineItem
     {
         public string GlAccountNo;
-        public string AccountLabel;
+        public string GlAccountLabel;
         public decimal Amount;
         public string Memo;
         public string LocationId;
@@ -154,6 +154,40 @@ namespace rocks.kfs.Intacct
         public string ItemId;
         public string ClassId;
         public decimal TotalTrxAmount;
+    }
+
+    public class GLReceiptCsvLine
+    {
+        public DateTime? ReceiptDate;
+        public PaymentMethod? PaymentMethod;
+        public DateTime? TransactionDate;
+        public string TransactionNumber;
+        public string Description;
+        public DepositTo? DepositTo;
+        public string BankAccountId;
+        public DateTime? DepositDate;
+        public string UndepositedFundsAccountId;
+        public string Currency;
+        public DateTime? ExchRateDate;
+        public string ExchRateType;
+        public decimal? ExchRate;
+        public int LineNumber;
+        public string AccountNumber;
+        public string AccountLabel;
+        public decimal TransactionAmount;
+        public decimal Amount;
+        public string DepartmentId;
+        public string LocationId;
+        public string Memo;
+        public string ProjectId;
+        public string CustomerId;
+        public string ItemId;
+        public string TaskId;
+        public string VendorId;
+        public string EmployeeId;
+        public string ClassId;
+        public string Payer;
+        public SortedDictionary<string, dynamic> CustomFields = new SortedDictionary<string, object>();
     }
 
     public class GLTransaction : ILavaDataDictionary
