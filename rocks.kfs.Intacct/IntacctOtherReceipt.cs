@@ -389,7 +389,7 @@ namespace rocks.kfs.Intacct
             exportColumns.CustomFieldKeys = customFieldCols.ToList();
 
             var output = new StringBuilder();
-            output.Append( "Receipt_Date, Payer_Name, Paymethod, DocDate, DocNumber, Description" );
+            output.Append( "Receipt_Date, Payer_Name, PayMethod, DocDate, DocNumber, Description" );
             if ( items.Any( i => i.DepositTo == DepositTo.BankAccount ) )
             {
                 output.Append( ", BankAccountId, DepositDate" );
