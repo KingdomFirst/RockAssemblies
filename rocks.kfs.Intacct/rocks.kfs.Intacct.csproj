@@ -85,6 +85,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\ExportMethod.cs" />
     <Compile Include="Enums\DepositTo.cs" />
     <Compile Include="Enums\GLAccountGroupingMode.cs" />
     <Compile Include="Enums\JournalState.cs" />
