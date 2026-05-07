@@ -14,24 +14,16 @@
 // limitations under the License.
 // </copyright>
 //
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-
-namespace rocks.kfs.Intacct.Enums
+namespace rocks.kfs.Intacct.SystemGuid
 {
-    public enum PaymentMethod
+    /// <summary>
+    /// Custom KFS Defined Types for Intacct Export plugin
+    /// </summary>
+    public class DefinedType
     {
-        [Display( Name = "Check" )]
-        [Description( "Printed Check" )]
-        PrintedCheck,
-        [Display( Name = "Cash" )]
-        [Description( "Cash" )]
-        Cash,
-        [Display( Name = "Record Transfer" )]
-        [Description( "EFT" )]
-        EFT,
-        [Display( Name = "Credit Card" )]
-        [Description( "Credit Card" )]
-        CreditCard
+        /// <summary>
+        /// The defined type containing intacct bank account numbers for other receipts.
+        /// </summary>
+        public const string INTACCT_OTHER_RECEIPT_BANK_ACCOUNT_DEFINED_TYPE = "6CB8EC05-957A-4389-8F3F-94F2C981269D";
     }
 }

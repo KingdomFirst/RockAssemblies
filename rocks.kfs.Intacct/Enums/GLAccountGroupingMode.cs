@@ -19,19 +19,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace rocks.kfs.Intacct.Enums
 {
-    public enum PaymentMethod
+    public enum GLAccountGroupingMode
     {
-        [Display( Name = "Check" )]
-        [Description( "Printed Check" )]
-        PrintedCheck,
-        [Display( Name = "Cash" )]
-        [Description( "Cash" )]
-        Cash,
-        [Display( Name = "Record Transfer" )]
-        [Description( "EFT" )]
-        EFT,
-        [Display( Name = "Credit Card" )]
-        [Description( "Credit Card" )]
-        CreditCard
+        DebitAndCreditLines = 0,
+        DebitLinesOnly = 1,
+        CreditLinesOnly = 2,
+        DebitAndCreditByFinancialAccount = 3,
+        NoGrouping = 4
     }
 }

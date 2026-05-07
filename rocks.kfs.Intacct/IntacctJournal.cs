@@ -18,12 +18,17 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Text;
+using System.Web;
 using System.Xml;
+using OfficeOpenXml;
 
 using Rock;
 using Rock.Data;
 using Rock.Model;
+using Rock.Utility;
 using Rock.Web.Cache;
+using rocks.kfs.Intacct.Enums;
 using rocks.kfs.Intacct.Utils;
 using KFSConst = rocks.kfs.Intacct.SystemGuid;
 
@@ -41,7 +46,7 @@ namespace rocks.kfs.Intacct
         /// <param name="DescriptionLava">Lava code to use for the description of each line of the journal entry.</param>
         /// <param name="groupingMode">The mode for handling grouping of GL accounts. <see cref="GLAccountGroupingMode"/></param>
         /// <returns>Returns the XML needed to create an Intacct Journal Entry.</returns>
-        public XmlDocument CreateJournalEntryXML( IntacctAuth AuthCreds, int BatchId, string JournalId, ref string debugLava, string DescriptionLava, GLAccountGroupingMode groupingMode )
+        public XmlDocument CreateJournalEntryXML( IntacctAuth AuthCreds, int BatchId, string JournalId, ref string debugLava, string DescriptionLava, GLAccountGroupingMode groupingMode, JournalState journalState = JournalState.Posted )
         {
             var doc = new XmlDocument();
             var financialBatch = new FinancialBatchService( new RockContext() ).Get( BatchId );
@@ -86,6 +91,10 @@ namespace rocks.kfs.Intacct
                         writer.WriteElementString( "REFERENCENO", financialBatch.Id.ToString() );
                         writer.WriteElementString( "BATCH_DATE", batchDate );
                         writer.WriteElementString( "BATCH_TITLE", financialBatch.Name );
+                        if ( journalState == JournalState.Draft )
+                        {
+                            writer.WriteElementString( "STATE", journalState.ToString() );
+                        }
                         writer.WriteElementString( "HISTORY_COMMENT", "Imported from RockRMS" );
                         writer.WriteStartElement( "ENTRIES" );
 
@@ -409,6 +418,7 @@ namespace rocks.kfs.Intacct
                     CustomFields = debitTransaction.CustomDimensions,
                     ItemIndex = debitTransaction.ItemIndex,
                     FeeItemIndex = debitTransaction.FeeItemIndex,
+                    CreditOrDebit = "Debit"
                 };
 
                 returnList.Add( debitLine );
@@ -428,6 +438,7 @@ namespace rocks.kfs.Intacct
                     CustomFields = creditTransaction.CustomDimensions,
                     ItemIndex = creditTransaction.ItemIndex,
                     FeeItemIndex = creditTransaction.FeeItemIndex,
+                    CreditOrDebit = "Credit"
                 };
 
                 returnList.Add( creditLine );
@@ -439,14 +450,220 @@ namespace rocks.kfs.Intacct
 
             return returnList;
         }
-    }
 
-    public enum GLAccountGroupingMode
-    {
-        DebitAndCreditLines = 0,
-        DebitLinesOnly = 1,
-        CreditLinesOnly = 2,
-        DebitAndCreditByFinancialAccount = 3,
-        NoGrouping = 4
+        public List<GLJournalCsvLine> GetGLCsvLines( FinancialBatch financialBatch, string JournalId, ref string debugLava, string DescriptionLava, GLAccountGroupingMode groupingMode, JournalState journalState = JournalState.Posted )
+        {
+            var glCsvLines = new List<GLJournalCsvLine>();
+            var batchDate = financialBatch.BatchStartDateTime == null ? RockDateTime.Now : ( ( System.DateTime ) financialBatch.BatchStartDateTime );
+            var glEntries = GetGlEntries( financialBatch, ref debugLava, DescriptionLava, groupingMode );
+            var journalLineNumber = 1;
+
+            foreach ( var entry in glEntries )
+            {
+                var csvLine = new GLJournalCsvLine()
+                {
+                    LineNumber = journalLineNumber,
+                    AccountNumber = entry.GlAccountNumber,
+                    LocationId = entry.LocationId,
+                    DepartmentId = entry.DepartmentId,
+                    Document = entry.DocumentNumber,
+                    Memo = entry.Memo,
+                    Debit = entry.CreditOrDebit == "Debit" ? entry.TransactionAmount : null,
+                    Credit = entry.CreditOrDebit == "Credit" ? entry.TransactionAmount * -1 : null,
+                    Currency = entry.TransactionCurrency,
+                    ExchangeRateDate = entry.ExchangeRateDate,
+                    ExchangeRateTypeId = entry.ExchangeRateType,
+                    ExchangeRate = entry.ExchangeRateValue,
+                    AllocationId = entry.AllocationId,
+                    ProjectId = entry.ProjectId,
+                    CustomerId = entry.CustomerId,
+                    VendorId = entry.VendorId,
+                    EmployeeId = entry.EmployeeId,
+                    ItemId = entry.ItemId,
+                    ClassId = entry.ClassId,
+                    CustomAllocationSplits = entry.CustomAllocationSplits,
+                    CustomFields = entry.CustomFields
+                };
+
+                // Only add Batch/Journal level info to first line of the journal.
+                if ( journalLineNumber == 1 )
+                {
+                    csvLine.Journal = JournalId;
+                    csvLine.Date = batchDate;
+                    csvLine.Description = financialBatch.Name;
+                    csvLine.ReferenceNumber = financialBatch.Id.ToString();
+                    csvLine.State = journalState.ToString();
+                }
+
+                glCsvLines.Add( csvLine );
+                journalLineNumber++;
+            }
+
+            return glCsvLines;
+        }
+
+        public void GLCsvExport( List<GLJournalCsvLine> items, string fileId )
+        {
+            if ( HttpContext.Current.Session["IntacctCsvExport"] != null )
+            {
+                HttpContext.Current.Session["IntacctCsvExport"] = string.Empty;
+            }
+            if ( HttpContext.Current.Session["IntacctFileId"] != null )
+            {
+                HttpContext.Current.Session["IntacctFileId"] = string.Empty;
+            }
+
+            var customFieldCols = items.SelectMany( i => i.CustomFields.Keys ).Distinct().ToList().OrderBy( k => k );
+            var exportColumns = new ExportColumns();
+            exportColumns.CustomFieldKeys = customFieldCols.ToList();
+
+            var output = new StringBuilder();
+            output.Append( "Journal, Date, Description, Reference_No, Line_No, Acct_No, Location_Id, Dept_Id" );
+            if ( items.Any( i => !i.Document.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", Document" );
+                exportColumns.Document = true;
+            }
+            output.Append( ", Memo, Debit, Credit" );
+            if ( items.Any( i => !i.Currency.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", Currency" );
+                exportColumns.Currency = true;
+            }
+            if ( items.Any( i => i.ExchangeRateDate.HasValue ) )
+            {
+                output.Append( ", Exch_Rate_Date" );
+                exportColumns.ExchangeRateDate = true;
+            }
+            if ( items.Any( i => !i.ExchangeRateTypeId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", Exch_Rate_Type_Id" );
+                exportColumns.ExchangeRateTypeId = true;
+            }
+            if ( items.Any( i => i.ExchangeRate.HasValue ) )
+            {
+                output.Append( ", Exch_Rate" );
+                exportColumns.ExchangeRate = true;
+            }
+            output.Append( ", State" );
+            if ( items.Any( i => !i.AllocationId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", Allocation_Id" );
+                exportColumns.AllocationId = true;
+            }
+            foreach ( var customFieldCol in customFieldCols )
+            {
+                output.AppendFormat( ", {0}", customFieldCol );
+            }
+            if ( items.Any( i => !i.ProjectId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_ProjectId" );
+                exportColumns.ProjectId = true;
+            }
+            if ( items.Any( i => !i.CustomerId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_CustomerId" );
+                exportColumns.CustomerId = true;
+            }
+            if ( items.Any( i => !i.VendorId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_VendorId" );
+                exportColumns.VendorId = true;
+            }
+            if ( items.Any( i => !i.EmployeeId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_EmployeeId" );
+                exportColumns.EmployeeId = true;
+            }
+            if ( items.Any( i => !i.ItemId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_ItemId" );
+                exportColumns.ItemId = true;
+            }
+            if ( items.Any( i => !i.ClassId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_ClassId" );
+                exportColumns.ClassId = true;
+            }
+
+            foreach ( var item in items )
+            {
+                output.Append( Environment.NewLine );
+                output.AppendFormat( "{0},{1},{2},{3},{4},{5},{6},{7}", item.Journal, item.Date.HasValue ? item.Date.Value.ToShortDateString() : string.Empty, item.Description, item.ReferenceNumber, item.LineNumber, item.AccountNumber, item.LocationId, item.DepartmentId );
+                if ( exportColumns.Document )
+                {
+                    output.AppendFormat( ",{0}", item.Document ?? string.Empty );
+                }
+                output.AppendFormat( ",{0},{1},{2}", item.Memo, item.Debit, item.Credit );
+                if ( exportColumns.Currency )
+                {
+                    output.AppendFormat( ",{0}", item.Currency ?? string.Empty );
+                }
+                if ( exportColumns.ExchangeRateDate )
+                {
+                    output.AppendFormat( ",{0}", item.ExchangeRateDate.HasValue ? item.ExchangeRateDate.Value.ToShortDateString() : string.Empty );
+                }
+                if ( exportColumns.ExchangeRateTypeId )
+                {
+                    output.AppendFormat( ",{0}", item.ExchangeRateTypeId ?? string.Empty );
+                } 
+                if ( exportColumns.ExchangeRate )
+                {
+                    output.AppendFormat( ",{0}", item.ExchangeRate.HasValue ? item.ExchangeRate.Value.ToString() : string.Empty );
+                }
+                output.AppendFormat( ",{0}", item.State );
+                if ( exportColumns.AllocationId )
+                {
+                    output.AppendFormat( ",{0}", item.AllocationId ?? string.Empty );
+                }
+                foreach ( var customFieldCol in exportColumns.CustomFieldKeys )
+                {
+                    output.AppendFormat( ",{0}", item.CustomFields.ContainsKey( customFieldCol ) ? item.CustomFields[customFieldCol] : string.Empty );
+                }
+                if ( exportColumns.ProjectId )
+                {
+                    output.AppendFormat( ",{0}", item.ProjectId ?? string.Empty );
+                }
+                if ( exportColumns.CustomerId )
+                {
+                    output.AppendFormat( ",{0}", item.CustomerId ?? string.Empty );
+                }
+                if ( exportColumns.VendorId )
+                {
+                    output.AppendFormat( ",{0}", item.VendorId ?? string.Empty );
+                }
+                if ( exportColumns.EmployeeId )
+                {
+                    output.AppendFormat( ",{0}", item.EmployeeId ?? string.Empty );
+                }
+                if ( exportColumns.ItemId )
+                {
+                    output.AppendFormat( ",{0}", item.ItemId ?? string.Empty );
+                }
+                if ( exportColumns.ClassId )
+                {
+                    output.AppendFormat( ",{0}", item.ClassId ?? string.Empty );
+                }
+            }
+            HttpContext.Current.Session["IntacctCsvExport"] = output.ToString();
+            HttpContext.Current.Session["IntacctFileId"] = fileId;
+        }
+
+        public class ExportColumns
+        {
+            public bool ExchangeRateDate = false;
+            public bool ExchangeRateTypeId = false;
+            public bool ExchangeRate = false;
+            public bool AllocationId = false;
+            public bool Document = false;
+            public bool Currency = false;
+            public List<string> CustomFieldKeys = new List<string>();
+            public bool ProjectId = false;
+            public bool CustomerId = false;
+            public bool VendorId = false;
+            public bool EmployeeId = false;
+            public bool ItemId = false;
+            public bool ClassId = false;
+        }
     }
 }

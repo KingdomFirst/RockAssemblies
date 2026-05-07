@@ -19,19 +19,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace rocks.kfs.Intacct.Enums
 {
-    public enum PaymentMethod
+    public enum DepositTo
     {
-        [Display( Name = "Check" )]
-        [Description( "Printed Check" )]
-        PrintedCheck,
-        [Display( Name = "Cash" )]
-        [Description( "Cash" )]
-        Cash,
-        [Display( Name = "Record Transfer" )]
-        [Description( "EFT" )]
-        EFT,
-        [Display( Name = "Credit Card" )]
-        [Description( "Credit Card" )]
-        CreditCard
+        [Display( Name = "Bank Account" )]
+        [Description( "Bank Account" )]
+        BankAccount,
+        [Display( Name = "Undeposited funds" )]
+        [Description( "Undeposited funds" )]
+        UndepositedFunds
     }
 }
