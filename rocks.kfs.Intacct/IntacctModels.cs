@@ -60,6 +60,7 @@ namespace rocks.kfs.Intacct
         public string VendorId;
         public string EmployeeId;
         public string ItemId;
+        public string TaskId;
         public string ClassId;
         public string ContractId;
         public string WarehouseId;
@@ -108,6 +109,7 @@ namespace rocks.kfs.Intacct
         public string EmployeeId;
         public string ItemId;
         public string ClassId;
+        public string TaskId;
         public List<AllocationLine> CustomAllocationSplits = new List<AllocationLine>();
         public SortedDictionary<string, dynamic> CustomFields = new SortedDictionary<string, object>();
     }

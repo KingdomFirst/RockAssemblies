@@ -144,10 +144,12 @@ namespace rocks.kfs.Intacct
                             if ( !string.IsNullOrWhiteSpace( item.ProjectId ) )
                             {
                                 writer.WriteElementString( "projectid", item.ProjectId );
-                            }
-                            if ( !string.IsNullOrWhiteSpace( item.TaskId ) )
-                            {
-                                writer.WriteElementString( "taskid", item.TaskId );
+
+                                // Task is a sub-dimension of Project in Intacct, so only include if Project is included.
+                                if ( !string.IsNullOrWhiteSpace( item.TaskId ) )
+                                {
+                                    writer.WriteElementString( "taskid", item.TaskId );
+                                }
                             }
                             if ( !string.IsNullOrWhiteSpace( item.CustomerId ) )
                             {
@@ -438,6 +440,11 @@ namespace rocks.kfs.Intacct
             {
                 output.Append( ", OtherReceiptsEntry_ProjectId" );
                 exportColumns.ProjectId = true;
+                if ( items.Any( i => !i.TaskId.IsNullOrWhiteSpace() ) )   // Task is a sub-dimension of Project in Intacct, so only include if Project is included.
+                {
+                    output.Append( ", OtherReceiptsEntry_TaskId" );
+                    exportColumns.TaskId = true;
+                }
             }
             if ( items.Any( i => !i.CustomerId.IsNullOrWhiteSpace() ) )
             {
@@ -511,6 +518,12 @@ namespace rocks.kfs.Intacct
                 if ( exportColumns.ProjectId )
                 {
                     output.AppendFormat( ",{0}", item.ProjectId ?? string.Empty );
+
+                    // Task is a sub-dimension of Project in Intacct, so only include if Project is included.
+                    if ( exportColumns.TaskId )
+                    {
+                        output.AppendFormat( ",{0}", item.TaskId ?? string.Empty );
+                    }
                 }
                 if ( exportColumns.CustomerId )
                 {
@@ -559,6 +572,7 @@ namespace rocks.kfs.Intacct
             public bool EmployeeId = false;
             public bool ItemId = false;
             public bool ClassId = false;
+            public bool TaskId = false;
         }
     }
 }

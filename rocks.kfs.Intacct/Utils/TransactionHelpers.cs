@@ -174,10 +174,20 @@ namespace rocks.kfs.Intacct.Utils
             knownDimensions.Add( "rocks.kfs.Intacct.DEPARTMENT" );
             knownDimensions.Add( "rocks.kfs.Intacct.LOCATION" );
             knownDimensions.Add( "rocks.kfs.Intacct.PROJECTID" );
+            knownDimensions.Add( "rocks.kfs.Intacct.CUSTOMERID" );
+            knownDimensions.Add( "rocks.kfs.Intacct.ITEMID" );
+            knownDimensions.Add( "rocks.kfs.Intacct.TASKID" );
+            knownDimensions.Add( "rocks.kfs.Intacct.VENDORID" );
+            knownDimensions.Add( "rocks.kfs.Intacct.EMPLOYEEID" );
             knownDimensions.Add( "rocks.kfs.Intacct.DEBITCLASSID" );
             knownDimensions.Add( "rocks.kfs.Intacct.DEBITDEPARTMENT" );
             knownDimensions.Add( "rocks.kfs.Intacct.DEBITLOCATION" );
             knownDimensions.Add( "rocks.kfs.Intacct.DEBITPROJECTID" );
+            knownDimensions.Add( "rocks.kfs.Intacct.DEBITCUSTOMERID" );
+            knownDimensions.Add( "rocks.kfs.Intacct.DEBITITEMID" );
+            knownDimensions.Add( "rocks.kfs.Intacct.DEBITTASKID" );
+            knownDimensions.Add( "rocks.kfs.Intacct.DEBITVENDORID" );
+            knownDimensions.Add( "rocks.kfs.Intacct.DEBITEMPLOYEEID" );
 
             var rockContext = new RockContext();
             var accountCategoryId = new CategoryService( rockContext ).Queryable().FirstOrDefault( c => c.Guid.Equals( new System.Guid( KFSConst.Attribute.FINANCIAL_ACCOUNT_ATTRIBUTE_CATEGORY ) ) ).Id;

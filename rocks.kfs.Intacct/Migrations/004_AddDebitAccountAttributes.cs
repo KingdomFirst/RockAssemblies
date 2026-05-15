@@ -16,7 +16,7 @@
 //
 using System;
 using Rock.Plugin;
-using KFSConst = rocks.kfs.Intacct.SystemGuid;
+using rocks.kfs.Intacct;
 
 namespace rocks.kfs.Intacct.Migrations
 {
@@ -30,11 +30,11 @@ namespace rocks.kfs.Intacct.Migrations
         {
             // ADD NEW DEBIT ACCOUNT ATTRIBUTES FOR FINANCIAL ACCOUNTS
             // project
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Default Debit Project", "Designates the Project for the assigned Debit Account at the Financial Account Level.", 6, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, "rocks.kfs.Intacct.DEBITPROJECTID" );
-            RockMigrationHelper.UpdateAttributeQualifier( KFSConst.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, "allowmultiple", "False", "4A597C2F-034F-4855-B939-F44EA19B4194" );
-            RockMigrationHelper.UpdateAttributeQualifier( KFSConst.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, "definedtype", "", "07C034DB-AD00-4BB9-A0B0-3BC35BF7A994" );
-            RockMigrationHelper.UpdateAttributeQualifier( KFSConst.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, "displaydescription", "True", "B87B2631-5692-4346-BDD7-557FC224FF40" );
-            RockMigrationHelper.UpdateAttributeQualifier( KFSConst.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, "enhancedselection", "True", "88B9BF14-0756-45B1-9B7F-5BFE1A4DDF7D" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Default Debit Project", "Designates the Project for the assigned Debit Account at the Financial Account Level.", 6, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, "rocks.kfs.Intacct.DEBITPROJECTID" );
+            RockMigrationHelper.UpdateAttributeQualifier( SystemGuid.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, "allowmultiple", "False", "4A597C2F-034F-4855-B939-F44EA19B4194" );
+            RockMigrationHelper.UpdateAttributeQualifier( SystemGuid.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, "definedtype", "", "07C034DB-AD00-4BB9-A0B0-3BC35BF7A994" );
+            RockMigrationHelper.UpdateAttributeQualifier( SystemGuid.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, "displaydescription", "True", "B87B2631-5692-4346-BDD7-557FC224FF40" );
+            RockMigrationHelper.UpdateAttributeQualifier( SystemGuid.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, "enhancedselection", "True", "88B9BF14-0756-45B1-9B7F-5BFE1A4DDF7D" );
 
             // set defined type qualifiers
             Sql( @"
@@ -45,9 +45,9 @@ namespace rocks.kfs.Intacct.Migrations
             " );
 
             // gl attributes
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Class", "The Intacct dimension for Class Id to be used for assigned Debit Account.", 7, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_CLASS_DEBIT, "rocks.kfs.Intacct.DEBITCLASSID" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Department", "The Intacct dimension for Department Id to be used for assigned Debit Account.", 8, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT_DEBIT, "rocks.kfs.Intacct.DEBITDEPARTMENT" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Location", "The Intacct dimension for Location Id to be used for assigned Debit Account. Required if multi-entity enabled.", 9, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_LOCATION_DEBIT, "rocks.kfs.Intacct.DEBITLOCATION" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Class", "The Intacct dimension for Class Id to be used for assigned Debit Account.", 7, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_CLASS_DEBIT, "rocks.kfs.Intacct.DEBITCLASSID" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Department", "The Intacct dimension for Department Id to be used for assigned Debit Account.", 8, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT_DEBIT, "rocks.kfs.Intacct.DEBITDEPARTMENT" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Location", "The Intacct dimension for Location Id to be used for assigned Debit Account. Required if multi-entity enabled.", 9, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_LOCATION_DEBIT, "rocks.kfs.Intacct.DEBITLOCATION" );
 
             // set attribute category for new attributes
             Sql( string.Format( @"
@@ -91,18 +91,25 @@ namespace rocks.kfs.Intacct.Migrations
                     INSERT INTO [AttributeCategory]
                     SELECT @AccountDebitLocation, @AccountCategoryId
                 END
-            ", KFSConst.Attribute.FINANCIAL_ACCOUNT_ATTRIBUTE_CATEGORY, KFSConst.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, KFSConst.Attribute.FINANCIAL_ACCOUNT_CLASS_DEBIT, KFSConst.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT_DEBIT, KFSConst.Attribute.FINANCIAL_ACCOUNT_LOCATION_DEBIT ) );
+            ", SystemGuid.Attribute.FINANCIAL_ACCOUNT_ATTRIBUTE_CATEGORY, SystemGuid.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CLASS_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_LOCATION_DEBIT ) );
 
             // rename and reorder of existing attributes
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Default Credit Project", "Designates the Project for the assigned Credit Account at the Financial Account Level.", 1, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_PROJECT, "rocks.kfs.Intacct.PROJECTID" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Credit Class", "The Intacct dimension for Class Id to be used for assigned Credit Account.", 2, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_CLASS, "rocks.kfs.Intacct.CLASSID" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Credit Department", "The Intacct dimension for Department Id to be used for assigned Credit Account.", 3, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT, "rocks.kfs.Intacct.DEPARTMENT" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Credit Location", "The Intacct dimension for Location Id to be used for assigned Credit Account. Required if multi-entity enabled.", 4, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_LOCATION, "rocks.kfs.Intacct.LOCATION" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Default Credit Project", "Designates the Project for the assigned Credit Account at the Financial Account Level.", 1, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_PROJECT, "rocks.kfs.Intacct.PROJECTID" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Credit Class", "The Intacct dimension for Class Id to be used for assigned Credit Account.", 2, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_CLASS, "rocks.kfs.Intacct.CLASSID" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Credit Department", "The Intacct dimension for Department Id to be used for assigned Credit Account.", 3, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT, "rocks.kfs.Intacct.DEPARTMENT" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Credit Location", "The Intacct dimension for Location Id to be used for assigned Credit Account. Required if multi-entity enabled.", 4, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_LOCATION, "rocks.kfs.Intacct.LOCATION" );
 
             // reorder remaining attributes
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Credit Account", "Account number to use for credit column. Required by Intacct.", 0, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_CREDIT_ACCOUNT, "rocks.kfs.Intacct.ACCOUNTNO" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Account", "Account number to use for debit column. Required by Intacct.", 5, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_DEBIT_ACCOUNT, "rocks.kfs.Intacct.DEBITACCOUNTNO" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Transaction Fee Account", "Expense account number for gateway transaction fees.", 10, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_FEE_ACCOUNT, "rocks.kfs.Intacct.FEEACCOUNTNO" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Credit Account", "Account number to use for credit column. Required by Intacct.", 0, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_CREDIT_ACCOUNT, "rocks.kfs.Intacct.ACCOUNTNO" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Account", "Account number to use for debit column. Required by Intacct.", 5, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_DEBIT_ACCOUNT, "rocks.kfs.Intacct.DEBITACCOUNTNO" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Transaction Fee Account", "Expense account number for gateway transaction fees.", 10, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_FEE_ACCOUNT, "rocks.kfs.Intacct.FEEACCOUNTNO" );
+
+            // set dimension attributes to inactive so they don't show on the financial account edit screen until activated as needed.
+            Sql( string.Format( @"
+
+                UPDATE [Attribute] SET [IsActive] = 0
+                WHERE [Guid] IN ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
+            ", SystemGuid.Attribute.FINANCIAL_ACCOUNT_PROJECT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CLASS, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CLASS_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_FEE_ACCOUNT ) );
 
             // copy values already provided in existing (now credit) attributes into corresponding new debit attributes to keep previous functionality in tact
             Sql( string.Format( @"
@@ -237,7 +244,7 @@ namespace rocks.kfs.Intacct.Migrations
                 FROM AttributeValue AV WITH(NOLOCK)
                 LEFT JOIN AttributeValue AV2 WITH(NOLOCK) ON AV.EntityId = AV2.EntityId AND AV2.AttributeId = @DebitLocationAttrId 
                 WHERE AV.AttributeId = @CreditLocationAttrId AND AV2.Id IS NULL;
-            ", KFSConst.Attribute.FINANCIAL_ACCOUNT_PROJECT, KFSConst.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, KFSConst.Attribute.FINANCIAL_ACCOUNT_CLASS, KFSConst.Attribute.FINANCIAL_ACCOUNT_CLASS_DEBIT, KFSConst.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT, KFSConst.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT_DEBIT, KFSConst.Attribute.FINANCIAL_ACCOUNT_LOCATION, KFSConst.Attribute.FINANCIAL_ACCOUNT_LOCATION_DEBIT ) );
+            ", SystemGuid.Attribute.FINANCIAL_ACCOUNT_PROJECT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CLASS, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CLASS_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_LOCATION, SystemGuid.Attribute.FINANCIAL_ACCOUNT_LOCATION_DEBIT ) );
         }
 
         /// <summary>
@@ -246,19 +253,19 @@ namespace rocks.kfs.Intacct.Migrations
         public override void Down()
         {
             // remove debit account related attributes
-            RockMigrationHelper.DeleteAttribute( KFSConst.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT );
-            RockMigrationHelper.DeleteAttribute( KFSConst.Attribute.FINANCIAL_ACCOUNT_CLASS_DEBIT );
-            RockMigrationHelper.DeleteAttribute( KFSConst.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT_DEBIT );
-            RockMigrationHelper.DeleteAttribute( KFSConst.Attribute.FINANCIAL_ACCOUNT_LOCATION_DEBIT );
+            RockMigrationHelper.DeleteAttribute( SystemGuid.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT );
+            RockMigrationHelper.DeleteAttribute( SystemGuid.Attribute.FINANCIAL_ACCOUNT_CLASS_DEBIT );
+            RockMigrationHelper.DeleteAttribute( SystemGuid.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT_DEBIT );
+            RockMigrationHelper.DeleteAttribute( SystemGuid.Attribute.FINANCIAL_ACCOUNT_LOCATION_DEBIT );
 
             // update name and order of original attributes 
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Default Project", "Designates the Project at the Financial Account Level", 0, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_PROJECT, "rocks.kfs.Intacct.PROJECTID" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Class", "The Intacct dimension for Class Id.", 4, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_CLASS, "rocks.kfs.Intacct.CLASSID" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Department", "The Intacct dimension for Department Id.", 5, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT, "rocks.kfs.Intacct.DEPARTMENT" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Location", "The Intacct dimension for Location Id. Required if multi-entity enabled.", 6, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_LOCATION, "rocks.kfs.Intacct.LOCATION" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Credit Account", "Account number to use for credit column. Required by Intacct.", 1, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_CREDIT_ACCOUNT, "rocks.kfs.Intacct.ACCOUNTNO" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Account", "Account number to use for debit column. Required by Intacct.", 2, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_DEBIT_ACCOUNT, "rocks.kfs.Intacct.DEBITACCOUNTNO" );
-            RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Transaction Fee Account", "Expense account number for gateway transaction fees.", 3, "", KFSConst.Attribute.FINANCIAL_ACCOUNT_FEE_ACCOUNT, "rocks.kfs.Intacct.FEEACCOUNTNO" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.DEFINED_VALUE, "", "", "Default Project", "Designates the Project at the Financial Account Level", 0, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_PROJECT, "rocks.kfs.Intacct.PROJECTID" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Class", "The Intacct dimension for Class Id.", 4, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_CLASS, "rocks.kfs.Intacct.CLASSID" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Department", "The Intacct dimension for Department Id.", 5, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT, "rocks.kfs.Intacct.DEPARTMENT" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Location", "The Intacct dimension for Location Id. Required if multi-entity enabled.", 6, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_LOCATION, "rocks.kfs.Intacct.LOCATION" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Credit Account", "Account number to use for credit column. Required by Intacct.", 1, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_CREDIT_ACCOUNT, "rocks.kfs.Intacct.ACCOUNTNO" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Account", "Account number to use for debit column. Required by Intacct.", 2, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_DEBIT_ACCOUNT, "rocks.kfs.Intacct.DEBITACCOUNTNO" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Transaction Fee Account", "Expense account number for gateway transaction fees.", 3, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_FEE_ACCOUNT, "rocks.kfs.Intacct.FEEACCOUNTNO" );
         }
     }
 }
