@@ -64,6 +64,31 @@ namespace rocks.kfs.Intacct.SystemGuid
         public const string FINANCIAL_ACCOUNT_LOCATION = "CFA818F9-3163-45FE-AA03-AAF8DEDCF48D";
 
         /// <summary>
+        /// The Intacct dimension for Customer.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_CUSTOMER = "C6918ACE-7C0A-4B8E-8F70-382BFE2C46B4";
+
+        /// <summary>
+        /// The Intacct dimension for Item Id.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_ITEM = "F2703B0D-4062-495D-90BE-89867529DA34";
+
+        /// <summary>
+        /// The Intacct dimension for Task.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_TASK = "371D6A0C-FB3E-4EAF-A92A-89DA1C46C848";
+
+        /// <summary>
+        /// The Intacct dimension for Vendor.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_VENDOR = "DD6BA8F4-5C2B-4662-A24B-5EDA863CC16C";
+
+        /// <summary>
+        /// The Intacct dimension for Employee.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_EMPLOYEE = "9BE35CAF-3C20-4D7D-B484-BB3F45949EE7";
+
+        /// <summary>
         /// The Intacct dimension for Projects of debit account.
         /// </summary>
         public const string FINANCIAL_ACCOUNT_PROJECT_DEBIT = "9DF341B7-2E07-44BA-94B1-F637BE551961";
@@ -82,6 +107,31 @@ namespace rocks.kfs.Intacct.SystemGuid
         /// The Intacct dimension for Location of debit account.
         /// </summary>
         public const string FINANCIAL_ACCOUNT_LOCATION_DEBIT = "0F247FC0-ECF0-407F-A042-F8E3638ED5B4";
+
+        /// <summary>
+        /// The Intacct dimension for Customer of debit account.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_CUSTOMER_DEBIT = "AC8D6CF8-00A4-44E0-A013-FA388660A9E0";
+
+        /// <summary>
+        /// The Intacct dimension for Item Id of debit account.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_ITEM_DEBIT = "B9360194-F2EB-4AD8-A1D0-8BA22D9B6E73";
+
+        /// <summary>
+        /// The Intacct dimension for Task of debit account.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_TASK_DEBIT = "0FB0853B-4567-4C07-B16B-E1DA54AEA510";
+
+        /// <summary>
+        /// The Intacct dimension for Vendor of debit account.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_VENDOR_DEBIT = "1E89E1D6-E9D5-44BB-81EB-7ECF9A609E81";
+
+        /// <summary>
+        /// The Intacct dimension for Employee of debit account.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_EMPLOYEE_DEBIT = "257DECD4-ED63-45F1-92F6-2B0C8D8C1392";
 
         #endregion
 
