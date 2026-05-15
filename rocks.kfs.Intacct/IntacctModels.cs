@@ -110,6 +110,8 @@ namespace rocks.kfs.Intacct
         public string ItemId;
         public string ClassId;
         public string TaskId;
+        public string ContractId;
+        public string WarehouseId;
         public List<AllocationLine> CustomAllocationSplits = new List<AllocationLine>();
         public SortedDictionary<string, dynamic> CustomFields = new SortedDictionary<string, object>();
     }
@@ -369,6 +371,8 @@ namespace rocks.kfs.Intacct
         public string CreditTask;
         public string CreditVendor;
         public string CreditEmployee;
+        public string CreditContract;
+        public string CreditWarehouse;
         public string DebitClass;
         public string DebitDepartment;
         public string DebitLocation;
@@ -378,6 +382,8 @@ namespace rocks.kfs.Intacct
         public string DebitTask;
         public string DebitVendor;
         public string DebitEmployee;
+        public string DebitContract;
+        public string DebitWarehouse;
         public string Description;
         public SortedDictionary<string, dynamic> CustomDimensions;
         public string CustomDimensionString;

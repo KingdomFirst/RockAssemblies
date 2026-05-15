@@ -89,6 +89,16 @@ namespace rocks.kfs.Intacct.SystemGuid
         public const string FINANCIAL_ACCOUNT_EMPLOYEE = "9BE35CAF-3C20-4D7D-B484-BB3F45949EE7";
 
         /// <summary>
+        /// The Intacct dimension for Contract.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_CONTRACTID = "14C6ABE2-BA4B-40A9-B14B-BD7FF6BBF045";
+
+        /// <summary>
+        /// The Intacct dimension for Warehouse.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_WAREHOUSEID = "A97DB314-8389-4412-ACED-D416D3F92D80";
+
+        /// <summary>
         /// The Intacct dimension for Projects of debit account.
         /// </summary>
         public const string FINANCIAL_ACCOUNT_PROJECT_DEBIT = "9DF341B7-2E07-44BA-94B1-F637BE551961";
@@ -132,6 +142,17 @@ namespace rocks.kfs.Intacct.SystemGuid
         /// The Intacct dimension for Employee of debit account.
         /// </summary>
         public const string FINANCIAL_ACCOUNT_EMPLOYEE_DEBIT = "257DECD4-ED63-45F1-92F6-2B0C8D8C1392";
+
+        /// <summary>
+        /// The Intacct dimension for Contract.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_CONTRACTID_DEBIT = "554EC300-B497-4665-89D3-5B40BCA84912";
+
+        /// <summary>
+        /// The Intacct dimension for Warehouse.
+        /// </summary>
+        public const string FINANCIAL_ACCOUNT_WAREHOUSEID_DEBIT = "6E4F5B13-CDDD-4C45-9891-6B28E081C1FF";
+
 
         #endregion
 

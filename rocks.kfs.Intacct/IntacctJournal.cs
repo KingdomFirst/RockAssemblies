@@ -255,6 +255,8 @@ namespace rocks.kfs.Intacct
                     CreditTask = account.GetAttributeValue( "rocks.kfs.Intacct.TASKID" ),
                     CreditVendor = account.GetAttributeValue( "rocks.kfs.Intacct.VENDORID" ),
                     CreditEmployee = account.GetAttributeValue( "rocks.kfs.Intacct.EMPLOYEEID" ),
+                    CreditContract = account.GetAttributeValue( "rocks.kfs.Intacct.CONTRACTID" ),
+                    CreditWarehouse = account.GetAttributeValue( "rocks.kfs.Intacct.WAREHOUSEID" ),
                     DebitClass = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITCLASSID" ),
                     DebitDepartment = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITDEPARTMENT" ),
                     DebitLocation = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITLOCATION" ),
@@ -264,6 +266,8 @@ namespace rocks.kfs.Intacct
                     DebitTask = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITTASKID" ),
                     DebitVendor = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITVENDORID" ),
                     DebitEmployee = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITEMPLOYEEID" ),
+                    DebitContract = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITCONTRACTID" ),
+                    DebitWarehouse = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITWAREHOUSEID" ),
                     Description = DescriptionLava.ResolveMergeFields( mergeFields ),
                     CustomDimensions = new SortedDictionary<string, dynamic>( customDimensionValues ),
                     ProcessTransactionFees = summary.ProcessTransactionFees
@@ -426,6 +430,8 @@ namespace rocks.kfs.Intacct
                     EmployeeId = debitTransaction.DebitEmployee,
                     ItemId = debitTransaction.DebitItem,
                     TaskId = debitTransaction.DebitTask,
+                    ContractId = debitTransaction.DebitContract,
+                    WarehouseId = debitTransaction.DebitWarehouse,
                     Memo = debitTransaction.Description,
                     CustomFields = debitTransaction.CustomDimensions,
                     ItemIndex = debitTransaction.ItemIndex,
@@ -451,6 +457,8 @@ namespace rocks.kfs.Intacct
                     EmployeeId = creditTransaction.CreditEmployee,
                     ItemId = creditTransaction.CreditItem,
                     TaskId = creditTransaction.CreditTask,
+                    ContractId = creditTransaction.CreditContract,
+                    WarehouseId = creditTransaction.CreditWarehouse,
                     Memo = creditTransaction.Description,
                     CustomFields = creditTransaction.CustomDimensions,
                     ItemIndex = creditTransaction.ItemIndex,
@@ -498,6 +506,8 @@ namespace rocks.kfs.Intacct
                     EmployeeId = entry.EmployeeId,
                     ItemId = entry.ItemId,
                     ClassId = entry.ClassId,
+                    ContractId = entry.ContractId,
+                    WarehouseId = entry.WarehouseId,
                     CustomAllocationSplits = entry.CustomAllocationSplits,
                     CustomFields = entry.CustomFields
                 };
@@ -609,6 +619,16 @@ namespace rocks.kfs.Intacct
                 output.Append( ", GLEntry_ClassId" );
                 exportColumns.ClassId = true;
             }
+            if ( items.Any( i => !i.ContractId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_ContractId" );
+                exportColumns.ContractId = true;
+            }
+            if ( items.Any( i => !i.WarehouseId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_WarehouseId" );
+                exportColumns.WarehouseId = true;
+            }
 
             foreach ( var item in items )
             {
@@ -630,7 +650,7 @@ namespace rocks.kfs.Intacct
                 if ( exportColumns.ExchangeRateTypeId )
                 {
                     output.AppendFormat( ",{0}", item.ExchangeRateTypeId ?? string.Empty );
-                } 
+                }
                 if ( exportColumns.ExchangeRate )
                 {
                     output.AppendFormat( ",{0}", item.ExchangeRate.HasValue ? item.ExchangeRate.Value.ToString() : string.Empty );
@@ -674,6 +694,14 @@ namespace rocks.kfs.Intacct
                 {
                     output.AppendFormat( ",{0}", item.ClassId ?? string.Empty );
                 }
+                if ( exportColumns.ContractId )
+                {
+                    output.AppendFormat( ",{0}", item.ContractId ?? string.Empty );
+                }
+                if ( exportColumns.WarehouseId )
+                {
+                    output.AppendFormat( ",{0}", item.WarehouseId ?? string.Empty );
+                }
             }
             HttpContext.Current.Session["IntacctCsvExport"] = output.ToString();
             HttpContext.Current.Session["IntacctFileId"] = fileId;
@@ -695,6 +723,8 @@ namespace rocks.kfs.Intacct
             public bool ItemId = false;
             public bool ClassId = false;
             public bool TaskId= false;
+            public bool ContractId = false;
+            public bool WarehouseId = false;
         }
     }
 }
