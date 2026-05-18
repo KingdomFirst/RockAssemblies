@@ -265,6 +265,11 @@ namespace rocks.kfs.Intacct
                 var classId = account.GetAttributeValue( "rocks.kfs.Intacct.CLASSID" );
                 var departmentId = account.GetAttributeValue( "rocks.kfs.Intacct.DEPARTMENT" );
                 var locationId = account.GetAttributeValue( "rocks.kfs.Intacct.LOCATION" );
+                var taskId = account.GetAttributeValue( "rocks.kfs.Intacct.TASKID" );
+                var customerId = account.GetAttributeValue( "rocks.kfs.Intacct.CUSTOMERID" );
+                var itemId = account.GetAttributeValue( "rocks.kfs.Intacct.ITEMID" );
+                var vendorId = account.GetAttributeValue( "rocks.kfs.Intacct.VENDORID" );
+                var employeeId = account.GetAttributeValue( "rocks.kfs.Intacct.EMPLOYEEID" );
 
                 var receiptItem = new ReceiptLineItem
                 {
@@ -275,6 +280,11 @@ namespace rocks.kfs.Intacct
                     DepartmentId = departmentId,
                     ProjectId = bTran.CreditProject,
                     ClassId = classId,
+                    TaskId = taskId,
+                    CustomerId = customerId,
+                    ItemId = itemId,
+                    VendorId = vendorId,
+                    EmployeeId = employeeId,
                     CustomFields = creditDimensions,
                     CustomFieldsString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) )
                 };
