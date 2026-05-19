@@ -158,6 +158,8 @@ namespace rocks.kfs.Intacct
         public string EmployeeId;
         public string ItemId;
         public string ClassId;
+        public string ContractId;
+        public string WarehouseId;
         public decimal TotalTrxAmount;
     }
 
@@ -190,6 +192,8 @@ namespace rocks.kfs.Intacct
         public string TaskId;
         public string VendorId;
         public string EmployeeId;
+        public string ContractId;
+        public string WarehouseId;
         public string ClassId;
         public string Payer;
         public SortedDictionary<string, dynamic> CustomFields = new SortedDictionary<string, object>();

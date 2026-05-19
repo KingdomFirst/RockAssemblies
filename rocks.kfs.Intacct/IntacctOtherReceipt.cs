@@ -171,6 +171,14 @@ namespace rocks.kfs.Intacct
                             {
                                 writer.WriteElementString( "classid", item.ClassId );
                             }
+                            if ( !string.IsNullOrWhiteSpace( item.ContractId ) )
+                            {
+                                writer.WriteElementString( "contractid", item.ContractId );
+                            }
+                            if ( !string.IsNullOrWhiteSpace( item.WarehouseId ) )
+                            {
+                                writer.WriteElementString( "warehouseid", item.WarehouseId );
+                            }
 
                             // Intacct XML api documentation shows support for custom fields, but we are unable to get them to work. Disabling for now.
                             //if ( item.CustomFields.Count > 0 )
@@ -271,6 +279,8 @@ namespace rocks.kfs.Intacct
                 var itemId = account.GetAttributeValue( "rocks.kfs.Intacct.ITEMID" );
                 var vendorId = account.GetAttributeValue( "rocks.kfs.Intacct.VENDORID" );
                 var employeeId = account.GetAttributeValue( "rocks.kfs.Intacct.EMPLOYEEID" );
+                var contractId = account.GetAttributeValue( "rocks.kfs.Intacct.CONTRACTID" );
+                var warehouseId = account.GetAttributeValue( "rocks.kfs.Intacct.WAREHOUSEID" );
 
                 var receiptItem = new ReceiptLineItem
                 {
@@ -286,6 +296,8 @@ namespace rocks.kfs.Intacct
                     ItemId = itemId,
                     VendorId = vendorId,
                     EmployeeId = employeeId,
+                    ContractId = contractId,
+                    WarehouseId = warehouseId,
                     CustomFields = creditDimensions,
                     CustomFieldsString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) )
                 };
@@ -302,6 +314,8 @@ namespace rocks.kfs.Intacct
                         DepartmentId = departmentId,
                         ProjectId = bTran.CreditProject,
                         ClassId = classId,
+                        ContractId = contractId,
+                        WarehouseId = warehouseId,
                         CustomFields = creditDimensions,
                         CustomFieldsString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) )
                     };
