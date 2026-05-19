@@ -106,10 +106,9 @@ namespace rocks.kfs.Intacct.Migrations
 
             // set dimension attributes to inactive so they don't show on the financial account edit screen until activated as needed.
             Sql( string.Format( @"
-
                 UPDATE [Attribute] SET [IsActive] = 0
-                WHERE [Guid] IN ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
-            ", SystemGuid.Attribute.FINANCIAL_ACCOUNT_PROJECT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_PROJECT_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CLASS, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CLASS_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_DEPARTMENT_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_FEE_ACCOUNT ) );
+                WHERE [Guid] IN ('{0}')
+            ", SystemGuid.Attribute.FINANCIAL_ACCOUNT_FEE_ACCOUNT ) );
 
             // copy values already provided in existing (now credit) attributes into corresponding new debit attributes to keep previous functionality in tact
             Sql( string.Format( @"

@@ -42,8 +42,8 @@ namespace rocks.kfs.Intacct.Migrations
             RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Item", "Debit Item", "The Intacct dimension for Item to be used for assigned Debit Account.", 19, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_ITEM_DEBIT, "rocks.kfs.Intacct.DEBITITEMID" );
             RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Vendor", "Debit Vendor", "The Intacct dimension for Vendor to be used for assigned Debit Account.", 20, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_VENDOR_DEBIT, "rocks.kfs.Intacct.DEBITVENDORID" );
             RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Employee", "Debit Employee", "The Intacct dimension for Employee to be used for assigned Debit Account.", 21, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_EMPLOYEE_DEBIT, "rocks.kfs.Intacct.DEBITEMPLOYEEID" );
-            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Credit Contract Id", "Credit Contract Id", "The Intacct dimension for Contract Id to be used for assigned Debit Account. Not supported in Other Receipts mode.", 22, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_CONTRACTID_DEBIT, "rocks.kfs.Intacct.DEBITCONTRACTID" );
-            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Credit Warehouse Id", "Credit Warehouse Id", "The Intacct dimension for Warehouse Id to be used for assigned Debit Account. Not supported in Other Receipts mode.", 23, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_WAREHOUSEID_DEBIT, "rocks.kfs.Intacct.DEBITWAREHOUSEID" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Contract Id", "Debit Contract Id", "The Intacct dimension for Contract Id to be used for assigned Debit Account. Not supported in Other Receipts mode.", 22, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_CONTRACTID_DEBIT, "rocks.kfs.Intacct.DEBITCONTRACTID" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Debit Warehouse Id", "Debit Warehouse Id", "The Intacct dimension for Warehouse Id to be used for assigned Debit Account. Not supported in Other Receipts mode.", 23, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_WAREHOUSEID_DEBIT, "rocks.kfs.Intacct.DEBITWAREHOUSEID" );
 
             // set attribute category for new attributes
             Sql( string.Format( @"
@@ -146,7 +146,6 @@ namespace rocks.kfs.Intacct.Migrations
 
             // set dimension attributes to inactive so they don't show on the financial account edit screen until activated as needed.
             Sql( string.Format( @"
-
                 UPDATE [Attribute] SET [IsActive] = 0
                 WHERE [Guid] IN ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
             ", SystemGuid.Attribute.FINANCIAL_ACCOUNT_CUSTOMER, SystemGuid.Attribute.FINANCIAL_ACCOUNT_ITEM, SystemGuid.Attribute.FINANCIAL_ACCOUNT_TASK, SystemGuid.Attribute.FINANCIAL_ACCOUNT_VENDOR, SystemGuid.Attribute.FINANCIAL_ACCOUNT_EMPLOYEE, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CUSTOMER_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_ITEM_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_TASK_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_VENDOR_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_EMPLOYEE_DEBIT ) );

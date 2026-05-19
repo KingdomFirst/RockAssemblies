@@ -144,12 +144,12 @@ namespace rocks.kfs.Intacct.SystemGuid
         public const string FINANCIAL_ACCOUNT_EMPLOYEE_DEBIT = "257DECD4-ED63-45F1-92F6-2B0C8D8C1392";
 
         /// <summary>
-        /// The Intacct dimension for Contract.
+        /// The Intacct dimension for Contract of debit account.
         /// </summary>
         public const string FINANCIAL_ACCOUNT_CONTRACTID_DEBIT = "554EC300-B497-4665-89D3-5B40BCA84912";
 
         /// <summary>
-        /// The Intacct dimension for Warehouse.
+        /// The Intacct dimension for Warehouse of debit account.
         /// </summary>
         public const string FINANCIAL_ACCOUNT_WAREHOUSEID_DEBIT = "6E4F5B13-CDDD-4C45-9891-6B28E081C1FF";
 

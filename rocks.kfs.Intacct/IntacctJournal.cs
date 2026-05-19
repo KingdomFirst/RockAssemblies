@@ -722,7 +722,7 @@ namespace rocks.kfs.Intacct
             public bool EmployeeId = false;
             public bool ItemId = false;
             public bool ClassId = false;
-            public bool TaskId= false;
+            public bool TaskId = false;
             public bool ContractId = false;
             public bool WarehouseId = false;
         }
