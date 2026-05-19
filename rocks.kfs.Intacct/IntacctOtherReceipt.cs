@@ -314,6 +314,11 @@ namespace rocks.kfs.Intacct
                         DepartmentId = departmentId,
                         ProjectId = bTran.CreditProject,
                         ClassId = classId,
+                        TaskId = taskId,
+                        CustomerId = customerId,
+                        ItemId = itemId,
+                        VendorId = vendorId,
+                        EmployeeId = employeeId,
                         ContractId = contractId,
                         WarehouseId = warehouseId,
                         CustomFields = creditDimensions,
@@ -326,7 +331,7 @@ namespace rocks.kfs.Intacct
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.CreditLinesOnly )
             {
                 lineItemList = lineItemList
-                    .GroupBy( d => new { d.ClassId, d.DepartmentId, d.LocationId, d.ProjectId, d.GlAccountNo, d.CustomFieldsString } )
+                    .GroupBy( d => new { d.ClassId, d.DepartmentId, d.LocationId, d.ProjectId, d.GlAccountNo, d.CustomerId, d.TaskId, d.ItemId, d.VendorId, d.EmployeeId, d.ContractId, d.WarehouseId, d.CustomFieldsString } )
                     .Select( s => new ReceiptLineItem
                     {
                         Amount = s.Sum( f => f.Amount ),
@@ -335,6 +340,13 @@ namespace rocks.kfs.Intacct
                         DepartmentId = s.Key.DepartmentId,
                         LocationId = s.Key.LocationId,
                         ProjectId = s.Key.ProjectId,
+                        TaskId = s.Key.TaskId,
+                        CustomerId = s.Key.CustomerId,
+                        ItemId = s.Key.ItemId,
+                        VendorId = s.Key.VendorId,
+                        EmployeeId = s.Key.EmployeeId,
+                        ContractId = s.Key.ContractId,
+                        WarehouseId = s.Key.WarehouseId,
                         Memo = s.First().Memo,
                         CustomFields = s.First().CustomFields
                     } )
@@ -366,6 +378,7 @@ namespace rocks.kfs.Intacct
                     LocationId = item.LocationId,
                     Memo = item.Memo,
                     ProjectId = item.ProjectId,
+                    TaskId = item.TaskId,
                     CustomerId = item.CustomerId,
                     ItemId = item.ItemId,
                     VendorId = item.VendorId,

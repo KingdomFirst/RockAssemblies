@@ -142,13 +142,49 @@ namespace rocks.kfs.Intacct.Migrations
                     INSERT INTO [AttributeCategory]
                     SELECT @AccountDebitEmployee, @AccountCategoryId
                 END
-            ", SystemGuid.Attribute.FINANCIAL_ACCOUNT_ATTRIBUTE_CATEGORY, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CUSTOMER, SystemGuid.Attribute.FINANCIAL_ACCOUNT_ITEM, SystemGuid.Attribute.FINANCIAL_ACCOUNT_TASK, SystemGuid.Attribute.FINANCIAL_ACCOUNT_VENDOR, SystemGuid.Attribute.FINANCIAL_ACCOUNT_EMPLOYEE, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CUSTOMER_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_ITEM_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_TASK_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_VENDOR_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_EMPLOYEE_DEBIT ) );
+
+                DECLARE @AccountDebitContract int = ( SELECT [Id] FROM [Attribute] WHERE [Guid] = '{11}' )
+
+                IF NOT EXISTS ( SELECT [AttributeId], [CategoryId] FROM [AttributeCategory] WHERE [AttributeId] = @AccountDebitContract AND [CategoryId] = @AccountCategoryId )
+
+                BEGIN
+                    INSERT INTO [AttributeCategory]
+                    SELECT @AccountDebitContract, @AccountCategoryId
+                END
+
+                DECLARE @AccountDebitWarehouse int = ( SELECT [Id] FROM [Attribute] WHERE [Guid] = '{12}' )
+
+                IF NOT EXISTS ( SELECT [AttributeId], [CategoryId] FROM [AttributeCategory] WHERE [AttributeId] = @AccountDebitWarehouse AND [CategoryId] = @AccountCategoryId )
+
+                BEGIN
+                    INSERT INTO [AttributeCategory]
+                    SELECT @AccountDebitWarehouse, @AccountCategoryId
+                END
+
+                DECLARE @AccountCreditContract int = ( SELECT [Id] FROM [Attribute] WHERE [Guid] = '{13}' )
+
+                IF NOT EXISTS ( SELECT [AttributeId], [CategoryId] FROM [AttributeCategory] WHERE [AttributeId] = @AccountCreditContract AND [CategoryId] = @AccountCategoryId )
+
+                BEGIN
+                    INSERT INTO [AttributeCategory]
+                    SELECT @AccountCreditContract, @AccountCategoryId
+                END
+
+                DECLARE @AccountCreditWarehouse int = ( SELECT [Id] FROM [Attribute] WHERE [Guid] = '{14}' )
+
+                IF NOT EXISTS ( SELECT [AttributeId], [CategoryId] FROM [AttributeCategory] WHERE [AttributeId] = @AccountCreditWarehouse AND [CategoryId] = @AccountCategoryId )
+
+                BEGIN
+                    INSERT INTO [AttributeCategory]
+                    SELECT @AccountCreditWarehouse, @AccountCategoryId
+                END
+            ", SystemGuid.Attribute.FINANCIAL_ACCOUNT_ATTRIBUTE_CATEGORY, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CUSTOMER, SystemGuid.Attribute.FINANCIAL_ACCOUNT_ITEM, SystemGuid.Attribute.FINANCIAL_ACCOUNT_TASK, SystemGuid.Attribute.FINANCIAL_ACCOUNT_VENDOR, SystemGuid.Attribute.FINANCIAL_ACCOUNT_EMPLOYEE, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CUSTOMER_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_ITEM_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_TASK_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_VENDOR_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_EMPLOYEE_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CONTRACTID_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_WAREHOUSEID_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CONTRACTID, SystemGuid.Attribute.FINANCIAL_ACCOUNT_WAREHOUSEID ) );
 
             // set dimension attributes to inactive so they don't show on the financial account edit screen until activated as needed.
             Sql( string.Format( @"
                 UPDATE [Attribute] SET [IsActive] = 0
-                WHERE [Guid] IN ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
-            ", SystemGuid.Attribute.FINANCIAL_ACCOUNT_CUSTOMER, SystemGuid.Attribute.FINANCIAL_ACCOUNT_ITEM, SystemGuid.Attribute.FINANCIAL_ACCOUNT_TASK, SystemGuid.Attribute.FINANCIAL_ACCOUNT_VENDOR, SystemGuid.Attribute.FINANCIAL_ACCOUNT_EMPLOYEE, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CUSTOMER_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_ITEM_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_TASK_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_VENDOR_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_EMPLOYEE_DEBIT ) );
+                WHERE [Guid] IN ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}')
+            ", SystemGuid.Attribute.FINANCIAL_ACCOUNT_CUSTOMER, SystemGuid.Attribute.FINANCIAL_ACCOUNT_ITEM, SystemGuid.Attribute.FINANCIAL_ACCOUNT_TASK, SystemGuid.Attribute.FINANCIAL_ACCOUNT_VENDOR, SystemGuid.Attribute.FINANCIAL_ACCOUNT_EMPLOYEE, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CUSTOMER_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_ITEM_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_TASK_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_VENDOR_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_EMPLOYEE_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CONTRACTID_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_WAREHOUSEID_DEBIT, SystemGuid.Attribute.FINANCIAL_ACCOUNT_CONTRACTID, SystemGuid.Attribute.FINANCIAL_ACCOUNT_WAREHOUSEID ) );
 
             // reorder remaining attributes
             RockMigrationHelper.UpdateEntityAttribute( "Rock.Model.FinancialAccount", Rock.SystemGuid.FieldType.TEXT, "", "", "Credit Class", "The Intacct dimension for Class Id to be used for assigned Credit Account.", 3, "", SystemGuid.Attribute.FINANCIAL_ACCOUNT_CLASS, "rocks.kfs.Intacct.CLASSID" );

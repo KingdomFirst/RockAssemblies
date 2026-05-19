@@ -327,7 +327,7 @@ namespace rocks.kfs.Intacct
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.DebitLinesOnly )
             {
                 debitTransactions = debitTransactions
-                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount, d.CustomDimensionString, d.ProcessTransactionFees } )
+                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount, d.DebitItem, d.DebitTask, d.DebitCustomer, d.DebitVendor, d.DebitEmployee, d.DebitContract, d.DebitWarehouse, d.CustomDimensionString, d.ProcessTransactionFees } )
                     .Select( s => new GLBatchTotals()
                     {
                         Amount = s.Sum( f => f.Amount ),
@@ -343,7 +343,7 @@ namespace rocks.kfs.Intacct
                     .ToList();
 
                 feeDebitTransactions = feeDebitTransactions
-                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount, d.CustomDimensionString } )
+                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount, d.DebitItem, d.DebitTask, d.DebitCustomer, d.DebitVendor, d.DebitEmployee, d.DebitContract, d.DebitWarehouse, d.CustomDimensionString } )
                     .Select( s => new GLBatchTotals
                     {
                         Amount = s.Sum( f => f.Amount ),
@@ -385,7 +385,7 @@ namespace rocks.kfs.Intacct
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.CreditLinesOnly )
             {
                 creditTransactions = creditTransactions
-                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount, d.CustomDimensionString } )
+                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount, d.CreditItem, d.CreditTask, d.CreditCustomer, d.CreditVendor, d.CreditEmployee, d.CreditContract, d.CreditWarehouse, d.CustomDimensionString } )
                     .Select( s => new GLBatchTotals
                     {
                         Amount = s.Sum( f => f.Amount ),
@@ -401,7 +401,7 @@ namespace rocks.kfs.Intacct
                     .ToList();
 
                 feeCreditTransactions = feeCreditTransactions
-                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount, d.CustomDimensionString } )
+                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount, d.CreditItem, d.CreditTask, d.CreditCustomer, d.CreditVendor, d.CreditEmployee, d.CreditContract, d.CreditWarehouse, d.CustomDimensionString } )
                     .Select( s => new GLBatchTotals
                     {
                         Amount = s.Sum( f => f.Amount ),
