@@ -370,6 +370,8 @@ namespace rocks.kfs.Intacct
                     ItemId = item.ItemId,
                     VendorId = item.VendorId,
                     EmployeeId = item.EmployeeId,
+                    ContractId = item.ContractId,
+                    WarehouseId = item.WarehouseId,
                     ClassId = item.ClassId,
                     CustomFields = item.CustomFields
                 };
@@ -496,6 +498,16 @@ namespace rocks.kfs.Intacct
                 output.Append( ", OtherReceiptsEntry_ClassId" );
                 exportColumns.ClassId = true;
             }
+            if ( items.Any( i => !i.ContractId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", OtherReceiptsEntry_ContractId" );
+                exportColumns.ContractId = true;
+            }
+            if ( items.Any( i => !i.WarehouseId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", OtherReceiptsEntry_WarehouseId" );
+                exportColumns.WarehouseId = true;
+            }
             foreach ( var customFieldCol in customFieldCols )
             {
                 output.AppendFormat( ", {0}", customFieldCol );
@@ -570,6 +582,14 @@ namespace rocks.kfs.Intacct
                 {
                     output.AppendFormat( ",{0}", item.ClassId ?? string.Empty );
                 }
+                if ( exportColumns.ContractId )
+                {
+                    output.AppendFormat( ",{0}", item.ContractId ?? string.Empty );
+                }
+                if ( exportColumns.WarehouseId )
+                {
+                    output.AppendFormat( ",{0}", item.WarehouseId ?? string.Empty );
+                }
                 foreach ( var customFieldCol in exportColumns.CustomFieldKeys )
                 {
                     output.AppendFormat( ",{0}", item.CustomFields.ContainsKey( customFieldCol ) ? item.CustomFields[customFieldCol] : string.Empty );
@@ -598,6 +618,8 @@ namespace rocks.kfs.Intacct
             public bool ItemId = false;
             public bool ClassId = false;
             public bool TaskId = false;
+            public bool ContractId = false;
+            public bool WarehouseId = false;
         }
     }
 }
