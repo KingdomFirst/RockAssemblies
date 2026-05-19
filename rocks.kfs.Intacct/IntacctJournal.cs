@@ -133,12 +133,15 @@ namespace rocks.kfs.Intacct
                                 {
                                     writer.WriteElementString( "LOCATION", line.LocationId ?? string.Empty );
                                     writer.WriteElementString( "DEPARTMENT", line.DepartmentId ?? string.Empty );
-                                    writer.WriteElementString( "PROJECTID", line.ProjectId ?? string.Empty );
+                                    if ( line.ProjectId.IsNotNullOrWhiteSpace() )
+                                    {
+                                        writer.WriteElementString( "PROJECTID", line.ProjectId );
+                                        writer.WriteElementString( "TASKID", line.TaskId ?? string.Empty );
+                                    }
                                     writer.WriteElementString( "CUSTOMERID", line.CustomerId ?? string.Empty );
                                     writer.WriteElementString( "VENDORID", line.VendorId ?? string.Empty );
                                     writer.WriteElementString( "EMPLOYEEID", line.EmployeeId ?? string.Empty );
                                     writer.WriteElementString( "ITEMID", line.ItemId ?? string.Empty );
-                                    writer.WriteElementString( "TASKID", line.TaskId ?? string.Empty );
                                     writer.WriteElementString( "CLASSID", line.ClassId ?? string.Empty );
                                     writer.WriteElementString( "CONTRACTID", line.ContractId ?? string.Empty );
                                     writer.WriteElementString( "WAREHOUSEID", line.WarehouseId ?? string.Empty );
@@ -154,12 +157,15 @@ namespace rocks.kfs.Intacct
                                             writer.WriteElementString( "AMOUNT", split.Amount.ToString() );
                                             writer.WriteElementString( "LOCATIONID", split.LocationId ?? string.Empty );
                                             writer.WriteElementString( "DEPARTMENTID", split.DepartmentId ?? string.Empty );
-                                            writer.WriteElementString( "PROJECTID", split.ProjectId ?? string.Empty );
+                                            if ( split.ProjectId.IsNotNullOrWhiteSpace() )
+                                            {
+                                                writer.WriteElementString( "PROJECTID", split.ProjectId );
+                                                writer.WriteElementString( "TASKID", split.TaskId ?? string.Empty );
+                                            }
                                             writer.WriteElementString( "CUSTOMERID", split.CustomerId ?? string.Empty );
                                             writer.WriteElementString( "VENDORID", split.VendorId ?? string.Empty );
                                             writer.WriteElementString( "EMPLOYEEID", split.EmployeeId ?? string.Empty );
                                             writer.WriteElementString( "ITEMID", split.ItemId ?? string.Empty );
-                                            writer.WriteElementString( "TASKID", line.TaskId ?? string.Empty );
                                             writer.WriteElementString( "CLASSID", split.ClassId ?? string.Empty );
                                             writer.WriteElementString( "CONTRACTID", split.ContractId ?? string.Empty );
                                             writer.WriteElementString( "WAREHOUSEID", split.WarehouseId ?? string.Empty );

@@ -74,6 +74,7 @@ namespace rocks.kfs.Intacct
         public string DepartmentId;
         public string LocationId;
         public string ProjectId;
+        public string TaskId;
         public string CustomerId;
         public string VendorId;
         public string EmployeeId;
