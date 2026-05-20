@@ -94,6 +94,7 @@
     <Compile Include="IntacctOtherReceipt.cs" />
     <Compile Include="IntacctJournal.cs" />
     <Compile Include="IntacctModels.cs" />
+    <Compile Include="Migrations\007_AddMoreDimensionAttributes.cs" />
     <Compile Include="Migrations\006_CreateBankAccountDefinedType.cs" />
     <Compile Include="Migrations\005_AddContextAttribute.cs" />
     <Compile Include="Migrations\004_AddDebitAccountAttributes.cs" />

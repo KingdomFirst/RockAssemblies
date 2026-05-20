@@ -144,10 +144,12 @@ namespace rocks.kfs.Intacct
                             if ( !string.IsNullOrWhiteSpace( item.ProjectId ) )
                             {
                                 writer.WriteElementString( "projectid", item.ProjectId );
-                            }
-                            if ( !string.IsNullOrWhiteSpace( item.TaskId ) )
-                            {
-                                writer.WriteElementString( "taskid", item.TaskId );
+
+                                // Task is a sub-dimension of Project in Intacct, so only include if Project is included.
+                                if ( !string.IsNullOrWhiteSpace( item.TaskId ) )
+                                {
+                                    writer.WriteElementString( "taskid", item.TaskId );
+                                }
                             }
                             if ( !string.IsNullOrWhiteSpace( item.CustomerId ) )
                             {
@@ -169,19 +171,28 @@ namespace rocks.kfs.Intacct
                             {
                                 writer.WriteElementString( "classid", item.ClassId );
                             }
-
-                            if ( item.CustomFields.Count > 0 )
+                            if ( !string.IsNullOrWhiteSpace( item.ContractId ) )
                             {
-                                writer.WriteStartElement( "customfields" );
-                                foreach ( KeyValuePair<string, dynamic> customField in item.CustomFields )
-                                {
-                                    writer.WriteStartElement( "customfield" );
-                                    writer.WriteElementString( "customfieldname", customField.Key );
-                                    writer.WriteElementString( "customfieldvalue", customField.Value ?? string.Empty );
-                                    writer.WriteEndElement();  // close customfield
-                                }
-                                writer.WriteEndElement();  // close customfields
+                                writer.WriteElementString( "contractid", item.ContractId );
                             }
+                            if ( !string.IsNullOrWhiteSpace( item.WarehouseId ) )
+                            {
+                                writer.WriteElementString( "warehouseid", item.WarehouseId );
+                            }
+
+                            // Intacct XML api documentation shows support for custom fields, but we are unable to get them to work. Disabling for now.
+                            //if ( item.CustomFields.Count > 0 )
+                            //{
+                            //    writer.WriteStartElement( "customfields" );
+                            //    foreach ( KeyValuePair<string, dynamic> customField in item.CustomFields )
+                            //    {
+                            //        writer.WriteStartElement( "customfield" );
+                            //        writer.WriteElementString( "customfieldname", customField.Key );
+                            //        writer.WriteElementString( "customfieldvalue", customField.Value ?? string.Empty );
+                            //        writer.WriteEndElement();  // close customfield
+                            //    }
+                            //    writer.WriteEndElement();  // close customfields
+                            //}
                             writer.WriteEndElement();  // close lineitem
                         }
 
@@ -263,6 +274,13 @@ namespace rocks.kfs.Intacct
                 var classId = account.GetAttributeValue( "rocks.kfs.Intacct.CLASSID" );
                 var departmentId = account.GetAttributeValue( "rocks.kfs.Intacct.DEPARTMENT" );
                 var locationId = account.GetAttributeValue( "rocks.kfs.Intacct.LOCATION" );
+                var taskId = account.GetAttributeValue( "rocks.kfs.Intacct.TASKID" );
+                var customerId = account.GetAttributeValue( "rocks.kfs.Intacct.CUSTOMERID" );
+                var itemId = account.GetAttributeValue( "rocks.kfs.Intacct.ITEMID" );
+                var vendorId = account.GetAttributeValue( "rocks.kfs.Intacct.VENDORID" );
+                var employeeId = account.GetAttributeValue( "rocks.kfs.Intacct.EMPLOYEEID" );
+                var contractId = account.GetAttributeValue( "rocks.kfs.Intacct.CONTRACTID" );
+                var warehouseId = account.GetAttributeValue( "rocks.kfs.Intacct.WAREHOUSEID" );
 
                 var receiptItem = new ReceiptLineItem
                 {
@@ -273,6 +291,13 @@ namespace rocks.kfs.Intacct
                     DepartmentId = departmentId,
                     ProjectId = bTran.CreditProject,
                     ClassId = classId,
+                    TaskId = taskId,
+                    CustomerId = customerId,
+                    ItemId = itemId,
+                    VendorId = vendorId,
+                    EmployeeId = employeeId,
+                    ContractId = contractId,
+                    WarehouseId = warehouseId,
                     CustomFields = creditDimensions,
                     CustomFieldsString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) )
                 };
@@ -289,6 +314,13 @@ namespace rocks.kfs.Intacct
                         DepartmentId = departmentId,
                         ProjectId = bTran.CreditProject,
                         ClassId = classId,
+                        TaskId = taskId,
+                        CustomerId = customerId,
+                        ItemId = itemId,
+                        VendorId = vendorId,
+                        EmployeeId = employeeId,
+                        ContractId = contractId,
+                        WarehouseId = warehouseId,
                         CustomFields = creditDimensions,
                         CustomFieldsString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) )
                     };
@@ -299,7 +331,7 @@ namespace rocks.kfs.Intacct
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.CreditLinesOnly )
             {
                 lineItemList = lineItemList
-                    .GroupBy( d => new { d.ClassId, d.DepartmentId, d.LocationId, d.ProjectId, d.GlAccountNo, d.CustomFieldsString } )
+                    .GroupBy( d => new { d.ClassId, d.DepartmentId, d.LocationId, d.ProjectId, d.GlAccountNo, d.CustomerId, d.TaskId, d.ItemId, d.VendorId, d.EmployeeId, d.ContractId, d.WarehouseId, d.CustomFieldsString } )
                     .Select( s => new ReceiptLineItem
                     {
                         Amount = s.Sum( f => f.Amount ),
@@ -308,6 +340,13 @@ namespace rocks.kfs.Intacct
                         DepartmentId = s.Key.DepartmentId,
                         LocationId = s.Key.LocationId,
                         ProjectId = s.Key.ProjectId,
+                        TaskId = s.Key.TaskId,
+                        CustomerId = s.Key.CustomerId,
+                        ItemId = s.Key.ItemId,
+                        VendorId = s.Key.VendorId,
+                        EmployeeId = s.Key.EmployeeId,
+                        ContractId = s.Key.ContractId,
+                        WarehouseId = s.Key.WarehouseId,
                         Memo = s.First().Memo,
                         CustomFields = s.First().CustomFields
                     } )
@@ -339,10 +378,13 @@ namespace rocks.kfs.Intacct
                     LocationId = item.LocationId,
                     Memo = item.Memo,
                     ProjectId = item.ProjectId,
+                    TaskId = item.TaskId,
                     CustomerId = item.CustomerId,
                     ItemId = item.ItemId,
                     VendorId = item.VendorId,
                     EmployeeId = item.EmployeeId,
+                    ContractId = item.ContractId,
+                    WarehouseId = item.WarehouseId,
                     ClassId = item.ClassId,
                     CustomFields = item.CustomFields
                 };
@@ -438,6 +480,11 @@ namespace rocks.kfs.Intacct
             {
                 output.Append( ", OtherReceiptsEntry_ProjectId" );
                 exportColumns.ProjectId = true;
+                if ( items.Any( i => !i.TaskId.IsNullOrWhiteSpace() ) )   // Task is a sub-dimension of Project in Intacct, so only include if Project is included.
+                {
+                    output.Append( ", OtherReceiptsEntry_TaskId" );
+                    exportColumns.TaskId = true;
+                }
             }
             if ( items.Any( i => !i.CustomerId.IsNullOrWhiteSpace() ) )
             {
@@ -463,6 +510,16 @@ namespace rocks.kfs.Intacct
             {
                 output.Append( ", OtherReceiptsEntry_ClassId" );
                 exportColumns.ClassId = true;
+            }
+            if ( items.Any( i => !i.ContractId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", OtherReceiptsEntry_ContractId" );
+                exportColumns.ContractId = true;
+            }
+            if ( items.Any( i => !i.WarehouseId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", OtherReceiptsEntry_WarehouseId" );
+                exportColumns.WarehouseId = true;
             }
             foreach ( var customFieldCol in customFieldCols )
             {
@@ -511,6 +568,12 @@ namespace rocks.kfs.Intacct
                 if ( exportColumns.ProjectId )
                 {
                     output.AppendFormat( ",{0}", item.ProjectId ?? string.Empty );
+
+                    // Task is a sub-dimension of Project in Intacct, so only include if Project is included.
+                    if ( exportColumns.TaskId )
+                    {
+                        output.AppendFormat( ",{0}", item.TaskId ?? string.Empty );
+                    }
                 }
                 if ( exportColumns.CustomerId )
                 {
@@ -531,6 +594,14 @@ namespace rocks.kfs.Intacct
                 if ( exportColumns.ClassId )
                 {
                     output.AppendFormat( ",{0}", item.ClassId ?? string.Empty );
+                }
+                if ( exportColumns.ContractId )
+                {
+                    output.AppendFormat( ",{0}", item.ContractId ?? string.Empty );
+                }
+                if ( exportColumns.WarehouseId )
+                {
+                    output.AppendFormat( ",{0}", item.WarehouseId ?? string.Empty );
                 }
                 foreach ( var customFieldCol in exportColumns.CustomFieldKeys )
                 {
@@ -559,6 +630,9 @@ namespace rocks.kfs.Intacct
             public bool EmployeeId = false;
             public bool ItemId = false;
             public bool ClassId = false;
+            public bool TaskId = false;
+            public bool ContractId = false;
+            public bool WarehouseId = false;
         }
     }
 }
