@@ -16,21 +16,16 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Web;
 using System.Xml;
-using OfficeOpenXml;
 
 using Rock;
 using Rock.Data;
 using Rock.Model;
-using Rock.Utility;
-using Rock.Web.Cache;
 using rocks.kfs.Intacct.Enums;
 using rocks.kfs.Intacct.Utils;
-using KFSConst = rocks.kfs.Intacct.SystemGuid;
 
 namespace rocks.kfs.Intacct
 {
@@ -138,7 +133,11 @@ namespace rocks.kfs.Intacct
                                 {
                                     writer.WriteElementString( "LOCATION", line.LocationId ?? string.Empty );
                                     writer.WriteElementString( "DEPARTMENT", line.DepartmentId ?? string.Empty );
-                                    writer.WriteElementString( "PROJECTID", line.ProjectId ?? string.Empty );
+                                    if ( line.ProjectId.IsNotNullOrWhiteSpace() )
+                                    {
+                                        writer.WriteElementString( "PROJECTID", line.ProjectId );
+                                        writer.WriteElementString( "TASKID", line.TaskId ?? string.Empty );
+                                    }
                                     writer.WriteElementString( "CUSTOMERID", line.CustomerId ?? string.Empty );
                                     writer.WriteElementString( "VENDORID", line.VendorId ?? string.Empty );
                                     writer.WriteElementString( "EMPLOYEEID", line.EmployeeId ?? string.Empty );
@@ -158,7 +157,11 @@ namespace rocks.kfs.Intacct
                                             writer.WriteElementString( "AMOUNT", split.Amount.ToString() );
                                             writer.WriteElementString( "LOCATIONID", split.LocationId ?? string.Empty );
                                             writer.WriteElementString( "DEPARTMENTID", split.DepartmentId ?? string.Empty );
-                                            writer.WriteElementString( "PROJECTID", split.ProjectId ?? string.Empty );
+                                            if ( split.ProjectId.IsNotNullOrWhiteSpace() )
+                                            {
+                                                writer.WriteElementString( "PROJECTID", split.ProjectId );
+                                                writer.WriteElementString( "TASKID", split.TaskId ?? string.Empty );
+                                            }
                                             writer.WriteElementString( "CUSTOMERID", split.CustomerId ?? string.Empty );
                                             writer.WriteElementString( "VENDORID", split.VendorId ?? string.Empty );
                                             writer.WriteElementString( "EMPLOYEEID", split.EmployeeId ?? string.Empty );
@@ -253,10 +256,24 @@ namespace rocks.kfs.Intacct
                     CreditDepartment = account.GetAttributeValue( "rocks.kfs.Intacct.DEPARTMENT" ),
                     CreditLocation = account.GetAttributeValue( "rocks.kfs.Intacct.LOCATION" ),
                     CreditProject = summary.CreditProject,
+                    CreditCustomer = account.GetAttributeValue( "rocks.kfs.Intacct.CUSTOMERID" ),
+                    CreditItem = account.GetAttributeValue( "rocks.kfs.Intacct.ITEMID" ),
+                    CreditTask = account.GetAttributeValue( "rocks.kfs.Intacct.TASKID" ),
+                    CreditVendor = account.GetAttributeValue( "rocks.kfs.Intacct.VENDORID" ),
+                    CreditEmployee = account.GetAttributeValue( "rocks.kfs.Intacct.EMPLOYEEID" ),
+                    CreditContract = account.GetAttributeValue( "rocks.kfs.Intacct.CONTRACTID" ),
+                    CreditWarehouse = account.GetAttributeValue( "rocks.kfs.Intacct.WAREHOUSEID" ),
                     DebitClass = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITCLASSID" ),
                     DebitDepartment = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITDEPARTMENT" ),
                     DebitLocation = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITLOCATION" ),
                     DebitProject = summary.DebitProject,
+                    DebitCustomer = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITCUSTOMERID" ),
+                    DebitItem = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITITEMID" ),
+                    DebitTask = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITTASKID" ),
+                    DebitVendor = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITVENDORID" ),
+                    DebitEmployee = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITEMPLOYEEID" ),
+                    DebitContract = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITCONTRACTID" ),
+                    DebitWarehouse = account.GetAttributeValue( "rocks.kfs.Intacct.DEBITWAREHOUSEID" ),
                     Description = DescriptionLava.ResolveMergeFields( mergeFields ),
                     CustomDimensions = new SortedDictionary<string, dynamic>( customDimensionValues ),
                     ProcessTransactionFees = summary.ProcessTransactionFees
@@ -310,7 +327,7 @@ namespace rocks.kfs.Intacct
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.DebitLinesOnly )
             {
                 debitTransactions = debitTransactions
-                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount, d.CustomDimensionString, d.ProcessTransactionFees } )
+                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount, d.DebitItem, d.DebitTask, d.DebitCustomer, d.DebitVendor, d.DebitEmployee, d.DebitContract, d.DebitWarehouse, d.CustomDimensionString, d.ProcessTransactionFees } )
                     .Select( s => new GLBatchTotals()
                     {
                         Amount = s.Sum( f => f.Amount ),
@@ -326,7 +343,7 @@ namespace rocks.kfs.Intacct
                     .ToList();
 
                 feeDebitTransactions = feeDebitTransactions
-                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount, d.CustomDimensionString } )
+                    .GroupBy( d => new { d.DebitClass, d.DebitDepartment, d.DebitLocation, d.DebitProject, d.DebitAccount, d.DebitItem, d.DebitTask, d.DebitCustomer, d.DebitVendor, d.DebitEmployee, d.DebitContract, d.DebitWarehouse, d.CustomDimensionString } )
                     .Select( s => new GLBatchTotals
                     {
                         Amount = s.Sum( f => f.Amount ),
@@ -368,7 +385,7 @@ namespace rocks.kfs.Intacct
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.CreditLinesOnly )
             {
                 creditTransactions = creditTransactions
-                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount, d.CustomDimensionString } )
+                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount, d.CreditItem, d.CreditTask, d.CreditCustomer, d.CreditVendor, d.CreditEmployee, d.CreditContract, d.CreditWarehouse, d.CustomDimensionString } )
                     .Select( s => new GLBatchTotals
                     {
                         Amount = s.Sum( f => f.Amount ),
@@ -384,7 +401,7 @@ namespace rocks.kfs.Intacct
                     .ToList();
 
                 feeCreditTransactions = feeCreditTransactions
-                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount, d.CustomDimensionString } )
+                    .GroupBy( d => new { d.CreditClass, d.CreditDepartment, d.CreditLocation, d.CreditProject, d.CreditAccount, d.CreditItem, d.CreditTask, d.CreditCustomer, d.CreditVendor, d.CreditEmployee, d.CreditContract, d.CreditWarehouse, d.CustomDimensionString } )
                     .Select( s => new GLBatchTotals
                     {
                         Amount = s.Sum( f => f.Amount ),
@@ -414,6 +431,13 @@ namespace rocks.kfs.Intacct
                     DepartmentId = debitTransaction.DebitDepartment,
                     LocationId = debitTransaction.DebitLocation,
                     ProjectId = debitTransaction.DebitProject,
+                    CustomerId = debitTransaction.DebitCustomer,
+                    VendorId = debitTransaction.DebitVendor,
+                    EmployeeId = debitTransaction.DebitEmployee,
+                    ItemId = debitTransaction.DebitItem,
+                    TaskId = debitTransaction.DebitTask,
+                    ContractId = debitTransaction.DebitContract,
+                    WarehouseId = debitTransaction.DebitWarehouse,
                     Memo = debitTransaction.Description,
                     CustomFields = debitTransaction.CustomDimensions,
                     ItemIndex = debitTransaction.ItemIndex,
@@ -434,6 +458,13 @@ namespace rocks.kfs.Intacct
                     DepartmentId = creditTransaction.CreditDepartment,
                     LocationId = creditTransaction.CreditLocation,
                     ProjectId = creditTransaction.CreditProject,
+                    CustomerId = creditTransaction.CreditCustomer,
+                    VendorId = creditTransaction.CreditVendor,
+                    EmployeeId = creditTransaction.CreditEmployee,
+                    ItemId = creditTransaction.CreditItem,
+                    TaskId = creditTransaction.CreditTask,
+                    ContractId = creditTransaction.CreditContract,
+                    WarehouseId = creditTransaction.CreditWarehouse,
                     Memo = creditTransaction.Description,
                     CustomFields = creditTransaction.CustomDimensions,
                     ItemIndex = creditTransaction.ItemIndex,
@@ -481,6 +512,8 @@ namespace rocks.kfs.Intacct
                     EmployeeId = entry.EmployeeId,
                     ItemId = entry.ItemId,
                     ClassId = entry.ClassId,
+                    ContractId = entry.ContractId,
+                    WarehouseId = entry.WarehouseId,
                     CustomAllocationSplits = entry.CustomAllocationSplits,
                     CustomFields = entry.CustomFields
                 };
@@ -559,6 +592,13 @@ namespace rocks.kfs.Intacct
             {
                 output.Append( ", GLEntry_ProjectId" );
                 exportColumns.ProjectId = true;
+
+                // Task is a sub-dimension of Project in Intacct, so only include if Project is included.
+                if ( items.Any( i => !i.TaskId.IsNullOrWhiteSpace() ) )
+                {
+                    output.Append( ", GLEntry_TaskId" );
+                    exportColumns.TaskId = true;
+                }
             }
             if ( items.Any( i => !i.CustomerId.IsNullOrWhiteSpace() ) )
             {
@@ -585,6 +625,16 @@ namespace rocks.kfs.Intacct
                 output.Append( ", GLEntry_ClassId" );
                 exportColumns.ClassId = true;
             }
+            if ( items.Any( i => !i.ContractId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_ContractId" );
+                exportColumns.ContractId = true;
+            }
+            if ( items.Any( i => !i.WarehouseId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", GLEntry_WarehouseId" );
+                exportColumns.WarehouseId = true;
+            }
 
             foreach ( var item in items )
             {
@@ -606,7 +656,7 @@ namespace rocks.kfs.Intacct
                 if ( exportColumns.ExchangeRateTypeId )
                 {
                     output.AppendFormat( ",{0}", item.ExchangeRateTypeId ?? string.Empty );
-                } 
+                }
                 if ( exportColumns.ExchangeRate )
                 {
                     output.AppendFormat( ",{0}", item.ExchangeRate.HasValue ? item.ExchangeRate.Value.ToString() : string.Empty );
@@ -623,6 +673,12 @@ namespace rocks.kfs.Intacct
                 if ( exportColumns.ProjectId )
                 {
                     output.AppendFormat( ",{0}", item.ProjectId ?? string.Empty );
+
+                    // Task is a sub-dimension of Project in Intacct, so only include if Project is included.
+                    if ( exportColumns.TaskId )
+                    {
+                        output.AppendFormat( ",{0}", item.TaskId ?? string.Empty );
+                    }
                 }
                 if ( exportColumns.CustomerId )
                 {
@@ -644,6 +700,14 @@ namespace rocks.kfs.Intacct
                 {
                     output.AppendFormat( ",{0}", item.ClassId ?? string.Empty );
                 }
+                if ( exportColumns.ContractId )
+                {
+                    output.AppendFormat( ",{0}", item.ContractId ?? string.Empty );
+                }
+                if ( exportColumns.WarehouseId )
+                {
+                    output.AppendFormat( ",{0}", item.WarehouseId ?? string.Empty );
+                }
             }
             HttpContext.Current.Session["IntacctCsvExport"] = output.ToString();
             HttpContext.Current.Session["IntacctFileId"] = fileId;
@@ -664,6 +728,9 @@ namespace rocks.kfs.Intacct
             public bool EmployeeId = false;
             public bool ItemId = false;
             public bool ClassId = false;
+            public bool TaskId = false;
+            public bool ContractId = false;
+            public bool WarehouseId = false;
         }
     }
 }
