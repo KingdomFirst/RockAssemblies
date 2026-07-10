@@ -164,16 +164,31 @@ namespace rocks.kfs.CyberSource.Controls
     function initCyberSourceMicroFormFields() {{
         if ($('.cybersource-payment-inputs .js-credit-card-input').length == 0) {{
             // control hasn't been rendered so skip
-            if (number != undefined && securityCode != undefined) {{
-                number.unload();
-                securityCode.unload();
-            }}
+            if (number != undefined) {{ try {{ number.unload(); }} catch (e) {{ }} number = undefined; }}
+            if (securityCode != undefined) {{ try {{ securityCode.unload(); }} catch (e) {{ }} securityCode = undefined; }}
             return;
         }}
-        if (number == undefined && securityCode == undefined) {{
-            number = microform.createField('number', {{ placeholder: '0000 0000 0000 0000' }});
-            securityCode = microform.createField('securityCode');
+
+        if (number != undefined || securityCode != undefined) {{
+            if ($('.cybersource-payment-inputs .js-credit-card-input iframe').length > 0) {{
+                // the existing fields are still attached to the DOM (a partial postback that did not
+                // re-render the payment inputs); leave them and any entered values alone
+                checkCybersourceFieldsLoaded(false);
+                return;
+            }}
+
+            // a postback re-rendered the containers and destroyed the field iframes. A microform
+            // field can only be loaded once, so start over with a fresh microform instance and new
+            // fields instead of re-loading the stale ones (which throws and leaves dead inputs).
+            try {{ number.unload(); }} catch (e) {{ }}
+            try {{ securityCode.unload(); }} catch (e) {{ }}
+            microform = flex.microform({{ styles: myStyles }});
+            number = undefined;
+            securityCode = undefined;
         }}
+
+        number = microform.createField('number', {{ placeholder: '0000 0000 0000 0000' }});
+        securityCode = microform.createField('securityCode');
 
         number.load('.cybersource-payment-inputs .js-credit-card-input');
         securityCode.load('.cybersource-payment-inputs .js-credit-card-cvv-input');
@@ -186,14 +201,13 @@ namespace rocks.kfs.CyberSource.Controls
             $errorsOutput.parent().show();
         }});
 
-        var cardIcon = document.querySelector('#cardDisplay');
-        var cardSecurityCodeLabel = document.querySelector('label.credit-card-cvv-label');
-
         number.on('change', function(data) {{
+          var cardIcon = document.querySelector('#cardDisplay');
+          var cardSecurityCodeLabel = document.querySelector('label.credit-card-cvv-label');
           if (data.card.length === 1) {{
-            cardIcon.className = 'fa-2x ' + cardIcons[data.card[0].name];
-            cardSecurityCodeLabel.textContent = data.card[0].securityCode.name;
-          }} else {{
+            if (cardIcon) {{ cardIcon.className = 'fa-2x ' + cardIcons[data.card[0].name]; }}
+            if (cardSecurityCodeLabel) {{ cardSecurityCodeLabel.textContent = data.card[0].securityCode.name; }}
+          }} else if (cardIcon) {{
             cardIcon.className = 'fa-2x fas fa-credit-card';
           }}
         }});
@@ -316,7 +330,14 @@ namespace rocks.kfs.CyberSource.Controls
         {
             base.OnLoad( e );
 
-            if ( !Page.IsPostBack )
+            var scriptManager = ScriptManager.GetCurrent( this.Page );
+            var isInAsyncPostBack = scriptManager != null && scriptManager.IsInAsyncPostBack;
+
+            // Register on the initial load and on full postbacks: a full postback (e.g. a failed
+            // validator elsewhere on the block) rebuilds the whole page without this script block,
+            // leaving initCyberSourceMicroFormFields undefined and the card fields dead. Skip async
+            // postbacks so partial updates keep the existing microform instance and entered values.
+            if ( !isInAsyncPostBack )
             {
                 ScriptManager.RegisterClientScriptBlock( this, this.GetType(), "microformJSBlock", string.Format( MicroformJS, microformJWK, this.ClientID, _hfPaymentInfoToken.ClientID ), true );
             }
