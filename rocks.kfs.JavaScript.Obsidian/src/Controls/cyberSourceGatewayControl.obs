@@ -113,9 +113,15 @@
         securityCode: { name:string }
     }
 
+    type MicroformValidationDetail = {
+        location: string;
+        message?: string;
+    }
+
     type MicroformResponse = {
         card: Array<MicroformCard>;
         message: string;
+        details?: Array<MicroformValidationDetail>;
     }
     type MicroformField = {
         _config: object;
@@ -463,10 +469,27 @@
 
          FlexJS?.microform?.createToken(options, function (err, token) {
              if (err) {
-                 // handle error
                  console.error(err);
                  isSaving.value = false;
-                 emit(GatewayEmitStrings.Error, err.message);
+                 FlexJS.inSubmission = false;
+
+                 // when the failure is field validation (invalid or empty inputs), emit Validation so the
+                 // block treats it as recoverable field errors rather than a gateway error
+                 if (err.details && err.details.length > 0) {
+                     const fieldLabels: Record<string, string> = {
+                         number: "Card Number",
+                         securityCode: "Security Code",
+                         expirationMonth: "Expiration Month",
+                         expirationYear: "Expiration Year"
+                     };
+                     emit(GatewayEmitStrings.Validation, err.details.map(detail => ({
+                         name: fieldLabels[detail.location] ?? detail.location,
+                         text: "is invalid or missing."
+                     })));
+                 }
+                 else {
+                     emit(GatewayEmitStrings.Error, err.message);
+                 }
              } else {
                  hasReceivedToken = true;
                  let addressToken = {

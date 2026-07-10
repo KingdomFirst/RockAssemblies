@@ -215,10 +215,29 @@ namespace rocks.kfs.CyberSource.Controls
 
         microform.createToken(options, function (err, token) {{
             if (err) {{
-                // handle error
                 console.error(err);
-                $errorsOutput.text(err.message)
+
+                var errorMessage = err.message;
+                if (err.details && err.details.length > 0) {{
+                    var fieldLabels = {{ number: 'Card Number', securityCode: 'Security Code', expirationMonth: 'Expiration Month', expirationYear: 'Expiration Year' }};
+                    errorMessage = err.details.map(function (detail) {{
+                        return (fieldLabels[detail.location] || detail.location) + ' is invalid or missing.';
+                    }}).join(' ');
+                }}
+
+                $errorsOutput.text(errorMessage);
                 $errorsOutput.parent().show();
+
+                // reset any 'Processing...' loading buttons back to their original state so the user can
+                // correct the fields and try again. Don't post back here: the partial postback re-render
+                // would tear down the microform iframes and lose the entered values.
+                $('.btn-give-now, .js-submit-hostedpaymentinfo, .navigation.actions .btn').each(function () {{
+                    var $btn = $(this);
+                    if ($btn.attr('data-init-text')) {{
+                        $btn.html($btn.attr('data-init-text'));
+                    }}
+                    $btn.prop('disabled', false).removeAttr('disabled').removeClass('disabled');
+                }});
             }} else {{
                 flexResponse.val(token);
 
@@ -345,8 +364,10 @@ namespace rocks.kfs.CyberSource.Controls
 
             if ( _hfPaymentInfoToken.Value.IsNullOrWhiteSpace() )
             {
+                // _divValidationMessage is a div, so its client-set text does not round-trip on postback;
+                // use a fixed message for the unexpected case of a token postback without a token
                 hostedGatewayPaymentControlTokenEventArgs.IsValid = false;
-                hostedGatewayPaymentControlTokenEventArgs.ErrorMessage = _divValidationMessage.InnerText;
+                hostedGatewayPaymentControlTokenEventArgs.ErrorMessage = "Invalid or missing payment information. Please check your card number, expiration date, and security code.";
             }
             else
             {
