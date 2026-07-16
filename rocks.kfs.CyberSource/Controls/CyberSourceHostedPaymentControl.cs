@@ -164,55 +164,57 @@ namespace rocks.kfs.CyberSource.Controls
     function initCyberSourceMicroFormFields() {{
         if ($('.cybersource-payment-inputs .js-credit-card-input').length == 0) {{
             // control hasn't been rendered so skip
-            if (number != undefined) {{ try {{ number.unload(); }} catch (e) {{ }} number = undefined; }}
-            if (securityCode != undefined) {{ try {{ securityCode.unload(); }} catch (e) {{ }} securityCode = undefined; }}
+            if (number != undefined && securityCode != undefined) {{
+                number.unload();
+                securityCode.unload();
+            }}
             return;
         }}
+        if (number == undefined && securityCode == undefined) {{
+            number = microform.createField('number', {{ placeholder: '0000 0000 0000 0000' }});
+            securityCode = microform.createField('securityCode');
 
-        if (number != undefined || securityCode != undefined) {{
-            if ($('.cybersource-payment-inputs .js-credit-card-input iframe').length > 0) {{
-                // the existing fields are still attached to the DOM (a partial postback that did not
-                // re-render the payment inputs); leave them and any entered values alone
-                checkCybersourceFieldsLoaded(false);
-                return;
-            }}
+            // attach handlers once, when the fields are created. The field objects survive the
+            // unload/load cycle below, so re-attaching on every init would stack duplicates.
+            number.on('error', function(data) {{
+                var $errorsOutput = $('.js-validation-message');
 
-            // a postback re-rendered the containers and destroyed the field iframes. A microform
-            // field can only be loaded once, so start over with a fresh microform instance and new
-            // fields instead of re-loading the stale ones (which throws and leaves dead inputs).
-            try {{ number.unload(); }} catch (e) {{ }}
-            try {{ securityCode.unload(); }} catch (e) {{ }}
-            microform = flex.microform({{ styles: myStyles }});
-            number = undefined;
-            securityCode = undefined;
+                console.error(data);
+                $errorsOutput.text(data.message);
+                $errorsOutput.parent().show();
+            }});
+
+            number.on('change', function(data) {{
+              // look these up at event time: a postback replaces these elements while the field
+              // object (and this handler) live on, so references captured at init would go stale.
+              var cardIcon = document.querySelector('#cardDisplay');
+              var cardSecurityCodeLabel = document.querySelector('label.credit-card-cvv-label');
+              if (data.card.length === 1) {{
+                if (cardIcon) {{ cardIcon.className = 'fa-2x ' + cardIcons[data.card[0].name]; }}
+                if (cardSecurityCodeLabel) {{ cardSecurityCodeLabel.textContent = data.card[0].securityCode.name; }}
+              }} else if (cardIcon) {{
+                cardIcon.className = 'fa-2x fas fa-credit-card';
+              }}
+            }});
         }}
-
-        number = microform.createField('number', {{ placeholder: '0000 0000 0000 0000' }});
-        securityCode = microform.createField('securityCode');
 
         number.load('.cybersource-payment-inputs .js-credit-card-input');
         securityCode.load('.cybersource-payment-inputs .js-credit-card-cvv-input');
 
-        number.on('error', function(data) {{
-            var $errorsOutput = $('.js-validation-message');
-
-            console.error(data);
-            $errorsOutput.text(data.message);
-            $errorsOutput.parent().show();
-        }});
-
-        number.on('change', function(data) {{
-          var cardIcon = document.querySelector('#cardDisplay');
-          var cardSecurityCodeLabel = document.querySelector('label.credit-card-cvv-label');
-          if (data.card.length === 1) {{
-            if (cardIcon) {{ cardIcon.className = 'fa-2x ' + cardIcons[data.card[0].name]; }}
-            if (cardSecurityCodeLabel) {{ cardSecurityCodeLabel.textContent = data.card[0].securityCode.name; }}
-          }} else if (cardIcon) {{
-            cardIcon.className = 'fa-2x fas fa-credit-card';
-          }}
-        }});
-
         checkCybersourceFieldsLoaded(false);
+    }}
+
+    // Resets any 'Processing...' loading buttons back to their original state so the user can
+    // correct the fields and try again. Does not post back: a partial postback re-render would
+    // tear down the microform iframes and lose the entered values.
+    function resetCyberSourceLoadingButtons() {{
+        $('.btn-give-now, .js-submit-hostedpaymentinfo, .navigation.actions .btn').each(function () {{
+            var $btn = $(this);
+            if ($btn.attr('data-init-text')) {{
+                $btn.html($btn.attr('data-init-text'));
+            }}
+            $btn.prop('disabled', false).removeAttr('disabled').removeClass('disabled');
+        }});
     }}
 
     function submitCyberSourceMicroFormInfo() {{
@@ -221,6 +223,26 @@ namespace rocks.kfs.CyberSource.Controls
         var expMonth = $('.cybersource-payment-inputs .js-monthyear-month');
         var expYear = $('.cybersource-payment-inputs .js-monthyear-year');
         var $errorsOutput = $('.js-validation-message');
+
+        // The Expiration Month/Year come from a Rock MonthYearPicker, not the microform iframes, so
+        // CyberSource does not validate them - createToken will happily tokenize with a missing year
+        // and the bad expiration is only caught later when the charge is attempted. Validate here so
+        // the user cannot advance past this step (and consume the capture context) without them.
+        var expMonthVal = parseInt(expMonth.val(), 10);
+        var expYearVal = parseInt(expYear.val(), 10);
+        var expErrors = [];
+        if (!expMonthVal) {{
+            expErrors.push('Expiration Month');
+        }}
+        if (!expYearVal) {{
+            expErrors.push('Expiration Year');
+        }}
+        if (expErrors.length > 0) {{
+            $errorsOutput.text(expErrors.join(' and ') + (expErrors.length === 1 ? ' is required.' : ' are required.'));
+            $errorsOutput.parent().show();
+            resetCyberSourceLoadingButtons();
+            return;
+        }}
 
         var options = {{
             expirationMonth: ('00'+expMonth.val()).slice(-2),
@@ -242,16 +264,7 @@ namespace rocks.kfs.CyberSource.Controls
                 $errorsOutput.text(errorMessage);
                 $errorsOutput.parent().show();
 
-                // reset any 'Processing...' loading buttons back to their original state so the user can
-                // correct the fields and try again. Don't post back here: the partial postback re-render
-                // would tear down the microform iframes and lose the entered values.
-                $('.btn-give-now, .js-submit-hostedpaymentinfo, .navigation.actions .btn').each(function () {{
-                    var $btn = $(this);
-                    if ($btn.attr('data-init-text')) {{
-                        $btn.html($btn.attr('data-init-text'));
-                    }}
-                    $btn.prop('disabled', false).removeAttr('disabled').removeClass('disabled');
-                }});
+                resetCyberSourceLoadingButtons();
             }} else {{
                 flexResponse.val(token);
 
