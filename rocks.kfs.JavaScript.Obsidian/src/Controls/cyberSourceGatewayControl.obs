@@ -22,7 +22,12 @@
                     <div class="row">
                         <div class="col-xs-6 exp-col">
                             <div class="iframe-input credit-card-exp-input js-credit-card-exp-input"></div>
-                            <DatePartsPicker label="Expiration Date" :isRequired="true" :startYear="nowYear" :futureYearCount="15" v-model="ccexpvalue" :showBlankItem="false" :multiple="false" :hideDay="true" :disabled="isSaving" />
+                            <!-- NOTE: isRequired is not a DatePartsPicker prop, so it never registered any validation, and
+                                 rules="required" is not a drop in replacement: it auto-adds a 'datekey' rule, and with
+                                 hideDay the day stays 0, so the date key would never validate. A missing expiration is
+                                 caught by createToken instead, which rejects the 0 month/year and reports it through the
+                                 err.details handler in submitCybersourceMicroFormInfo. -->
+                            <DatePartsPicker label="Expiration Date" :startYear="nowYear" :futureYearCount="15" v-model="ccexpvalue" :showBlankItem="false" :multiple="false" :hideDay="true" :disabled="isSaving" />
                         </div>
                         <div class="col-xs-6 cvv-col">
                             <div class="form-group">
