@@ -28,11 +28,14 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Web;
+
 using Quartz;
+
 using Rock;
 using Rock.Attribute;
 using Rock.Communication;
 using Rock.Data;
+using Rock.Jobs;
 using Rock.Model;
 using Rock.Web.Cache;
 
@@ -46,7 +49,7 @@ namespace rocks.kfs.GroupRoleAttendanceReminder.Jobs
     [TextField( "Send Reminders", "Comma delimited list of days after a group meets to send a reminder. For example, a value of '2,4' would result in a reminder getting sent two and four days after group meets if attendance was not entered.", true, "", "", 2 )]
     [EmailField( "Staff Email", "Staff email address to send to if no member with specified role is in the group or parent structure.", false, "", "", 4 )]
     [DisallowConcurrentExecution]
-    public class GroupRoleSendAttendanceReminder : IJob
+    public class GroupRoleSendAttendanceReminder : RockJob
     {
         private int attendanceRemindersSent = 0;
         private int errorCount = 0;
@@ -65,21 +68,18 @@ namespace rocks.kfs.GroupRoleAttendanceReminder.Jobs
         /// <summary>
         /// Executes the specified context.
         /// </summary>
-        /// <param name="context">The context.</param>
-        public virtual void Execute( IJobExecutionContext context )
+        public override void Execute()
         {
-            JobDataMap dataMap = context.JobDetail.JobDataMap;
-
-            Guid? groupRoleGuid = dataMap.GetString( "GroupRoletoSendto" ).AsGuidOrNull();
+            Guid? groupRoleGuid = GetAttributeValue( "GroupRoletoSendto" ).AsGuidOrNull();
 
             if ( !groupRoleGuid.HasValue || groupRoleGuid == Guid.Empty )
             {
-                context.Result = "Job failed. Unable to find group role/type";
+                Result = "Job failed. Unable to find group role/type";
                 throw new Exception( "No group role/type found" );
             }
 
-            systemEmailGuid = dataMap.GetString( "SystemEmail" ).AsGuid();
-            staffEmail = dataMap.GetString( "StaffEmail" );
+            systemEmailGuid = GetAttributeValue( "SystemEmail" ).AsGuid();
+            staffEmail = GetAttributeValue( "StaffEmail" );
 
             var groupTypeRoleService = new GroupTypeRoleService( new RockContext() );
             var groupRole = groupTypeRoleService.Get( groupRoleGuid.Value );
@@ -93,7 +93,7 @@ namespace rocks.kfs.GroupRoleAttendanceReminder.Jobs
                 //dates.Add( RockDateTime.Today );
                 try
                 {
-                    string[] reminderDays = dataMap.GetString( "SendReminders" ).Split( ',' );
+                    string[] reminderDays = GetAttributeValue( "SendReminders" ).Split( ',' );
                     foreach ( string reminderDay in reminderDays )
                     {
                         if ( reminderDay.Trim().IsNotNullOrWhiteSpace() )
@@ -138,7 +138,7 @@ namespace rocks.kfs.GroupRoleAttendanceReminder.Jobs
                     if ( !string.IsNullOrWhiteSpace( group.Schedule.iCalendarContent ) )
                     {
                         // If schedule has an iCal schedule, get occurrences between first and last dates
-                        foreach ( var occurrence in group.Schedule.GetOccurrences( startDate, endDate ) )
+                        foreach ( var occurrence in group.Schedule.GetICalOccurrences( startDate, endDate ) )
                         {
                             var startTime = occurrence.Period.StartTime.Value;
                             if ( dates.Contains( startTime.Date ) )
@@ -261,7 +261,7 @@ namespace rocks.kfs.GroupRoleAttendanceReminder.Jobs
                 }
             }
 
-            context.Result = string.Format( "{0} attendance reminders sent", attendanceRemindersSent );
+            Result = string.Format( "{0} attendance reminders sent", attendanceRemindersSent );
             if ( errorMessages.Any() )
             {
                 StringBuilder sb = new StringBuilder();
@@ -269,7 +269,7 @@ namespace rocks.kfs.GroupRoleAttendanceReminder.Jobs
                 sb.Append( string.Format( "{0} Errors: ", errorCount ) );
                 errorMessages.ForEach( e => { sb.AppendLine(); sb.Append( e ); } );
                 string errors = sb.ToString();
-                context.Result += errors;
+                Result += errors;
                 var exception = new Exception( errors );
                 HttpContext context2 = HttpContext.Current;
                 ExceptionLogService.LogException( exception, context2 );
@@ -313,7 +313,7 @@ namespace rocks.kfs.GroupRoleAttendanceReminder.Jobs
         private void SendEmailToMember( GroupMember member, Group group, KeyValuePair<int, List<DateTime>> occGroup )
         {
             var email = staffEmail;
-            if ( member.IsNotNull() )
+            if ( member != null )
             {
                 email = member.Person.Email;
             }
@@ -322,8 +322,8 @@ namespace rocks.kfs.GroupRoleAttendanceReminder.Jobs
             {
                 groupsNotified.Add( group.Id );
 
-                var mergeObjects = Rock.Lava.LavaHelper.GetCommonMergeFields( null, member.IsNotNull() ? member.Person : null );
-                mergeObjects.Add( "Person", member.IsNotNull() ? member.Person : null );
+                var mergeObjects = Rock.Lava.LavaHelper.GetCommonMergeFields( null, member != null ? member.Person : null );
+                mergeObjects.Add( "Person", member != null ? member.Person : null );
                 mergeObjects.Add( "Group", group );
                 mergeObjects.Add( "Occurrence", occGroup.Value.Max() );
 

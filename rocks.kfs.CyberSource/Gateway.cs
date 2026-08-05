@@ -37,6 +37,7 @@ using CyberSource.Model;
 using rocks.kfs.CyberSource.Controls;
 using static rocks.kfs.CyberSource.CyberSourceTypes;
 using CyberSourceSDK = CyberSource;
+using rocks.kfs.CyberSource.Model;
 
 namespace rocks.kfs.CyberSource
 {
@@ -106,12 +107,29 @@ namespace rocks.kfs.CyberSource
         DefaultBooleanValue = false,
         Order = 7 )]
 
+    [CustomDropdownListField(
+        "Event Registration Address Mode",
+        Key = AttributeKey.EventRegistrationAddressMode,
+        Description = @"The mode for address input on the Gateway with event registrations. In order to use 'Hide' or 'Optional' you must have Relaxed AVS enabled by the processor.",
+        ListSource = "Hide,Optional,Required",
+        DefaultValue = "Required",
+        Order = 8 )]
+
+    [ValueListField(
+        "Allowed Card Networks",
+        customValues: "VISA,MASTERCARD,AMEX,CARNET,CARTESBANCAIRES,CUP,DINERSCLUB,DISCOVER,EFTPOS,ELO,JCB,JCREW,MADA,MAESTRO,MEEZA",
+        Key = AttributeKey.AllowedCardNetworks,
+        Description = "Select the card networks to allow for this gateway. Selections must be supported by your Cybersource configuration.",
+        IsRequired = true,
+        DefaultValue = "VISA|MASTERCARD",
+        Order = 9 )]
+
     #endregion
 
     /// <summary>
     /// CyberSource Payment Gateway
     /// </summary>
-    public class Gateway : GatewayComponent, IHostedGatewayComponent
+    public class Gateway : GatewayComponent, IHostedGatewayComponent, IObsidianHostedGatewayComponent
     {
         private static readonly string DemoUrl = "apitest.cybersource.com";
         private static readonly string ProductionUrl = "api.cybersource.com";
@@ -129,6 +147,8 @@ namespace rocks.kfs.CyberSource
             public const string BatchPrefix = "BatchPrefix";
             public const string Mode = "Mode";
             public const string CapturePayment = "CapturePayment";
+            public const string EventRegistrationAddressMode = "EventRegistrationAddressMode";
+            public const string AllowedCardNetworks = "AllowedCardNetworks";
 
             /// <summary>
             /// The credit card fee coverage percentage
@@ -149,6 +169,7 @@ namespace rocks.kfs.CyberSource
         [System.Diagnostics.DebuggerStepThrough]
         public static string GetGatewayUrl( FinancialGateway financialGateway )
         {
+            financialGateway.LoadAttributes();
             bool testMode = financialGateway.GetAttributeValue( AttributeKey.Mode ).Equals( "Test" );
             if ( testMode )
             {
@@ -343,15 +364,15 @@ namespace rocks.kfs.CyberSource
             PtsV2PaymentsPost201Response chargeResult = null;
             try
             {
-                var configDictionary = new Configuration().GetConfiguration( financialGateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+                var clientConfig = Configuration.GetClientConfig( financialGateway );
 
                 var apiInstance = new PaymentsApi( clientConfig );
                 chargeResult = apiInstance.CreatePayment( requestObj );
             }
             catch ( Exception e )
             {
-                errorMessage += "Exception on calling the API : " + e.Message;
+                ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
+                errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the payment information you entered and try again.";
             }
 
             if ( chargeResult == null || chargeResult.ErrorInformation != null )
@@ -449,8 +470,7 @@ namespace rocks.kfs.CyberSource
             PtsV2PaymentsRefundPost201Response refundResponse = null;
             PtsV2PaymentsReversalsPost201Response reversalResponse = null;
             TssV2TransactionsGet200Response transactionDetail = GetTransactionDetailResponse( financialGateway, origTransaction.TransactionCode );
-            var configDictionary = new Configuration().GetConfiguration( financialGateway );
-            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            var clientConfig = Configuration.GetClientConfig( financialGateway );
             if ( transactionDetail != null && transactionDetail.ApplicationInformation != null )
             {
                 applications.AddRange( transactionDetail.ApplicationInformation.Applications );
@@ -485,7 +505,8 @@ namespace rocks.kfs.CyberSource
             catch ( Exception e )
             {
                 var apiException = ( CyberSourceSDK.Client.ApiException ) e;
-                errorMessage += "Exception on calling the API : " + e.Message;
+                ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
+                errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the payment information you entered and try again.";
 
                 PtsV2PaymentsRefundPost201Response alreadyHandled = null;
 
@@ -520,7 +541,8 @@ namespace rocks.kfs.CyberSource
                 }
                 catch ( Exception ie )
                 {
-                    errorMessage += "Exception on calling the API : " + ie.Message;
+                    ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
+                    errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the refund information entered and try again.";
                     if ( alreadyHandled != null )
                     {
                         refundResponse = alreadyHandled;
@@ -581,8 +603,7 @@ namespace rocks.kfs.CyberSource
             string subscriptionId = "";
             string subscriptionDescription = $"{referencedPaymentInfo.Description} - Subscription Ref: {descriptionGuid}";
 
-            var configDictionary = new Configuration().GetConfiguration( financialGateway );
-            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            var clientConfig = Configuration.GetClientConfig( financialGateway );
 
             try
             {
@@ -659,7 +680,8 @@ namespace rocks.kfs.CyberSource
                     }
                     catch ( Exception e )
                     {
-                        errorMessage += "Exception on calling the Subscriptions API : " + e.Message;
+                        ExceptionLogService.LogException( $"Exception on calling the Cybersource Subscriptions API: {e.Message}" );
+                        errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the payment information you entered and try again.";
                         return null;
                     }
 
@@ -811,8 +833,7 @@ namespace rocks.kfs.CyberSource
 
             var transactionFrequencyGuid = DefinedValueCache.Get( scheduledTransaction.TransactionFrequencyValueId ).Guid;
 
-            var configDictionary = new Configuration().GetConfiguration( scheduledTransaction.FinancialGateway );
-            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            var clientConfig = Configuration.GetClientConfig( scheduledTransaction.FinancialGateway );
 
             GetSubscriptionResponse subscriptionStatusResult = null;
             DateTime? nextPaymentDate = RockDateTime.Now;
@@ -841,7 +862,7 @@ namespace rocks.kfs.CyberSource
                         if ( apiInstance.GetStatusCode() != 200 || setSubscriptionStatusResult.Status != "COMPLETED" )
                         {
                             // Write decline/error as an exception.
-                            var exception = new Exception( $"Error re-activating CyberSource subscription. Message:  {setSubscriptionStatusResult.Status} " );
+                            var exception = new Exception( $"Error re-activating Cybersource subscription. Message:  {setSubscriptionStatusResult.Status} " );
 
                             ExceptionLogService.LogException( exception );
 
@@ -852,7 +873,7 @@ namespace rocks.kfs.CyberSource
                     }
                     catch ( Exception e )
                     {
-                        errorMessage += $"Error re-activating CyberSource subscription. Message:  {e.Message} ";
+                        errorMessage += $"Error re-activating Cybersource subscription. Message:  {e.Message} ";
 
                         var exception = new Exception( errorMessage );
                         ExceptionLogService.LogException( exception );
@@ -932,7 +953,8 @@ namespace rocks.kfs.CyberSource
                     var exception = new Exception( $"Error processing CyberSource subscription. Message:  {e.Message} " );
 
                     ExceptionLogService.LogException( exception );
-                    errorMessage = e.Message;
+                    errorMessage = "We encountered an error while calling the Gateway provider API. Kindly double-check the subscription information you entered and try again.";
+
 
                     return false;
                 }
@@ -1002,7 +1024,7 @@ namespace rocks.kfs.CyberSource
                     var exception = new Exception( $"Error processing CyberSource Address Update. Message:  {e.Message} " );
 
                     ExceptionLogService.LogException( exception );
-                    errorMessage = e.Message;
+                    errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the address information you entered and try again.";
 
                     return false;
                 }
@@ -1047,8 +1069,7 @@ namespace rocks.kfs.CyberSource
         {
             var subscriptionId = transaction.GatewayScheduleId;
 
-            var configDictionary = new Configuration().GetConfiguration( transaction.FinancialGateway );
-            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            var clientConfig = Configuration.GetClientConfig( transaction.FinancialGateway );
 
             var apiInstance = new SubscriptionsApi( clientConfig );
 
@@ -1072,7 +1093,8 @@ namespace rocks.kfs.CyberSource
                     return true;
                 }
 
-                errorMessage = "Exception on calling the CyberSource API : " + e.Message;
+                ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
+                errorMessage = "We encountered an error while calling the Gateway provider API. Kindly double-check the payment information you entered and try again.";
                 return false;
             }
         }
@@ -1099,15 +1121,15 @@ namespace rocks.kfs.CyberSource
             GetSubscriptionResponse subscriptionResponse = null;
             try
             {
-                var configDictionary = new Configuration().GetConfiguration( financialGateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+                var clientConfig = Configuration.GetClientConfig( financialGateway );
 
                 apiInstance = new SubscriptionsApi( clientConfig );
                 subscriptionResponse = apiInstance.GetSubscription( subscriptionId );
             }
             catch ( Exception e )
             {
-                errorMessage += $"Exception on calling the Subscription Response API : {e.Message}";
+                ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
+                errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the subscription information you entered and try again.";
             }
 
             if ( apiInstance.GetStatusCode() == ( int ) System.Net.HttpStatusCode.OK )
@@ -1171,8 +1193,7 @@ namespace rocks.kfs.CyberSource
                 Limit: limit,
                 Sort: sort
             );
-            var configDictionary = new Configuration().GetConfiguration( gateway );
-            var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+            var clientConfig = Configuration.GetClientConfig( gateway );
             var allSubscriptions = new List<GetAllSubscriptionsResponseSubscriptions>();
 
             TssV2TransactionsPost201Response searchResult = null;
@@ -1183,7 +1204,8 @@ namespace rocks.kfs.CyberSource
             }
             catch ( Exception e )
             {
-                errorMessage = "Exception on calling the API : " + e.Message;
+                ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
+                errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the payment information you entered and try again.";
                 return paymentList;
             }
 
@@ -1402,6 +1424,22 @@ namespace rocks.kfs.CyberSource
 
             var tokenizerToken = paymentInfo.ReferenceNumber;
 
+            if ( tokenizerToken.StartsWith( "{" ) && tokenizerToken.EndsWith( "}" ) )
+            {
+                var parseToken = JsonConvert.DeserializeObject<AddressToken>( tokenizerToken );
+                if ( parseToken != null )
+                {
+                    paymentInfo.Street1 = parseToken.BillingAddress.Street1;
+                    paymentInfo.Street2 = parseToken.BillingAddress.Street2;
+                    paymentInfo.City = parseToken.BillingAddress.City;
+                    paymentInfo.State = parseToken.BillingAddress.State;
+                    paymentInfo.PostalCode = parseToken.BillingAddress.PostalCode;
+                    paymentInfo.Country = parseToken.BillingAddress.Country;
+
+                    tokenizerToken = parseToken.OriginalToken;
+                }
+            }
+
             Ptsv2paymentsClientReferenceInformation clientReferenceInformation = new Ptsv2paymentsClientReferenceInformation(
                 Comments: paymentInfo.FullName
             );
@@ -1455,15 +1493,15 @@ namespace rocks.kfs.CyberSource
             PtsV2PaymentsPost201Response tokenResult = null;
             try
             {
-                var configDictionary = new Configuration().GetConfiguration( financialGateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+                var clientConfig = Configuration.GetClientConfig( financialGateway );
 
                 var apiInstance = new PaymentsApi( clientConfig );
                 tokenResult = apiInstance.CreatePayment( requestObj );
             }
             catch ( Exception e )
             {
-                errorMessage += "Exception on calling the API : " + e.Message;
+                ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
+                errorMessage += "We encountered an error while calling the Gateway provider API. Kindly double-check the payment information you entered and try again.";
             }
 
             if ( tokenResult == null || tokenResult.ErrorInformation != null )
@@ -1515,6 +1553,68 @@ namespace rocks.kfs.CyberSource
 
         #endregion
 
+        #region IObsidianFinancialGateway
+
+        /// <inheritdoc/>
+        public string GetObsidianControlFileUrl( FinancialGateway financialGateway )
+        {
+            return "/Plugins/rocks_kfs/Obsidian/Controls/cyberSourceGatewayControl.obs.js";
+        }
+
+        /// <inheritdoc/>
+        public object GetObsidianControlSettings( FinancialGateway financialGateway, HostedPaymentInfoControlOptions options )
+        {
+            var microFormJWK = "";
+            var microFormJsPath = Configuration.GetMicroFormJWK( financialGateway, out microFormJWK );
+            var clientIntegrity = "";
+
+            var microFormParameters = microFormJsPath.Split( '|' );
+
+            if ( microFormParameters.Length > 1 && microFormParameters[1].IsNotNullOrWhiteSpace() )
+            {
+                clientIntegrity = microFormParameters[1];
+            }
+
+            microFormJsPath = microFormParameters[0];
+
+            DateTime epoch = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
+            DateTime now = DateTime.UtcNow;
+            long millisecondsSinceEpoch = ( long ) ( now - epoch ).TotalMilliseconds;
+
+            return new
+            {
+                gatewayUrl = GetGatewayUrl( financialGateway ),
+                addressMode = financialGateway.GetAttributeValue( AttributeKey.EventRegistrationAddressMode ),
+                microFormJsPath,
+                microFormJWK,
+                jwkGeneratedTime = millisecondsSinceEpoch,
+                integrity = clientIntegrity
+            };
+        }
+
+        /// <inheritdoc/>
+        public bool TryGetPaymentTokenFromParameters( FinancialGateway financialGateway, IDictionary<string, string> parameters, out string paymentToken )
+        {
+            paymentToken = null;
+
+            return false;
+        }
+
+        /// <inheritdoc/>
+        public bool IsPaymentTokenCharged( FinancialGateway financialGateway, string paymentToken )
+        {
+            return false;
+        }
+
+        /// <inheritdoc/>
+        public FinancialTransaction FetchPaymentTokenTransaction( RockContext rockContext, FinancialGateway financialGateway, int? fundId, string paymentToken )
+        {
+            // This method is not required in our implementation.
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
         #region Private Helpers
 
         /// <summary>
@@ -1527,8 +1627,7 @@ namespace rocks.kfs.CyberSource
         {
             try
             {
-                var configDictionary = new Configuration().GetConfiguration( financialGateway );
-                var clientConfig = new CyberSourceSDK.Client.Configuration( merchConfigDictObj: configDictionary );
+                var clientConfig = Configuration.GetClientConfig( financialGateway );
 
                 var apiInstance = new TransactionDetailsApi( clientConfig );
                 var result = apiInstance.GetTransaction( id );
@@ -1536,8 +1635,7 @@ namespace rocks.kfs.CyberSource
             }
             catch ( Exception e )
             {
-                var errorMessage = "Exception on calling the API : " + e.Message;
-                ExceptionLogService.LogException( errorMessage );
+                ExceptionLogService.LogException( $"Exception on calling the Cybersource API: {e.Message}" );
                 return null;
             }
         }
@@ -1908,7 +2006,6 @@ namespace rocks.kfs.CyberSource
 
             return financialPaymentDetail;
         }
-
         #endregion Private Helpers
 
         #region Static Helpers

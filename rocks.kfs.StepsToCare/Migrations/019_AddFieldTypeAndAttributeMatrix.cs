@@ -37,17 +37,18 @@ namespace rocks.kfs.StepsToCare.Migrations
                 IsActive = true,
                 FormattedLava = AttributeMatrixTemplate.FormattedLavaDefault,
                 CreatedDateTime = RockDateTime.Now,
-                Guid = SystemGuid.Attribute.CATEGORY_MATRIX_CARE_TOUCHES.AsGuid()
+                Guid = SystemGuid.Category.MATRIX_CARE_TOUCHES.AsGuid()
             };
 
             var rockContext = new RockContext();
+            var attributeMatrixTemplateService = new AttributeMatrixTemplateService( rockContext );
             rockContext.WrapTransaction( () =>
             {
-                rockContext.AttributeMatrixTemplates.Add( attributeMatrixTemplate );
+                attributeMatrixTemplateService.Add( attributeMatrixTemplate );
                 rockContext.SaveChanges();
             } );
 
-            var attributeMatrixTemplateId = new AttributeMatrixTemplateService( rockContext ).Get( SystemGuid.Attribute.CATEGORY_MATRIX_CARE_TOUCHES.AsGuid() ).Id.ToString();
+            var attributeMatrixTemplateId = attributeMatrixTemplateService.Get( SystemGuid.Category.MATRIX_CARE_TOUCHES.AsGuid() ).Id.ToString();
 
             // Entity: Rock.Model.AttributeMatrixItem Attribute: Note Template
             RockMigrationHelper.AddOrUpdateEntityAttribute( "Rock.Model.AttributeMatrixItem", SystemGuid.FieldType.NOTE_TEMPLATE, "AttributeMatrixTemplateId", attributeMatrixTemplateId, "Note Template", "Note Template", @"", 0, @"", SystemGuid.Attribute.MATRIX_ATTRIBUTE_TOUCH_NOTE_TEMPLATE, "NoteTemplate" );
@@ -94,6 +95,15 @@ namespace rocks.kfs.StepsToCare.Migrations
 
             RockMigrationHelper.DeleteFieldType( SystemGuid.FieldType.NOTE_TEMPLATE );
             RockMigrationHelper.DeleteFieldType( SystemGuid.FieldType.CARE_NEED );
+
+            var rockContext = new RockContext();
+            var attributeMatrixTemplateService = new AttributeMatrixTemplateService( rockContext );
+            var attributeMatrixTemplate = attributeMatrixTemplateService.Get( SystemGuid.Category.MATRIX_CARE_TOUCHES.AsGuid() );
+            rockContext.WrapTransaction( () =>
+            {
+                attributeMatrixTemplateService.Delete( attributeMatrixTemplate );
+                rockContext.SaveChanges();
+            } );
         }
     }
 }

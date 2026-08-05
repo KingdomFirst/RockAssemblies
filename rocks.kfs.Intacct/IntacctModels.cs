@@ -16,8 +16,10 @@
 //
 using System;
 using System.Collections.Generic;
+
 using Rock;
-using Rock.Data;
+using Rock.Lava;
+
 using rocks.kfs.Intacct.Enums;
 
 namespace rocks.kfs.Intacct
@@ -40,6 +42,9 @@ namespace rocks.kfs.Intacct
         public DateTime? ExchangeRateDate;
         public decimal? ExchangeRateValue;
         public string ExchangeRateType;
+        public int ItemIndex;
+        public int FeeItemIndex;
+        public string CreditOrDebit;
     }
 
     public class GlEntry
@@ -55,6 +60,7 @@ namespace rocks.kfs.Intacct
         public string VendorId;
         public string EmployeeId;
         public string ItemId;
+        public string TaskId;
         public string ClassId;
         public string ContractId;
         public string WarehouseId;
@@ -68,6 +74,7 @@ namespace rocks.kfs.Intacct
         public string DepartmentId;
         public string LocationId;
         public string ProjectId;
+        public string TaskId;
         public string CustomerId;
         public string VendorId;
         public string EmployeeId;
@@ -75,6 +82,39 @@ namespace rocks.kfs.Intacct
         public string ClassId;
         public string ContractId;
         public string WarehouseId;
+    }
+
+    public class GLJournalCsvLine
+    {
+        public string Journal;
+        public DateTime? Date;
+        public string Description;
+        public string ReferenceNumber;
+        public int LineNumber;
+        public string AccountNumber;
+        public string LocationId;
+        public string DepartmentId;
+        public string Document;
+        public string Memo;
+        public decimal? Debit;
+        public decimal? Credit;
+        public string Currency;
+        public DateTime? ExchangeRateDate;
+        public string ExchangeRateTypeId;
+        public decimal? ExchangeRate;
+        public string State = string.Empty;
+        public string AllocationId;
+        public string ProjectId;
+        public string CustomerId;
+        public string VendorId;
+        public string EmployeeId;
+        public string ItemId;
+        public string ClassId;
+        public string TaskId;
+        public string ContractId;
+        public string WarehouseId;
+        public List<AllocationLine> CustomAllocationSplits = new List<AllocationLine>();
+        public SortedDictionary<string, dynamic> CustomFields = new SortedDictionary<string, object>();
     }
 
     public class OtherReceipt
@@ -103,7 +143,7 @@ namespace rocks.kfs.Intacct
     public class ReceiptLineItem
     {
         public string GlAccountNo;
-        public string AccountLabel;
+        public string GlAccountLabel;
         public decimal Amount;
         public string Memo;
         public string LocationId;
@@ -118,45 +158,74 @@ namespace rocks.kfs.Intacct
         public string EmployeeId;
         public string ItemId;
         public string ClassId;
+        public string ContractId;
+        public string WarehouseId;
         public decimal TotalTrxAmount;
     }
 
-    public class GLTransaction : Rock.Lava.ILiquidizable
+    public class GLReceiptCsvLine
     {
-        [LavaInclude]
+        public DateTime? ReceiptDate;
+        public PaymentMethod? PaymentMethod;
+        public DateTime? TransactionDate;
+        public string TransactionNumber;
+        public string Description;
+        public DepositTo? DepositTo;
+        public string BankAccountId;
+        public DateTime? DepositDate;
+        public string UndepositedFundsAccountId;
+        public string Currency;
+        public DateTime? ExchRateDate;
+        public string ExchRateType;
+        public decimal? ExchRate;
+        public int LineNumber;
+        public string AccountNumber;
+        public string AccountLabel;
+        public decimal TransactionAmount;
         public decimal Amount;
-
-        [LavaInclude]
-        public int FinancialAccountId;
-
-        [LavaInclude]
-        public string CreditProject;
-
-        [LavaInclude]
-        public string DebitProject;
-
-        [LavaInclude]
-        public decimal TransactionFeeAmount;
-
-        [LavaInclude]
-        public string TransactionFeeAccount;
-
-        [LavaInclude]
-        public int ProcessTransactionFees;
-
-        [LavaInclude]
+        public string DepartmentId;
+        public string LocationId;
+        public string Memo;
+        public string ProjectId;
+        public string CustomerId;
+        public string ItemId;
+        public string TaskId;
+        public string VendorId;
+        public string EmployeeId;
+        public string ContractId;
+        public string WarehouseId;
+        public string ClassId;
         public string Payer;
+        public SortedDictionary<string, dynamic> CustomFields = new SortedDictionary<string, object>();
+    }
 
-        #region ILiquidizable
+    public class GLTransaction : ILavaDataDictionary
+    {
+        [LavaVisible]
+        public decimal Amount { get; set; }
 
-        /// <summary>
-        /// Creates a DotLiquid compatible dictionary that represents the current entity object. 
-        /// </summary>
-        /// <returns>DotLiquid compatible dictionary.</returns>
-        public object ToLiquid()
-        {
-            return this;
-        }
+        [LavaVisible]
+        public int FinancialAccountId { get; set; }
+
+        [LavaVisible]
+        public string CreditProject { get; set; }
+
+        [LavaVisible]
+        public string DebitProject { get; set; }
+
+        [LavaVisible]
+        public decimal TransactionFeeAmount { get; set; }
+
+        [LavaVisible]
+        public string TransactionFeeAccount { get; set; }
+
+        [LavaVisible]
+        public int ProcessTransactionFees { get; set; }
+
+        [LavaVisible]
+        public string Payer { get; set; }
+
+        #region ILavaDataDictionary implementation
 
         /// <summary>
         /// Gets the available keys (for debugging info).
@@ -164,7 +233,7 @@ namespace rocks.kfs.Intacct
         /// <value>
         /// The available keys.
         /// </value>
-        [LavaIgnore]
+        [LavaHidden]
         public virtual List<string> AvailableKeys
         {
             get
@@ -188,7 +257,20 @@ namespace rocks.kfs.Intacct
         /// </value>
         /// <param name="key">The key.</param>
         /// <returns></returns>
-        [LavaIgnore]
+        public object GetValue( string key )
+        {
+            return this[key];
+        }
+
+        /// <summary>
+        /// Gets the <see cref="System.Object"/> with the specified key.
+        /// </summary>
+        /// <value>
+        /// The <see cref="System.Object"/>.
+        /// </value>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
+        [LavaHidden]
         public virtual object this[object key]
         {
             get
@@ -227,12 +309,52 @@ namespace rocks.kfs.Intacct
         /// </summary>
         /// <param name="key">The key.</param>
         /// <returns></returns>
+        public bool ContainsKey( string key )
+        {
+            string propertyKey = key.ToStringSafe();
+            var propInfo = GetType().GetProperty( propertyKey );
+
+            return propInfo != null;
+        }
+
+        #endregion
+
+        #region ILiquidizable
+
+        /// <summary>
+        /// Determines whether the specified key contains key.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
         public virtual bool ContainsKey( object key )
         {
             string propertyKey = key.ToStringSafe();
             var propInfo = GetType().GetProperty( propertyKey );
 
             return propInfo != null;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="System.Object"/> with the specified key.
+        /// </summary>
+        /// <value>
+        /// The <see cref="System.Object"/>.
+        /// </value>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
+        public object GetValue( object key )
+        {
+            return this[key];
+        }
+
+        /// <summary>
+        /// To the liquid.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="System.NotImplementedException"></exception>
+        public object ToLiquid()
+        {
+            return this;
         }
 
         #endregion
@@ -249,14 +371,30 @@ namespace rocks.kfs.Intacct
         public string CreditDepartment;
         public string CreditLocation;
         public string CreditProject;
+        public string CreditCustomer;
+        public string CreditItem;
+        public string CreditTask;
+        public string CreditVendor;
+        public string CreditEmployee;
+        public string CreditContract;
+        public string CreditWarehouse;
         public string DebitClass;
         public string DebitDepartment;
         public string DebitLocation;
         public string DebitProject;
+        public string DebitCustomer;
+        public string DebitItem;
+        public string DebitTask;
+        public string DebitVendor;
+        public string DebitEmployee;
+        public string DebitContract;
+        public string DebitWarehouse;
         public string Description;
         public SortedDictionary<string, dynamic> CustomDimensions;
         public string CustomDimensionString;
         public int ProcessTransactionFees;
+        public int ItemIndex = -1;
+        public int FeeItemIndex = -1;
 
         public object Clone()
         {

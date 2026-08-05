@@ -56,7 +56,7 @@ namespace rocks.kfs.StepsToCare.Migrations
             // Add Page Route
             //   Page:Care Needs
             //   Route:Person/{PersonId}/CareNeeds
-            RockMigrationHelper.AddPageRoute( "ABA4CE73-28DC-42DE-BE70-33F09287C116", "Person/{PersonId}/CareNeeds", "A243DDEE-1B40-4DAD-8A70-35116558E47F" );
+            RockMigrationHelper.AddOrUpdatePageRoute( "ABA4CE73-28DC-42DE-BE70-33F09287C116", "Person/{PersonId}/CareNeeds", "A243DDEE-1B40-4DAD-8A70-35116558E47F" );
             // Add Block
             //  Block Name: Care Dashboard
             //  Page Name: Care Needs

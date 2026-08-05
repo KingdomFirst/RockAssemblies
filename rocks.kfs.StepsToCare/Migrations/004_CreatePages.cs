@@ -34,13 +34,13 @@ namespace rocks.kfs.StepsToCare.Migrations
             RockMigrationHelper.AddPage( true, "1F93E9AA-ECCA-42A2-8C91-73D991DBCD9F", "D65F783D-87A9-4CC9-8110-E83466A0EADB", "Care Configuration", "", "39F72E9D-22B7-4F1E-8633-6C3745AC6F34", "" );
 
             // Add Page Route for Steps to Care
-            RockMigrationHelper.AddPageRoute( "1F93E9AA-ECCA-42A2-8C91-73D991DBCD9F", "StepsToCare", "9FA7606C-13BC-4049-A1A1-0389C98C3743" );
+            RockMigrationHelper.AddOrUpdatePageRoute( "1F93E9AA-ECCA-42A2-8C91-73D991DBCD9F", "StepsToCare", "9FA7606C-13BC-4049-A1A1-0389C98C3743" );
 
             // Add Page Route for Care Entry
-            RockMigrationHelper.AddPageRoute( "27953B65-21E2-4CA9-8461-3AFAD46D9BC8", "StepsToCareDetail", "7DA0C653-88E4-4997-89BA-C58B33A2AA32" );
+            RockMigrationHelper.AddOrUpdatePageRoute( "27953B65-21E2-4CA9-8461-3AFAD46D9BC8", "StepsToCareDetail", "7DA0C653-88E4-4997-89BA-C58B33A2AA32" );
 
             // Add Page Route for Care Entry
-            RockMigrationHelper.AddPageRoute( "27953B65-21E2-4CA9-8461-3AFAD46D9BC8", "StepsToCareDetail/{CareNeedId}", "32CDFBC1-F3EB-405B-9462-F7E2DD722006" );
+            RockMigrationHelper.AddOrUpdatePageRoute( "27953B65-21E2-4CA9-8461-3AFAD46D9BC8", "StepsToCareDetail/{CareNeedId}", "32CDFBC1-F3EB-405B-9462-F7E2DD722006" );
 
             // Add/Update BlockType Care Entry
             RockMigrationHelper.UpdateBlockType( "Care Entry", "Care entry page for KFS Steps to Care package. Used for adding and editing care needs ", "~/Plugins/rocks_kfs/StepsToCare/CareEntry.ascx", "KFS > Steps To Care", "4F0F9ED7-9F74-4152-B27F-D9B2A458AFBE" );

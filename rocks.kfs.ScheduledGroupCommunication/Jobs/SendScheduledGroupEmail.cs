@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2019 by Kingdom First Solutions
+// Copyright 2025 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ using Quartz;
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
+using Rock.Jobs;
 using Rock.Model;
 using Rock.Web.Cache;
 
@@ -40,7 +41,7 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
     /// Job to send scheduled group emails.
     /// </summary>
     [DisallowConcurrentExecution]
-    public class SendScheduledGroupEmail : IJob
+    public class SendScheduledGroupEmail : RockJob
     {
         /// <summary>
         /// Empty constructor for job initialization
@@ -55,17 +56,12 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
 
         /// <summary>
         /// Job that will send scheduled group emails.
-        ///
-        /// Called by the <see cref="IScheduler" /> when a
-        /// <see cref="ITrigger" /> fires that is associated with
-        /// the <see cref="IJob" />.
         /// </summary>
-        public virtual void Execute( IJobExecutionContext context )
+        public override void Execute()
         {
-            var dataMap = context.JobDetail.JobDataMap;
-            int? commandTimeout = dataMap.GetString( "CommandTimeout" ).AsIntegerOrNull();
-            int? lastRunBuffer = dataMap.GetString( "LastRunBuffer" ).AsIntegerOrNull();
-            var enabledLavaCommands = dataMap.GetString( "EnabledLavaCommands" );
+            int? commandTimeout = GetAttributeValue( "CommandTimeout" ).AsIntegerOrNull();
+            int? lastRunBuffer = GetAttributeValue( "LastRunBuffer" ).AsIntegerOrNull();
+            var enabledLavaCommands = GetAttributeValue( "EnabledLavaCommands" );
             var JobStartDateTime = RockDateTime.Now;
             var dateAttributes = new List<AttributeValue>();
             var dAttributeMatrixItemAndGroupIds = new Dictionary<int, int>(); // Key: AttributeMatrixItemId   Value: GroupId
@@ -83,11 +79,13 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
             {
                 using ( var rockContext = new RockContext() )
                 {
+                    rockContext.Database.CommandTimeout = commandTimeout;
+
                     // get the last run date or yesterday
                     DateTime? lastStartDateTime = null;
 
                     // get job type id
-                    int jobId = context.JobDetail.Description.AsInteger();
+                    int jobId = ServiceJobId;
 
                     // load job
                     var job = new ServiceJobService( rockContext )
@@ -257,11 +255,11 @@ namespace rocks.kfs.ScheduledGroupCommunication.Jobs
 
                 if ( communicationsSent > 0 )
                 {
-                    context.Result = string.Format( "Sent {0} {1}", communicationsSent, "communication".PluralizeIf( communicationsSent > 1 ) );
+                    Result = string.Format( "Sent {0} {1}", communicationsSent, "communication".PluralizeIf( communicationsSent > 1 ) );
                 }
                 else
                 {
-                    context.Result = "No communications to send";
+                    Result = "No communications to send";
                 }
             }
             catch ( System.Exception ex )

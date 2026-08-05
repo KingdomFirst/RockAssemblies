@@ -20,6 +20,7 @@ using Rock;
 using Rock.Attribute;
 using Rock.Communication;
 using Rock.Data;
+using Rock.Jobs;
 using Rock.Logging;
 using Rock.Model;
 using Rock.Web.Cache;
@@ -78,7 +79,7 @@ namespace rocks.kfs.Zoom.Jobs
     #endregion Job Attributes
 
     [DisallowConcurrentExecution]
-    public class ZoomMeetingGroupReminder : IJob
+    public class ZoomMeetingGroupReminder : RockJob
     {
         /// <summary>
         /// Attribute Keys
@@ -110,15 +111,13 @@ namespace rocks.kfs.Zoom.Jobs
         /// <summary>
         /// Executes the specified context.
         /// </summary>
-        /// <param name="context">The context.</param>
-        public virtual void Execute( IJobExecutionContext context )
+        public override void Execute()
         {
             var rockContext = new RockContext();
-            var dataMap = context.JobDetail.JobDataMap;
-            resGroupAttribute = AttributeCache.Get( dataMap.GetString( AttributeKey.GroupAttributeSetting ).AsGuid() );
+            resGroupAttribute = AttributeCache.Get( GetAttributeValue( AttributeKey.GroupAttributeSetting ).AsGuid() );
             reservationLocationEntityTypeId = new EntityTypeService( rockContext ).GetNoTracking( com.bemaservices.RoomManagement.SystemGuid.EntityType.RESERVATION_LOCATION.AsGuid() ).Id;
 
-            context.Result = "0 meeting reminders sent.";
+            Result = "0 meeting reminders sent.";
 
             if ( resGroupAttribute == null )
             {
@@ -126,13 +125,13 @@ namespace rocks.kfs.Zoom.Jobs
                 {
                     $"The Reservation Group Attribute job setting is invalid. Please check your Room Registration and KFS Zoom Room plugin configuration."
                 };
-                HandleErrorMessages( context, errorMessages );
+                HandleErrorMessages( errorMessages );
             }
 
-            var systemCommunicationGuid = dataMap.GetString( AttributeKey.SystemCommunication ).AsGuid();
+            var systemCommunicationGuid = GetAttributeValue( AttributeKey.SystemCommunication ).AsGuid();
             var systemCommunication = new SystemCommunicationService( rockContext ).Get( systemCommunicationGuid );
 
-            var jobPreferredCommunicationType = ( CommunicationType ) dataMap.GetString( AttributeKey.SendUsing ).AsInteger();
+            var jobPreferredCommunicationType = ( CommunicationType ) GetAttributeValue( AttributeKey.SendUsing ).AsInteger();
             var isSmsEnabled = MediumContainer.HasActiveSmsTransport() && !string.IsNullOrWhiteSpace( systemCommunication.SMSMessage );
             var isPushEnabled = MediumContainer.HasActivePushTransport() && !string.IsNullOrWhiteSpace( systemCommunication.PushData );
 
@@ -143,7 +142,7 @@ namespace rocks.kfs.Zoom.Jobs
                 {
                     $"The job is setup to send via SMS but either SMS isn't enabled or no SMS message was found in system communication {systemCommunication.Title}."
                 };
-                HandleErrorMessages( context, errorMessages );
+                HandleErrorMessages( errorMessages );
             }
 
             if ( jobPreferredCommunicationType == CommunicationType.PushNotification && !isPushEnabled )
@@ -153,7 +152,7 @@ namespace rocks.kfs.Zoom.Jobs
                 {
                     $"The job is setup to send via Push Notification but either Push Notifications are not enabled or no Push message was found in system communication {systemCommunication.Title}."
                 };
-                HandleErrorMessages( context, errorMessages );
+                HandleErrorMessages( errorMessages );
             }
 
             var results = new StringBuilder();
@@ -174,10 +173,10 @@ namespace rocks.kfs.Zoom.Jobs
             }
 
             // Get upcoming Zoom Room occurrences
-            var roomOccurrenceInfo = GetOccurenceAndGroupData( dataMap, rockContext );
+            var roomOccurrenceInfo = GetOccurenceAndGroupData( rockContext );
 
             // Process reminders
-            var meetingRemindersResults = SendMeetingReminders( context, rockContext, roomOccurrenceInfo, systemCommunication, jobPreferredCommunicationType, isSmsEnabled, isPushEnabled );
+            var meetingRemindersResults = SendMeetingReminders( rockContext, roomOccurrenceInfo, systemCommunication, jobPreferredCommunicationType, isSmsEnabled, isPushEnabled );
 
             results.AppendLine( $"{notificationEmails + notificationSms + notificationPush } meeting reminders sent." );
 
@@ -185,8 +184,8 @@ namespace rocks.kfs.Zoom.Jobs
 
             results.Append( FormatWarningMessages( meetingRemindersResults.Warnings ) );
 
-            context.Result = results.ToString();
-            HandleErrorMessages( context, meetingRemindersResults.Errors );
+            Result = results.ToString();
+            HandleErrorMessages( meetingRemindersResults.Errors );
         }
 
         /// <summary>
@@ -195,10 +194,10 @@ namespace rocks.kfs.Zoom.Jobs
         /// <param name="dataMap">The data map.</param>
         /// <param name="rockContext">The rock context.</param>
         /// <returns></returns>
-        private Dictionary<RoomOccurrence, Group> GetOccurenceAndGroupData( JobDataMap dataMap, RockContext rockContext )
+        private Dictionary<RoomOccurrence, Group> GetOccurenceAndGroupData( RockContext rockContext )
         {
             var result = new Dictionary<RoomOccurrence, Group>();
-            var dates = GetSearchDates( dataMap );
+            var dates = GetSearchDates();
             var startDate = dates.Min();
 
             var zRoomOccurrenceService = new RoomOccurrenceService( rockContext );
@@ -242,17 +241,15 @@ namespace rocks.kfs.Zoom.Jobs
         /// <summary>
         /// Gets the search dates.
         /// </summary>
-        /// <param name="dataMap">The data map.</param>
         /// <returns></returns>
-        private List<DateTime> GetSearchDates( JobDataMap dataMap )
+        private List<DateTime> GetSearchDates()
         {
-
             // Get the occurrence dates that apply
             var dates = new List<DateTime>();
 
             try
             {
-                var reminderDays = dataMap.GetString( AttributeKey.DaysPrior ).Split( ',' );
+                var reminderDays = GetAttributeValue( AttributeKey.DaysPrior ).Split( ',' );
                 foreach ( string reminderDay in reminderDays )
                 {
                     if ( reminderDay.Trim().IsNotNullOrWhiteSpace() )
@@ -283,8 +280,7 @@ namespace rocks.kfs.Zoom.Jobs
         /// <param name="systemCommunication">The system communication.</param>
         /// <param name="jobPreferredCommunicationType">Type of the job preferred communication.</param>
         /// <returns></returns>
-        private SendMessageResult SendMeetingReminders( IJobExecutionContext context,
-                        RockContext rockContext,
+        private SendMessageResult SendMeetingReminders( RockContext rockContext,
                         Dictionary<RoomOccurrence, Group> occurrenceData,
                         SystemCommunication systemCommunication,
                         CommunicationType jobPreferredCommunicationType,
@@ -416,7 +412,7 @@ namespace rocks.kfs.Zoom.Jobs
                 sb.Append( string.Format( "{0} Errors: ", errorCount ) );
                 errorMessages.ForEach( e => { sb.AppendLine(); sb.Append( e ); } );
                 string errors = sb.ToString();
-                context.Result += errors;
+                Result += errors;
                 var exception = new Exception( errors );
                 HttpContext context2 = HttpContext.Current;
                 ExceptionLogService.LogException( exception, context2 );
@@ -436,17 +432,17 @@ namespace rocks.kfs.Zoom.Jobs
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="errorMessages">The error messages.</param>
-        private void HandleErrorMessages( IJobExecutionContext context, List<string> errorMessages )
+        private void HandleErrorMessages( List<string> errorMessages )
         {
             if ( errorMessages.Any() )
             {
-                StringBuilder sb = new StringBuilder( context.Result.ToString() );
+                StringBuilder sb = new StringBuilder( Result.ToString() );
 
                 sb.Append( FormatMessages( errorMessages, "Error" ) );
 
                 var resultMessage = sb.ToString();
 
-                context.Result = resultMessage;
+                Result = resultMessage;
 
                 var exception = new Exception( resultMessage );
 

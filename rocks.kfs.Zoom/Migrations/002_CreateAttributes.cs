@@ -19,7 +19,7 @@ using Rock.Plugin;
 
 namespace rocks.kfs.Zoom.Migrations
 {
-    [MigrationNumber( 2, "1.12.4" )]
+    [MigrationNumber( 2, "1.13" )]
     public partial class CreateAttributes : Migration
     {
         /// <summary>
@@ -32,14 +32,14 @@ namespace rocks.kfs.Zoom.Migrations
             RockMigrationHelper.AddSecurityAuthForEntityType( "rocks.kfs.Zoom.ZoomApp", 0, Rock.Security.Authorization.VIEW, true, Rock.SystemGuid.Group.GROUP_ADMINISTRATORS, 0, "6BC0A6D7-844F-49DF-BE40-5AD45EAB3CEE" );
             RockMigrationHelper.AddSecurityAuthForEntityType( "rocks.kfs.Zoom.ZoomApp", 1, Rock.Security.Authorization.VIEW, false, null, Rock.Model.SpecialRole.AllUsers.ConvertToInt(), "3921542F-476D-48B4-97F5-788709A1F4B4" );
 
-            RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Key", "", "The API Key for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "D53A2B48-C8B4-4481-B2AB-139CAF90C78C", "rocks.kfs.ZoomApiKey" );
-            RockMigrationHelper.AddNewEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Secret", "", "The API Secret for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "CB89B071-4866-41BD-ACB1-1810F5224A82", "rocks.kfs.ZoomApiSecret" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Key", "", "The API Key for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "D53A2B48-C8B4-4481-B2AB-139CAF90C78C", "rocks.kfs.ZoomApiKey" );
+            RockMigrationHelper.AddOrUpdateEntityAttribute( "rocks.kfs.Zoom.ZoomApp", Rock.SystemGuid.FieldType.ENCRYPTED_TEXT, "", "", "API Secret", "", "The API Secret for the Zoom Marketplace JWT app to use for KFS Zoom integration elements.", 0, "", "CB89B071-4866-41BD-ACB1-1810F5224A82", "rocks.kfs.ZoomApiSecret" );
 
             // Only add the Reservation attribute if the Reservation table exists
             try
             {
                 Sql( @"SELECT TOP 1 Id FROM _com_bemaservices_RoomManagement_Reservation" );
-                RockMigrationHelper.AddNewEntityAttribute( "com.bemaservices.RoomManagement.Model.Reservation", Rock.SystemGuid.FieldType.GROUP_TYPE_GROUP, "", "", "Zoom Notify Group", "", "The Group to notify when a Zoom Room meeting is connected with this reservation.", 0, "", ZoomGuid.Attribute.ROOM_RESERVATION_GROUP_ATTRIBUTE, "rocks.kfs.ZoomNotifyGroup" );
+                RockMigrationHelper.AddOrUpdateEntityAttribute( "com.bemaservices.RoomManagement.Model.Reservation", Rock.SystemGuid.FieldType.GROUP_TYPE_GROUP, "", "", "Zoom Notify Group", "", "The Group to notify when a Zoom Room meeting is connected with this reservation.", 0, "", ZoomGuid.Attribute.ROOM_RESERVATION_GROUP_ATTRIBUTE, "rocks.kfs.ZoomNotifyGroup" );
             }
             catch { }
 
