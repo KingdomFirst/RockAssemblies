@@ -395,14 +395,32 @@ namespace rocks.kfs.CyberSource
                 transaction.ForeignKey = chargeResult.TokenInformation?.Customer?.Id;
             }
 
+            // The Transaction Details API is a search index that is only eventually consistent, so a
+            // payment that was just created returns 404 until it has been indexed. Retry with a backoff
+            // (waiting between attempts rather than after each one) to give it time to show up.
             TssV2TransactionsGet200Response transactionDetail = null;
             var requestCount = 0;
-            while ( ( transactionDetail == null || transactionDetail.PaymentInformation == null ) && requestCount < 10 )
+            var retryDelayMilliseconds = 250;
+            while ( ( transactionDetail == null || transactionDetail.PaymentInformation == null ) && requestCount < 8 )
             {
+                if ( requestCount > 0 )
+                {
+                    Thread.Sleep( retryDelayMilliseconds );
+                    retryDelayMilliseconds = Math.Min( retryDelayMilliseconds * 2, 1500 );
+                }
+
                 transactionDetail = GetTransactionDetailResponse( financialGateway, chargeResult.Id );
                 requestCount += 1;
-                Thread.Sleep( 250 );
             }
+
+            if ( transactionDetail == null || transactionDetail.PaymentInformation == null )
+            {
+                // CreatePayment already succeeded, so the card has been charged. Keep the transaction and
+                // let the payment detail stay sparse: losing the card metadata is far better than throwing
+                // away the record of a payment the person was actually charged for.
+                ExceptionLogService.LogException( $"CyberSource payment {chargeResult.Id} was processed but the transaction detail was still unavailable after {requestCount} attempts. The transaction was saved without payment detail (card type, masked account number, expiration)." );
+            }
+
             transaction.FinancialPaymentDetail = CreatePaymentPaymentDetail( transactionDetail );
 
             transaction.AdditionalLavaFields = GetAdditionalLavaFields( chargeResult );
@@ -1659,32 +1677,55 @@ namespace rocks.kfs.CyberSource
         /// <param name="financialPaymentDetail">The financial payment detail.</param>
         private void UpdateFinancialPaymentDetail( TssV2TransactionsGet200Response transactionDetail, FinancialPaymentDetail financialPaymentDetail )
         {
-            financialPaymentDetail.GatewayPersonIdentifier = transactionDetail.PaymentInformation?.Customer?.Id;
+            var paymentInformation = transactionDetail?.PaymentInformation;
+            if ( paymentInformation == null )
+            {
+                // The transaction detail was never returned by the gateway (see Charge). The charge itself
+                // has already gone through, so leave the detail sparse instead of throwing.
+                return;
+            }
 
-            string paymentType = transactionDetail.PaymentInformation.PaymentType.Type;
+            financialPaymentDetail.GatewayPersonIdentifier = paymentInformation.Customer?.Id;
+
+            string paymentType = paymentInformation.PaymentType?.Type;
             if ( paymentType == "credit card" )
             {
                 // cc payment
                 var curType = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.CURRENCY_TYPE_CREDIT_CARD );
-                financialPaymentDetail.NameOnCard = $"{transactionDetail.OrderInformation.BillTo.FirstName} {transactionDetail.OrderInformation.BillTo.LastName}";
+                var billTo = transactionDetail.OrderInformation?.BillTo;
+                if ( billTo != null )
+                {
+                    financialPaymentDetail.NameOnCard = $"{billTo.FirstName} {billTo.LastName}";
+                }
+
                 financialPaymentDetail.CurrencyTypeValueId = curType != null ? curType.Id : ( int? ) null;
 
                 //// The gateway tells us what the CreditCardType is since it was selected using their hosted payment entry frame.
                 //// So, first see if we can determine CreditCardTypeValueId using the CardType response from the gateway
 
                 // See if we can figure it out from the CC Type (Amex, Visa, etc)
-                var creditCardTypeValue = CreditCardPaymentInfo.GetCreditCardTypeFromName( transactionDetail.ProcessingInformation.PaymentSolution );
-                if ( creditCardTypeValue == null )
+                DefinedValueCache creditCardTypeValue = null;
+                var paymentSolution = transactionDetail.ProcessingInformation?.PaymentSolution;
+                if ( paymentSolution.IsNotNullOrWhiteSpace() )
+                {
+                    creditCardTypeValue = CreditCardPaymentInfo.GetCreditCardTypeFromName( paymentSolution );
+                }
+
+                if ( creditCardTypeValue == null && paymentInformation.Card != null )
                 {
                     // GetCreditCardTypeFromName should have worked, but just in case, see if we can figure it out from the MaskedCard using RegEx
-                    creditCardTypeValue = CreditCardPaymentInfo.GetCreditCardTypeFromCreditCardNumber( transactionDetail.PaymentInformation.Card.Prefix );
+                    creditCardTypeValue = CreditCardPaymentInfo.GetCreditCardTypeFromCreditCardNumber( paymentInformation.Card.Prefix );
                 }
 
                 financialPaymentDetail.CreditCardTypeValueId = creditCardTypeValue?.Id;
-                financialPaymentDetail.AccountNumberMasked = $"{transactionDetail.PaymentInformation.Card.Prefix}XXXXXX{transactionDetail.PaymentInformation.Card.Suffix}";
 
-                financialPaymentDetail.ExpirationMonth = transactionDetail.PaymentInformation.Card.ExpirationMonth.AsIntegerOrNull();
-                financialPaymentDetail.ExpirationYear = transactionDetail.PaymentInformation.Card.ExpirationYear.AsIntegerOrNull();
+                if ( paymentInformation.Card != null )
+                {
+                    financialPaymentDetail.AccountNumberMasked = $"{paymentInformation.Card.Prefix}XXXXXX{paymentInformation.Card.Suffix}";
+
+                    financialPaymentDetail.ExpirationMonth = paymentInformation.Card.ExpirationMonth.AsIntegerOrNull();
+                    financialPaymentDetail.ExpirationYear = paymentInformation.Card.ExpirationYear.AsIntegerOrNull();
+                }
             }
             // ACH not supported by majority of CyberSource Payment Processors.
             //else
