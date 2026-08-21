@@ -41,13 +41,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Migrations\001_AddPagesAndBlocks.cs" />
+    <Compile Include="OLD\001_AddPagesAndBlocks.cs" />
+    <Compile Include="Migrations\001_NfluenceMobileApp.cs" />
+    <Compile Include="Migrations\002_NfluenceMobileAppWorkflows.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Rock.Common\Rock.Common.csproj">
       <Project>{13568622-324E-4493-B605-C9896E725D30}</Project>
       <Name>Rock.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Rock.Enums\Rock.Enums.csproj">
+      <Project>{61DECE2B-0434-435E-8D65-49A4FDF98365}</Project>
+      <Name>Rock.Enums</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Rock\Rock.csproj">
       <Project>{185A31D7-3037-4DAE-8797-0459849A84BD}</Project>
