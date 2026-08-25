@@ -1,4 +1,4 @@
-// <copyright>
+﻿// <copyright>
 // Copyright 2026 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -6152,7 +6152,7 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
                     --            key on IX_UserName if a previous run already created it.
                     -- So look the login up by the name Rock derives, and use it if present.
                     -- JSON_MODIFY with a NULL value removes the property (lax mode), which is
-                    -- exactly the "let Rock create one" case - so one statement covers both and
+                    -- exactly the ""let Rock create one"" case - so one statement covers both and
                     -- the migration stays safely re-runnable.
                     DECLARE @RestUserName NVARCHAR(255) = 'mobile_application_' + CAST( @SiteId AS NVARCHAR(20) );
                     DECLARE @RestLoginId INT = ( SELECT TOP 1 [Id] FROM [UserLogin] WHERE [UserName] = @RestUserName );
