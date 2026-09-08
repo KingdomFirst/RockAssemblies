@@ -41,7 +41,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             //
             RockMigrationHelper.AddSite( "Nfluence Church App", "Nfluence Church App for Rock", "", "1D501408-CA88-4565-8822-BD318F255A59" );
             Sql( @"UPDATE [Site] SET [SiteType] = 1, [IsSystem] = 0 WHERE [Guid] = '1D501408-CA88-4565-8822-BD318F255A59'" );
-            Sql( @"UPDATE [Site] SET [AdditionalSettings] = N'{""LastDeploymentDate"":""2026-08-19T16:42:47.7027894-06:00"",""LastDeploymentVersionId"":1787179367,""PhoneUpdatePackageUrl"":""https://e392-2601-8c0-100-6e80-80d8-d059-a3fe-5e3f.ngrok-free.app:443/GetFile.ashx?id=3019"",""TabletUpdatePackageUrl"":""https://e392-2601-8c0-100-6e80-80d8-d059-a3fe-5e3f.ngrok-free.app:443/GetFile.ashx?id=3020"",""ShellType"":2,""TabLocation"":1,""CssStyle"":"""",""ApiKeyId"":1012,""ProfilePageId"":16822,""PersonAttributeCategories"":[0],""BarBackgroundColor"":"""",""IOSEnableBarTransparency"":false,""IOSBarBlurStyle"":0,""MenuButtonColor"":null,""ActivityIndicatorColor"":null,""FlyoutXaml"":""<ListView SeparatorVisibility=\""None\"" \n    HasUnevenRows=\""true\"" \n    ItemsSource=\""{Binding MenuItems}\"">\n\n    <ListView.Header>\n        <StackLayout VerticalOptions=\""FillAndExpand\""\n            Orientation=\""Vertical\"">\n\n            <Rock:LoginStatus Padding=\""20, 70, 20, 50\"" \n                ImageSize=\""120\"" \n                ImageBorderColor=\""rgba(255, 255, 255, 0.4)\"" \n                ImageBorderSize=\""5\"" />\n\n            <BoxView HeightRequest=\""1\"" BackgroundColor=\""rgba(255, 255, 255, 0.2)\""\n                HorizontalOptions=\""FillAndExpand\""/>\n\n        </StackLayout>\n    </ListView.Header>\n\n    <ListView.ItemTemplate>\n        <DataTemplate>\n            <Rock:ViewCell SelectedBackgroundColor=\""rgba(255, 255, 255, 0.2)\"">\n            \n                <StackLayout VerticalOptions=\""FillAndExpand\"" \n                    Orientation=\""Vertical\"">\n\n                    <ContentView StyleClass=\""pt-16, pb-12\"">\n                        <Label StyleClass=\""text-white, ml-32, flyout-menu-item\""\n                            Text=\""{Binding Title}\"" \n                            VerticalOptions=\""Center\"" \n                            HorizontalOptions=\""FillAndExpand\"" />\n                    </ContentView>\n\n                    <BoxView HeightRequest=\""1\""\n                        BackgroundColor=\""rgba(255, 255, 255, 0.4)\""\n                        HorizontalOptions=\""FillAndExpand\"" />\n\n                </StackLayout>\n\n            </Rock:ViewCell>\n        </DataTemplate>\n    </ListView.ItemTemplate>\n\n</ListView>"",""LockedPhoneOrientation"":1,""LockedTabletOrientation"":0,""DownhillSettings"":{""SpacingValues"":{""0"":""0"",""4"":""4"",""8"":""8"",""16"":""16"",""24"":""24"",""48"":""48"",""80"":""80"",""1"":""1"",""2"":""2"",""12"":""12"",""32"":""32"",""64"":""64""},""SpacingUnits"":"""",""FontSizes"":{""xs"":0.75,""sm"":0.875,""base"":1.0,""lg"":1.125,""xl"":1.25,""2xl"":1.5,""3xl"":1.875,""4xl"":2.25,""5xl"":3.0,""6xl"":4.0},""BorderWidths"":[0,1,2,4,8],""Platform"":0,""BorderUnits"":"""",""FontUnits"":"""",""FontSizeDefault"":16.0,""ApplicationColors"":{""Primary"":""#007bff"",""Secondary"":""#6c757d"",""Success"":""#28a745"",""Danger"":""#dc3545"",""Warning"":""#ffc107"",""Info"":""#17a2b8"",""Light"":""#f8f9fa"",""Dark"":""#343a40"",""White"":""#ffffff"",""Brand"":""#007bff"",""InterfaceStrongest"":""#000000"",""InterfaceStronger"":""#1c1c1e"",""InterfaceStrong"":""#5d5d6f"",""InterfaceMedium"":""#8b8ba7"",""InterfaceSoft"":""#d9d9e3"",""InterfaceSofter"":""#f2f2f7"",""InterfaceSoftest"":""#ffffff"",""PrimaryStrong"":""#de5a25"",""PrimarySoft"":""#eeab90"",""SecondaryStrong"":""#53b1fd"",""SecondarySoft"":""#eff8ff"",""BrandStrong"":""#de5a25"",""BrandSoft"":""#eeab90"",""SuccessStrong"":""#248a3d"",""SuccessSoft"":""#d7f4de"",""InfoStrong"":""#007aff"",""InfoSoft"":""#d6eaff"",""DangerStrong"":""#d70015"",""DangerSoft"":""#ffccd1"",""WarningStrong"":""#e58600"",""WarningSoft"":""#ffecd1""},""RadiusBase"":0.0,""TextColor"":""#676767"",""HeadingColor"":""#333333"",""BackgroundColor"":""#ffffff"",""AdditionalCssToParse"":{},""SupplyTailwindCss"":true,""MobileStyleFramework"":2},""NavigationBarActionXaml"":""<Rock:LoginStatusPhoto StyleClass=\""p-8\"" NotLoggedInCommand=\""{Binding PushPage}\"" NotLoggedInPhotoFillColor=\""{AppThemeBinding Light=#4B5563, Dark=#FFFFFF}\""\n NotLoggedInCommandParameter=\""9d8435bd-8583-4325-aefc-af073d0e9020\"" LoggedInCommand=\""{Binding PushPage}\""\n LoggedInCommandParameter=\""9d8435bd-8583-4325-aefc-af073d0e9020\"" ProfilePhotoCircle=\""true\"" ProfilePhotoStrokeWidth=\""1\"" HeightRequest=\""50\"" />"",""HomepageRoutingLogic"":"""",""CampusFilterDataViewId"":null,""CommunicationViewPageId"":16846,""InteractiveExperiencePageId"":null,""SmsConversationPageId"":null,""EnableNotificationsAutomatically"":true,""PushTokenUpdateValue"":"""",""IsDeepLinkingEnabled"":false,""BundleIdentifier"":null,""TeamIdentifier"":null,""PackageName"":null,""CertificateFingerprint"":null,""DeepLinkPathPrefix"":null,""DeepLinkRoutes"":[],""DeepLinkDomains"":null,""IsPackageCompressionEnabled"":true,""Auth0Domain"":"""",""Auth0ClientId"":"""",""Auth0ConnectionStatusValueId"":66,""Auth0RecordStatusValueId"":5,""EntraClientId"":"""",""EntraTenantId"":"""",""EntraAuthenticationComponent"":null}' WHERE [Guid] = '1D501408-CA88-4565-8822-BD318F255A59'" );
+            Sql( @"UPDATE [Site] SET [AdditionalSettings] = N'{""LastDeploymentDate"":""2026-09-03T17:14:58.5770298-06:00"",""LastDeploymentVersionId"":1788477298,""PhoneUpdatePackageUrl"":""https://8e0e-2601-8c0-100-6e80-b41e-290-14a-a4be.ngrok-free.app:443/GetFile.ashx?id=3049"",""TabletUpdatePackageUrl"":""https://8e0e-2601-8c0-100-6e80-b41e-290-14a-a4be.ngrok-free.app:443/GetFile.ashx?id=3050"",""ShellType"":2,""TabLocation"":1,""CssStyle"":"""",""ApiKeyId"":1012,""ProfilePageId"":16822,""PersonAttributeCategories"":[0],""BarBackgroundColor"":"""",""IOSEnableBarTransparency"":false,""IOSBarBlurStyle"":0,""MenuButtonColor"":null,""ActivityIndicatorColor"":null,""FlyoutXaml"":""<ListView SeparatorVisibility=\""None\"" \n    HasUnevenRows=\""true\"" \n    ItemsSource=\""{Binding MenuItems}\"">\n\n    <ListView.Header>\n        <StackLayout VerticalOptions=\""FillAndExpand\""\n            Orientation=\""Vertical\"">\n\n            <Rock:LoginStatus Padding=\""20, 70, 20, 50\"" \n                ImageSize=\""120\"" \n                ImageBorderColor=\""rgba(255, 255, 255, 0.4)\"" \n                ImageBorderSize=\""5\"" />\n\n            <BoxView HeightRequest=\""1\"" BackgroundColor=\""rgba(255, 255, 255, 0.2)\""\n                HorizontalOptions=\""FillAndExpand\""/>\n\n        </StackLayout>\n    </ListView.Header>\n\n    <ListView.ItemTemplate>\n        <DataTemplate>\n            <Rock:ViewCell SelectedBackgroundColor=\""rgba(255, 255, 255, 0.2)\"">\n            \n                <StackLayout VerticalOptions=\""FillAndExpand\"" \n                    Orientation=\""Vertical\"">\n\n                    <ContentView StyleClass=\""pt-16, pb-12\"">\n                        <Label StyleClass=\""text-white, ml-32, flyout-menu-item\""\n                            Text=\""{Binding Title}\"" \n                            VerticalOptions=\""Center\"" \n                            HorizontalOptions=\""FillAndExpand\"" />\n                    </ContentView>\n\n                    <BoxView HeightRequest=\""1\""\n                        BackgroundColor=\""rgba(255, 255, 255, 0.4)\""\n                        HorizontalOptions=\""FillAndExpand\"" />\n\n                </StackLayout>\n\n            </Rock:ViewCell>\n        </DataTemplate>\n    </ListView.ItemTemplate>\n\n</ListView>"",""LockedPhoneOrientation"":1,""LockedTabletOrientation"":0,""DownhillSettings"":{""SpacingValues"":{""0"":""0"",""4"":""4"",""8"":""8"",""16"":""16"",""24"":""24"",""48"":""48"",""80"":""80"",""1"":""1"",""2"":""2"",""12"":""12"",""32"":""32"",""64"":""64""},""SpacingUnits"":"""",""FontSizes"":{""xs"":0.75,""sm"":0.875,""base"":1.0,""lg"":1.125,""xl"":1.25,""2xl"":1.5,""3xl"":1.875,""4xl"":2.25,""5xl"":3.0,""6xl"":4.0},""BorderWidths"":[0,1,2,4,8],""Platform"":0,""BorderUnits"":"""",""FontUnits"":"""",""FontSizeDefault"":16.0,""ApplicationColors"":{""Primary"":""#007bff"",""Secondary"":""#6c757d"",""Success"":""#28a745"",""Danger"":""#dc3545"",""Warning"":""#ffc107"",""Info"":""#17a2b8"",""Light"":""#f8f9fa"",""Dark"":""#343a40"",""White"":""#ffffff"",""Brand"":""#007bff"",""InterfaceStrongest"":""#000000"",""InterfaceStronger"":""#1c1c1e"",""InterfaceStrong"":""#5d5d6f"",""InterfaceMedium"":""#8b8ba7"",""InterfaceSoft"":""#d9d9e3"",""InterfaceSofter"":""#f2f2f7"",""InterfaceSoftest"":""#ffffff"",""PrimaryStrong"":""#de5a25"",""PrimarySoft"":""#eeab90"",""SecondaryStrong"":""#53b1fd"",""SecondarySoft"":""#eff8ff"",""BrandStrong"":""#de5a25"",""BrandSoft"":""#eeab90"",""SuccessStrong"":""#248a3d"",""SuccessSoft"":""#d7f4de"",""InfoStrong"":""#007aff"",""InfoSoft"":""#d6eaff"",""DangerStrong"":""#d70015"",""DangerSoft"":""#ffccd1"",""WarningStrong"":""#e58600"",""WarningSoft"":""#ffecd1""},""RadiusBase"":0.0,""TextColor"":""#676767"",""HeadingColor"":""#333333"",""BackgroundColor"":""#ffffff"",""AdditionalCssToParse"":{},""SupplyTailwindCss"":true,""MobileStyleFramework"":2},""NavigationBarActionXaml"":""<Rock:LoginStatusPhoto StyleClass=\""p-8\"" NotLoggedInCommand=\""{Binding PushPage}\"" NotLoggedInPhotoFillColor=\""{AppThemeBinding Light=#4B5563, Dark=#FFFFFF}\""\n NotLoggedInCommandParameter=\""9d8435bd-8583-4325-aefc-af073d0e9020\"" LoggedInCommand=\""{Binding PushPage}\""\n LoggedInCommandParameter=\""9d8435bd-8583-4325-aefc-af073d0e9020\"" ProfilePhotoCircle=\""true\"" ProfilePhotoStrokeWidth=\""1\"" HeightRequest=\""50\"" />"",""HomepageRoutingLogic"":"""",""CampusFilterDataViewId"":null,""CommunicationViewPageId"":16846,""InteractiveExperiencePageId"":null,""SmsConversationPageId"":null,""EnableNotificationsAutomatically"":true,""PushTokenUpdateValue"":"""",""IsDeepLinkingEnabled"":false,""BundleIdentifier"":null,""TeamIdentifier"":null,""PackageName"":null,""CertificateFingerprint"":null,""DeepLinkPathPrefix"":null,""DeepLinkRoutes"":[],""DeepLinkDomains"":null,""IsPackageCompressionEnabled"":true,""Auth0Domain"":"""",""Auth0ClientId"":"""",""Auth0ConnectionStatusValueId"":66,""Auth0RecordStatusValueId"":5,""EntraClientId"":"""",""EntraTenantId"":"""",""EntraAuthenticationComponent"":null}' WHERE [Guid] = '1D501408-CA88-4565-8822-BD318F255A59'" );
 
             //
             // Layouts
@@ -172,6 +172,15 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Schedule Unavailability", "", "3A6D9E14-7C25-4F83-91B6-5D420AE7C193", "" );
             RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Podcast Feed", "", "A3F7C21D-8E64-4B09-95A2-7D0E1F63B458", "" );
             RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Podcast Feed Episode", "", "B4081D3E-9F75-4C1A-A6B3-8E1F2A74C569", "" );
+            RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "The Lucas Miles Show", "", "E7A94B26-1C58-4D73-9F02-3B615A87D4C1", "" );
+            RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "The Lucas Miles Show Episode", "", "F8BA5C37-2D69-4E84-A013-4C726B98E5D2", "" );
+            RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Strong Church", "", "C4D71E82-5A93-4B06-8F21-7E304C69B5A8", "" );
+            RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Strong Church Episode", "", "D5E82F93-6BA4-4C17-9032-8F415D7AC6B9", "" );
+            RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Prayer", "", "A1F4C7E2-3B95-4D68-8E07-25C9B0D4A631", "" );
+            RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Prayer - Prayer Wall", "", "B2E5D8A3-4C06-4E79-9F18-36D0C1E5B742", "" );
+            RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Prayer - Submit Prayer", "", "C3F6E9B4-5D17-4F8A-A029-47E1D2F6C853", "" );
+            RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Prayer - Private Entry", "", "D4A7F0C5-6E28-4A9B-B13A-58F2E3A7D964", "" );
+            RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Prayer Session", "", "E5B8A1D6-7F39-4BAC-C24B-69A3F4B8EA75", "" );
 
             // Mobile page settings (AutoRefresh, HideNavigationBar, PageType, ...)
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":true,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'EF0257AD-B5E4-4D53-B7D0-17561941EE1E'" );   // Nfluence Church App Homepage
@@ -188,7 +197,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'A93CFC38-98F5-41DE-B68D-6E7EE97F2D46'" );   // Menu
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = '6419FA93-A317-47FC-9C8B-A4265F7BC7EF'" );   // Bible
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = '289D32AD-AD5F-431F-BCBE-7EBEE71D0F19'" );   // Sermon Notes
-            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":true,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = '9D8435BD-8583-4325-AEFC-AF073D0E9020'" );   // User Profile - Notifications
+            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = '9D8435BD-8583-4325-AEFC-AF073D0E9020'" );   // User Profile - Notifications
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = '5F46D984-6597-4834-9B78-8F009AB1E1E7'" );   // Settings
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = '5AC83965-D553-4255-B1ED-85F0D8742B6A'" );   // Delete Account
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'B29E8335-21C0-4459-A1AD-D85537FC2C08'" );   // Check-in
@@ -203,11 +212,11 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = '6D3762E4-0689-42FE-8535-A7B89C4FC028'" );   // Series Detail
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = '4079B24C-D548-4CD0-A833-C5688BBEF052'" );   // Sermon Detail
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'D77959E1-8A63-49D7-9FA1-A8720214D073'" );   // My Giving - All
-            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":true,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'A4FFB56B-938E-44B9-ADB2-A2529B0D8AF2'" );   // User Profile - My List
-            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":true,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'DF9A3772-CC1C-4CE3-885B-ABF828EF6065'" );   // User Profile - My Giving
+            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'A4FFB56B-938E-44B9-ADB2-A2529B0D8AF2'" );   // User Profile - My List
+            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'DF9A3772-CC1C-4CE3-885B-ABF828EF6065'" );   // User Profile - My Giving
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'E626FC0E-18F1-49DB-8A17-AA0AE375E4E8'" );   // Communication View
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'FA0ECB26-442E-446E-B78B-51B04B6ABB1D'" );   // Communication Subscribe
-            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":true,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'F77C9F5C-3AA5-4ED3-8390-DB086ABE7BF7'" );   // Push Notification Detail
+            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'F77C9F5C-3AA5-4ED3-8390-DB086ABE7BF7'" );   // Push Notification Detail
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = '1519A17F-8CB5-487E-87DD-30FD2E5CF0DA'" );   // Post-Service Survey
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = '2A5CE7F5-1A5D-49C6-B06A-730CB6FD8ACE'" );   // Post-Service Survey Form
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'BD9535DD-DA9C-4CEC-9397-2E429BE4E6C0'" );   // Group Members
@@ -224,6 +233,11 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = '1E4C7A55-8B92-4D30-A6F1-3C08D5B72E41'" );   // Schedule Preferences
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = '2F7B3C88-4D61-4E29-B0A5-9E13F6C48D72'" );   // Sign Up for Serving
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = '3A6D9E14-7C25-4F83-91B6-5D420AE7C193'" );   // Schedule Unavailability
+            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'A1F4C7E2-3B95-4D68-8E07-25C9B0D4A631'" );   // Prayer
+            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'B2E5D8A3-4C06-4E79-9F18-36D0C1E5B742'" );   // Prayer - Prayer Wall
+            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'C3F6E9B4-5D17-4F8A-A029-47E1D2F6C853'" );   // Prayer - Submit Prayer
+            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'D4A7F0C5-6E28-4A9B-B13A-58F2E3A7D964'" );   // Prayer - Private Entry
+            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'E5B8A1D6-7F39-4BAC-C24B-69A3F4B8EA75'" );   // Prayer Session
 
             //
             // Blocks
@@ -243,7 +257,6 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             RockMigrationHelper.AddBlock( true, "6419FA93-A317-47FC-9C8B-A4265F7BC7EF".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 0, "1C5A37BB-A556-4777-9E33-51A11D4DB8A8" );
             RockMigrationHelper.AddBlock( true, "289D32AD-AD5F-431F-BCBE-7EBEE71D0F19".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 0, "83D77AF7-E32C-4994-9CEA-9698E5F7BF25" );
             RockMigrationHelper.AddBlock( true, "9D8435BD-8583-4325-AEFC-AF073D0E9020".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 0, "5081D904-65B8-46D7-9BF4-602661982712" );
-            RockMigrationHelper.AddBlock( true, "9D8435BD-8583-4325-AEFC-AF073D0E9020".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Header", @"", @"", 0, "05137346-7182-43EC-B7BD-581237869417" );
             RockMigrationHelper.AddBlock( true, "9D8435BD-8583-4325-AEFC-AF073D0E9020".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Notifications", "Main", @"", @"", 1, "2C7A4F19-6B83-4E05-9D24-A15C8E30B7F6" );
             RockMigrationHelper.AddBlock( true, "9D8435BD-8583-4325-AEFC-AF073D0E9020".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content - Not logged in", "Main", @"", @"", 2, "10E07AFD-C2EB-4E97-9121-027811648F4B" );
             RockMigrationHelper.AddBlock( true, "5F46D984-6597-4834-9B78-8F009AB1E1E7".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 0, "4CAF5978-5265-4633-8021-D53E30C318EE" );
@@ -263,15 +276,12 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             RockMigrationHelper.AddBlock( true, "4079B24C-D548-4CD0-A833-C5688BBEF052".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "B76B5F10-D2D6-4C60-B6FB-F913A62442E0".AsGuid(), "Content Channel Item View", "Main", @"", @"", 0, "A67C5D2C-1161-4EBA-8F92-93962EF739F6" );
             RockMigrationHelper.AddBlock( true, "D77959E1-8A63-49D7-9FA1-A8720214D073".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 0, "C3E6A9C2-EBA4-4AF9-A37B-3E7F8CFE0DF4" );
             RockMigrationHelper.AddBlock( true, "A4FFB56B-938E-44B9-ADB2-A2529B0D8AF2".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 0, "78C66DE9-AE93-4B11-9667-B87EF00A1C4C" );
-            RockMigrationHelper.AddBlock( true, "A4FFB56B-938E-44B9-ADB2-A2529B0D8AF2".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Header", @"", @"", 0, "81E84E8F-4FC6-4D89-997E-8BBF1A7B2E05" );
             RockMigrationHelper.AddBlock( true, "A4FFB56B-938E-44B9-ADB2-A2529B0D8AF2".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 1, "8380B1DB-4D13-47D5-B290-D8D98E6FB4BD" );
             RockMigrationHelper.AddBlock( true, "DF9A3772-CC1C-4CE3-885B-ABF828EF6065".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 0, "5166C7A4-C480-4F93-8A1F-634775438974" );
-            RockMigrationHelper.AddBlock( true, "DF9A3772-CC1C-4CE3-885B-ABF828EF6065".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Header", @"", @"", 0, "65350FBF-7EDA-4D89-9778-6020D53B785F" );
             RockMigrationHelper.AddBlock( true, "DF9A3772-CC1C-4CE3-885B-ABF828EF6065".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content - Not signed in", "Main", @"", @"", 1, "77A80F5F-CED1-4471-BCE3-1F405BE29C6B" );
             RockMigrationHelper.AddBlock( true, "DF9A3772-CC1C-4CE3-885B-ABF828EF6065".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 2, "FF2703A4-BF7D-4A53-A214-10AD2E850BAA" );
             RockMigrationHelper.AddBlock( true, "E626FC0E-18F1-49DB-8A17-AA0AE375E4E8".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "863E5638-B310-407E-A54E-2C069979881D".AsGuid(), "Communication View", "Main", @"", @"", 0, "DDA29EBD-B8A0-44FD-A1A4-2E783F050005" );
             RockMigrationHelper.AddBlock( true, "FA0ECB26-442E-446E-B78B-51B04B6ABB1D".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "D0C51784-71ED-46F3-86AB-972148B78BE8".AsGuid(), "Communication List Subscribe", "Main", @"", @"", 0, "DE95662D-6AD7-47F3-92F7-7851C3E9E6E8" );
-            RockMigrationHelper.AddBlock( true, "F77C9F5C-3AA5-4ED3-8390-DB086ABE7BF7".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Header", @"", @"", 0, "BD66F886-936E-4624-AEF5-00698C7C0BFC" );
             RockMigrationHelper.AddBlock( true, "F77C9F5C-3AA5-4ED3-8390-DB086ABE7BF7".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 0, "AC2DDABC-C82A-4827-8565-248724D1C324" );
             RockMigrationHelper.AddBlock( true, "1519A17F-8CB5-487E-87DD-30FD2E5CF0DA".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Intro", "Main", @"", @"", 0, "3B3985B1-5A10-441C-94DD-C83FA15B5579" );
             RockMigrationHelper.AddBlock( true, "2A5CE7F5-1A5D-49C6-B06A-730CB6FD8ACE".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "9116AAD8-CF16-4BCE-B0CF-5B4D565710ED".AsGuid(), "Workflow Entry", "Main", @"", @"", 0, "4687C5D1-BEAE-48F7-AB47-C5F723369EB6" );
@@ -284,6 +294,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             RockMigrationHelper.AddBlock( true, "BB429C19-052F-4537-A40B-A157016B341B".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "B76B5F10-D2D6-4C60-B6FB-F913A62442E0".AsGuid(), "Content Channel Item View", "Main", @"", @"", 0, "258628D3-224E-4CFA-856B-B9C3A8E097BD" );
             RockMigrationHelper.AddBlock( true, "BB429C19-052F-4537-A40B-A157016B341B".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Scripture References", "Main", @"", @"", 1, "500D9BFF-47F3-4AEA-9601-6450337C9CE2" );
             RockMigrationHelper.AddBlock( true, "BB429C19-052F-4537-A40B-A157016B341B".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "A8BBE3F8-F3CC-4C0A-AB2F-5085F5BF59E7".AsGuid(), "Structured Content View", "Main", @"", @"", 3, "B4E573CC-516E-4E32-A9B6-8E1475F8086F" );
+            RockMigrationHelper.AddBlock( true, "BB429C19-052F-4537-A40B-A157016B341B".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Share My Notes", "Main", @"", @"", 4, "5A9E13C7-6B04-4F82-9D31-72E05CA8F6B1" );
             RockMigrationHelper.AddBlock( true, "8EAB3BB6-F327-420F-8FE7-00C78A2449C4".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Podcast List", "Main", @"", @"", 0, "C82E63A0-0D0F-4EA7-A2B8-A53FF93C88F0" );
             RockMigrationHelper.AddBlock( true, "129CD3DF-28B5-44B0-B77C-1241041E2B50".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Podcast Detail", "Main", @"", @"", 0, "B0264469-6A70-46F8-8A13-AC0B3375652A" );
             RockMigrationHelper.AddBlock( true, "C7AA98DB-9032-4C96-AD1E-4A2A99817A32".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "B76B5F10-D2D6-4C60-B6FB-F913A62442E0".AsGuid(), "Content Channel Item View", "Main", @"", @"", 0, "633A561C-B5A3-44A6-97E5-5A422CCD1AA8" );
@@ -296,6 +307,18 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             RockMigrationHelper.AddBlock( true, "3A6D9E14-7C25-4F83-91B6-5D420AE7C193".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "AEFF246D-A514-4D46-801E-D717E1D1D209".AsGuid(), "Schedule Unavailability", "Main", @"", @"", 1, "6DA3E4F8-7059-4C12-A136-8E42B5DF97C0" );
             RockMigrationHelper.AddBlock( true, "A3F7C21D-8E64-4B09-95A2-7D0E1F63B458".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Podcast Feed List", "Main", @"", @"", 0, "C519E24F-A086-4D2B-B7C4-9F203B85D67A" );
             RockMigrationHelper.AddBlock( true, "B4081D3E-9F75-4C1A-A6B3-8E1F2A74C569".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Podcast Feed Episode", "Main", @"", @"", 0, "D62AF350-B197-4E3C-98D5-A0314C96E78B" );
+            RockMigrationHelper.AddBlock( true, "E7A94B26-1C58-4D73-9F02-3B615A87D4C1".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Lucas Miles Show List", "Main", @"", @"", 0, "09CB6D48-3E7A-4F95-B124-5D837CA9F6E3" );
+            RockMigrationHelper.AddBlock( true, "F8BA5C37-2D69-4E84-A013-4C726B98E5D2".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Lucas Miles Show Episode", "Main", @"", @"", 0, "1ADC7E59-4F8B-40A6-A235-6E948DBA07F4" );
+            RockMigrationHelper.AddBlock( true, "C4D71E82-5A93-4B06-8F21-7E304C69B5A8".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Strong Church List", "Main", @"", @"", 0, "E6F93A04-7CB5-4D28-A143-90526E8BD7CA" );
+            RockMigrationHelper.AddBlock( true, "D5E82F93-6BA4-4C17-9032-8F415D7AC6B9".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Strong Church Episode", "Main", @"", @"", 0, "F70A4B15-8DC6-4E39-B254-A1637F9CE8DB" );
+            RockMigrationHelper.AddBlock( true, "A1F4C7E2-3B95-4D68-8E07-25C9B0D4A631".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 0, "11A2B3C4-D5E6-4F70-8192-A3B4C5D6E7F8" );
+            RockMigrationHelper.AddBlock( true, "A1F4C7E2-3B95-4D68-8E07-25C9B0D4A631".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "4A3B0D13-FC32-4354-A224-9D450F860BE9".AsGuid(), "Prayer Session Setup", "Main", @"", @"", 1, "22B3C4D5-E6F7-4081-92A3-B4C5D6E7F809" );
+            RockMigrationHelper.AddBlock( true, "B2E5D8A3-4C06-4E79-9F18-36D0C1E5B742".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 0, "33C4D5E6-F708-4192-A3B4-C5D6E7F8091A" );
+            RockMigrationHelper.AddBlock( true, "B2E5D8A3-4C06-4E79-9F18-36D0C1E5B742".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "CA75C558-9345-47E7-99AF-D8191D31D00D".AsGuid(), "Prayer Card View", "Main", @"", @"", 1, "44D5E6F7-0819-42A3-B4C5-D6E7F8091A2B" );
+            RockMigrationHelper.AddBlock( true, "C3F6E9B4-5D17-4F8A-A029-47E1D2F6C853".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "EBB91B46-292E-4784-9E37-38781C714008".AsGuid(), "Prayer Request Details", "Main", @"", @"", 0, "55E6F708-192A-43B4-C5D6-E7F8091A2B3C" );
+            RockMigrationHelper.AddBlock( true, "D4A7F0C5-6E28-4A9B-B13A-58F2E3A7D964".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 0, "66F70819-2A3B-44C5-D6E7-F8091A2B3C4D" );
+            RockMigrationHelper.AddBlock( true, "D4A7F0C5-6E28-4A9B-B13A-58F2E3A7D964".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "EBB91B46-292E-4784-9E37-38781C714008".AsGuid(), "Prayer Request Details", "Main", @"", @"", 1, "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E" );
+            RockMigrationHelper.AddBlock( true, "E5B8A1D6-7F39-4BAC-C24B-69A3F4B8EA75".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "420DEA5F-9ABC-4E59-A9BD-DCA972657B84".AsGuid(), "Prayer Session", "Main", @"", @"", 0, "88192A3B-4C5D-46E7-F809-1A2B3C4D5E6F" );
 
             //
             // Block attribute values
@@ -354,7 +377,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- assign appPageForLinked = item | Attribute:""LinktoAppPage"",""RawValue"" -%}
   {%- assign lnRaw = item | Attribute:'LinkedItem','RawValue' -%}
   {%- assign isLinked = false -%}{%- assign lnTitle = '' -%}{%- assign lnImg = '' -%}
-  {%- assign lnSummary = '' -%}{%- assign lnId = '' -%}{%- assign lnPage = '' -%}
+  {%- assign lnSummary = '' -%}{%- assign lnId = '' -%}{%- assign lnPage = '' -%}{%- assign lnGuid = '' -%}{%- assign lnQuery = '' -%}
   {%- comment -%} ""unless isEvent"" rather than ""isEvent == false"": assign stores a
       string, so comparing against the boolean literal never matches {%- endcomment -%}
   {%- unless isEvent -%}
@@ -367,13 +390,19 @@ namespace rocks.kfs.MobileAppMigration.Migrations
           past endcontentchannelitem, which is why the event code does the same {%- endcomment -%}
       {%- for li in contentchannelitemItems -%}
         {%- assign isLinked = true -%}
-        {%- assign lnId = li.Id -%}
+        {%- assign lnId = li.Id -%}{%- assign lnGuid = li.Guid -%}
         {%- assign lnTitle = li.Title -%}
         {%- assign lnSummary = li | Attribute:'Summary' -%}
         {%- if lnSummary == '' or lnSummary == null -%}
           {%- assign lnSummary = li.Content | StripHtml | Trim -%}
         {%- endif -%}
         {%- assign lnImg = li | Attribute:'Image','RawValue' -%}
+        {%- comment -%} Saved Podcast Episodes (channel 52) have no Image attribute
+            and no parent series - their artwork lives in ImageUrl, already an
+            absolute URL. Without this a linked episode renders with no picture. {%- endcomment -%}
+        {%- if lnImg == '' or lnImg == null -%}
+          {%- assign lnImg = li | Attribute:'ImageUrl','RawValue' -%}
+        {%- endif -%}
         {%- if lnImg == '' or lnImg == null -%}
           {%- for lp in li.ParentItems limit:1 -%}
             {%- assign lnImg = lp.ContentChannelItem | Attribute:'SeriesImage','RawValue' -%}
@@ -389,10 +418,18 @@ namespace rocks.kfs.MobileAppMigration.Migrations
         {%- endif -%}
         {%- comment -%} destination comes from the linked item's own channel, so no
             install-specific channel-to-page map is baked in {%- endcomment -%}
+        {%- comment -%} the two pages read DIFFERENT page parameters. Structured Item
+            Detail resolves the item by Guid (its Scripture References and
+            Structured Content blocks read ItemGuid and render nothing without
+            it); Item Detail resolves by Id. Sending the wrong one still shows a
+            title and date, because the Content Channel Item View block accepts
+            either - which makes the failure look like the wrong page. {%- endcomment -%}
         {%- if li.ContentChannel.IsStructuredContent -%}
           {%- assign lnPage = 'bb429c19-052f-4537-a40b-a157016b341b' -%}
+          {%- capture lnQuery -%}?ItemGuid={{ lnGuid }}{%- endcapture -%}
         {%- else -%}
           {%- assign lnPage = 'c9d8bd2d-8f1e-42e6-a4c3-b71b0511e9c7' -%}
+          {%- capture lnQuery -%}?ContentChannelItemId={{ lnId }}{%- endcapture -%}
         {%- endif -%}
         {%- if appPageForLinked != '' and appPageForLinked != null -%}{%- assign lnPage = appPageForLinked -%}{%- endif -%}
       {%- endfor -%}
@@ -437,7 +474,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   c9d8bd2d-8f1e-42e6-a4c3-b71b0511e9c7?ContentChannelItemId={{ item.Id -}}
   {%- endif -%}
   {%- endcapture -%}
-  {% assign image = item | Attribute:'Image','Url' %}{% assign imageUrl = item | Attribute:'ImageUrl' %}{% assign subtitle = item | Attribute:'Subtitle' %}{% assign cardWidth = item | Attribute:'CardWidth' %}{% assign elevation = item | Attribute:'ShadowDepth' %}{% assign showDetailsButton = item | Attribute:'DisplayDetailsButton' | AsBoolean %}{% assign showTitle = item | Attribute:'ShowTitle' | AsBoolean %}{% assign tagline = item | Attribute:'Tagline' %}{% assign imageAspectRatio = item | Attribute:'ImageAspectRatio' %}
+  {% assign image = item | Attribute:'Image','Url' %}{% assign imageUrl = item | Attribute:'ImageUrl','RawValue' %}{% assign subtitle = item | Attribute:'Subtitle' %}{% assign cardWidth = item | Attribute:'CardWidth' %}{% assign elevation = item | Attribute:'ShadowDepth' %}{% assign showDetailsButton = item | Attribute:'DisplayDetailsButton' | AsBoolean %}{% assign showTitle = item | Attribute:'ShowTitle' | AsBoolean %}{% assign tagline = item | Attribute:'Tagline' %}{% assign imageAspectRatio = item | Attribute:'ImageAspectRatio' %}
   {%- if isEvent -%}
   <Rock:StyledBorder StrokeThickness=""0"" Padding=""0"" CornerRadius=""16"" StyleClass=""bg-interface-softest,mx-16,my-8"">
       <Rock:StyledBorder.Shadow><Shadow Brush=""#000000"" Offset=""0,4"" Radius=""12"" Opacity=""0.15"" /></Rock:StyledBorder.Shadow>
@@ -475,7 +512,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
       <Rock:StyledBorder.Shadow><Shadow Brush=""#000000"" Offset=""0,4"" Radius=""12"" Opacity=""0.15"" /></Rock:StyledBorder.Shadow>
       {%- endif -%}
       <Rock:StyledBorder.GestureRecognizers>
-          <TapGestureRecognizer Command=""{Binding PushPage}"" CommandParameter=""{{ lnPage }}?ContentChannelItemId={{ lnId }}"" />
+          <TapGestureRecognizer Command=""{Binding PushPage}"" CommandParameter=""{{ lnPage }}{{ lnQuery }}"" />
       </Rock:StyledBorder.GestureRecognizers>
       <VerticalStackLayout Spacing=""0"">
           {%- comment -%} the feed item's own image wins if one was set, so a card
@@ -502,7 +539,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
               {%- endif -%}
               {%- if showDetailsButton -%}
               <Button Text=""SEE DETAILS"" StyleClass=""btn,btn-primary,mt-12"" HorizontalOptions=""Start""
-                  Command=""{Binding PushPage}"" CommandParameter=""{{ lnPage }}?ContentChannelItemId={{ lnId }}"" />
+                  Command=""{Binding PushPage}"" CommandParameter=""{{ lnPage }}{{ lnQuery }}"" />
               {%- endif -%}
           </VerticalStackLayout>
       </VerticalStackLayout>
@@ -533,11 +570,23 @@ namespace rocks.kfs.MobileAppMigration.Migrations
               {%- if subtitle != '' -%}
               <Label Text=""{{ subtitle | Escape }}"" StyleClass=""footnote,text-interface-soft"" />
               {%- endif -%}
-              {%- if showDetailsButton -%}
-              <Label Text=""{{ item.Content | StripHtml | TruncateWords:30 | Escape }}"" StyleClass=""subheadline,text-interface-strong,mt-8"" />
-              <Button Text=""SEE DETAILS"" StyleClass=""btn,btn-primary,mt-12"" HorizontalOptions=""Start"" Command=""{{ command }}"" CommandParameter=""{{ linkUrl }}"" />
-              {%- elseif contentStripped != '' -%}
-              <Label Text=""{{ item.Content | StripHtml | TruncateWords:50 | Escape }}"" StyleClass=""subheadline,text-interface-strong,mt-4"" />
+              {%- comment -%} Show Blurb on Card: only an explicit No suppresses the body text.
+                  The SEE DETAILS button is independent and still honours its own setting. {%- endcomment -%}
+              {%- assign blurbRaw = item | Attribute:'ShowCardBlurb','RawValue' -%}
+              {%- assign showCardBlurb = true -%}
+              {%- if blurbRaw == 'False' -%}{%- assign showCardBlurb = false -%}{%- endif -%}
+              {%- if showCardBlurb -%}
+                  {%- if showDetailsButton -%}
+                  <Label Text=""{{ item.Content | StripHtml | TruncateWords:30 | Escape }}"" StyleClass=""subheadline,text-interface-strong,mt-8"" />
+                  <Button Text=""SEE DETAILS"" StyleClass=""btn,btn-primary,mt-12"" HorizontalOptions=""Start"" Command=""{{ command }}"" CommandParameter=""{{ linkUrl }}"" />
+                  {%- elseif contentStripped != '' -%}
+                  <Label Text=""{{ item.Content | StripHtml | TruncateWords:50 | Escape }}"" StyleClass=""subheadline,text-interface-strong,mt-4"" />
+                  {%- endif -%}
+              {%- else -%}
+                  {%- if showDetailsButton -%}
+                  <Button Text=""SEE DETAILS"" StyleClass=""btn,btn-primary,mt-12"" HorizontalOptions=""Start""
+                      Command=""{{ command }}"" CommandParameter=""{{ linkUrl }}"" />
+                  {%- endif -%}
               {%- endif -%}
           </VerticalStackLayout>
       </VerticalStackLayout>
@@ -696,7 +745,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
 
     <VerticalStackLayout>
       {%- assign image = Item | Attribute:'Image','Url' -%}
-      {%- assign imageUrl = Item | Attribute:'ImageUrl' -%}
+      {%- assign imageUrl = Item | Attribute:'ImageUrl','RawValue' -%}
       {%- if imageUrl != '' or image != '' -%}
       <Rock:Image Source=""{% if imageUrl != '' %}{{ imageUrl | Escape }}{% else %}{{ image | Escape }}{% endif %}"" Aspect=""AspectFill"" Ratio=""16:9"" />
       {%- endif -%}
@@ -1154,19 +1203,32 @@ namespace rocks.kfs.MobileAppMigration.Migrations
 {%- assign isListMode = false -%}
 {%- if forcedStyle != '' -%}{% assign isListMode = true %}{%- endif -%}
 
+{%- assign pageSize = 30 -%}
+{%- assign take = pageSize -%}
+{%- comment -%} A curated menu filters rows by menuKey and is short, so it keeps
+    the old unbounded fetch. Only a data list pages. {%- endcomment -%}
+{%- assign fetch = 1000 -%}
+{%- if isListMode -%}{%- assign fetch = take | Plus:1 -%}{%- endif -%}
 {%- assign renderedCount = 0 -%}
+{%- assign extraCount = 0 -%}
 {%- capture listBody -%}
-{%- contentchannelitem where:'ContentChannelId == ""{{ menuChannelId }}""' sort:'{{ sortBy }}' -%}
+{%- contentchannelitem where:'ContentChannelId == ""{{ menuChannelId }}""' sort:'{{ sortBy }}' limit:'{{ fetch }}' -%}
 {%- for item in contentchannelitemItems -%}
   {%- assign itemMenu = item | Attribute:'Menu','RawValue' -%}
   {%- if isListMode or itemMenu == menuKey -%}
+  {%- comment -%} past the page: count it so Show More knows there is more, and skip
+      every attribute read below {%- endcomment -%}
+  {%- if isListMode and renderedCount >= take -%}
+    {%- assign extraCount = extraCount | Plus:1 -%}
+    {% continue %}
+  {%- endif -%}
   {%- assign renderedCount = renderedCount | Plus:1 -%}
 
   {%- if isListMode -%}{% assign style = forcedStyle %}{%- else -%}{% assign style = item | Attribute:'DisplayStyle','RawValue' %}{%- endif -%}
   {%- assign icon = item | Attribute:'Icon' -%}
   {%- if metaMode == 'sermon' -%}{%- assign speaker = item | Attribute:'Speaker' -%}{%- capture subtitle -%}{{ item.StartDateTime | Date:'MMMM d, yyyy' }}{% if speaker != '' %} • {{ speaker }}{% endif %}{%- endcapture -%}{%- assign subtitle = subtitle | Trim | Upcase -%}{%- else -%}{%- assign subtitle = item | Attribute:'Subtitle' -%}{%- endif -%}
   {%- assign img = item | Attribute:'Image','Url' -%}
-  {%- assign imgUrl = item | Attribute:'ImageUrl' -%}
+  {%- assign imgUrl = item | Attribute:'ImageUrl','RawValue' -%}
   {%- if imgUrl == '' -%}{% assign imgUrl = img %}{%- endif -%}
 
   {%- assign subMenu = item | Attribute:'OpensSubMenu','RawValue' -%}
@@ -1252,6 +1314,18 @@ namespace rocks.kfs.MobileAppMigration.Migrations
 
 {%- if renderedCount > 0 -%}
 {{ listBody }}
+{%- if isListMode and extraCount > 0 -%}
+    {%- assign nextTake = take | Plus:pageSize -%}
+    <Button Text=""Show More"" StyleClass=""btn, btn-primary""
+        HorizontalOptions=""Center"" Margin=""0,4,0,12""
+        Command=""{Binding Callback}"">
+        <Button.CommandParameter>
+            <Rock:CallbackParameters Name=""ShowMore"">
+                <Rock:Parameter Name=""Take"" Value=""{{ nextTake }}"" />
+            </Rock:CallbackParameters>
+        </Button.CommandParameter>
+    </Button>
+{%- endif -%}
 {%- elsif emptyMessage != '' -%}
     <VerticalStackLayout Spacing=""12"" StyleClass=""p-32"" HorizontalOptions=""Fill"">
         {%- if emptyIcon != '' -%}
@@ -1265,6 +1339,175 @@ namespace rocks.kfs.MobileAppMigration.Migrations
 </VerticalStackLayout>" );   // Content
             RockMigrationHelper.AddBlockAttributeValue( "83D77AF7-E32C-4994-9CEA-9698E5F7BF25", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"RockEntity" );   // EnabledLavaCommands
             RockMigrationHelper.AddBlockAttributeValue( "83D77AF7-E32C-4994-9CEA-9698E5F7BF25", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
+            RockMigrationHelper.AddBlockAttributeValue( "83D77AF7-E32C-4994-9CEA-9698E5F7BF25", "2725F971-243A-4B60-83EB-527BA8C08737", @"{% if Command == 'ShowMore' %}
+<!--
+  Reusable Menu / List template (Nfluence Rock Mobile)
+  ONE template drives: curated recursive menus (Sundays, Explore, sub-menus)
+  AND data-driven lists (Sermon Notes, Staff) by pointing at a different channel.
+
+  Config block below — set per placement:
+    menuChannelId : App Menu channel Id (for a data-list, the data channel's Id)
+    menuKey       : curated menu -> which menu to show (Sundays tab='sundays', Explore='explore');
+                    sub-menu pages read it from PageParameter.MenuKey
+    forcedStyle   : data-list -> force one style for every row (e.g. 'Meta Row', 'Avatar Row');
+                    leave BLANK for a curated menu (per-item DisplayStyle)
+    sortBy        : 'Order' for menus; 'StartDateTime desc' for sermons
+  Block settings: Dynamic Content = Yes, Rock Entity command enabled.
+-->
+<VerticalStackLayout Spacing=""0"" StyleClass=""pt-12,pb-16"">
+
+{%- assign menuChannelId = '21' -%}
+{%- assign menuKey = '' -%}
+{%- assign forcedStyle = 'Meta Row' -%}
+{%- assign sortBy = 'StartDateTime desc' -%}
+{%- assign metaMode = 'sermon' -%}
+{%- comment -%} Shown when the list renders no rows. Blank it to show nothing. {%- endcomment -%}
+{%- assign emptyMessage = 'No sermon notes have been posted yet.' -%}
+{%- assign emptyIcon = 'file-alt' -%}
+
+{%- assign menuPageGuid = 'a93cfc38-98f5-41de-b68d-6e7ee97f2d46' -%}
+{%- assign itemDetailGuid = 'bb429c19-052f-4537-a40b-a157016b341b' -%}
+{%- assign webviewGuid = 'c543ef2a-df73-4c21-bb01-94f2a6cb6373' -%}
+{%- assign isListMode = false -%}
+{%- if forcedStyle != '' -%}{% assign isListMode = true %}{%- endif -%}
+
+{%- assign pageSize = 30 -%}
+{%- assign take = Parameters.Take | AsInteger -%}
+{%- if take == null or take < 1 -%}{%- assign take = pageSize -%}{%- endif -%}
+{%- comment -%} A curated menu filters rows by menuKey and is short, so it keeps
+    the old unbounded fetch. Only a data list pages. {%- endcomment -%}
+{%- assign fetch = 1000 -%}
+{%- if isListMode -%}{%- assign fetch = take | Plus:1 -%}{%- endif -%}
+{%- assign renderedCount = 0 -%}
+{%- assign extraCount = 0 -%}
+{%- capture listBody -%}
+{%- contentchannelitem where:'ContentChannelId == ""{{ menuChannelId }}""' sort:'{{ sortBy }}' limit:'{{ fetch }}' -%}
+{%- for item in contentchannelitemItems -%}
+  {%- assign itemMenu = item | Attribute:'Menu','RawValue' -%}
+  {%- if isListMode or itemMenu == menuKey -%}
+  {%- comment -%} past the page: count it so Show More knows there is more, and skip
+      every attribute read below {%- endcomment -%}
+  {%- if isListMode and renderedCount >= take -%}
+    {%- assign extraCount = extraCount | Plus:1 -%}
+    {% continue %}
+  {%- endif -%}
+  {%- assign renderedCount = renderedCount | Plus:1 -%}
+
+  {%- if isListMode -%}{% assign style = forcedStyle %}{%- else -%}{% assign style = item | Attribute:'DisplayStyle','RawValue' %}{%- endif -%}
+  {%- assign icon = item | Attribute:'Icon' -%}
+  {%- if metaMode == 'sermon' -%}{%- assign speaker = item | Attribute:'Speaker' -%}{%- capture subtitle -%}{{ item.StartDateTime | Date:'MMMM d, yyyy' }}{% if speaker != '' %} • {{ speaker }}{% endif %}{%- endcapture -%}{%- assign subtitle = subtitle | Trim | Upcase -%}{%- else -%}{%- assign subtitle = item | Attribute:'Subtitle' -%}{%- endif -%}
+  {%- assign img = item | Attribute:'Image','Url' -%}
+  {%- assign imgUrl = item | Attribute:'ImageUrl','RawValue' -%}
+  {%- if imgUrl == '' -%}{% assign imgUrl = img %}{%- endif -%}
+
+  {%- assign subMenu = item | Attribute:'OpensSubMenu','RawValue' -%}
+  {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}
+  {%- assign linkUrlVal = item | Attribute:'LinktoURL' -%}
+  {%- assign appPage = item | Attribute:'LinktoAppPage','RawValue' -%}
+  {%- assign pageParams = item | Attribute:'PageParameters' -%}
+  {%- assign contentStripped = item.Content | StripHtml | Trim -%}
+  {%- comment -%}
+      A structured-content document holding only a Notes field is entirely
+      <textarea> markup with no text between the tags, so StripHtml returns ''
+      and the detail link never renders. Treat a notes field as content in its
+      own right. <img> has the same blind spot if image-only items ever appear.
+  {%- endcomment -%}
+  {%- if contentStripped == '' and item.Content contains '<textarea' -%}
+    {%- assign contentStripped = 'notes' -%}
+  {%- endif -%}
+
+  {%- capture cmd -%}
+  {%- if subMenu != '' -%}{Binding PushPage}
+  {%- elsif linkType == 'External Browser' -%}{Binding OpenExternalBrowser}
+  {%- elsif linkType == 'Internal Browser' -%}{Binding OpenBrowser}
+  {%- elsif linkUrlVal != '' or appPage != '' or contentStripped != '' -%}{Binding PushPage}
+  {%- endif -%}
+  {%- endcapture -%}{% assign cmd = cmd | Trim %}
+
+  {%- capture param -%}
+  {%- if subMenu != '' -%}{{ menuPageGuid }}?MenuKey={{ subMenu }}&amp;Title={{ item.Title | UrlEncode }}
+  {%- elsif linkUrlVal != '' and linkType == 'Webview' -%}{{ webviewGuid }}?url={{ linkUrlVal | UrlEncode }}
+  {%- elsif linkUrlVal != '' -%}{{ linkUrlVal | Escape }}
+  {%- elsif appPage != '' -%}{{ appPage | Split:',' | First }}{% if pageParams != '' %}{{ pageParams }}{% endif %}
+  {%- elsif contentStripped != '' -%}{{ itemDetailGuid }}?ItemGuid={{ item.Guid }}
+  {%- endif -%}
+  {%- endcapture -%}{% assign param = param | Trim %}
+
+  {%- if style == 'Section Header' -%}
+  <Label Text=""{{ item.Title | Escape }}"" StyleClass=""caption1,font-weight-semi-bold,text-interface-soft,px-16,mt-16,mb-4"" />
+
+  {%- elsif style == 'Hero Banner' -%}
+  <Rock:Image Source=""{{ imgUrl | Escape }}"" Aspect=""AspectFill"" Ratio=""16:9"" StyleClass=""mb-8"">
+    {%- if cmd != '' -%}<Rock:Image.GestureRecognizers><TapGestureRecognizer Command=""{{ cmd }}"" CommandParameter=""{{ param }}"" /></Rock:Image.GestureRecognizers>{%- endif -%}
+  </Rock:Image>
+
+  {%- elsif style == 'Image Card' -%}
+  <Rock:StyledBorder StrokeThickness=""0"" Padding=""0"" CornerRadius=""16"" StyleClass=""bg-interface-softest,mx-16,my-8"">
+    <Rock:StyledBorder.Shadow><Shadow Brush=""#000000"" Offset=""0,4"" Radius=""12"" Opacity=""0.15"" /></Rock:StyledBorder.Shadow>
+    {%- if cmd != '' -%}<Rock:StyledBorder.GestureRecognizers><TapGestureRecognizer Command=""{{ cmd }}"" CommandParameter=""{{ param }}"" /></Rock:StyledBorder.GestureRecognizers>{%- endif -%}
+    <VerticalStackLayout Spacing=""0"">
+      <Rock:Image Source=""{{ imgUrl | Escape }}"" Aspect=""AspectFill"" Ratio=""16:9"" />
+      <VerticalStackLayout StyleClass=""p-16"" Spacing=""4"">
+        <Label Text=""{{ item.Title | Escape }}"" StyleClass=""title3,text-interface-strongest"" />
+        {%- if subtitle != '' -%}<Label Text=""{{ subtitle | Escape }}"" StyleClass=""footnote,text-interface-soft"" />{%- endif -%}
+      </VerticalStackLayout>
+    </VerticalStackLayout>
+  </Rock:StyledBorder>
+
+  {%- else -%}
+  <!-- Row styles: Icon Row, Plain Row, Thumbnail Row, Avatar Row, Meta Row -->
+  <Rock:StyledBorder StrokeThickness=""0"" CornerRadius=""12"" Padding=""18,{% if subtitle == '' %}22{% else %}16{% endif %}"" StyleClass=""bg-interface-softest,mx-16,my-8"">
+    <Rock:StyledBorder.Shadow><Shadow Brush=""#000000"" Offset=""0,2"" Radius=""8"" Opacity=""0.10"" /></Rock:StyledBorder.Shadow>
+    {%- if cmd != '' -%}<Rock:StyledBorder.GestureRecognizers><TapGestureRecognizer Command=""{{ cmd }}"" CommandParameter=""{{ param }}"" /></Rock:StyledBorder.GestureRecognizers>{%- endif -%}
+    <Grid ColumnDefinitions=""Auto,*,Auto"" ColumnSpacing=""14"" VerticalOptions=""Center"">
+      {%- if icon != '' and style != 'Thumbnail Row' and style != 'Avatar Row' -%}
+      <Rock:Icon Grid.Column=""0"" IconClass=""{{ icon }}"" FontSize=""22"" TextColor=""{Rock:PaletteColor Interface-Strong}"" VerticalOptions=""Center"" />
+      {%- elsif style == 'Thumbnail Row' and imgUrl != '' -%}
+      <Rock:Image Grid.Column=""0"" Source=""{{ imgUrl | Escape }}"" WidthRequest=""56"" HeightRequest=""56"" Aspect=""AspectFill"" StyleClass=""rounded"" />
+      {%- elsif style == 'Avatar Row' and imgUrl != '' -%}
+      <Rock:Image Grid.Column=""0"" Source=""{{ imgUrl | Escape }}"" WidthRequest=""52"" HeightRequest=""52"" Aspect=""AspectFill"" StyleClass=""rounded-full"" />
+      {%- endif -%}
+      <VerticalStackLayout Grid.Column=""1"" Spacing=""2"" VerticalOptions=""Center"">
+        <Label Text=""{{ item.Title | Escape }}"" StyleClass=""body,font-weight-semi-bold,text-interface-strongest"" />
+        {%- if subtitle != '' -%}<Label Text=""{{ subtitle | Escape }}"" StyleClass=""footnote,text-interface-soft"" />{%- endif -%}
+      </VerticalStackLayout>
+      {%- if cmd != '' -%}<Rock:Icon Grid.Column=""2"" IconClass=""chevron-right"" IconFamily=""FontAwesomeSolid"" FontSize=""15"" TextColor=""{Rock:PaletteColor Interface-Soft}"" VerticalOptions=""Center"" />{%- endif -%}
+    </Grid>
+  </Rock:StyledBorder>
+  {%- endif -%}
+
+  {%- endif -%}
+{%- endfor -%}
+{%- endcontentchannelitem -%}
+{%- endcapture -%}
+
+{%- if renderedCount > 0 -%}
+{{ listBody }}
+{%- if isListMode and extraCount > 0 -%}
+    {%- assign nextTake = take | Plus:pageSize -%}
+    <Button Text=""Show More"" StyleClass=""btn, btn-primary""
+        HorizontalOptions=""Center"" Margin=""0,4,0,12""
+        Command=""{Binding Callback}"">
+        <Button.CommandParameter>
+            <Rock:CallbackParameters Name=""ShowMore"">
+                <Rock:Parameter Name=""Take"" Value=""{{ nextTake }}"" />
+            </Rock:CallbackParameters>
+        </Button.CommandParameter>
+    </Button>
+{%- endif -%}
+{%- elsif emptyMessage != '' -%}
+    <VerticalStackLayout Spacing=""12"" StyleClass=""p-32"" HorizontalOptions=""Fill"">
+        {%- if emptyIcon != '' -%}
+        <Rock:Icon IconClass=""{{ emptyIcon }}"" IconFamily=""FontAwesomeSolid"" FontSize=""36""
+            StyleClass=""text-interface-soft"" HorizontalOptions=""Center"" />
+        {%- endif -%}
+        <Label Text=""{{ emptyMessage | Escape }}"" StyleClass=""body, text-interface-medium""
+            HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+    </VerticalStackLayout>
+{%- endif -%}
+</VerticalStackLayout>
+{% endif %}
+" );   // CallbackLogic
             RockMigrationHelper.AddBlockAttributeValue( "9C074994-EE12-41C8-8072-49A3012A72E8", "E4709745-E420-425D-82FB-E7EA9B8C89E2", @"368dd475-242c-49c4-a42c-7278be690cc2" );   // ConnectionStatus
             RockMigrationHelper.AddBlockAttributeValue( "9C074994-EE12-41C8-8072-49A3012A72E8", "13AED2C1-BC58-4B5C-B711-CEA71A52ECC4", @"283999ec-7346-42e3-b807-bce9b2babb49" );   // RecordStatus
             RockMigrationHelper.AddBlockAttributeValue( "9C074994-EE12-41C8-8072-49A3012A72E8", "F8A627F5-D23B-4F09-BF68-C2E7D5279C4D", @"True" );   // BirthDateShow
@@ -1299,6 +1542,24 @@ namespace rocks.kfs.MobileAppMigration.Migrations
         {% else %}
             <Rock:StyledBorder HeightRequest=""150"" VerticalOptions=""Start"" StyleClass=""bg-interface-soft"" />
         {% endif %}
+
+        <!-- Settings. Moved here from the page header block: that header needed
+             Hide Navigation Bar, which on Android 15+ leaves the page drawing under
+             the status bar (Rock SafeAreaPaddingBehavior reads deprecated inset
+             APIs). The real navigation bar is inset correctly, so the cog lives
+             here instead. -->
+        <Rock:Icon IconClass=""cog""
+            IconFamily=""MaterialDesignIcons""
+            FontSize=""22""
+            StyleClass=""text-interface-strongest""
+            HorizontalOptions=""End""
+            VerticalOptions=""Start""
+            Margin=""0,16,16,0"">
+            <Rock:Icon.GestureRecognizers>
+                <TapGestureRecognizer Command=""{Binding PushPage}""
+                    CommandParameter=""5f46d984-6597-4834-9b78-8f009ab1e1e7"" />
+            </Rock:Icon.GestureRecognizers>
+        </Rock:Icon>
 
         <Grid WidthRequest=""92"" HeightRequest=""92"" HorizontalOptions=""Center"" VerticalOptions=""Start""
               Margin=""0,104,0,0"" BackgroundColor=""Transparent"">
@@ -2511,14 +2772,35 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
             RockMigrationHelper.AddBlockAttributeValue( "82791881-D9E4-48E1-9844-A84CFDC78955", "5BB516A9-2512-479D-9979-50DFAA705960", @"q8Lln9mXyM" );   // ConfigurationTemplate
             RockMigrationHelper.AddBlockAttributeValue( "82791881-D9E4-48E1-9844-A84CFDC78955", "6F90A16E-BB57-47D0-9230-07B633CAA65F", @"xbKmXMlo7J,yKQmK0l8Gp,RGKBqjmW8b,pAZB8dBngD,d1VPVOB2MZ" );   // Areas
             RockMigrationHelper.AddBlockAttributeValue( "82791881-D9E4-48E1-9844-A84CFDC78955", "EBA83553-0D5C-487A-9CF5-48E88EA67F8B", @"OX9mQWPQo8" );   // Kiosk
-            RockMigrationHelper.AddBlockAttributeValue( "E430DB8D-53B7-432A-BF3D-28D590295FE1", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"{%- assign appRoot = 'Global' | Attribute:'PublicApplicationRoot' -%}
+            RockMigrationHelper.AddBlockAttributeValue( "E430DB8D-53B7-432A-BF3D-28D590295FE1", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"{%- comment -%}
+    ===========================================================================
+    SERMON LIBRARY - Content (first paint)
+    ---------------------------------------------------------------------------
+    Generated by build_sermon_library.py - edit that, not this, or Content and
+    CallbackLogic will drift apart.
+
+    Dynamic Content is ON, so ""Show More"" fires {Binding Callback} and this block
+    re-renders IN PLACE, keeping scroll position. Paging applies to the series
+    rows; the hero and the Recent Sermons strip are redrawn unchanged.
+
+    Thumbnail precedence, most specific first:
+        Recent strip  media element thumb -> item Image -> parent series art
+        Series rows   item Image -> that series' art
+    and MediaDefault.png behind both, so a card always has a picture.
+    ===========================================================================
+{%- endcomment -%}
+
+{%- assign seriesRowCount = 5 -%}
+{%- assign take = seriesRowCount -%}
+{%- assign appRoot = 'Global' | Attribute:'PublicApplicationRoot' -%}
 {%- assign seriesChannelId = 4 -%}
 {%- assign messageChannelId = 5 -%}
 {%- assign sermonPageGuid = '4079b24c-d548-4cd0-a833-c5688bbef052' -%}
 {%- assign seriesPageGuid = '6d3762e4-0689-42fe-8535-a7b89c4fc028' -%}
-{%- assign appRoot = 'Global' | Attribute:'PublicApplicationRoot' -%}
 {%- assign recentCount = 10 -%}
-{%- assign seriesRowCount = 5 -%}
+{%- comment -%} last resort behind every thumbnail; lives in RockWeb/Content/MobileApp {%- endcomment -%}
+{%- assign defaultImg = appRoot | Append:'Content/MobileApp/MediaDefault.png' -%}
+{%- assign takePlusOne = take | Plus:1 -%}
 
 <VerticalStackLayout Spacing=""0"">
 
@@ -2550,7 +2832,7 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
         <HorizontalStackLayout Spacing=""12"" Padding=""16,0"">
             {% contentchannelitem where:'ContentChannelId == ""{{ messageChannelId }}""' sort:'StartDateTime desc' limit:'{{ recentCount }}' %}
                 {% for msg in contentchannelitemItems %}
-{%- comment -%} thumbnail: Media File thumb -> Image -> Series Image {%- endcomment -%}
+{%- comment -%} thumbnail: Media File thumb -> Image -> Series Image -> MediaDefault {%- endcomment -%}
                     {%- assign img = msg | Attribute:'MediaFile','DefaultThumbnailUrl' -%}
                     {%- if img == '' or img == null -%}{%- assign img = msg | Attribute:'Image','RawValue' -%}{%- if img != '' and img != null -%}{%- unless img contains 'http' -%}{%- assign img = appRoot | Append:'GetImage.ashx?Guid=' | Append:img -%}{%- endunless -%}{%- endif -%}{%- endif -%}
                     {%- if img == '' -%}
@@ -2564,20 +2846,38 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
                             {%- if sg != '' -%}{%- assign img = sg -%}{%- endif -%}
                         {%- endfor -%}
                     {%- endif -%}
+                    {%- if img == '' or img == null -%}{%- assign img = defaultImg -%}{%- endif -%}
+                    {%- assign cardDate = msg.StartDateTime | Date:'MMM d, yyyy' | Upcase -%}
                     <VerticalStackLayout WidthRequest=""240"" Spacing=""8"">
-                        <Rock:StyledBorder CornerRadius=""10"" Padding=""0"" WidthRequest=""240"" HeightRequest=""135"" StyleClass=""bg-interface-softer"">{% if img != '' %}<Rock:Image Source=""{{ img | Escape }}"" Aspect=""AspectFill"" WidthRequest=""240"" HeightRequest=""135"" />{% else %}<Rock:Icon IconClass=""video"" IconFamily=""FontAwesomeSolid"" FontSize=""28"" StyleClass=""text-interface-soft"" HorizontalOptions=""Center"" VerticalOptions=""Center"" />{% endif %}</Rock:StyledBorder>
-                        <Label StyleClass=""body, bold, text-interface-strongest"" Text=""{{ msg.Title | Escape }}"" MaxLines=""2"" LineBreakMode=""TailTruncation"" />
-                        <VerticalStackLayout.GestureRecognizers>
-                            <TapGestureRecognizer Command=""{Binding PushPage}"" CommandParameter=""{{ sermonPageGuid }}?ContentChannelItemId={{ msg.Id }}"" />
-                        </VerticalStackLayout.GestureRecognizers>
-                    </VerticalStackLayout>
+                                <Rock:StyledBorder CornerRadius=""10"" Padding=""0"" StrokeThickness=""0"" WidthRequest=""240"" HeightRequest=""135"" StyleClass=""bg-interface-softer"">
+                                    <Grid>
+                                        <Rock:Image Source=""{{ img | Escape }}"" Aspect=""AspectFill"" WidthRequest=""240"" HeightRequest=""135"" />
+                                        {%- if cardDate != '' and cardDate != null -%}
+                                        <Rock:StyledBorder CornerRadius=""6"" Padding=""7,3"" StrokeThickness=""0"" BackgroundColor=""#B3000000"" HorizontalOptions=""Start"" VerticalOptions=""End"" Margin=""6"">
+                                            <Label Text=""{{ cardDate }}"" StyleClass=""caption1, bold"" TextColor=""#FFFFFF"" />
+                                        </Rock:StyledBorder>
+                                        {%- endif -%}
+                                    </Grid>
+                                </Rock:StyledBorder>
+                                <Label StyleClass=""body, bold, text-interface-strongest"" Text=""{{ msg.Title | Escape }}"" MaxLines=""2"" LineBreakMode=""TailTruncation"" />
+                                <VerticalStackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer Command=""{Binding PushPage}"" CommandParameter=""{{ sermonPageGuid }}?ContentChannelItemId={{ msg.Id }}"" />
+                                </VerticalStackLayout.GestureRecognizers>
+                            </VerticalStackLayout>
                 {% endfor %}
             {% endcontentchannelitem %}
         </HorizontalStackLayout>
     </ScrollView>
 
-    {% contentchannelitem where:'ContentChannelId == ""{{ seriesChannelId }}""' sort:'StartDateTime desc' limit:'{{ seriesRowCount }}' %}
+    {% contentchannelitem where:'ContentChannelId == ""{{ seriesChannelId }}""' sort:'StartDateTime desc' limit:'{{ takePlusOne }}' %}
+        {%- comment -%} one series beyond the window tells us whether to offer Show More.
+             The window is counted in series FETCHED, not rows drawn, so the cursor
+             advances by a fixed amount even when a series has no messages yet. {%- endcomment -%}
+        {%- assign fetched = contentchannelitemItems | Size -%}
+        {%- assign hasMore = false -%}
+        {%- if fetched > take -%}{%- assign hasMore = true -%}{%- endif -%}
         {% for series in contentchannelitemItems %}
+            {%- if forloop.index0 < take -%}
             {%- assign childCount = series.ChildItems | Size -%}
             {%- comment -%} seriesGuid ends up holding an absolute image URL, not a guid: SeriesImage (Image field, a guid) wrapped in GetImage, else SeriesImageLink (Text field, already a URL). {%- endcomment -%}
 {%- assign seriesGuidGuid = series | Attribute:'SeriesImage','RawValue' -%}
@@ -2600,8 +2900,19 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
                             {%- assign msg = assoc.ChildContentChannelItem -%}
                             {%- assign img = msg | Attribute:'Image','RawValue' -%}{%- if img != '' and img != null -%}{%- unless img contains 'http' -%}{%- assign img = appRoot | Append:'GetImage.ashx?Guid=' | Append:img -%}{%- endunless -%}{%- endif -%}
                             {%- if img == '' and seriesGuid != '' -%}{%- assign img = seriesGuid -%}{%- endif -%}
+                            {%- if img == '' or img == null -%}{%- assign img = defaultImg -%}{%- endif -%}
+                            {%- assign cardDate = msg.StartDateTime | Date:'MMM d, yyyy' | Upcase -%}
                             <VerticalStackLayout WidthRequest=""240"" Spacing=""8"">
-                                <Rock:StyledBorder CornerRadius=""10"" Padding=""0"" WidthRequest=""240"" HeightRequest=""135"" StyleClass=""bg-interface-softer"">{% if img != '' %}<Rock:Image Source=""{{ img | Escape }}"" Aspect=""AspectFill"" WidthRequest=""240"" HeightRequest=""135"" />{% else %}<Rock:Icon IconClass=""video"" IconFamily=""FontAwesomeSolid"" FontSize=""28"" StyleClass=""text-interface-soft"" HorizontalOptions=""Center"" VerticalOptions=""Center"" />{% endif %}</Rock:StyledBorder>
+                                <Rock:StyledBorder CornerRadius=""10"" Padding=""0"" StrokeThickness=""0"" WidthRequest=""240"" HeightRequest=""135"" StyleClass=""bg-interface-softer"">
+                                    <Grid>
+                                        <Rock:Image Source=""{{ img | Escape }}"" Aspect=""AspectFill"" WidthRequest=""240"" HeightRequest=""135"" />
+                                        {%- if cardDate != '' and cardDate != null -%}
+                                        <Rock:StyledBorder CornerRadius=""6"" Padding=""7,3"" StrokeThickness=""0"" BackgroundColor=""#B3000000"" HorizontalOptions=""Start"" VerticalOptions=""End"" Margin=""6"">
+                                            <Label Text=""{{ cardDate }}"" StyleClass=""caption1, bold"" TextColor=""#FFFFFF"" />
+                                        </Rock:StyledBorder>
+                                        {%- endif -%}
+                                    </Grid>
+                                </Rock:StyledBorder>
                                 <Label StyleClass=""body, bold, text-interface-strongest"" Text=""{{ msg.Title | Escape }}"" MaxLines=""2"" LineBreakMode=""TailTruncation"" />
                                 <VerticalStackLayout.GestureRecognizers>
                                     <TapGestureRecognizer Command=""{Binding PushPage}"" CommandParameter=""{{ sermonPageGuid }}?ContentChannelItemId={{ msg.Id }}"" />
@@ -2611,13 +2922,199 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
                     </HorizontalStackLayout>
                 </ScrollView>
             {% endif %}
+            {%- endif -%}
         {% endfor %}
+
+        {%- if hasMore -%}
+            {%- assign nextTake = take | Plus:seriesRowCount -%}
+            <Button Text=""Show More"" StyleClass=""btn, btn-primary""
+                HorizontalOptions=""Center"" Margin=""0,24,0,0""
+                Command=""{Binding Callback}"">
+                <Button.CommandParameter>
+                    <Rock:CallbackParameters Name=""ShowMore"">
+                        <Rock:Parameter Name=""Take"" Value=""{{ nextTake }}"" />
+                    </Rock:CallbackParameters>
+                </Button.CommandParameter>
+            </Button>
+        {%- endif -%}
     {% endcontentchannelitem %}
 
     <BoxView HeightRequest=""24"" Color=""Transparent"" />
 </VerticalStackLayout>" );   // Content
             RockMigrationHelper.AddBlockAttributeValue( "E430DB8D-53B7-432A-BF3D-28D590295FE1", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"RockEntity" );   // EnabledLavaCommands
             RockMigrationHelper.AddBlockAttributeValue( "E430DB8D-53B7-432A-BF3D-28D590295FE1", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
+            RockMigrationHelper.AddBlockAttributeValue( "E430DB8D-53B7-432A-BF3D-28D590295FE1", "2725F971-243A-4B60-83EB-527BA8C08737", @"{%- comment -%}
+    ===========================================================================
+    SERMON LIBRARY - CallbackLogic (Show More)
+    ---------------------------------------------------------------------------
+    Generated by build_sermon_library.py - edit that, not this, or Content and
+    CallbackLogic will drift apart.
+
+    Dynamic Content is ON, so ""Show More"" fires {Binding Callback} and this block
+    re-renders IN PLACE, keeping scroll position. Paging applies to the series
+    rows; the hero and the Recent Sermons strip are redrawn unchanged.
+
+    Thumbnail precedence, most specific first:
+        Recent strip  media element thumb -> item Image -> parent series art
+        Series rows   item Image -> that series' art
+    and MediaDefault.png behind both, so a card always has a picture.
+    ===========================================================================
+{%- endcomment -%}
+
+{%- assign seriesRowCount = 5 -%}
+{%- assign take = Parameters.Take | AsInteger -%}
+{%- if take == null or take < 1 -%}{%- assign take = seriesRowCount -%}{%- endif -%}
+{% if Command == 'ShowMore' %}
+{%- assign appRoot = 'Global' | Attribute:'PublicApplicationRoot' -%}
+{%- assign seriesChannelId = 4 -%}
+{%- assign messageChannelId = 5 -%}
+{%- assign sermonPageGuid = '4079b24c-d548-4cd0-a833-c5688bbef052' -%}
+{%- assign seriesPageGuid = '6d3762e4-0689-42fe-8535-a7b89c4fc028' -%}
+{%- assign recentCount = 10 -%}
+{%- comment -%} last resort behind every thumbnail; lives in RockWeb/Content/MobileApp {%- endcomment -%}
+{%- assign defaultImg = appRoot | Append:'Content/MobileApp/MediaDefault.png' -%}
+{%- assign takePlusOne = take | Plus:1 -%}
+
+<VerticalStackLayout Spacing=""0"">
+
+    {% contentchannelitem where:'ContentChannelId == ""{{ seriesChannelId }}""' sort:'StartDateTime desc' limit:'1' %}
+        {% for hero in contentchannelitemItems %}
+            {%- comment -%} hg ends up holding an absolute image URL, not a guid: SeriesImage (Image field, a guid) wrapped in GetImage, else SeriesImageLink (Text field, already a URL). {%- endcomment -%}
+{%- assign hgGuid = hero | Attribute:'SeriesImage','RawValue' -%}
+{%- assign hgLink = hero | Attribute:'SeriesImageLink','RawValue' -%}
+{%- assign hg = '' -%}
+{%- if hgGuid != '' and hgGuid != null -%}{%- assign hg = hgGuid -%}
+{%- elsif hgLink != '' and hgLink != null -%}{%- assign hg = hgLink -%}{%- endif -%}{%- if hg != '' and hg != null -%}{%- unless hg contains 'http' -%}{%- assign hg = appRoot | Append:'GetImage.ashx?Guid=' | Append:hg -%}{%- endunless -%}{%- endif -%}
+            {% if hg != '' %}
+                <Rock:StyledBorder CornerRadius=""12"" Padding=""0"" StyleClass=""mx-16, mt-16"">
+                    <Rock:Image Source=""{{ hg | Escape }}"" Aspect=""AspectFill"" Ratio=""16:9"" />
+                    <Rock:StyledBorder.GestureRecognizers>
+                        <TapGestureRecognizer Command=""{Binding PushPage}""
+                            CommandParameter=""{{ seriesPageGuid }}?ContentChannelItemId={{ hero.Id }}"" />
+                    </Rock:StyledBorder.GestureRecognizers>
+                </Rock:StyledBorder>
+            {% endif %}
+        {% endfor %}
+    {% endcontentchannelitem %}
+
+    <Grid ColumnDefinitions=""*, Auto"" StyleClass=""mx-16, mt-24"">
+        <Label Grid.Column=""0"" StyleClass=""title2, bold, text-interface-strongest"" Text=""Recent Sermons"" VerticalOptions=""Center"" />
+    </Grid>
+
+    <ScrollView Orientation=""Horizontal"" HorizontalScrollBarVisibility=""Never"" StyleClass=""mt-12"">
+        <HorizontalStackLayout Spacing=""12"" Padding=""16,0"">
+            {% contentchannelitem where:'ContentChannelId == ""{{ messageChannelId }}""' sort:'StartDateTime desc' limit:'{{ recentCount }}' %}
+                {% for msg in contentchannelitemItems %}
+{%- comment -%} thumbnail: Media File thumb -> Image -> Series Image -> MediaDefault {%- endcomment -%}
+                    {%- assign img = msg | Attribute:'MediaFile','DefaultThumbnailUrl' -%}
+                    {%- if img == '' or img == null -%}{%- assign img = msg | Attribute:'Image','RawValue' -%}{%- if img != '' and img != null -%}{%- unless img contains 'http' -%}{%- assign img = appRoot | Append:'GetImage.ashx?Guid=' | Append:img -%}{%- endunless -%}{%- endif -%}{%- endif -%}
+                    {%- if img == '' -%}
+                        {%- for p in msg.ParentItems limit:1 -%}
+                            {%- comment -%} sg ends up holding an absolute image URL, not a guid: SeriesImage (Image field, a guid) wrapped in GetImage, else SeriesImageLink (Text field, already a URL). {%- endcomment -%}
+{%- assign sgGuid = p.ContentChannelItem | Attribute:'SeriesImage','RawValue' -%}
+{%- assign sgLink = p.ContentChannelItem | Attribute:'SeriesImageLink','RawValue' -%}
+{%- assign sg = '' -%}
+{%- if sgGuid != '' and sgGuid != null -%}{%- assign sg = sgGuid -%}
+{%- elsif sgLink != '' and sgLink != null -%}{%- assign sg = sgLink -%}{%- endif -%}{%- if sg != '' and sg != null -%}{%- unless sg contains 'http' -%}{%- assign sg = appRoot | Append:'GetImage.ashx?Guid=' | Append:sg -%}{%- endunless -%}{%- endif -%}
+                            {%- if sg != '' -%}{%- assign img = sg -%}{%- endif -%}
+                        {%- endfor -%}
+                    {%- endif -%}
+                    {%- if img == '' or img == null -%}{%- assign img = defaultImg -%}{%- endif -%}
+                    {%- assign cardDate = msg.StartDateTime | Date:'MMM d, yyyy' | Upcase -%}
+                    <VerticalStackLayout WidthRequest=""240"" Spacing=""8"">
+                                <Rock:StyledBorder CornerRadius=""10"" Padding=""0"" StrokeThickness=""0"" WidthRequest=""240"" HeightRequest=""135"" StyleClass=""bg-interface-softer"">
+                                    <Grid>
+                                        <Rock:Image Source=""{{ img | Escape }}"" Aspect=""AspectFill"" WidthRequest=""240"" HeightRequest=""135"" />
+                                        {%- if cardDate != '' and cardDate != null -%}
+                                        <Rock:StyledBorder CornerRadius=""6"" Padding=""7,3"" StrokeThickness=""0"" BackgroundColor=""#B3000000"" HorizontalOptions=""Start"" VerticalOptions=""End"" Margin=""6"">
+                                            <Label Text=""{{ cardDate }}"" StyleClass=""caption1, bold"" TextColor=""#FFFFFF"" />
+                                        </Rock:StyledBorder>
+                                        {%- endif -%}
+                                    </Grid>
+                                </Rock:StyledBorder>
+                                <Label StyleClass=""body, bold, text-interface-strongest"" Text=""{{ msg.Title | Escape }}"" MaxLines=""2"" LineBreakMode=""TailTruncation"" />
+                                <VerticalStackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer Command=""{Binding PushPage}"" CommandParameter=""{{ sermonPageGuid }}?ContentChannelItemId={{ msg.Id }}"" />
+                                </VerticalStackLayout.GestureRecognizers>
+                            </VerticalStackLayout>
+                {% endfor %}
+            {% endcontentchannelitem %}
+        </HorizontalStackLayout>
+    </ScrollView>
+
+    {% contentchannelitem where:'ContentChannelId == ""{{ seriesChannelId }}""' sort:'StartDateTime desc' limit:'{{ takePlusOne }}' %}
+        {%- comment -%} one series beyond the window tells us whether to offer Show More.
+             The window is counted in series FETCHED, not rows drawn, so the cursor
+             advances by a fixed amount even when a series has no messages yet. {%- endcomment -%}
+        {%- assign fetched = contentchannelitemItems | Size -%}
+        {%- assign hasMore = false -%}
+        {%- if fetched > take -%}{%- assign hasMore = true -%}{%- endif -%}
+        {% for series in contentchannelitemItems %}
+            {%- if forloop.index0 < take -%}
+            {%- assign childCount = series.ChildItems | Size -%}
+            {%- comment -%} seriesGuid ends up holding an absolute image URL, not a guid: SeriesImage (Image field, a guid) wrapped in GetImage, else SeriesImageLink (Text field, already a URL). {%- endcomment -%}
+{%- assign seriesGuidGuid = series | Attribute:'SeriesImage','RawValue' -%}
+{%- assign seriesGuidLink = series | Attribute:'SeriesImageLink','RawValue' -%}
+{%- assign seriesGuid = '' -%}
+{%- if seriesGuidGuid != '' and seriesGuidGuid != null -%}{%- assign seriesGuid = seriesGuidGuid -%}
+{%- elsif seriesGuidLink != '' and seriesGuidLink != null -%}{%- assign seriesGuid = seriesGuidLink -%}{%- endif -%}{%- if seriesGuid != '' and seriesGuid != null -%}{%- unless seriesGuid contains 'http' -%}{%- assign seriesGuid = appRoot | Append:'GetImage.ashx?Guid=' | Append:seriesGuid -%}{%- endunless -%}{%- endif -%}
+            {% if childCount > 0 %}
+                <Grid ColumnDefinitions=""*, Auto"" StyleClass=""mx-16, mt-24"">
+                    <Label Grid.Column=""0"" StyleClass=""title2, bold, text-interface-strongest"" Text=""{{ series.Title | Escape }}"" MaxLines=""2"" LineBreakMode=""TailTruncation"" VerticalOptions=""Center"" />
+                    <Label Grid.Column=""1"" StyleClass=""body, text-interface-medium"" Text=""View All"" VerticalOptions=""Center"" />
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command=""{Binding PushPage}"" CommandParameter=""{{ seriesPageGuid }}?ContentChannelItemId={{ series.Id }}"" />
+                    </Grid.GestureRecognizers>
+                </Grid>
+
+                <ScrollView Orientation=""Horizontal"" HorizontalScrollBarVisibility=""Never"" StyleClass=""mt-12"">
+                    <HorizontalStackLayout Spacing=""12"" Padding=""16,0"">
+                        {% for assoc in series.ChildItems %}
+                            {%- assign msg = assoc.ChildContentChannelItem -%}
+                            {%- assign img = msg | Attribute:'Image','RawValue' -%}{%- if img != '' and img != null -%}{%- unless img contains 'http' -%}{%- assign img = appRoot | Append:'GetImage.ashx?Guid=' | Append:img -%}{%- endunless -%}{%- endif -%}
+                            {%- if img == '' and seriesGuid != '' -%}{%- assign img = seriesGuid -%}{%- endif -%}
+                            {%- if img == '' or img == null -%}{%- assign img = defaultImg -%}{%- endif -%}
+                            {%- assign cardDate = msg.StartDateTime | Date:'MMM d, yyyy' | Upcase -%}
+                            <VerticalStackLayout WidthRequest=""240"" Spacing=""8"">
+                                <Rock:StyledBorder CornerRadius=""10"" Padding=""0"" StrokeThickness=""0"" WidthRequest=""240"" HeightRequest=""135"" StyleClass=""bg-interface-softer"">
+                                    <Grid>
+                                        <Rock:Image Source=""{{ img | Escape }}"" Aspect=""AspectFill"" WidthRequest=""240"" HeightRequest=""135"" />
+                                        {%- if cardDate != '' and cardDate != null -%}
+                                        <Rock:StyledBorder CornerRadius=""6"" Padding=""7,3"" StrokeThickness=""0"" BackgroundColor=""#B3000000"" HorizontalOptions=""Start"" VerticalOptions=""End"" Margin=""6"">
+                                            <Label Text=""{{ cardDate }}"" StyleClass=""caption1, bold"" TextColor=""#FFFFFF"" />
+                                        </Rock:StyledBorder>
+                                        {%- endif -%}
+                                    </Grid>
+                                </Rock:StyledBorder>
+                                <Label StyleClass=""body, bold, text-interface-strongest"" Text=""{{ msg.Title | Escape }}"" MaxLines=""2"" LineBreakMode=""TailTruncation"" />
+                                <VerticalStackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer Command=""{Binding PushPage}"" CommandParameter=""{{ sermonPageGuid }}?ContentChannelItemId={{ msg.Id }}"" />
+                                </VerticalStackLayout.GestureRecognizers>
+                            </VerticalStackLayout>
+                        {% endfor %}
+                    </HorizontalStackLayout>
+                </ScrollView>
+            {% endif %}
+            {%- endif -%}
+        {% endfor %}
+
+        {%- if hasMore -%}
+            {%- assign nextTake = take | Plus:seriesRowCount -%}
+            <Button Text=""Show More"" StyleClass=""btn, btn-primary""
+                HorizontalOptions=""Center"" Margin=""0,24,0,0""
+                Command=""{Binding Callback}"">
+                <Button.CommandParameter>
+                    <Rock:CallbackParameters Name=""ShowMore"">
+                        <Rock:Parameter Name=""Take"" Value=""{{ nextTake }}"" />
+                    </Rock:CallbackParameters>
+                </Button.CommandParameter>
+            </Button>
+        {%- endif -%}
+    {% endcontentchannelitem %}
+
+    <BoxView HeightRequest=""24"" Color=""Transparent"" />
+</VerticalStackLayout>
+{% endif %}" );   // CallbackLogic
             RockMigrationHelper.AddBlockAttributeValue( "C63AD407-B2D3-4DA5-BC49-B34DF3554EE1", "D80CF7C7-F6F4-4E77-97A8-B0842E4AF7FB", @"{%- assign appRoot = 'Global' | Attribute:'PublicApplicationRoot' -%}
 {%- assign publicPagesReady = true -%}
 {% comment %} flip to true once /series/{Id} exists — see PRODUCTION-SETUP-CHECKLIST.md {% endcomment %}
@@ -3113,6 +3610,24 @@ FETCH NEXT @RowsOfPage ROWS ONLY
             <Rock:StyledBorder HeightRequest=""150"" VerticalOptions=""Start"" StyleClass=""bg-interface-soft"" />
         {% endif %}
 
+        <!-- Settings. Moved here from the page header block: that header needed
+             Hide Navigation Bar, which on Android 15+ leaves the page drawing under
+             the status bar (Rock SafeAreaPaddingBehavior reads deprecated inset
+             APIs). The real navigation bar is inset correctly, so the cog lives
+             here instead. -->
+        <Rock:Icon IconClass=""cog""
+            IconFamily=""MaterialDesignIcons""
+            FontSize=""22""
+            StyleClass=""text-interface-strongest""
+            HorizontalOptions=""End""
+            VerticalOptions=""Start""
+            Margin=""0,16,16,0"">
+            <Rock:Icon.GestureRecognizers>
+                <TapGestureRecognizer Command=""{Binding PushPage}""
+                    CommandParameter=""5f46d984-6597-4834-9b78-8f009ab1e1e7"" />
+            </Rock:Icon.GestureRecognizers>
+        </Rock:Icon>
+
         <Grid WidthRequest=""92"" HeightRequest=""92"" HorizontalOptions=""Center"" VerticalOptions=""Start""
               Margin=""0,104,0,0"" BackgroundColor=""Transparent"">
         {% if CurrentPerson != null %}
@@ -3260,6 +3775,24 @@ FETCH NEXT @RowsOfPage ROWS ONLY
         {% else %}
             <Rock:StyledBorder HeightRequest=""150"" VerticalOptions=""Start"" StyleClass=""bg-interface-soft"" />
         {% endif %}
+
+        <!-- Settings. Moved here from the page header block: that header needed
+             Hide Navigation Bar, which on Android 15+ leaves the page drawing under
+             the status bar (Rock SafeAreaPaddingBehavior reads deprecated inset
+             APIs). The real navigation bar is inset correctly, so the cog lives
+             here instead. -->
+        <Rock:Icon IconClass=""cog""
+            IconFamily=""MaterialDesignIcons""
+            FontSize=""22""
+            StyleClass=""text-interface-strongest""
+            HorizontalOptions=""End""
+            VerticalOptions=""Start""
+            Margin=""0,16,16,0"">
+            <Rock:Icon.GestureRecognizers>
+                <TapGestureRecognizer Command=""{Binding PushPage}""
+                    CommandParameter=""5f46d984-6597-4834-9b78-8f009ab1e1e7"" />
+            </Rock:Icon.GestureRecognizers>
+        </Rock:Icon>
 
         <Grid WidthRequest=""92"" HeightRequest=""92"" HorizontalOptions=""Center"" VerticalOptions=""Start""
               Margin=""0,104,0,0"" BackgroundColor=""Transparent"">
@@ -3654,182 +4187,6 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
 " );   // Content
             RockMigrationHelper.AddBlockAttributeValue( "FF2703A4-BF7D-4A53-A214-10AD2E850BAA", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"Sql" );   // EnabledLavaCommands
             RockMigrationHelper.AddBlockAttributeValue( "FF2703A4-BF7D-4A53-A214-10AD2E850BAA", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
-            RockMigrationHelper.AddBlockAttributeValue( "05137346-7182-43EC-B7BD-581237869417", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"    <!-- ===== Custom nav bar (page's Hide Navigation Bar must be ON) ===== -->
-    <VerticalStackLayout StyleClass=""bg-interface-softest"" Spacing=""0"">
-        <VerticalStackLayout.Behaviors>
-            <Rock:SafeAreaPaddingBehavior Edges=""Top"" />
-        </VerticalStackLayout.Behaviors>
-
-        <Grid ColumnDefinitions=""56, *, Auto"" ColumnSpacing=""0"" Padding=""16,16"">
-            <Rock:Icon Grid.Column=""0""
-                IconClass=""arrow-left""
-                IconFamily=""MaterialDesignIcons""
-                FontSize=""24""
-                StyleClass=""text-interface-strongest""
-                VerticalOptions=""Center""
-                VerticalTextAlignment=""Center""
-                HorizontalOptions=""Start"">
-                <Rock:Icon.GestureRecognizers>
-                    <TapGestureRecognizer Command=""{Binding PopPage}"" />
-                </Rock:Icon.GestureRecognizers>
-            </Rock:Icon>
-
-            <Label Grid.Column=""1""
-                Text=""Profile""
-                StyleClass=""title3, font-weight-semi-bold, text-interface-strongest""
-                VerticalOptions=""Center""
-                VerticalTextAlignment=""Center""
-                HorizontalOptions=""Start""
-                LineBreakMode=""TailTruncation"" />
-
-            <Rock:Icon Grid.Column=""2""
-                IconClass=""cog""
-                IconFamily=""MaterialDesignIcons""
-                FontSize=""22""
-                StyleClass=""text-interface-strongest""
-                VerticalOptions=""Center""
-                VerticalTextAlignment=""Center""
-                HorizontalOptions=""End"">
-                <Rock:Icon.GestureRecognizers>
-                    <TapGestureRecognizer Command=""{Binding PushPage}""
-                        CommandParameter=""5f46d984-6597-4834-9b78-8f009ab1e1e7"" />
-                </Rock:Icon.GestureRecognizers>
-            </Rock:Icon>
-        </Grid>
-    </VerticalStackLayout>" );   // Content
-            RockMigrationHelper.AddBlockAttributeValue( "05137346-7182-43EC-B7BD-581237869417", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"False" );   // DynamicContent
-            RockMigrationHelper.AddBlockAttributeValue( "65350FBF-7EDA-4D89-9778-6020D53B785F", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"    <!-- ===== Custom nav bar (page's Hide Navigation Bar must be ON) ===== -->
-    <VerticalStackLayout StyleClass=""bg-interface-softest"" Spacing=""0"">
-        <VerticalStackLayout.Behaviors>
-            <Rock:SafeAreaPaddingBehavior Edges=""Top"" />
-        </VerticalStackLayout.Behaviors>
-
-        <Grid ColumnDefinitions=""56, *, Auto"" ColumnSpacing=""0"" Padding=""16,16"">
-            <Rock:Icon Grid.Column=""0""
-                IconClass=""arrow-left""
-                IconFamily=""MaterialDesignIcons""
-                FontSize=""24""
-                StyleClass=""text-interface-strongest""
-                VerticalOptions=""Center""
-                VerticalTextAlignment=""Center""
-                HorizontalOptions=""Start"">
-                <Rock:Icon.GestureRecognizers>
-                    <TapGestureRecognizer Command=""{Binding PopPage}"" />
-                </Rock:Icon.GestureRecognizers>
-            </Rock:Icon>
-
-            <Label Grid.Column=""1""
-                Text=""Profile""
-                StyleClass=""title3, font-weight-semi-bold, text-interface-strongest""
-                VerticalOptions=""Center""
-                VerticalTextAlignment=""Center""
-                HorizontalOptions=""Start""
-                LineBreakMode=""TailTruncation"" />
-
-            <Rock:Icon Grid.Column=""2""
-                IconClass=""cog""
-                IconFamily=""MaterialDesignIcons""
-                FontSize=""22""
-                StyleClass=""text-interface-strongest""
-                VerticalOptions=""Center""
-                VerticalTextAlignment=""Center""
-                HorizontalOptions=""End"">
-                <Rock:Icon.GestureRecognizers>
-                    <TapGestureRecognizer Command=""{Binding PushPage}""
-                        CommandParameter=""5f46d984-6597-4834-9b78-8f009ab1e1e7"" />
-                </Rock:Icon.GestureRecognizers>
-            </Rock:Icon>
-        </Grid>
-    </VerticalStackLayout>" );   // Content
-            RockMigrationHelper.AddBlockAttributeValue( "65350FBF-7EDA-4D89-9778-6020D53B785F", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"False" );   // DynamicContent
-            RockMigrationHelper.AddBlockAttributeValue( "81E84E8F-4FC6-4D89-997E-8BBF1A7B2E05", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"    <!-- ===== Custom nav bar (page's Hide Navigation Bar must be ON) ===== -->
-    <VerticalStackLayout StyleClass=""bg-interface-softest"" Spacing=""0"">
-        <VerticalStackLayout.Behaviors>
-            <Rock:SafeAreaPaddingBehavior Edges=""Top"" />
-        </VerticalStackLayout.Behaviors>
-
-        <Grid ColumnDefinitions=""56, *, Auto"" ColumnSpacing=""0"" Padding=""16,16"">
-            <Rock:Icon Grid.Column=""0""
-                IconClass=""arrow-left""
-                IconFamily=""MaterialDesignIcons""
-                FontSize=""24""
-                StyleClass=""text-interface-strongest""
-                VerticalOptions=""Center""
-                VerticalTextAlignment=""Center""
-                HorizontalOptions=""Start"">
-                <Rock:Icon.GestureRecognizers>
-                    <TapGestureRecognizer Command=""{Binding PopPage}"" />
-                </Rock:Icon.GestureRecognizers>
-            </Rock:Icon>
-
-            <Label Grid.Column=""1""
-                Text=""Profile""
-                StyleClass=""title3, font-weight-semi-bold, text-interface-strongest""
-                VerticalOptions=""Center""
-                VerticalTextAlignment=""Center""
-                HorizontalOptions=""Start""
-                LineBreakMode=""TailTruncation"" />
-
-            <Rock:Icon Grid.Column=""2""
-                IconClass=""cog""
-                IconFamily=""MaterialDesignIcons""
-                FontSize=""22""
-                StyleClass=""text-interface-strongest""
-                VerticalOptions=""Center""
-                VerticalTextAlignment=""Center""
-                HorizontalOptions=""End"">
-                <Rock:Icon.GestureRecognizers>
-                    <TapGestureRecognizer Command=""{Binding PushPage}""
-                        CommandParameter=""5f46d984-6597-4834-9b78-8f009ab1e1e7"" />
-                </Rock:Icon.GestureRecognizers>
-            </Rock:Icon>
-        </Grid>
-    </VerticalStackLayout>" );   // Content
-            RockMigrationHelper.AddBlockAttributeValue( "81E84E8F-4FC6-4D89-997E-8BBF1A7B2E05", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"False" );   // DynamicContent
-            RockMigrationHelper.AddBlockAttributeValue( "BD66F886-936E-4624-AEF5-00698C7C0BFC", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"    <!-- ===== Custom nav bar (page's Hide Navigation Bar must be ON) ===== -->
-    <VerticalStackLayout StyleClass=""bg-interface-softest"" Spacing=""0"">
-        <VerticalStackLayout.Behaviors>
-            <Rock:SafeAreaPaddingBehavior Edges=""Top"" />
-        </VerticalStackLayout.Behaviors>
-
-        <Grid ColumnDefinitions=""56, *, Auto"" ColumnSpacing=""0"" Padding=""16,16"">
-            <Rock:Icon Grid.Column=""0""
-                IconClass=""arrow-left""
-                IconFamily=""MaterialDesignIcons""
-                FontSize=""24""
-                StyleClass=""text-interface-strongest""
-                VerticalOptions=""Center""
-                VerticalTextAlignment=""Center""
-                HorizontalOptions=""Start"">
-                <Rock:Icon.GestureRecognizers>
-                    <TapGestureRecognizer Command=""{Binding PopPage}"" />
-                </Rock:Icon.GestureRecognizers>
-            </Rock:Icon>
-
-            <Label Grid.Column=""1""
-                Text=""Profile""
-                StyleClass=""title3, font-weight-semi-bold, text-interface-strongest""
-                VerticalOptions=""Center""
-                VerticalTextAlignment=""Center""
-                HorizontalOptions=""Start""
-                LineBreakMode=""TailTruncation"" />
-
-            <Rock:Icon Grid.Column=""2""
-                IconClass=""cog""
-                IconFamily=""MaterialDesignIcons""
-                FontSize=""22""
-                StyleClass=""text-interface-strongest""
-                VerticalOptions=""Center""
-                VerticalTextAlignment=""Center""
-                HorizontalOptions=""End"">
-                <Rock:Icon.GestureRecognizers>
-                    <TapGestureRecognizer Command=""{Binding PushPage}""
-                        CommandParameter=""5f46d984-6597-4834-9b78-8f009ab1e1e7"" />
-                </Rock:Icon.GestureRecognizers>
-            </Rock:Icon>
-        </Grid>
-    </VerticalStackLayout>" );   // Content
-            RockMigrationHelper.AddBlockAttributeValue( "BD66F886-936E-4624-AEF5-00698C7C0BFC", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"False" );   // DynamicContent
             RockMigrationHelper.AddBlockAttributeValue( "DDA29EBD-B8A0-44FD-A1A4-2E783F050005", "20C706F6-D690-401B-83A6-9BD41661AAD2", @"39b8b16d-d213-46fd-9b8f-710453806193|" );   // Template
             RockMigrationHelper.AddBlockAttributeValue( "AC2DDABC-C82A-4827-8565-248724D1C324", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"{%- if PageParameter.ItemId == ""-1"" or PageParameter.ItemId == """" or PageParameter.ItemId == empty -%}
 
@@ -4330,18 +4687,63 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
     </StackLayout>
 </Rock:BibleBrowser>" );   // Content
             RockMigrationHelper.AddBlockAttributeValue( "1C5A37BB-A556-4777-9E33-51A11D4DB8A8", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
-            RockMigrationHelper.AddBlockAttributeValue( "C82E63A0-0D0F-4EA7-A2B8-A53FF93C88F0", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"{%- assign messageChannelId = 5 -%}
+            RockMigrationHelper.AddBlockAttributeValue( "C82E63A0-0D0F-4EA7-A2B8-A53FF93C88F0", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"{%- comment -%}
+    ===========================================================================
+    PODCASTS - Content (first paint)
+    ---------------------------------------------------------------------------
+    Generated by build_podcast_list.py - edit that, not this, or Content and
+    CallbackLogic will drift apart.
+
+    Dynamic Content is ON, so ""Show More"" fires {Binding Callback} and this block
+    re-renders IN PLACE, keeping scroll position.
+
+    take counts RENDERED rows. Items with no AudioLink are skipped, so paging on
+    the fetch window would give ragged pages; the fetch is take*3+10 to leave
+    room for the skipped ones. hasMore is true when a renderable item was found
+    past the window, or when the fetch hit its own limit and there may be more
+    beyond it.
+    ===========================================================================
+{%- endcomment -%}
+
+{%- assign pageSize = 30 -%}
+{%- assign take = pageSize -%}
+{%- assign messageChannelId = 5 -%}
 {%- assign detailPageGuid = '129CD3DF-28B5-44B0-B77C-1241041E2B50' -%}
 {%- assign appRoot = 'Global' | Attribute:'PublicApplicationRoot' -%}
 
 <VerticalStackLayout Spacing=""0"" StyleClass=""p-16"">
-{%- contentchannelitem where:'ContentChannelId == ""{{ messageChannelId }}""' sort:'StartDateTime desc' -%}
+{%- comment -%} take*3+10: the loop drops items with no AudioLink, so the fetch
+    needs headroom to still produce a full page of take rendered rows {%- endcomment -%}
+{%- assign fetch = take | Times:3 | Plus:10 -%}
+{%- contentchannelitem where:'ContentChannelId == ""{{ messageChannelId }}""' sort:'StartDateTime desc' limit:'{{ fetch }}' -%}
+    {%- assign fetched = contentchannelitemItems | Size -%}
     {%- assign shown = 0 -%}
+    {%- assign extra = 0 -%}
     {% for item in contentchannelitemItems %}
         {%- assign audio = item | Attribute:'AudioLink','RawValue' -%}
         {%- if audio == '' -%}{% continue %}{%- endif -%}
+        {%- comment -%} past the window: count it so the button knows there is
+            more, but skip every expensive lookup below {%- endcomment -%}
+        {%- if shown >= take -%}{%- assign extra = extra | Plus:1 -%}{% continue %}{%- endif -%}
         {%- assign shown = shown | Plus:1 -%}
-        {%- assign img = item | Attribute:'Image','RawValue' -%}
+        {%- assign mediaThumb = item | Attribute:'MediaFile','DefaultThumbnailUrl' -%}
+        {%- assign img = item | Attribute:'Image','RawValue' -%}{%- if img != '' and img != null -%}{%- unless img contains 'http' -%}{%- assign img = appRoot | Append:'GetImage.ashx?Guid=' | Append:img -%}{%- endunless -%}{%- endif -%}
+        {%- if mediaThumb == '' or mediaThumb == null -%}{%- assign mediaThumb = img -%}{%- endif -%}
+        {%- assign seriesGuid = '' -%}
+        {%- for p in item.ParentItems limit:1 -%}
+            {%- assign parentSeries = p.ContentChannelItem -%}
+            {%- comment -%} seriesGuid ends up holding an absolute image URL, not a guid: SeriesImage (Image field, a guid) wrapped in GetImage, else SeriesImageLink (Text field, already a URL). {%- endcomment -%}
+        {%- assign seriesGuidGuid = parentSeries | Attribute:'SeriesImage','RawValue' -%}
+        {%- assign seriesGuidLink = parentSeries | Attribute:'SeriesImageLink','RawValue' -%}
+        {%- assign seriesGuid = '' -%}
+        {%- if seriesGuidGuid != '' and seriesGuidGuid != null -%}{%- assign seriesGuid = seriesGuidGuid -%}
+        {%- elsif seriesGuidLink != '' and seriesGuidLink != null -%}{%- assign seriesGuid = seriesGuidLink -%}{%- endif -%}{%- if seriesGuid != '' and seriesGuid != null -%}{%- unless seriesGuid contains 'http' -%}{%- assign seriesGuid = appRoot | Append:'GetImage.ashx?Guid=' | Append:seriesGuid -%}{%- endunless -%}{%- endif -%}
+        {%- endfor -%}
+        
+        {%- comment -%} player artwork: MediaFile thumb -> item Image -> parent Series Image {%- endcomment -%}
+        {%- if mediaThumb == '' or mediaThumb == null -%}
+            {%- if seriesGuid != '' -%}{%- assign mediaThumb = seriesGuid -%}{%- endif -%}
+        {%- endif -%}
         {%- assign speaker = item | Attribute:'Speaker' -%}
         {%- assign dur = item | Attribute:'Duration','RawValue' | AsInteger -%}
         <Rock:StyledBorder CornerRadius=""12"" Padding=""12"" StyleClass=""bg-interface-softest, mb-8"">
@@ -4350,8 +4752,8 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
             </Rock:StyledBorder.GestureRecognizers>
             <Grid ColumnDefinitions=""Auto, *, Auto"" ColumnSpacing=""12"">
                 <Rock:StyledBorder Grid.Column=""0"" WidthRequest=""60"" HeightRequest=""60"" CornerRadius=""8"" Padding=""0"" StyleClass=""bg-interface-softer"">
-                    {% if img != '' %}
-                        <Rock:Image Source=""{{ img | Escape }}"" Aspect=""AspectFill"" WidthRequest=""60"" HeightRequest=""60"" />
+                    {% if mediaThumb != '' %}
+                        <Rock:Image Source=""{{ mediaThumb | Escape }}"" Aspect=""AspectFill"" WidthRequest=""60"" HeightRequest=""60"" />
                     {% else %}
                         <Rock:Icon IconClass=""microphone"" IconFamily=""FontAwesomeSolid"" FontSize=""22"" StyleClass=""text-primary-strong"" HorizontalOptions=""Center"" VerticalOptions=""Center"" />
                     {% endif %}
@@ -4365,6 +4767,130 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
             </Grid>
         </Rock:StyledBorder>
     {% endfor %}
+
+    {%- assign hasMore = false -%}
+    {%- if extra > 0 -%}{%- assign hasMore = true -%}{%- endif -%}
+    {%- if fetched >= fetch -%}{%- assign hasMore = true -%}{%- endif -%}
+    {%- if hasMore and shown > 0 -%}
+        {%- assign nextTake = take | Plus:pageSize -%}
+        <Button Text=""Show More"" StyleClass=""btn, btn-primary""
+            HorizontalOptions=""Center"" Margin=""0,8,0,8""
+            Command=""{Binding Callback}"">
+            <Button.CommandParameter>
+                <Rock:CallbackParameters Name=""ShowMore"">
+                    <Rock:Parameter Name=""Take"" Value=""{{ nextTake }}"" />
+                </Rock:CallbackParameters>
+            </Button.CommandParameter>
+        </Button>
+    {%- endif -%}
+    {% if shown == 0 %}
+        <VerticalStackLayout Spacing=""12"" StyleClass=""p-24"" HorizontalOptions=""Center"">
+            <Rock:Icon IconClass=""microphone-slash"" IconFamily=""FontAwesomeSolid"" FontSize=""34"" StyleClass=""text-interface-soft"" HorizontalOptions=""Center"" />
+            <Label Text=""No episodes available yet."" StyleClass=""body, text-interface-medium"" HorizontalTextAlignment=""Center"" />
+        </VerticalStackLayout>
+    {% endif %}
+{%- endcontentchannelitem -%}
+</VerticalStackLayout>" );   // Content
+            RockMigrationHelper.AddBlockAttributeValue( "C82E63A0-0D0F-4EA7-A2B8-A53FF93C88F0", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"RockEntity" );   // EnabledLavaCommands
+            RockMigrationHelper.AddBlockAttributeValue( "C82E63A0-0D0F-4EA7-A2B8-A53FF93C88F0", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
+            RockMigrationHelper.AddBlockAttributeValue( "C82E63A0-0D0F-4EA7-A2B8-A53FF93C88F0", "2725F971-243A-4B60-83EB-527BA8C08737", @"{%- comment -%}
+    ===========================================================================
+    PODCASTS - CallbackLogic (Show More)
+    ---------------------------------------------------------------------------
+    Generated by build_podcast_list.py - edit that, not this, or Content and
+    CallbackLogic will drift apart.
+
+    Dynamic Content is ON, so ""Show More"" fires {Binding Callback} and this block
+    re-renders IN PLACE, keeping scroll position.
+
+    take counts RENDERED rows. Items with no AudioLink are skipped, so paging on
+    the fetch window would give ragged pages; the fetch is take*3+10 to leave
+    room for the skipped ones. hasMore is true when a renderable item was found
+    past the window, or when the fetch hit its own limit and there may be more
+    beyond it.
+    ===========================================================================
+{%- endcomment -%}
+
+{%- assign pageSize = 30 -%}
+{%- assign take = Parameters.Take | AsInteger -%}
+{%- if take == null or take < 1 -%}{%- assign take = pageSize -%}{%- endif -%}
+{% if Command == 'ShowMore' %}
+{%- assign messageChannelId = 5 -%}
+{%- assign detailPageGuid = '129CD3DF-28B5-44B0-B77C-1241041E2B50' -%}
+{%- assign appRoot = 'Global' | Attribute:'PublicApplicationRoot' -%}
+
+<VerticalStackLayout Spacing=""0"" StyleClass=""p-16"">
+{%- comment -%} take*3+10: the loop drops items with no AudioLink, so the fetch
+    needs headroom to still produce a full page of take rendered rows {%- endcomment -%}
+{%- assign fetch = take | Times:3 | Plus:10 -%}
+{%- contentchannelitem where:'ContentChannelId == ""{{ messageChannelId }}""' sort:'StartDateTime desc' limit:'{{ fetch }}' -%}
+    {%- assign fetched = contentchannelitemItems | Size -%}
+    {%- assign shown = 0 -%}
+    {%- assign extra = 0 -%}
+    {% for item in contentchannelitemItems %}
+        {%- assign audio = item | Attribute:'AudioLink','RawValue' -%}
+        {%- if audio == '' -%}{% continue %}{%- endif -%}
+        {%- comment -%} past the window: count it so the button knows there is
+            more, but skip every expensive lookup below {%- endcomment -%}
+        {%- if shown >= take -%}{%- assign extra = extra | Plus:1 -%}{% continue %}{%- endif -%}
+        {%- assign shown = shown | Plus:1 -%}
+        {%- assign mediaThumb = item | Attribute:'MediaFile','DefaultThumbnailUrl' -%}
+        {%- assign img = item | Attribute:'Image','RawValue' -%}{%- if img != '' and img != null -%}{%- unless img contains 'http' -%}{%- assign img = appRoot | Append:'GetImage.ashx?Guid=' | Append:img -%}{%- endunless -%}{%- endif -%}
+        {%- if mediaThumb == '' or mediaThumb == null -%}{%- assign mediaThumb = img -%}{%- endif -%}
+        {%- assign seriesGuid = '' -%}
+        {%- for p in item.ParentItems limit:1 -%}
+            {%- assign parentSeries = p.ContentChannelItem -%}
+            {%- comment -%} seriesGuid ends up holding an absolute image URL, not a guid: SeriesImage (Image field, a guid) wrapped in GetImage, else SeriesImageLink (Text field, already a URL). {%- endcomment -%}
+        {%- assign seriesGuidGuid = parentSeries | Attribute:'SeriesImage','RawValue' -%}
+        {%- assign seriesGuidLink = parentSeries | Attribute:'SeriesImageLink','RawValue' -%}
+        {%- assign seriesGuid = '' -%}
+        {%- if seriesGuidGuid != '' and seriesGuidGuid != null -%}{%- assign seriesGuid = seriesGuidGuid -%}
+        {%- elsif seriesGuidLink != '' and seriesGuidLink != null -%}{%- assign seriesGuid = seriesGuidLink -%}{%- endif -%}{%- if seriesGuid != '' and seriesGuid != null -%}{%- unless seriesGuid contains 'http' -%}{%- assign seriesGuid = appRoot | Append:'GetImage.ashx?Guid=' | Append:seriesGuid -%}{%- endunless -%}{%- endif -%}
+        {%- endfor -%}
+        
+        {%- comment -%} player artwork: MediaFile thumb -> item Image -> parent Series Image {%- endcomment -%}
+        {%- if mediaThumb == '' or mediaThumb == null -%}
+            {%- if seriesGuid != '' -%}{%- assign mediaThumb = seriesGuid -%}{%- endif -%}
+        {%- endif -%}
+        {%- assign speaker = item | Attribute:'Speaker' -%}
+        {%- assign dur = item | Attribute:'Duration','RawValue' | AsInteger -%}
+        <Rock:StyledBorder CornerRadius=""12"" Padding=""12"" StyleClass=""bg-interface-softest, mb-8"">
+            <Rock:StyledBorder.GestureRecognizers>
+                <TapGestureRecognizer Command=""{Binding PushPage}"" CommandParameter=""{{ detailPageGuid }}?ContentChannelItemId={{ item.Id }}"" />
+            </Rock:StyledBorder.GestureRecognizers>
+            <Grid ColumnDefinitions=""Auto, *, Auto"" ColumnSpacing=""12"">
+                <Rock:StyledBorder Grid.Column=""0"" WidthRequest=""60"" HeightRequest=""60"" CornerRadius=""8"" Padding=""0"" StyleClass=""bg-interface-softer"">
+                    {% if mediaThumb != '' %}
+                        <Rock:Image Source=""{{ mediaThumb | Escape }}"" Aspect=""AspectFill"" WidthRequest=""60"" HeightRequest=""60"" />
+                    {% else %}
+                        <Rock:Icon IconClass=""microphone"" IconFamily=""FontAwesomeSolid"" FontSize=""22"" StyleClass=""text-primary-strong"" HorizontalOptions=""Center"" VerticalOptions=""Center"" />
+                    {% endif %}
+                </Rock:StyledBorder>
+                <VerticalStackLayout Grid.Column=""1"" Spacing=""3"" VerticalOptions=""Center"">
+                    <Label StyleClass=""body, bold, text-interface-strongest"" Text=""{{ item.Title | Escape }}"" MaxLines=""2"" LineBreakMode=""TailTruncation"" />
+                    <Label StyleClass=""caption1, text-interface-medium""
+                        Text=""{{ item.StartDateTime | Date:'MMM d, yyyy' }}{% if speaker != '' %} &#8226; {{ speaker | Escape }}{% endif %}{% if dur > 0 %} &#8226; {{ dur }} min{% endif %}"" />
+                </VerticalStackLayout>
+                <Rock:Icon Grid.Column=""2"" IconClass=""circle-play"" IconFamily=""FontAwesomeSolid"" FontSize=""26"" StyleClass=""text-primary-strong"" VerticalOptions=""Center"" />
+            </Grid>
+        </Rock:StyledBorder>
+    {% endfor %}
+
+    {%- assign hasMore = false -%}
+    {%- if extra > 0 -%}{%- assign hasMore = true -%}{%- endif -%}
+    {%- if fetched >= fetch -%}{%- assign hasMore = true -%}{%- endif -%}
+    {%- if hasMore and shown > 0 -%}
+        {%- assign nextTake = take | Plus:pageSize -%}
+        <Button Text=""Show More"" StyleClass=""btn, btn-primary""
+            HorizontalOptions=""Center"" Margin=""0,8,0,8""
+            Command=""{Binding Callback}"">
+            <Button.CommandParameter>
+                <Rock:CallbackParameters Name=""ShowMore"">
+                    <Rock:Parameter Name=""Take"" Value=""{{ nextTake }}"" />
+                </Rock:CallbackParameters>
+            </Button.CommandParameter>
+        </Button>
+    {%- endif -%}
     {% if shown == 0 %}
         <VerticalStackLayout Spacing=""12"" StyleClass=""p-24"" HorizontalOptions=""Center"">
             <Rock:Icon IconClass=""microphone-slash"" IconFamily=""FontAwesomeSolid"" FontSize=""34"" StyleClass=""text-interface-soft"" HorizontalOptions=""Center"" />
@@ -4373,9 +4899,7 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
     {% endif %}
 {%- endcontentchannelitem -%}
 </VerticalStackLayout>
-" );   // Content
-            RockMigrationHelper.AddBlockAttributeValue( "C82E63A0-0D0F-4EA7-A2B8-A53FF93C88F0", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"RockEntity" );   // EnabledLavaCommands
-            RockMigrationHelper.AddBlockAttributeValue( "C82E63A0-0D0F-4EA7-A2B8-A53FF93C88F0", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
+{% endif %}" );   // CallbackLogic
             RockMigrationHelper.AddBlockAttributeValue( "43523BEC-BC89-448E-BE74-9DB32CF4BB3B", "370F3617-CE26-4FA8-96CA-26B82E4D4F15", @"0" );   // ScanMode
             RockMigrationHelper.AddBlockAttributeValue( "B0264469-6A70-46F8-8A13-AC0B3375652A", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"{%- assign appRoot = 'Global' | Attribute:'PublicApplicationRoot' -%}
 {%- assign itemId = PageParameter.ContentChannelItemId -%}
@@ -4549,7 +5073,33 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
 
     <VerticalStackLayout>
       {%- assign image = Item | Attribute:'Image','Url' -%}
-      {%- assign imageUrl = Item | Attribute:'ImageUrl' -%}
+      {%- assign imageUrl = Item | Attribute:'ImageUrl','RawValue' -%}
+      {%- comment -%} A note two levels down carries no artwork of its own, so fall
+          back up the tree: the message it belongs to, then that message's series.
+          'Url' on an Image field returns an absolute URL and SeriesImageLink is
+          already one, so nothing needs GetImage.ashx assembled by hand.
+          An Attribute that does not exist on the channel returns null, hence the
+          normalise at the end - the render below tests != '' and would otherwise
+          emit an empty Source. {%- endcomment -%}
+      {%- if imageUrl == '' and image == '' -%}
+        {%- for pa in Item.ParentItems limit:1 -%}
+          {%- assign parentItem = pa.ContentChannelItem -%}
+          {%- assign imageUrl = parentItem | Attribute:'Image','Url' -%}
+          {%- if imageUrl == '' or imageUrl == null -%}
+            {%- assign imageUrl = parentItem | Attribute:'ImageUrl','RawValue' -%}
+          {%- endif -%}
+          {%- if imageUrl == '' or imageUrl == null -%}
+            {%- for ga in parentItem.ParentItems limit:1 -%}
+              {%- assign seriesItem = ga.ContentChannelItem -%}
+              {%- assign imageUrl = seriesItem | Attribute:'SeriesImage','Url' -%}
+              {%- if imageUrl == '' or imageUrl == null -%}
+                {%- assign imageUrl = seriesItem | Attribute:'SeriesImageLink','RawValue' -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- if imageUrl == null -%}{%- assign imageUrl = '' -%}{%- endif -%}
+      {%- endif -%}
       {%- if imageUrl != '' or image != '' -%}
       <Rock:Image Source=""{% if imageUrl != '' %}{{ imageUrl | Escape }}{% else %}{{ image | Escape }}{% endif %}"" Aspect=""AspectFill"" Ratio=""16:9"" />
       {%- endif -%}
@@ -5821,7 +6371,16 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
     picked out. That is why the server-side {% cache %} matters here far more
     than on the list.
 
-    CACHING - block CacheDuration is 60 and that is SAFE here
+    NO {% cache %} HERE - DELIBERATELY.
+    This body renders per-person state (the FollowingIcon's EntityId and
+    IsFollowed) and performs a write (the item is created on view), neither of
+    which belongs in a cache keyed only by episode. Rock's CacheBlock also
+    hashes only the block BODY, so changing EnabledLavaCommands or
+    DynamicContent does not invalidate it - a bad render then survives the fix
+    for the full duration. The block's own CacheDuration still limits how often
+    a device re-fetches.
+
+
     Confirmed against the decompiled shell (BlockBase.GetCachedValueAsync), not
     assumed: the cache key is
 
@@ -5846,7 +6405,6 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
 {%- assign authorKey = '{http://www.itunes.com/dtds/podcast-1.0.dtd}author' -%}
 
 <VerticalStackLayout Spacing=""0"" StyleClass=""pb-16"">
-{% cache key:'nfluence-podcast-rss-ep-{{ episodeId }}' duration:'900' %}
 {% webrequest url:'{{ feedUrl }}' responsecontenttype:'xml' return:'feed' timeout:'15000' %}
     {%- assign channel = feed.rss.channel -%}
     {%- assign artwork = '' -%}
@@ -5873,6 +6431,75 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
         {%- endif -%}
     {%- endfor -%}
 
+
+    {%- comment -%} ===== the saved item =====
+        FollowingIcon needs an EntityId, so the item is created on VIEW by a
+        signed-in person. Anonymous visitors fall through with EntityId 0 and
+        get the sign-in prompt when they tap. {%- endcomment -%}
+    {%- assign savedItemId = 0 -%}
+    {%- assign savedTypeId = 0 -%}
+    {%- assign isSaved = 'false' -%}
+    {%- if CurrentPerson and found -%}
+    {% sql statement:'command' episodeid:'{{ episodeId }}' channelguid:'7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' eptitle:'{{ epTitle | Escape }}' epaudio:'{{ epAudio }}' epimage:'{{ epImg }}' epfeed:'{{ feedUrl }}' epdate:'{{ epDate | Date:""yyyy-MM-dd HH:mm:ss"" }}' detailpage:'b4081d3e-9f75-4c1a-a6b3-8e1f2a74c569' %}
+        DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = @channelguid );
+        DECLARE @TypeId INT = ( SELECT TOP 1 [ContentChannelTypeId] FROM [ContentChannel] WHERE [Id] = @ChannelId );
+        DECLARE @EpAttr INT = ( SELECT TOP 1 [Id] FROM [Attribute]
+                                 WHERE [Key] = 'EpisodeId' AND [EntityTypeQualifierColumn] = 'ContentChannelId'
+                                   AND [EntityTypeQualifierValue] = CAST( @ChannelId AS NVARCHAR(20) ) );
+        IF @ChannelId IS NOT NULL AND @EpAttr IS NOT NULL
+           AND NOT EXISTS ( SELECT 1 FROM [ContentChannelItem] i
+                             JOIN [AttributeValue] av ON av.[EntityId] = i.[Id] AND av.[AttributeId] = @EpAttr
+                            WHERE i.[ContentChannelId] = @ChannelId AND av.[Value] = @episodeid )
+        BEGIN
+            INSERT INTO [ContentChannelItem]
+                ( [ContentChannelId], [ContentChannelTypeId], [Title], [Content],
+                  [Priority], [Status], [StartDateTime], [Order], [Guid],
+                  [CreatedDateTime], [ModifiedDateTime] )
+            VALUES ( @ChannelId, @TypeId, @eptitle, '', 0, 2,
+                     TRY_CONVERT( DATETIME, @epdate ), 0, NEWID(), GETDATE(), GETDATE() );
+            DECLARE @NewId INT = SCOPE_IDENTITY();
+            INSERT INTO [AttributeValue] ( [IsSystem], [AttributeId], [EntityId], [Value], [Guid] )
+            SELECT 0, a.[Id], @NewId,
+                   CASE a.[Key]
+                        WHEN 'EpisodeId'          THEN @episodeid
+                        WHEN 'FeedUrl'            THEN @epfeed
+                        WHEN 'AudioUrl'           THEN @epaudio
+                        WHEN 'ImageUrl'           THEN @epimage
+                        WHEN 'LinkAppPage'        THEN @detailpage
+                        WHEN 'LinkPageParameters' THEN '?EpisodeId=' + @episodeid
+                        WHEN 'LinkButtonText'     THEN 'Play Episode'
+                   END, NEWID()
+            FROM [Attribute] a
+            WHERE a.[EntityTypeQualifierColumn] = 'ContentChannelId'
+              AND a.[EntityTypeQualifierValue] = CAST( @ChannelId AS NVARCHAR(20) )
+              AND a.[Key] IN ( 'EpisodeId', 'FeedUrl', 'AudioUrl', 'ImageUrl',
+                               'LinkAppPage', 'LinkPageParameters', 'LinkButtonText' );
+        END
+    {% endsql %}
+    {% sql return:'savedRows' episodeid:'{{ episodeId }}' channelguid:'7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' personid:'{{ CurrentPerson.Id }}' %}
+        DECLARE @CciType INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+        SELECT TOP 1
+               i.[Id]    AS ItemId,
+               @CciType  AS TypeId,
+               CASE WHEN EXISTS ( SELECT 1 FROM [Following] f
+                                   JOIN [PersonAlias] pa ON pa.[Id] = f.[PersonAliasId] AND pa.[PersonId] = @personid
+                                  WHERE f.[EntityTypeId] = @CciType AND f.[EntityId] = i.[Id]
+                                    AND ISNULL( f.[PurposeKey], '' ) = '' )
+                    THEN 'true' ELSE 'false' END AS IsFollowed
+        FROM [ContentChannelItem] i
+        JOIN [ContentChannel] cc ON cc.[Id] = i.[ContentChannelId] AND cc.[Guid] = @channelguid
+        JOIN [Attribute] a ON a.[Key] = 'EpisodeId'
+                          AND a.[EntityTypeQualifierColumn] = 'ContentChannelId'
+                          AND a.[EntityTypeQualifierValue] = CAST( cc.[Id] AS NVARCHAR(20) )
+        JOIN [AttributeValue] av ON av.[AttributeId] = a.[Id] AND av.[EntityId] = i.[Id]
+                                AND av.[Value] = @episodeid
+    {% endsql %}
+    {%- for r in savedRows -%}
+        {%- assign savedItemId = r.ItemId -%}
+        {%- assign savedTypeId = r.TypeId -%}
+        {%- assign isSaved = r.IsFollowed -%}
+    {%- endfor -%}
+    {%- endif -%}
     {%- if found == false -%}
         {%- comment -%} the feed only holds the latest 30, so an episode that has
             aged out of it lands here rather than rendering blank {%- endcomment -%}
@@ -5953,8 +6580,27 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
                 Text=""{{ epDate | Date:'MMMM d, yyyy' }}{% if epDurMin > 0 %} &#8226; {{ epDurMin }} min{% endif %}"" />
         </VerticalStackLayout>
 
-        <Grid ColumnDefinitions=""*, *"" ColumnSpacing=""8"" StyleClass=""px-16, pt-16"">
+        <Grid ColumnDefinitions=""*, *, *"" ColumnSpacing=""8"" StyleClass=""px-16, pt-16"">
             <VerticalStackLayout Grid.Column=""0"" Spacing=""6"" HorizontalOptions=""Center"">
+                {%- comment -%} same attributes as the working Podcast Detail block (13512) {%- endcomment -%}
+                <Rock:FollowingIcon
+                    EntityTypeId=""{{ savedTypeId }}""
+                    EntityId=""{{ savedItemId }}""
+                    IsFollowed=""{{ isSaved }}""
+                    FontSize=""22""
+                    HorizontalOptions=""Center""
+                    FollowingIconClass=""heart""
+                    FollowingIconFamily=""FontAwesomeSolid""
+                    FollowingIconColor=""{Rock:PaletteColor App-Primary-Strong}""
+                    NotFollowingIconClass=""heart""
+                    NotFollowingIconFamily=""FontAwesomeRegular""
+                    NotFollowingIconColor=""{AppThemeBinding Light=#3F3F46, Dark=#E4E4E7}""
+                    NotLoggedInText=""Sign in to save this episode to your list."" />
+                <Label StyleClass=""caption1, font-weight-semi-bold, text-interface-medium""
+                    Text=""SAVE"" HorizontalOptions=""Center"" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Grid.Column=""1"" Spacing=""6"" HorizontalOptions=""Center"">
                 <Rock:Icon IconClass=""download"" IconFamily=""FontAwesomeSolid"" FontSize=""22""
                     StyleClass=""text-interface-stronger"" HorizontalOptions=""Center"" />
                 <Label StyleClass=""caption1, font-weight-semi-bold, text-interface-medium""
@@ -5965,7 +6611,7 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
                 </VerticalStackLayout.GestureRecognizers>
             </VerticalStackLayout>
 
-            <VerticalStackLayout Grid.Column=""1"" Spacing=""6"" HorizontalOptions=""Center"">
+            <VerticalStackLayout Grid.Column=""2"" Spacing=""6"" HorizontalOptions=""Center"">
                 <Rock:Icon IconClass=""share-square"" IconFamily=""FontAwesomeSolid"" FontSize=""22""
                     StyleClass=""text-interface-stronger"" HorizontalOptions=""Center"" />
                 <Label StyleClass=""caption1, font-weight-semi-bold, text-interface-medium""
@@ -5991,16 +6637,1369 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
         {%- endif -%}
     {%- endif -%}
 {% endwebrequest %}
-{% endcache %}
 </VerticalStackLayout>
 " );   // Content
-            RockMigrationHelper.AddBlockAttributeValue( "D62AF350-B197-4E3C-98D5-A0314C96E78B", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"WebRequest,Cache" );   // EnabledLavaCommands
+            RockMigrationHelper.AddBlockAttributeValue( "D62AF350-B197-4E3C-98D5-A0314C96E78B", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"WebRequest,Cache,Sql" );   // EnabledLavaCommands
             RockMigrationHelper.AddBlockAttributeValue( "D62AF350-B197-4E3C-98D5-A0314C96E78B", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
             RockMigrationHelper.AddBlockAttributeValue( "4B81C2D6-5E37-4A90-8F14-6C2093BD75AE", "A93E4436-B226-4911-8C9C-780D9F83C2A5", @"8df04e4b-9abf-477d-8cd2-d36ff06dbdb8|" );   // LandingTemplate
             RockMigrationHelper.AddBlockAttributeValue( "5C92D3E7-6F48-4B01-9025-7D31A4CE86BF", "B89B35C0-EC4C-43B9-89FF-13B67D5EF296", @"2204d103-a145-4003-9da0-1c9461d6baa1|" );   // LandingTemplate
             RockMigrationHelper.AddBlockAttributeValue( "5C92D3E7-6F48-4B01-9025-7D31A4CE86BF", "0894056C-B20F-4C80-9505-9BE289FC86F6", @"6" );   // FutureWeeksToShow
             RockMigrationHelper.AddBlockAttributeValue( "6DA3E4F8-7059-4C12-A136-8E42B5DF97C0", "476529FA-F47B-4AD7-8B8F-77E3BD72F3EA", @"fcfb9f90-9c94-4405-bbf9-df62dc85defd|" );   // TypeTemplate
             RockMigrationHelper.AddBlockAttributeValue( "6DA3E4F8-7059-4C12-A136-8E42B5DF97C0", "9B34B12E-0930-44E6-AE39-FB109E64E8EF", @"False" );   // IsDescriptionRequired
+            RockMigrationHelper.AddBlockAttributeValue( "09CB6D48-3E7A-4F95-B124-5D837CA9F6E3", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"{%- comment -%}
+    ===========================================================================
+    THE LUCAS MILES SHOW - LIST   (external RSS, no content channel)
+    ---------------------------------------------------------------------------
+    Same shape as the Nfluence podcast list block, with four differences that
+    come from Art19 rather than Buzzsprout. Verified against the live feed:
+
+    1. THE GUID IS NOT URL-SAFE
+       Buzzsprout:  Buzzsprout-19568132                       (19 chars)
+       Art19:       gid://art19-episode-locator/V0/NPhMOQ9f... (74 chars)
+       Passing that straight into ?EpisodeId= would put ""//"" and "":"" in a query
+       string. The last path segment is taken instead: 43 characters, unique
+       across all 119 episodes, and already URL-safe, so nothing has to be
+       encoded or decoded. Split drops the empty piece from ""//"", which is why
+       the id is Last and not parts[3].
+
+    2. EVERY EPISODE HAS ITS OWN ARTWORK
+       Art19 sets itunes:image on all 119 items and they are all different.
+       Buzzsprout sets none, so that block falls back to the show artwork for
+       every row. Here the episode image is used, show artwork behind it.
+
+    3. THE FULL ARCHIVE IS PRESENT, SO THIS PAGE PAGES
+       119 episodes, May 2017 - Oct 2021, not a 30-item window. Rendering
+       all of them measured 253,726 characters of XAML, so the list shows
+       25 at a time behind a Show More that fires {Binding Callback} and
+       re-renders in place. Set pageSize above 119 to disable paging.
+
+    4. itunes:author IS USUALLY ABSENT
+       Set on 2 of 119 items, so the channel author is the real source.
+
+    Caching is unchanged: {% cache %} server side, CacheDuration on the block.
+    ===========================================================================
+{%- endcomment -%}
+{%- assign feedUrl = 'https://rss.art19.com/the-lucas-miles-show' -%}
+{%- assign detailPageGuid = 'f8ba5c37-2d69-4e84-a013-4c726b98e5d2' -%}
+{%- assign durationKey = '{http://www.itunes.com/dtds/podcast-1.0.dtd}duration' -%}
+{%- assign imageKey = '{http://www.itunes.com/dtds/podcast-1.0.dtd}image' -%}
+{%- assign pageSize = 25 -%}
+{%- assign take = pageSize -%}
+
+<VerticalStackLayout Spacing=""0"">
+{% cache key:'lucas-miles-show-rss-list-{{ take }}' duration:'900' %}
+{% webrequest url:'{{ feedUrl }}' responsecontenttype:'xml' return:'feed' timeout:'20000' %}
+    {%- assign channel = feed.rss.channel -%}
+    {%- assign episodes = channel.item -%}
+    {%- assign artwork = '' -%}
+    {%- for img in channel.image limit:1 -%}{%- assign artwork = img.url -%}{%- endfor -%}
+
+    {%- if episodes == null or episodes == empty -%}
+        {%- comment -%} covers a dead feed, a timeout and a 500 alike: all three
+            leave episodes unset rather than throwing {%- endcomment -%}
+        <VerticalStackLayout Spacing=""12"" StyleClass=""p-32"" VerticalOptions=""Center"">
+            <Rock:Icon IconClass=""podcast"" IconFamily=""FontAwesomeSolid"" FontSize=""40""
+                StyleClass=""text-interface-soft"" HorizontalOptions=""Center"" />
+            <Label Text=""Episodes are unavailable right now.""
+                StyleClass=""title3, bold, text-interface-strongest""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+            <Label Text=""Please check back in a little while.""
+                StyleClass=""body, text-interface-medium""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+        </VerticalStackLayout>
+    {%- else -%}
+
+        <VerticalStackLayout Spacing=""10"" StyleClass=""p-16"">
+            {%- if artwork != '' and artwork != null -%}
+            <Rock:StyledBorder CornerRadius=""14"" StrokeThickness=""0"" Padding=""0""
+                HorizontalOptions=""Center"" WidthRequest=""150"" HeightRequest=""150"">
+                <Rock:Image Source=""{{ artwork | Escape }}"" Aspect=""AspectFill""
+                    HorizontalOptions=""Fill"" VerticalOptions=""Fill"" />
+            </Rock:StyledBorder>
+            {%- endif -%}
+            <Label Text=""{{ channel.title | Trim | Escape }}""
+                StyleClass=""title2, bold, text-interface-strongest""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+            <Label Text=""{{ episodes | Size }} episodes""
+                StyleClass=""caption1, text-interface-medium""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+        </VerticalStackLayout>
+
+        {%- assign epCount = episodes | Size -%}
+        {%- assign hasMore = false -%}
+        {%- if epCount > take -%}{%- assign hasMore = true -%}{%- endif -%}
+        <VerticalStackLayout Spacing=""0"" StyleClass=""px-16, pb-16"">
+            {%- for ep in episodes -%}
+            {%- if forloop.index0 < take -%}
+                {%- assign epTitle = ep.title | Trim -%}
+                {%- comment -%} last segment of the Art19 locator - see note 1 {%- endcomment -%}
+                {%- assign guidParts = ep.guid.Value | Split:'/' -%}
+                {%- assign epKey = guidParts | Last -%}
+                {%- assign epImg = ep[imageKey].href -%}
+                {%- if epImg == '' or epImg == null -%}{%- assign epImg = artwork -%}{%- endif -%}
+                {%- assign durSec = ep[durationKey] | AsInteger -%}
+                {%- assign durMin = durSec | DividedBy:60 | AsInteger -%}
+                <Rock:StyledBorder CornerRadius=""12"" Padding=""12"" StrokeThickness=""0""
+                    StyleClass=""bg-interface-softest"" Margin=""0,0,0,10"">
+                    <Rock:StyledBorder.GestureRecognizers>
+                        <TapGestureRecognizer Command=""{Binding PushPage}""
+                            CommandParameter=""{{ detailPageGuid }}?EpisodeId={{ epKey }}"" />
+                    </Rock:StyledBorder.GestureRecognizers>
+                    <Grid ColumnDefinitions=""64, *, Auto"" ColumnSpacing=""12"" VerticalOptions=""Center"">
+                        {%- if epImg != '' and epImg != null -%}
+                        <Rock:StyledBorder Grid.Column=""0"" CornerRadius=""8"" StrokeThickness=""0"" Padding=""0""
+                            WidthRequest=""64"" HeightRequest=""64"">
+                            <Rock:Image Source=""{{ epImg | Escape }}"" Aspect=""AspectFill""
+                                HorizontalOptions=""Fill"" VerticalOptions=""Fill"" />
+                        </Rock:StyledBorder>
+                        {%- endif -%}
+                        <VerticalStackLayout Grid.Column=""1"" Spacing=""3"" VerticalOptions=""Center"">
+                            <Label Text=""{{ epTitle | Escape }}""
+                                StyleClass=""body, bold, text-interface-strongest""
+                                LineBreakMode=""TailTruncation"" MaxLines=""2"" />
+                            <Label StyleClass=""caption1, text-interface-medium""
+                                Text=""{{ ep.pubDate | Date:'MMM d, yyyy' }}{% if durMin > 0 %} &#8226; {{ durMin }} min{% endif %}"" />
+                        </VerticalStackLayout>
+                        <Rock:Icon Grid.Column=""2"" IconClass=""chevron-right"" IconFamily=""FontAwesomeSolid""
+                            FontSize=""16"" StyleClass=""text-interface-soft"" VerticalOptions=""Center"" />
+                    </Grid>
+                </Rock:StyledBorder>
+            {%- endif -%}
+            {%- endfor -%}
+
+            {%- if hasMore -%}
+                {%- assign nextTake = take | Plus:pageSize -%}
+                {%- assign remaining = epCount | Minus:take -%}
+                <Button Text=""Show More ({{ remaining }} left)"" StyleClass=""btn, btn-primary""
+                    HorizontalOptions=""Center"" Margin=""0,4,0,8""
+                    Command=""{Binding Callback}"">
+                    <Button.CommandParameter>
+                        <Rock:CallbackParameters Name=""ShowMore"">
+                            <Rock:Parameter Name=""Take"" Value=""{{ nextTake }}"" />
+                        </Rock:CallbackParameters>
+                    </Button.CommandParameter>
+                </Button>
+            {%- endif -%}
+        </VerticalStackLayout>
+
+    {%- endif -%}
+{% endwebrequest %}
+{% endcache %}
+</VerticalStackLayout>
+" );   // Content
+            RockMigrationHelper.AddBlockAttributeValue( "09CB6D48-3E7A-4F95-B124-5D837CA9F6E3", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"WebRequest,Cache" );   // EnabledLavaCommands
+            RockMigrationHelper.AddBlockAttributeValue( "09CB6D48-3E7A-4F95-B124-5D837CA9F6E3", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
+            RockMigrationHelper.AddBlockAttributeValue( "09CB6D48-3E7A-4F95-B124-5D837CA9F6E3", "2725F971-243A-4B60-83EB-527BA8C08737", @"{%- comment -%}
+    ===========================================================================
+    THE LUCAS MILES SHOW - LIST   (external RSS, no content channel)
+    ---------------------------------------------------------------------------
+    Same shape as the Nfluence podcast list block, with four differences that
+    come from Art19 rather than Buzzsprout. Verified against the live feed:
+
+    1. THE GUID IS NOT URL-SAFE
+       Buzzsprout:  Buzzsprout-19568132                       (19 chars)
+       Art19:       gid://art19-episode-locator/V0/NPhMOQ9f... (74 chars)
+       Passing that straight into ?EpisodeId= would put ""//"" and "":"" in a query
+       string. The last path segment is taken instead: 43 characters, unique
+       across all 119 episodes, and already URL-safe, so nothing has to be
+       encoded or decoded. Split drops the empty piece from ""//"", which is why
+       the id is Last and not parts[3].
+
+    2. EVERY EPISODE HAS ITS OWN ARTWORK
+       Art19 sets itunes:image on all 119 items and they are all different.
+       Buzzsprout sets none, so that block falls back to the show artwork for
+       every row. Here the episode image is used, show artwork behind it.
+
+    3. THE FULL ARCHIVE IS PRESENT, SO THIS PAGE PAGES
+       119 episodes, May 2017 - Oct 2021, not a 30-item window. Rendering
+       all of them measured 253,726 characters of XAML, so the list shows
+       25 at a time behind a Show More that fires {Binding Callback} and
+       re-renders in place. Set pageSize above 119 to disable paging.
+
+    4. itunes:author IS USUALLY ABSENT
+       Set on 2 of 119 items, so the channel author is the real source.
+
+    Caching is unchanged: {% cache %} server side, CacheDuration on the block.
+    ===========================================================================
+{%- endcomment -%}
+{%- assign feedUrl = 'https://rss.art19.com/the-lucas-miles-show' -%}
+{%- assign detailPageGuid = 'f8ba5c37-2d69-4e84-a013-4c726b98e5d2' -%}
+{%- assign durationKey = '{http://www.itunes.com/dtds/podcast-1.0.dtd}duration' -%}
+{%- assign imageKey = '{http://www.itunes.com/dtds/podcast-1.0.dtd}image' -%}
+{%- assign pageSize = 25 -%}
+{%- assign take = Parameters.Take | AsInteger -%}
+{%- if take == null or take < 1 -%}{%- assign take = pageSize -%}{%- endif -%}
+
+{% if Command == 'ShowMore' %}
+<VerticalStackLayout Spacing=""0"">
+{% cache key:'lucas-miles-show-rss-list-{{ take }}' duration:'900' %}
+{% webrequest url:'{{ feedUrl }}' responsecontenttype:'xml' return:'feed' timeout:'20000' %}
+    {%- assign channel = feed.rss.channel -%}
+    {%- assign episodes = channel.item -%}
+    {%- assign artwork = '' -%}
+    {%- for img in channel.image limit:1 -%}{%- assign artwork = img.url -%}{%- endfor -%}
+
+    {%- if episodes == null or episodes == empty -%}
+        {%- comment -%} covers a dead feed, a timeout and a 500 alike: all three
+            leave episodes unset rather than throwing {%- endcomment -%}
+        <VerticalStackLayout Spacing=""12"" StyleClass=""p-32"" VerticalOptions=""Center"">
+            <Rock:Icon IconClass=""podcast"" IconFamily=""FontAwesomeSolid"" FontSize=""40""
+                StyleClass=""text-interface-soft"" HorizontalOptions=""Center"" />
+            <Label Text=""Episodes are unavailable right now.""
+                StyleClass=""title3, bold, text-interface-strongest""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+            <Label Text=""Please check back in a little while.""
+                StyleClass=""body, text-interface-medium""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+        </VerticalStackLayout>
+    {%- else -%}
+
+        <VerticalStackLayout Spacing=""10"" StyleClass=""p-16"">
+            {%- if artwork != '' and artwork != null -%}
+            <Rock:StyledBorder CornerRadius=""14"" StrokeThickness=""0"" Padding=""0""
+                HorizontalOptions=""Center"" WidthRequest=""150"" HeightRequest=""150"">
+                <Rock:Image Source=""{{ artwork | Escape }}"" Aspect=""AspectFill""
+                    HorizontalOptions=""Fill"" VerticalOptions=""Fill"" />
+            </Rock:StyledBorder>
+            {%- endif -%}
+            <Label Text=""{{ channel.title | Trim | Escape }}""
+                StyleClass=""title2, bold, text-interface-strongest""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+            <Label Text=""{{ episodes | Size }} episodes""
+                StyleClass=""caption1, text-interface-medium""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+        </VerticalStackLayout>
+
+        {%- assign epCount = episodes | Size -%}
+        {%- assign hasMore = false -%}
+        {%- if epCount > take -%}{%- assign hasMore = true -%}{%- endif -%}
+        <VerticalStackLayout Spacing=""0"" StyleClass=""px-16, pb-16"">
+            {%- for ep in episodes -%}
+            {%- if forloop.index0 < take -%}
+                {%- assign epTitle = ep.title | Trim -%}
+                {%- comment -%} last segment of the Art19 locator - see note 1 {%- endcomment -%}
+                {%- assign guidParts = ep.guid.Value | Split:'/' -%}
+                {%- assign epKey = guidParts | Last -%}
+                {%- assign epImg = ep[imageKey].href -%}
+                {%- if epImg == '' or epImg == null -%}{%- assign epImg = artwork -%}{%- endif -%}
+                {%- assign durSec = ep[durationKey] | AsInteger -%}
+                {%- assign durMin = durSec | DividedBy:60 | AsInteger -%}
+                <Rock:StyledBorder CornerRadius=""12"" Padding=""12"" StrokeThickness=""0""
+                    StyleClass=""bg-interface-softest"" Margin=""0,0,0,10"">
+                    <Rock:StyledBorder.GestureRecognizers>
+                        <TapGestureRecognizer Command=""{Binding PushPage}""
+                            CommandParameter=""{{ detailPageGuid }}?EpisodeId={{ epKey }}"" />
+                    </Rock:StyledBorder.GestureRecognizers>
+                    <Grid ColumnDefinitions=""64, *, Auto"" ColumnSpacing=""12"" VerticalOptions=""Center"">
+                        {%- if epImg != '' and epImg != null -%}
+                        <Rock:StyledBorder Grid.Column=""0"" CornerRadius=""8"" StrokeThickness=""0"" Padding=""0""
+                            WidthRequest=""64"" HeightRequest=""64"">
+                            <Rock:Image Source=""{{ epImg | Escape }}"" Aspect=""AspectFill""
+                                HorizontalOptions=""Fill"" VerticalOptions=""Fill"" />
+                        </Rock:StyledBorder>
+                        {%- endif -%}
+                        <VerticalStackLayout Grid.Column=""1"" Spacing=""3"" VerticalOptions=""Center"">
+                            <Label Text=""{{ epTitle | Escape }}""
+                                StyleClass=""body, bold, text-interface-strongest""
+                                LineBreakMode=""TailTruncation"" MaxLines=""2"" />
+                            <Label StyleClass=""caption1, text-interface-medium""
+                                Text=""{{ ep.pubDate | Date:'MMM d, yyyy' }}{% if durMin > 0 %} &#8226; {{ durMin }} min{% endif %}"" />
+                        </VerticalStackLayout>
+                        <Rock:Icon Grid.Column=""2"" IconClass=""chevron-right"" IconFamily=""FontAwesomeSolid""
+                            FontSize=""16"" StyleClass=""text-interface-soft"" VerticalOptions=""Center"" />
+                    </Grid>
+                </Rock:StyledBorder>
+            {%- endif -%}
+            {%- endfor -%}
+
+            {%- if hasMore -%}
+                {%- assign nextTake = take | Plus:pageSize -%}
+                {%- assign remaining = epCount | Minus:take -%}
+                <Button Text=""Show More ({{ remaining }} left)"" StyleClass=""btn, btn-primary""
+                    HorizontalOptions=""Center"" Margin=""0,4,0,8""
+                    Command=""{Binding Callback}"">
+                    <Button.CommandParameter>
+                        <Rock:CallbackParameters Name=""ShowMore"">
+                            <Rock:Parameter Name=""Take"" Value=""{{ nextTake }}"" />
+                        </Rock:CallbackParameters>
+                    </Button.CommandParameter>
+                </Button>
+            {%- endif -%}
+        </VerticalStackLayout>
+
+    {%- endif -%}
+{% endwebrequest %}
+{% endcache %}
+</VerticalStackLayout>
+{% endif %}
+" );   // CallbackLogic
+            RockMigrationHelper.AddBlockAttributeValue( "1ADC7E59-4F8B-40A6-A235-6E948DBA07F4", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"{%- comment -%}
+    ===========================================================================
+    THE LUCAS MILES SHOW - EPISODE DETAIL   (external RSS, no content channel)
+    ---------------------------------------------------------------------------
+    Arrives as ?EpisodeId=<43-char key>, which is the LAST SEGMENT of the Art19
+    guid, not the guid itself:
+
+        gid://art19-episode-locator/V0/NPhMOQ9f_15JPYp3f0Pm9BFKJcNtYSe9MSwe-28JI2k
+                                       ^------------ this part -------------^
+
+    The whole locator carries ""//"" and "":"" and cannot sit in a query string
+    without encoding. The tail is unique across all 119 episodes and already
+    URL-safe, so it travels as-is, and the match below re-derives it the same
+    way rather than comparing the full guid.
+
+    Art19 also sets itunes:image per episode (Buzzsprout sets none), so the
+    player overlay uses the episode artwork with the show artwork behind it,
+    and itunes:author is present on only 2 of 119 items, so the subtitle falls
+    back to the channel author. The feed has no per-episode endpoint, so the
+    whole 385KB is re-read and the matching item picked out - which is why the
+    server-side {% cache %} matters here far more than on the list.
+
+    NO {% cache %} HERE - DELIBERATELY.
+    This body renders per-person state (the FollowingIcon's EntityId and
+    IsFollowed) and performs a write (the item is created on view), neither of
+    which belongs in a cache keyed only by episode. Rock's CacheBlock also
+    hashes only the block BODY, so changing EnabledLavaCommands or
+    DynamicContent does not invalidate it - a bad render then survives the fix
+    for the full duration. The block's own CacheDuration still limits how often
+    a device re-fetches.
+
+
+    Confirmed against the decompiled shell (BlockBase.GetCachedValueAsync), not
+    assumed: the cache key is
+
+        block-{BlockGuid}-{sorted querystring}-initialContent
+
+    so two different EpisodeId keys are different entries and cannot serve
+    each other's content. The old content-channel Podcast Detail (13512) sits
+    at 0, but that is a preference, not a requirement.
+
+    The {% cache %} below is a separate, server-side layer keyed by episode id.
+    It is what stops each device pulling 385KB from Art19 on a cache miss.
+
+    Show notes come through as HTML, so they go into Rock:Html inside CDATA
+    rather than being escaped - the same treatment block 13512 gives its body.
+    ===========================================================================
+{%- endcomment -%}
+{%- assign feedUrl = 'https://rss.art19.com/the-lucas-miles-show' -%}
+{%- assign episodeId = PageParameter.EpisodeId -%}
+{%- assign durationKey = '{http://www.itunes.com/dtds/podcast-1.0.dtd}duration' -%}
+{%- assign contentKey = '{http://purl.org/rss/1.0/modules/content/}encoded' -%}
+{%- assign authorKey = '{http://www.itunes.com/dtds/podcast-1.0.dtd}author' -%}
+{%- assign imageKey = '{http://www.itunes.com/dtds/podcast-1.0.dtd}image' -%}
+
+<VerticalStackLayout Spacing=""0"" StyleClass=""pb-16"">
+{% webrequest url:'{{ feedUrl }}' responsecontenttype:'xml' return:'feed' timeout:'20000' %}
+    {%- assign channel = feed.rss.channel -%}
+    {%- assign chAuthor = channel[authorKey] -%}
+    {%- assign artwork = '' -%}
+    {%- for img in channel.image limit:1 -%}{%- assign artwork = img.url -%}{%- endfor -%}
+
+    {%- comment -%} assigns inside a for survive it, so the match is carried out {%- endcomment -%}
+    {%- assign found = false -%}
+    {%- assign epTitle = '' -%}
+    {%- assign epAudio = '' -%}
+    {%- assign epDate = '' -%}
+    {%- assign epNotes = '' -%}
+    {%- assign epAuthor = '' -%}
+    {%- assign epImg = '' -%}
+    {%- assign epDurSec = 0 -%}
+    {%- for ep in channel.item -%}
+        {%- comment -%} Split drops the empty piece from ""//"", so the id is
+            Last rather than parts[3] {%- endcomment -%}
+        {%- assign guidParts = ep.guid.Value | Split:'/' -%}
+        {%- assign thisKey = guidParts | Last -%}
+        {%- if found == false and thisKey == episodeId -%}
+            {%- assign found = true -%}
+            {%- assign epTitle = ep.title | Trim -%}
+            {%- assign epAudio = ep.enclosure.url -%}
+            {%- assign epDate = ep.pubDate -%}
+            {%- assign epAuthor = ep[authorKey] -%}
+            {%- assign epImg = ep[imageKey].href -%}
+            {%- assign epDurSec = ep[durationKey] | AsInteger -%}
+            {%- assign epNotes = ep[contentKey] -%}
+            {%- if epNotes == '' or epNotes == null -%}{%- assign epNotes = ep.description -%}{%- endif -%}
+        {%- endif -%}
+    {%- endfor -%}
+    {%- if epAuthor == '' or epAuthor == null -%}{%- assign epAuthor = chAuthor -%}{%- endif -%}
+    {%- if epImg == '' or epImg == null -%}{%- assign epImg = artwork -%}{%- endif -%}
+
+
+    {%- comment -%} ===== the saved item =====
+        FollowingIcon needs an EntityId, so the item is created on VIEW by a
+        signed-in person. Anonymous visitors fall through with EntityId 0 and
+        get the sign-in prompt when they tap. {%- endcomment -%}
+    {%- assign savedItemId = 0 -%}
+    {%- assign savedTypeId = 0 -%}
+    {%- assign isSaved = 'false' -%}
+    {%- if CurrentPerson and found -%}
+    {% sql statement:'command' episodeid:'{{ episodeId }}' channelguid:'7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' eptitle:'{{ epTitle | Escape }}' epaudio:'{{ epAudio }}' epimage:'{{ epImg }}' epfeed:'{{ feedUrl }}' epdate:'{{ epDate | Date:""yyyy-MM-dd HH:mm:ss"" }}' detailpage:'f8ba5c37-2d69-4e84-a013-4c726b98e5d2' %}
+        DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = @channelguid );
+        DECLARE @TypeId INT = ( SELECT TOP 1 [ContentChannelTypeId] FROM [ContentChannel] WHERE [Id] = @ChannelId );
+        DECLARE @EpAttr INT = ( SELECT TOP 1 [Id] FROM [Attribute]
+                                 WHERE [Key] = 'EpisodeId' AND [EntityTypeQualifierColumn] = 'ContentChannelId'
+                                   AND [EntityTypeQualifierValue] = CAST( @ChannelId AS NVARCHAR(20) ) );
+        IF @ChannelId IS NOT NULL AND @EpAttr IS NOT NULL
+           AND NOT EXISTS ( SELECT 1 FROM [ContentChannelItem] i
+                             JOIN [AttributeValue] av ON av.[EntityId] = i.[Id] AND av.[AttributeId] = @EpAttr
+                            WHERE i.[ContentChannelId] = @ChannelId AND av.[Value] = @episodeid )
+        BEGIN
+            INSERT INTO [ContentChannelItem]
+                ( [ContentChannelId], [ContentChannelTypeId], [Title], [Content],
+                  [Priority], [Status], [StartDateTime], [Order], [Guid],
+                  [CreatedDateTime], [ModifiedDateTime] )
+            VALUES ( @ChannelId, @TypeId, @eptitle, '', 0, 2,
+                     TRY_CONVERT( DATETIME, @epdate ), 0, NEWID(), GETDATE(), GETDATE() );
+            DECLARE @NewId INT = SCOPE_IDENTITY();
+            INSERT INTO [AttributeValue] ( [IsSystem], [AttributeId], [EntityId], [Value], [Guid] )
+            SELECT 0, a.[Id], @NewId,
+                   CASE a.[Key]
+                        WHEN 'EpisodeId'          THEN @episodeid
+                        WHEN 'FeedUrl'            THEN @epfeed
+                        WHEN 'AudioUrl'           THEN @epaudio
+                        WHEN 'ImageUrl'           THEN @epimage
+                        WHEN 'LinkAppPage'        THEN @detailpage
+                        WHEN 'LinkPageParameters' THEN '?EpisodeId=' + @episodeid
+                        WHEN 'LinkButtonText'     THEN 'Play Episode'
+                   END, NEWID()
+            FROM [Attribute] a
+            WHERE a.[EntityTypeQualifierColumn] = 'ContentChannelId'
+              AND a.[EntityTypeQualifierValue] = CAST( @ChannelId AS NVARCHAR(20) )
+              AND a.[Key] IN ( 'EpisodeId', 'FeedUrl', 'AudioUrl', 'ImageUrl',
+                               'LinkAppPage', 'LinkPageParameters', 'LinkButtonText' );
+        END
+    {% endsql %}
+    {% sql return:'savedRows' episodeid:'{{ episodeId }}' channelguid:'7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' personid:'{{ CurrentPerson.Id }}' %}
+        DECLARE @CciType INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+        SELECT TOP 1
+               i.[Id]    AS ItemId,
+               @CciType  AS TypeId,
+               CASE WHEN EXISTS ( SELECT 1 FROM [Following] f
+                                   JOIN [PersonAlias] pa ON pa.[Id] = f.[PersonAliasId] AND pa.[PersonId] = @personid
+                                  WHERE f.[EntityTypeId] = @CciType AND f.[EntityId] = i.[Id]
+                                    AND ISNULL( f.[PurposeKey], '' ) = '' )
+                    THEN 'true' ELSE 'false' END AS IsFollowed
+        FROM [ContentChannelItem] i
+        JOIN [ContentChannel] cc ON cc.[Id] = i.[ContentChannelId] AND cc.[Guid] = @channelguid
+        JOIN [Attribute] a ON a.[Key] = 'EpisodeId'
+                          AND a.[EntityTypeQualifierColumn] = 'ContentChannelId'
+                          AND a.[EntityTypeQualifierValue] = CAST( cc.[Id] AS NVARCHAR(20) )
+        JOIN [AttributeValue] av ON av.[AttributeId] = a.[Id] AND av.[EntityId] = i.[Id]
+                                AND av.[Value] = @episodeid
+    {% endsql %}
+    {%- for r in savedRows -%}
+        {%- assign savedItemId = r.ItemId -%}
+        {%- assign savedTypeId = r.TypeId -%}
+        {%- assign isSaved = r.IsFollowed -%}
+    {%- endfor -%}
+    {%- endif -%}
+    {%- if found == false -%}
+        {%- comment -%} the whole archive is in this feed, so this is a bad or
+            stale EpisodeId rather than an aged-out episode {%- endcomment -%}
+        <VerticalStackLayout Spacing=""12"" StyleClass=""p-32"" VerticalOptions=""Center"">
+            <Rock:Icon IconClass=""circle-question"" IconFamily=""FontAwesomeSolid"" FontSize=""40""
+                StyleClass=""text-interface-soft"" HorizontalOptions=""Center"" />
+            <Label Text=""This episode could not be found.""
+                StyleClass=""title3, bold, text-interface-strongest""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+            <Label Text=""It may have been removed from the feed.""
+                StyleClass=""body, text-interface-medium""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+            <Button Text=""Back"" StyleClass=""btn, btn-primary"" HorizontalOptions=""Center""
+                Command=""{Binding PopPage}"" Margin=""0,8,0,0"" />
+        </VerticalStackLayout>
+    {%- else -%}
+        {%- assign epDurMin = epDurSec | DividedBy:60 | AsInteger -%}
+
+        <Rock:MediaPlayer x:Name=""episodePlayer""
+            Source=""{{ epAudio | Escape }}""
+            Title=""{{ epTitle | Escape }}""
+            Subtitle=""{{ epAuthor | Escape }}""
+            ShowThumbnail=""false""
+            IsCastEnabled=""true""
+            MeasureWithAspectRatio=""false""
+            HeightRequest=""300"">
+            <Rock:MediaPlayer.OverlayContent>
+                <Grid InputTransparent=""False"">
+                    {% if epImg != '' and epImg != null %}
+                    <Rock:StyledBorder StrokeThickness=""0"" StyleClass=""bg-interface-softest""
+                        HorizontalOptions=""Fill"" VerticalOptions=""Fill"" />
+                    <Rock:Image Source=""{{ epImg | Escape }}"" Aspect=""AspectFill""
+                        HorizontalOptions=""Fill"" VerticalOptions=""Fill"" />
+                    {% endif %}
+
+                    <Rock:StyledBorder WidthRequest=""70"" HeightRequest=""70"" CornerRadius=""35"" Padding=""0""
+                        HorizontalOptions=""Center"" VerticalOptions=""Center"" InputTransparent=""False""
+                        StrokeThickness=""3"" Stroke=""#FFFFFF""
+                        BackgroundColor=""{Rock:PaletteColor App-Primary-Strong}"">
+                        <Rock:StyledBorder.Shadow><Shadow Brush=""#000000"" Offset=""0,2"" Radius=""10"" Opacity=""0.45"" /></Rock:StyledBorder.Shadow>
+                        <Rock:Icon IconClass=""play"" IconFamily=""FontAwesomeSolid"" FontSize=""28""
+                            TextColor=""#FFFFFF"" HorizontalOptions=""Center"" VerticalOptions=""Center"" />
+                        <Rock:StyledBorder.GestureRecognizers>
+                            <TapGestureRecognizer Command=""{Binding PlayCommand}"" />
+                        </Rock:StyledBorder.GestureRecognizers>
+                        <Rock:StyledBorder.Triggers>
+                            <DataTrigger TargetType=""Rock:StyledBorder""
+                                Binding=""{Binding Source={x:Reference episodePlayer}, Path=CurrentState}"" Value=""Playing"">
+                                <Setter Property=""IsVisible"" Value=""False"" />
+                            </DataTrigger>
+                        </Rock:StyledBorder.Triggers>
+                    </Rock:StyledBorder>
+
+                    <Rock:StyledBorder WidthRequest=""70"" HeightRequest=""70"" CornerRadius=""35"" Padding=""0""
+                        HorizontalOptions=""Center"" VerticalOptions=""Center"" IsVisible=""False"" InputTransparent=""False""
+                        StrokeThickness=""3"" Stroke=""#FFFFFF""
+                        BackgroundColor=""{Rock:PaletteColor App-Primary-Strong}"">
+                        <Rock:StyledBorder.Shadow><Shadow Brush=""#000000"" Offset=""0,2"" Radius=""10"" Opacity=""0.45"" /></Rock:StyledBorder.Shadow>
+                        <Rock:Icon IconClass=""pause"" IconFamily=""FontAwesomeSolid"" FontSize=""28""
+                            TextColor=""#FFFFFF"" HorizontalOptions=""Center"" VerticalOptions=""Center"" />
+                        <Rock:StyledBorder.GestureRecognizers>
+                            <TapGestureRecognizer Command=""{Binding PauseCommand}"" />
+                        </Rock:StyledBorder.GestureRecognizers>
+                        <Rock:StyledBorder.Triggers>
+                            <DataTrigger TargetType=""Rock:StyledBorder""
+                                Binding=""{Binding Source={x:Reference episodePlayer}, Path=CurrentState}"" Value=""Playing"">
+                                <Setter Property=""IsVisible"" Value=""True"" />
+                            </DataTrigger>
+                        </Rock:StyledBorder.Triggers>
+                    </Rock:StyledBorder>
+                </Grid>
+            </Rock:MediaPlayer.OverlayContent>
+        </Rock:MediaPlayer>
+
+        <VerticalStackLayout Spacing=""4"" StyleClass=""px-16, pt-16"">
+            <Label Text=""{{ epTitle | Escape }}"" StyleClass=""title3, bold, text-interface-strongest"" />
+            <Label StyleClass=""caption1, text-interface-medium""
+                Text=""{{ epDate | Date:'MMMM d, yyyy' }}{% if epDurMin > 0 %} &#8226; {{ epDurMin }} min{% endif %}"" />
+        </VerticalStackLayout>
+
+        <Grid ColumnDefinitions=""*, *, *"" ColumnSpacing=""8"" StyleClass=""px-16, pt-16"">
+            <VerticalStackLayout Grid.Column=""0"" Spacing=""6"" HorizontalOptions=""Center"">
+                {%- comment -%} same attributes as the working Podcast Detail block (13512) {%- endcomment -%}
+                <Rock:FollowingIcon
+                    EntityTypeId=""{{ savedTypeId }}""
+                    EntityId=""{{ savedItemId }}""
+                    IsFollowed=""{{ isSaved }}""
+                    FontSize=""22""
+                    HorizontalOptions=""Center""
+                    FollowingIconClass=""heart""
+                    FollowingIconFamily=""FontAwesomeSolid""
+                    FollowingIconColor=""{Rock:PaletteColor App-Primary-Strong}""
+                    NotFollowingIconClass=""heart""
+                    NotFollowingIconFamily=""FontAwesomeRegular""
+                    NotFollowingIconColor=""{AppThemeBinding Light=#3F3F46, Dark=#E4E4E7}""
+                    NotLoggedInText=""Sign in to save this episode to your list."" />
+                <Label StyleClass=""caption1, font-weight-semi-bold, text-interface-medium""
+                    Text=""SAVE"" HorizontalOptions=""Center"" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Grid.Column=""1"" Spacing=""6"" HorizontalOptions=""Center"">
+                <Rock:Icon IconClass=""download"" IconFamily=""FontAwesomeSolid"" FontSize=""22""
+                    StyleClass=""text-interface-stronger"" HorizontalOptions=""Center"" />
+                <Label StyleClass=""caption1, font-weight-semi-bold, text-interface-medium""
+                    Text=""DOWNLOAD"" HorizontalOptions=""Center"" />
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command=""{Binding OpenExternalBrowser}""
+                        CommandParameter=""{{ epAudio | Escape }}"" />
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Grid.Column=""2"" Spacing=""6"" HorizontalOptions=""Center"">
+                <Rock:Icon IconClass=""share-square"" IconFamily=""FontAwesomeSolid"" FontSize=""22""
+                    StyleClass=""text-interface-stronger"" HorizontalOptions=""Center"" />
+                <Label StyleClass=""caption1, font-weight-semi-bold, text-interface-medium""
+                    Text=""SHARE"" HorizontalOptions=""Center"" />
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command=""{Binding ShareContent}"">
+                        <TapGestureRecognizer.CommandParameter>
+                            <Rock:ShareContentParameters
+                                Title=""{{ epTitle | Escape }}""
+                                Text=""{{ epTitle | Escape }}""
+                                Uri=""{{ epAudio | Escape }}"" />
+                        </TapGestureRecognizer.CommandParameter>
+                    </TapGestureRecognizer>
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+        </Grid>
+
+        {%- if epNotes != '' and epNotes != null -%}
+        <VerticalStackLayout Spacing=""10"" StyleClass=""px-16, pt-12"">
+            <BoxView HeightRequest=""1"" StyleClass=""bg-interface-softer"" />
+            <Rock:Html><![CDATA[{{ epNotes }}]]></Rock:Html>
+        </VerticalStackLayout>
+        {%- endif -%}
+    {%- endif -%}
+{% endwebrequest %}
+</VerticalStackLayout>
+" );   // Content
+            RockMigrationHelper.AddBlockAttributeValue( "1ADC7E59-4F8B-40A6-A235-6E948DBA07F4", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"Cache,Sql,WebRequest" );   // EnabledLavaCommands
+            RockMigrationHelper.AddBlockAttributeValue( "1ADC7E59-4F8B-40A6-A235-6E948DBA07F4", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
+            RockMigrationHelper.AddBlockAttributeValue( "E6F93A04-7CB5-4D28-A143-90526E8BD7CA", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"{%- comment -%}
+    ===========================================================================
+    STRONG CHURCH - LIST   (external RSS, no content channel)
+    ---------------------------------------------------------------------------
+    Same shape as the other two podcast list blocks. Differences that come from
+    Anchor/Spotify rather than Buzzsprout or Art19, all verified against the
+    live feed:
+
+    1. DURATION IS HH:MM:SS, NOT SECONDS
+       Buzzsprout/Art19:  3248
+       Anchor:            00:20:55
+       `| AsInteger` on that renders EMPTY, so the duration simply disappeared.
+       The parser below handles HH:MM:SS, MM:SS and a bare second count.
+
+    2. THERE IS NO <channel><image>
+       Only <itunes:image href>. The usual `for img in channel.image` loop finds
+       nothing, so the show artwork fell back to blank everywhere. Read from the
+       itunes tag when the standard one is absent.
+
+    3. NO content:encoded ANYWHERE
+       Absent on all 37 items; <description> carries the notes instead. The
+       existing fallback already covers it.
+
+    4. THE GUID IS A PLAIN UUID
+       36 chars, unique, URL-safe - so it goes into ?EpisodeId= as-is, with none
+       of the Split/Last the Art19 locator needs.
+
+    37 episodes, Apr 2025 - May 2026, so no paging: the whole list is one page.
+
+    Caching is unchanged: {% cache %} server side, CacheDuration on the block.
+    ===========================================================================
+{%- endcomment -%}
+{%- assign feedUrl = 'https://anchor.fm/s/101f257cc/podcast/rss' -%}
+{%- assign detailPageGuid = 'd5e82f93-6ba4-4c17-9032-8f415d7ac6b9' -%}
+{%- assign durationKey = '{http://www.itunes.com/dtds/podcast-1.0.dtd}duration' -%}
+{%- assign imageKey = '{http://www.itunes.com/dtds/podcast-1.0.dtd}image' -%}
+
+<VerticalStackLayout Spacing=""0"">
+{% cache key:'strong-church-rss-list' duration:'900' %}
+{% webrequest url:'{{ feedUrl }}' responsecontenttype:'xml' return:'feed' timeout:'20000' %}
+    {%- assign channel = feed.rss.channel -%}
+    {%- assign episodes = channel.item -%}
+    {%- comment -%} this feed has no <channel><image>, only <itunes:image href> {%- endcomment -%}
+    {%- assign artwork = '' -%}
+    {%- for img in channel.image limit:1 -%}{%- assign artwork = img.url -%}{%- endfor -%}
+    {%- if artwork == '' or artwork == null -%}{%- assign artwork = channel[imageKey].href -%}{%- endif -%}
+
+    {%- if episodes == null or episodes == empty -%}
+        {%- comment -%} covers a dead feed, a timeout and a 500 alike: all three
+            leave episodes unset rather than throwing {%- endcomment -%}
+        <VerticalStackLayout Spacing=""12"" StyleClass=""p-32"" VerticalOptions=""Center"">
+            <Rock:Icon IconClass=""podcast"" IconFamily=""FontAwesomeSolid"" FontSize=""40""
+                StyleClass=""text-interface-soft"" HorizontalOptions=""Center"" />
+            <Label Text=""Episodes are unavailable right now.""
+                StyleClass=""title3, bold, text-interface-strongest""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+            <Label Text=""Please check back in a little while.""
+                StyleClass=""body, text-interface-medium""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+        </VerticalStackLayout>
+    {%- else -%}
+
+        <VerticalStackLayout Spacing=""10"" StyleClass=""p-16"">
+            {%- if artwork != '' and artwork != null -%}
+            <Rock:StyledBorder CornerRadius=""14"" StrokeThickness=""0"" Padding=""0""
+                HorizontalOptions=""Center"" WidthRequest=""150"" HeightRequest=""150"">
+                <Rock:Image Source=""{{ artwork | Escape }}"" Aspect=""AspectFill""
+                    HorizontalOptions=""Fill"" VerticalOptions=""Fill"" />
+            </Rock:StyledBorder>
+            {%- endif -%}
+            <Label Text=""{{ channel.title | Trim | Escape }}""
+                StyleClass=""title2, bold, text-interface-strongest""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+            <Label Text=""{{ episodes | Size }} episodes""
+                StyleClass=""caption1, text-interface-medium""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Spacing=""0"" StyleClass=""px-16, pb-16"">
+            {%- for ep in episodes -%}
+                {%- assign epTitle = ep.title | Trim -%}
+                {%- assign epKey = ep.guid.Value -%}
+                {%- comment -%} ROW THUMBNAILS USE THE SHOW ARTWORK, NOT THE EPISODE'S.
+                    This feed's episode art is 3000x3000 / 4.4MB - about 34MB once
+                    decoded - and there are 36 DISTINCT images across the 37 rows.
+                    Decoding those for 64x64 thumbnails is well over a gigabyte of
+                    bitmap, which is what was killing the app on an iPod touch. The
+                    CDN ignores every resize parameter, so the only lever is how
+                    many distinct images the page asks for: one, reused by the
+                    platform image cache, instead of 36.
+
+                    The DETAIL page still shows the episode's own art - one image
+                    there is affordable. Set useEpisodeArtInRows to true to go back,
+                    but only for a feed with sanely sized artwork. {%- endcomment -%}
+                {%- assign useEpisodeArtInRows = false -%}
+                {%- assign epImg = artwork -%}
+                {%- if useEpisodeArtInRows -%}
+                    {%- assign epImg = ep[imageKey].href -%}
+                    {%- if epImg == '' or epImg == null -%}{%- assign epImg = artwork -%}{%- endif -%}
+                {%- endif -%}
+                {%- comment -%} Anchor writes HH:MM:SS where Buzzsprout and Art19 write
+                    a number of seconds. AsInteger on ""00:20:55"" yields nothing, so the
+                    duration silently vanished. All three shapes are handled. {%- endcomment -%}
+                {%- assign durParts = ep[durationKey] | Split:':' -%}
+                {%- assign durSize = durParts | Size -%}
+                {%- assign durMin = 0 -%}
+                {%- if durSize == 3 -%}{%- assign durMin = durParts[0] | AsInteger | Times:60 | Plus:durParts[1] -%}
+                {%- elsif durSize == 2 -%}{%- assign durMin = durParts[0] | AsInteger -%}
+                {%- else -%}{%- assign durMin = ep[durationKey] | AsInteger | DividedBy:60 | AsInteger -%}{%- endif -%}
+                <Rock:StyledBorder CornerRadius=""12"" Padding=""12"" StrokeThickness=""0""
+                    StyleClass=""bg-interface-softest"" Margin=""0,0,0,10"">
+                    <Rock:StyledBorder.GestureRecognizers>
+                        <TapGestureRecognizer Command=""{Binding PushPage}""
+                            CommandParameter=""{{ detailPageGuid }}?EpisodeId={{ epKey }}"" />
+                    </Rock:StyledBorder.GestureRecognizers>
+                    <Grid ColumnDefinitions=""64, *, Auto"" ColumnSpacing=""12"" VerticalOptions=""Center"">
+                        {%- if epImg != '' and epImg != null -%}
+                        <Rock:StyledBorder Grid.Column=""0"" CornerRadius=""8"" StrokeThickness=""0"" Padding=""0""
+                            WidthRequest=""64"" HeightRequest=""64"">
+                            <Rock:Image Source=""{{ epImg | Escape }}"" Aspect=""AspectFill""
+                                HorizontalOptions=""Fill"" VerticalOptions=""Fill"" />
+                        </Rock:StyledBorder>
+                        {%- endif -%}
+                        <VerticalStackLayout Grid.Column=""1"" Spacing=""3"" VerticalOptions=""Center"">
+                            <Label Text=""{{ epTitle | Escape }}""
+                                StyleClass=""body, bold, text-interface-strongest""
+                                LineBreakMode=""TailTruncation"" MaxLines=""2"" />
+                            <Label StyleClass=""caption1, text-interface-medium""
+                                Text=""{{ ep.pubDate | Date:'MMM d, yyyy' }}{% if durMin > 0 %} &#8226; {{ durMin }} min{% endif %}"" />
+                        </VerticalStackLayout>
+                        <Rock:Icon Grid.Column=""2"" IconClass=""chevron-right"" IconFamily=""FontAwesomeSolid""
+                            FontSize=""16"" StyleClass=""text-interface-soft"" VerticalOptions=""Center"" />
+                    </Grid>
+                </Rock:StyledBorder>
+            {%- endfor -%}
+        </VerticalStackLayout>
+
+    {%- endif -%}
+{% endwebrequest %}
+{% endcache %}
+</VerticalStackLayout>
+" );   // Content
+            RockMigrationHelper.AddBlockAttributeValue( "E6F93A04-7CB5-4D28-A143-90526E8BD7CA", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"WebRequest,Cache" );   // EnabledLavaCommands
+            RockMigrationHelper.AddBlockAttributeValue( "E6F93A04-7CB5-4D28-A143-90526E8BD7CA", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
+            RockMigrationHelper.AddBlockAttributeValue( "F70A4B15-8DC6-4E39-B254-A1637F9CE8DB", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"{%- comment -%}
+    ===========================================================================
+    STRONG CHURCH - EPISODE DETAIL   (external RSS, no content channel)
+    ---------------------------------------------------------------------------
+    Arrives as ?EpisodeId=<uuid>. This feed's guid is a plain 36-character UUID,
+    unique and URL-safe, so unlike the Art19 locator it travels as-is and is
+    compared as-is - no Split/Last.
+
+    Two things about this feed differ from the other two, and both are handled
+    below rather than inherited:
+
+      itunes:duration is HH:MM:SS, not a second count. `| AsInteger` on
+      ""00:20:55"" renders EMPTY, so the duration disappeared.
+
+      There is no <channel><image>, only <itunes:image href>, so the show
+      artwork behind the player has to come from the itunes tag.
+
+    content:encoded is absent on all 37 items; the existing fallback to
+    <description> is what makes the show notes render.
+
+    The feed has no per-episode endpoint, so the whole 150KB is re-read and the
+    matching item picked out - which is why the server-side {% cache %} matters
+    here far more than on the list.
+
+    NO {% cache %} HERE - DELIBERATELY.
+    This body renders per-person state (the FollowingIcon's EntityId and
+    IsFollowed) and performs a write (the item is created on view), neither of
+    which belongs in a cache keyed only by episode. Rock's CacheBlock also
+    hashes only the block BODY, so changing EnabledLavaCommands or
+    DynamicContent does not invalidate it - a bad render then survives the fix
+    for the full duration. The block's own CacheDuration still limits how often
+    a device re-fetches.
+
+
+    Confirmed against the decompiled shell (BlockBase.GetCachedValueAsync), not
+    assumed: the cache key is
+
+        block-{BlockGuid}-{sorted querystring}-initialContent
+
+    so two different EpisodeId keys are different entries and cannot serve
+    each other's content. The old content-channel Podcast Detail (13512) sits
+    at 0, but that is a preference, not a requirement.
+
+    The {% cache %} below is a separate, server-side layer keyed by episode id.
+    It is what stops each device pulling 150KB from Anchor on a cache miss.
+
+    Show notes come through as HTML, so they go into Rock:Html inside CDATA
+    rather than being escaped - the same treatment block 13512 gives its body.
+    ===========================================================================
+{%- endcomment -%}
+{%- assign feedUrl = 'https://anchor.fm/s/101f257cc/podcast/rss' -%}
+{%- assign episodeId = PageParameter.EpisodeId -%}
+{%- assign durationKey = '{http://www.itunes.com/dtds/podcast-1.0.dtd}duration' -%}
+{%- assign contentKey = '{http://purl.org/rss/1.0/modules/content/}encoded' -%}
+{%- assign authorKey = '{http://www.itunes.com/dtds/podcast-1.0.dtd}author' -%}
+{%- assign imageKey = '{http://www.itunes.com/dtds/podcast-1.0.dtd}image' -%}
+
+<VerticalStackLayout Spacing=""0"" StyleClass=""pb-16"">
+{% webrequest url:'{{ feedUrl }}' responsecontenttype:'xml' return:'feed' timeout:'20000' %}
+    {%- assign channel = feed.rss.channel -%}
+    {%- assign chAuthor = channel[authorKey] -%}
+    {%- comment -%} this feed has no <channel><image>, only <itunes:image href> {%- endcomment -%}
+    {%- assign artwork = '' -%}
+    {%- for img in channel.image limit:1 -%}{%- assign artwork = img.url -%}{%- endfor -%}
+    {%- if artwork == '' or artwork == null -%}{%- assign artwork = channel[imageKey].href -%}{%- endif -%}
+
+    {%- comment -%} assigns inside a for survive it, so the match is carried out {%- endcomment -%}
+    {%- assign found = false -%}
+    {%- assign epTitle = '' -%}
+    {%- assign epAudio = '' -%}
+    {%- assign epDate = '' -%}
+    {%- assign epNotes = '' -%}
+    {%- assign epAuthor = '' -%}
+    {%- assign epImg = '' -%}
+    {%- assign epDurRaw = '' -%}
+    {%- for ep in channel.item -%}
+        {%- if found == false and ep.guid.Value == episodeId -%}
+            {%- assign found = true -%}
+            {%- assign epTitle = ep.title | Trim -%}
+            {%- assign epAudio = ep.enclosure.url -%}
+            {%- assign epDate = ep.pubDate -%}
+            {%- assign epAuthor = ep[authorKey] -%}
+            {%- assign epImg = ep[imageKey].href -%}
+            {%- assign epDurRaw = ep[durationKey] -%}
+            {%- assign epNotes = ep[contentKey] -%}
+            {%- if epNotes == '' or epNotes == null -%}{%- assign epNotes = ep.description -%}{%- endif -%}
+        {%- endif -%}
+    {%- endfor -%}
+    {%- if epAuthor == '' or epAuthor == null -%}{%- assign epAuthor = chAuthor -%}{%- endif -%}
+    {%- if epImg == '' or epImg == null -%}{%- assign epImg = artwork -%}{%- endif -%}
+    {%- comment -%} Anchor wraps the mp3 in a redirect whose PATH contains a whole
+        percent-encoded URL:
+            .../podcast/play/119827181/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2F...mp3
+        That is an unusual thing to hand a media player - an encoded scheme inside
+        a path - and iOS is stricter about URLs than Android. Unwrapping it to the
+        CloudFront URL the redirect points at also saves a hop. Verified against
+        all 37 episodes: every one unwraps to a direct 200 audio/mpeg. {%- endcomment -%}
+    {%- if epAudio contains 'https%3A%2F%2F' -%}
+        {%- assign audioParts = epAudio | Split:'https%3A%2F%2F' -%}
+        {%- assign innerAudio = audioParts | Last | Replace:'%2F','/' -%}
+        {%- assign epAudio = 'https://' | Append:innerAudio -%}
+    {%- endif -%}
+
+
+    {%- comment -%} ===== the saved item =====
+        FollowingIcon needs an EntityId, so the item is created on VIEW by a
+        signed-in person. Anonymous visitors fall through with EntityId 0 and
+        get the sign-in prompt when they tap. {%- endcomment -%}
+    {%- assign savedItemId = 0 -%}
+    {%- assign savedTypeId = 0 -%}
+    {%- assign isSaved = 'false' -%}
+    {%- if CurrentPerson and found -%}
+    {% sql statement:'command' episodeid:'{{ episodeId }}' channelguid:'7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' eptitle:'{{ epTitle | Escape }}' epaudio:'{{ epAudio }}' epimage:'{{ epImg }}' epfeed:'{{ feedUrl }}' epdate:'{{ epDate | Date:""yyyy-MM-dd HH:mm:ss"" }}' detailpage:'d5e82f93-6ba4-4c17-9032-8f415d7ac6b9' %}
+        DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = @channelguid );
+        DECLARE @TypeId INT = ( SELECT TOP 1 [ContentChannelTypeId] FROM [ContentChannel] WHERE [Id] = @ChannelId );
+        DECLARE @EpAttr INT = ( SELECT TOP 1 [Id] FROM [Attribute]
+                                 WHERE [Key] = 'EpisodeId' AND [EntityTypeQualifierColumn] = 'ContentChannelId'
+                                   AND [EntityTypeQualifierValue] = CAST( @ChannelId AS NVARCHAR(20) ) );
+        IF @ChannelId IS NOT NULL AND @EpAttr IS NOT NULL
+           AND NOT EXISTS ( SELECT 1 FROM [ContentChannelItem] i
+                             JOIN [AttributeValue] av ON av.[EntityId] = i.[Id] AND av.[AttributeId] = @EpAttr
+                            WHERE i.[ContentChannelId] = @ChannelId AND av.[Value] = @episodeid )
+        BEGIN
+            INSERT INTO [ContentChannelItem]
+                ( [ContentChannelId], [ContentChannelTypeId], [Title], [Content],
+                  [Priority], [Status], [StartDateTime], [Order], [Guid],
+                  [CreatedDateTime], [ModifiedDateTime] )
+            VALUES ( @ChannelId, @TypeId, @eptitle, '', 0, 2,
+                     TRY_CONVERT( DATETIME, @epdate ), 0, NEWID(), GETDATE(), GETDATE() );
+            DECLARE @NewId INT = SCOPE_IDENTITY();
+            INSERT INTO [AttributeValue] ( [IsSystem], [AttributeId], [EntityId], [Value], [Guid] )
+            SELECT 0, a.[Id], @NewId,
+                   CASE a.[Key]
+                        WHEN 'EpisodeId'          THEN @episodeid
+                        WHEN 'FeedUrl'            THEN @epfeed
+                        WHEN 'AudioUrl'           THEN @epaudio
+                        WHEN 'ImageUrl'           THEN @epimage
+                        WHEN 'LinkAppPage'        THEN @detailpage
+                        WHEN 'LinkPageParameters' THEN '?EpisodeId=' + @episodeid
+                        WHEN 'LinkButtonText'     THEN 'Play Episode'
+                   END, NEWID()
+            FROM [Attribute] a
+            WHERE a.[EntityTypeQualifierColumn] = 'ContentChannelId'
+              AND a.[EntityTypeQualifierValue] = CAST( @ChannelId AS NVARCHAR(20) )
+              AND a.[Key] IN ( 'EpisodeId', 'FeedUrl', 'AudioUrl', 'ImageUrl',
+                               'LinkAppPage', 'LinkPageParameters', 'LinkButtonText' );
+        END
+    {% endsql %}
+    {% sql return:'savedRows' episodeid:'{{ episodeId }}' channelguid:'7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' personid:'{{ CurrentPerson.Id }}' %}
+        DECLARE @CciType INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+        SELECT TOP 1
+               i.[Id]    AS ItemId,
+               @CciType  AS TypeId,
+               CASE WHEN EXISTS ( SELECT 1 FROM [Following] f
+                                   JOIN [PersonAlias] pa ON pa.[Id] = f.[PersonAliasId] AND pa.[PersonId] = @personid
+                                  WHERE f.[EntityTypeId] = @CciType AND f.[EntityId] = i.[Id]
+                                    AND ISNULL( f.[PurposeKey], '' ) = '' )
+                    THEN 'true' ELSE 'false' END AS IsFollowed
+        FROM [ContentChannelItem] i
+        JOIN [ContentChannel] cc ON cc.[Id] = i.[ContentChannelId] AND cc.[Guid] = @channelguid
+        JOIN [Attribute] a ON a.[Key] = 'EpisodeId'
+                          AND a.[EntityTypeQualifierColumn] = 'ContentChannelId'
+                          AND a.[EntityTypeQualifierValue] = CAST( cc.[Id] AS NVARCHAR(20) )
+        JOIN [AttributeValue] av ON av.[AttributeId] = a.[Id] AND av.[EntityId] = i.[Id]
+                                AND av.[Value] = @episodeid
+    {% endsql %}
+    {%- for r in savedRows -%}
+        {%- assign savedItemId = r.ItemId -%}
+        {%- assign savedTypeId = r.TypeId -%}
+        {%- assign isSaved = r.IsFollowed -%}
+    {%- endfor -%}
+    {%- endif -%}
+    {%- if found == false -%}
+        {%- comment -%} the whole archive is in this feed, so this is a bad or
+            stale EpisodeId rather than an aged-out episode {%- endcomment -%}
+        <VerticalStackLayout Spacing=""12"" StyleClass=""p-32"" VerticalOptions=""Center"">
+            <Rock:Icon IconClass=""circle-question"" IconFamily=""FontAwesomeSolid"" FontSize=""40""
+                StyleClass=""text-interface-soft"" HorizontalOptions=""Center"" />
+            <Label Text=""This episode could not be found.""
+                StyleClass=""title3, bold, text-interface-strongest""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+            <Label Text=""It may have been removed from the feed.""
+                StyleClass=""body, text-interface-medium""
+                HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
+            <Button Text=""Back"" StyleClass=""btn, btn-primary"" HorizontalOptions=""Center""
+                Command=""{Binding PopPage}"" Margin=""0,8,0,0"" />
+        </VerticalStackLayout>
+    {%- else -%}
+        {%- comment -%} HH:MM:SS here, not seconds - see the header {%- endcomment -%}
+        {%- assign durParts = epDurRaw | Split:':' -%}
+        {%- assign durSize = durParts | Size -%}
+        {%- assign epDurMin = 0 -%}
+        {%- if durSize == 3 -%}{%- assign epDurMin = durParts[0] | AsInteger | Times:60 | Plus:durParts[1] -%}
+        {%- elsif durSize == 2 -%}{%- assign epDurMin = durParts[0] | AsInteger -%}
+        {%- else -%}{%- assign epDurMin = epDurRaw | AsInteger | DividedBy:60 | AsInteger -%}{%- endif -%}
+
+        <Rock:MediaPlayer x:Name=""episodePlayer""
+            Source=""{{ epAudio | Escape }}""
+            Title=""{{ epTitle | Escape }}""
+            Subtitle=""{{ epAuthor | Escape }}""
+            ShowThumbnail=""false""
+            IsCastEnabled=""true""
+            MeasureWithAspectRatio=""false""
+            HeightRequest=""300"">
+            <Rock:MediaPlayer.OverlayContent>
+                <Grid InputTransparent=""False"">
+                    {%- comment -%} One episode image here is affordable. It is the LIST
+                        that could not carry 36 distinct 3000x3000 decodes - see the note
+                        in anchor_list.xml. {%- endcomment -%}
+                    {% if epImg != '' and epImg != null %}
+                    <Rock:StyledBorder StrokeThickness=""0"" StyleClass=""bg-interface-softest""
+                        HorizontalOptions=""Fill"" VerticalOptions=""Fill"" />
+                    <Rock:Image Source=""{{ epImg | Escape }}"" Aspect=""AspectFill""
+                        HorizontalOptions=""Fill"" VerticalOptions=""Fill"" />
+                    {% endif %}
+
+                    <Rock:StyledBorder WidthRequest=""70"" HeightRequest=""70"" CornerRadius=""35"" Padding=""0""
+                        HorizontalOptions=""Center"" VerticalOptions=""Center"" InputTransparent=""False""
+                        StrokeThickness=""3"" Stroke=""#FFFFFF""
+                        BackgroundColor=""{Rock:PaletteColor App-Primary-Strong}"">
+                        <Rock:StyledBorder.Shadow><Shadow Brush=""#000000"" Offset=""0,2"" Radius=""10"" Opacity=""0.45"" /></Rock:StyledBorder.Shadow>
+                        <Rock:Icon IconClass=""play"" IconFamily=""FontAwesomeSolid"" FontSize=""28""
+                            TextColor=""#FFFFFF"" HorizontalOptions=""Center"" VerticalOptions=""Center"" />
+                        <Rock:StyledBorder.GestureRecognizers>
+                            <TapGestureRecognizer Command=""{Binding PlayCommand}"" />
+                        </Rock:StyledBorder.GestureRecognizers>
+                        <Rock:StyledBorder.Triggers>
+                            <DataTrigger TargetType=""Rock:StyledBorder""
+                                Binding=""{Binding Source={x:Reference episodePlayer}, Path=CurrentState}"" Value=""Playing"">
+                                <Setter Property=""IsVisible"" Value=""False"" />
+                            </DataTrigger>
+                        </Rock:StyledBorder.Triggers>
+                    </Rock:StyledBorder>
+
+                    <Rock:StyledBorder WidthRequest=""70"" HeightRequest=""70"" CornerRadius=""35"" Padding=""0""
+                        HorizontalOptions=""Center"" VerticalOptions=""Center"" IsVisible=""False"" InputTransparent=""False""
+                        StrokeThickness=""3"" Stroke=""#FFFFFF""
+                        BackgroundColor=""{Rock:PaletteColor App-Primary-Strong}"">
+                        <Rock:StyledBorder.Shadow><Shadow Brush=""#000000"" Offset=""0,2"" Radius=""10"" Opacity=""0.45"" /></Rock:StyledBorder.Shadow>
+                        <Rock:Icon IconClass=""pause"" IconFamily=""FontAwesomeSolid"" FontSize=""28""
+                            TextColor=""#FFFFFF"" HorizontalOptions=""Center"" VerticalOptions=""Center"" />
+                        <Rock:StyledBorder.GestureRecognizers>
+                            <TapGestureRecognizer Command=""{Binding PauseCommand}"" />
+                        </Rock:StyledBorder.GestureRecognizers>
+                        <Rock:StyledBorder.Triggers>
+                            <DataTrigger TargetType=""Rock:StyledBorder""
+                                Binding=""{Binding Source={x:Reference episodePlayer}, Path=CurrentState}"" Value=""Playing"">
+                                <Setter Property=""IsVisible"" Value=""True"" />
+                            </DataTrigger>
+                        </Rock:StyledBorder.Triggers>
+                    </Rock:StyledBorder>
+                </Grid>
+            </Rock:MediaPlayer.OverlayContent>
+        </Rock:MediaPlayer>
+
+        <VerticalStackLayout Spacing=""4"" StyleClass=""px-16, pt-16"">
+            <Label Text=""{{ epTitle | Escape }}"" StyleClass=""title3, bold, text-interface-strongest"" />
+            <Label StyleClass=""caption1, text-interface-medium""
+                Text=""{{ epDate | Date:'MMMM d, yyyy' }}{% if epDurMin > 0 %} &#8226; {{ epDurMin }} min{% endif %}"" />
+        </VerticalStackLayout>
+
+        <Grid ColumnDefinitions=""*, *, *"" ColumnSpacing=""8"" StyleClass=""px-16, pt-16"">
+            <VerticalStackLayout Grid.Column=""0"" Spacing=""6"" HorizontalOptions=""Center"">
+                {%- comment -%} same attributes as the working Podcast Detail block (13512) {%- endcomment -%}
+                <Rock:FollowingIcon
+                    EntityTypeId=""{{ savedTypeId }}""
+                    EntityId=""{{ savedItemId }}""
+                    IsFollowed=""{{ isSaved }}""
+                    FontSize=""22""
+                    HorizontalOptions=""Center""
+                    FollowingIconClass=""heart""
+                    FollowingIconFamily=""FontAwesomeSolid""
+                    FollowingIconColor=""{Rock:PaletteColor App-Primary-Strong}""
+                    NotFollowingIconClass=""heart""
+                    NotFollowingIconFamily=""FontAwesomeRegular""
+                    NotFollowingIconColor=""{AppThemeBinding Light=#3F3F46, Dark=#E4E4E7}""
+                    NotLoggedInText=""Sign in to save this episode to your list."" />
+                <Label StyleClass=""caption1, font-weight-semi-bold, text-interface-medium""
+                    Text=""SAVE"" HorizontalOptions=""Center"" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Grid.Column=""1"" Spacing=""6"" HorizontalOptions=""Center"">
+                <Rock:Icon IconClass=""download"" IconFamily=""FontAwesomeSolid"" FontSize=""22""
+                    StyleClass=""text-interface-stronger"" HorizontalOptions=""Center"" />
+                <Label StyleClass=""caption1, font-weight-semi-bold, text-interface-medium""
+                    Text=""DOWNLOAD"" HorizontalOptions=""Center"" />
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command=""{Binding OpenExternalBrowser}""
+                        CommandParameter=""{{ epAudio | Escape }}"" />
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Grid.Column=""2"" Spacing=""6"" HorizontalOptions=""Center"">
+                <Rock:Icon IconClass=""share-square"" IconFamily=""FontAwesomeSolid"" FontSize=""22""
+                    StyleClass=""text-interface-stronger"" HorizontalOptions=""Center"" />
+                <Label StyleClass=""caption1, font-weight-semi-bold, text-interface-medium""
+                    Text=""SHARE"" HorizontalOptions=""Center"" />
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command=""{Binding ShareContent}"">
+                        <TapGestureRecognizer.CommandParameter>
+                            <Rock:ShareContentParameters
+                                Title=""{{ epTitle | Escape }}""
+                                Text=""{{ epTitle | Escape }}""
+                                Uri=""{{ epAudio | Escape }}"" />
+                        </TapGestureRecognizer.CommandParameter>
+                    </TapGestureRecognizer>
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+        </Grid>
+
+        {%- if epNotes != '' and epNotes != null -%}
+        <VerticalStackLayout Spacing=""10"" StyleClass=""px-16, pt-12"">
+            <BoxView HeightRequest=""1"" StyleClass=""bg-interface-softer"" />
+            <Rock:Html><![CDATA[{{ epNotes }}]]></Rock:Html>
+        </VerticalStackLayout>
+        {%- endif -%}
+    {%- endif -%}
+{% endwebrequest %}
+</VerticalStackLayout>
+" );   // Content
+            RockMigrationHelper.AddBlockAttributeValue( "F70A4B15-8DC6-4E39-B254-A1637F9CE8DB", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"Cache,Sql,WebRequest" );   // EnabledLavaCommands
+            RockMigrationHelper.AddBlockAttributeValue( "F70A4B15-8DC6-4E39-B254-A1637F9CE8DB", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
+            RockMigrationHelper.AddBlockAttributeValue( "5A9E13C7-6B04-4F82-9D31-72E05CA8F6B1", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"{%- comment -%}
+    ===========================================================================
+    SHARE MY NOTES  -  bottom of the Structured Item Detail page
+    ---------------------------------------------------------------------------
+    Rebuilds the sermon outline as plain text with the reader's own typed notes
+    interleaved, and hands it to the native share sheet - which covers Mail,
+    Messages, Notes, copy-to-clipboard and AirDrop, so ""email my notes to
+    myself"" needs nothing else built.
+
+    WHERE THE TYPED NOTES LIVE
+    The shell auto-saves them via the StructuredContentView block's
+    SaveUserValues action. Rock stores them as a Note row:
+
+        NoteType  'Structured Content User Value'  860C37A0-1A44-4681-B96D-4703813609D2
+        EntityId  the content channel item
+        Text      {""<note block id>"":""what they typed"", ...}
+
+    So the merge is: walk the document's blocks, and where a block is of type
+    'note', look its data.id up in that dictionary.
+
+    NEWLINES
+    The text goes into a XAML ATTRIBUTE, and XML attribute-value normalisation
+    turns a real newline into a space - which would flatten the whole thing onto
+    one line. So line breaks are carried as the marker ~~NL~~ and swapped for
+    &#10; AFTER Escape has run (Escape would otherwise turn the & into &amp;).
+
+    NOT CACHED - CacheDuration is 0 on this block deliberately. Everything it
+    renders is that one person's notes.
+    ===========================================================================
+{%- endcomment -%}
+{%- assign itemGuid = PageParameter.ItemGuid -%}
+{%- assign noteTypeGuid = '860C37A0-1A44-4681-B96D-4703813609D2' -%}
+
+{%- if CurrentPerson and itemGuid != '' and itemGuid != null -%}
+{% sql return:'rows' itemguid:'{{ itemGuid }}' personid:'{{ CurrentPerson.Id }}' notetype:'{{ noteTypeGuid }}' %}
+    SELECT TOP 1
+           i.[Title],
+           i.[StartDateTime],
+           i.[StructuredContent]      AS Doc,
+           ISNULL( n.[Text], '' )     AS UserJson,
+           /* Speaker is a Defined Value on some channels and plain text on others.
+              A Defined Value stores the DefinedValue Guid, so resolve it and fall
+              back to the raw text when it is not a guid. */
+           ISNULL( ( SELECT TOP 1 COALESCE( dv.[Value], av.[Value] ) FROM [AttributeValue] av
+                      JOIN [Attribute] a ON a.[Id] = av.[AttributeId]
+                                        AND a.[Key] = 'Speaker'
+                                        AND a.[EntityTypeQualifierColumn] = 'ContentChannelId'
+                                        AND a.[EntityTypeQualifierValue] = CAST( i.[ContentChannelId] AS NVARCHAR(20) )
+                      LEFT JOIN [DefinedValue] dv
+                             ON TRY_CAST( av.[Value] AS UNIQUEIDENTIFIER ) IS NOT NULL
+                            AND dv.[Guid] = TRY_CAST( av.[Value] AS UNIQUEIDENTIFIER )
+                     WHERE av.[EntityId] = i.[Id] ), '' ) AS Speaker
+    FROM [ContentChannelItem] i
+    LEFT JOIN [Note] n
+           ON n.[EntityId] = i.[Id]
+          AND n.[NoteTypeId] = ( SELECT TOP 1 [Id] FROM [NoteType] WHERE [Guid] = @notetype )
+          AND n.[CreatedByPersonAliasId] IN ( SELECT [Id] FROM [PersonAlias] WHERE [PersonId] = @personid )
+    WHERE i.[Guid] = @itemguid
+{% endsql %}
+
+{%- for r in rows -%}
+    {%- assign doc = r.Doc | FromJSON -%}
+    {%- assign userValues = r.UserJson | FromJSON -%}
+    {%- assign hasNotes = false -%}
+
+    {%- comment -%} build the body once, marking line breaks {%- endcomment -%}
+    {%- capture bodyText -%}
+        {%- for b in doc.blocks -%}
+            {%- if b.type == 'paragraph' -%}
+                {%- assign line = b.data.text | StripHtml | HtmlDecode | Trim -%}
+                {%- if line != '' -%}{{ line }}~~NL~~~~NL~~{%- endif -%}
+            {%- elsif b.type == 'header' -%}
+                {%- assign line = b.data.text | StripHtml | HtmlDecode | Trim -%}
+                {%- if line != '' -%}{{ line }}~~NL~~{%- endif -%}
+            {%- elsif b.type == 'list' -%}
+                {%- for li in b.data.items -%}
+                    {%- assign line = li | StripHtml | HtmlDecode | Trim -%}
+                    {%- if line != '' -%}  - {{ line }}~~NL~~{%- endif -%}
+                {%- endfor -%}
+                ~~NL~~
+            {%- elsif b.type == 'note' -%}
+                {%- assign mine = userValues[b.data.id] | Trim -%}
+                {%- if mine != '' and mine != null -%}
+                    {%- assign hasNotes = true -%}
+                    MY NOTES:~~NL~~{{ mine | Replace:'
+','~~NL~~' }}~~NL~~~~NL~~
+                {%- endif -%}
+            {%- endif -%}
+        {%- endfor -%}
+    {%- endcapture -%}
+
+    {%- capture shareText -%}
+{{ r.Title | Trim }}~~NL~~{{ r.StartDateTime | Date:'MMMM d, yyyy' }}{% if r.Speaker != '' %} - {{ r.Speaker }}{% endif %}~~NL~~~~NL~~{{ bodyText | Trim }}
+    {%- endcapture -%}
+    {%- assign shareText = shareText | Trim | Escape | Replace:'~~NL~~','&#10;' -%}
+
+    {%- comment -%} nothing worth sharing if the document is empty AND they have
+        written nothing {%- endcomment -%}
+    {%- assign bodyCheck = bodyText | Replace:'~~NL~~','' | Trim -%}
+    {%- if bodyCheck != '' -%}
+    <VerticalStackLayout StyleClass=""px-16, pb-24, pt-8"" Spacing=""8"">
+        <BoxView HeightRequest=""1"" StyleClass=""bg-interface-softer"" />
+        <VerticalStackLayout Spacing=""6"" HorizontalOptions=""Center"" StyleClass=""pt-12"">
+            <Rock:Icon IconClass=""share-square"" IconFamily=""FontAwesomeSolid"" FontSize=""22""
+                StyleClass=""text-interface-stronger"" HorizontalOptions=""Center"" />
+            <Label StyleClass=""caption1, font-weight-semi-bold, text-interface-medium""
+                Text=""{% if hasNotes %}SHARE MY NOTES{% else %}SHARE{% endif %}"" HorizontalOptions=""Center"" />
+            <VerticalStackLayout.GestureRecognizers>
+                <TapGestureRecognizer Command=""{Binding ShareContent}"">
+                    <TapGestureRecognizer.CommandParameter>
+                        <Rock:ShareContentParameters
+                            Title=""{{ r.Title | Escape }}""
+                            Text=""{{ shareText }}"" />
+                    </TapGestureRecognizer.CommandParameter>
+                </TapGestureRecognizer>
+            </VerticalStackLayout.GestureRecognizers>
+        </VerticalStackLayout>
+    </VerticalStackLayout>
+    {%- endif -%}
+{%- endfor -%}
+{%- endif -%}
+" );   // Content
+            RockMigrationHelper.AddBlockAttributeValue( "5A9E13C7-6B04-4F82-9D31-72E05CA8F6B1", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"Sql" );   // EnabledLavaCommands
+            RockMigrationHelper.AddBlockAttributeValue( "5A9E13C7-6B04-4F82-9D31-72E05CA8F6B1", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
+            RockMigrationHelper.AddBlockAttributeValue( "11A2B3C4-D5E6-4F70-8192-A3B4C5D6E7F8", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"<VerticalStackLayout StyleClass=""px-16, pt-24, pb-16"" Spacing=""14"">
+
+    <Label Text=""We believe in the power of prayer.""
+        StyleClass=""title2, bold, text-interface-strongest""
+        HorizontalTextAlignment=""Center"" />
+
+    <Label StyleClass=""body, text-interface-strong"" HorizontalTextAlignment=""Center""
+        Text=""Pray with and for one another on the prayer wall, or send a request privately to our staff and prayer team."" />
+
+    <Button Text=""PRAYER WALL""
+        StyleClass=""btn, btn-primary, mt-8""
+        HorizontalOptions=""Fill""
+        Command=""{Binding PushPage}""
+        CommandParameter=""b2e5d8a3-4c06-4e79-9f18-36d0c1e5b742"" />
+
+    <Button Text=""PRIVATE REQUEST""
+        StyleClass=""btn, btn-secondary""
+        HorizontalOptions=""Fill""
+        Command=""{Binding PushPage}""
+        CommandParameter=""d4a7f0c5-6e28-4a9b-b13a-58f2e3a7d964"" />
+
+    <BoxView HeightRequest=""1"" StyleClass=""bg-interface-softer"" Margin=""0,10,0,0"" />
+
+</VerticalStackLayout>" );   // Content
+            RockMigrationHelper.AddBlockAttributeValue( "11A2B3C4-D5E6-4F70-8192-A3B4C5D6E7F8", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
+            RockMigrationHelper.AddBlockAttributeValue( "33C4D5E6-F708-4192-A3B4-C5D6E7F8091A", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"<VerticalStackLayout StyleClass=""px-16, pt-16, pb-8"" Spacing=""10"">
+
+    <Label Text=""How can we pray for you?""
+        StyleClass=""title3, bold, text-interface-strongest"" />
+
+    <Label StyleClass=""body, text-interface-strong""
+        Text=""Share your request below, and read and pray for the requests others have shared."" />
+
+    <Rock:StyledBorder CornerRadius=""10"" Padding=""12"" StrokeThickness=""0""
+        StyleClass=""bg-interface-softer"" Margin=""0,4,0,0"">
+        <Label StyleClass=""footnote, text-interface-strong""
+            Text=""Anything shared here is public. For something more sensitive, use Private Request and it goes only to our staff and prayer team."" />
+    </Rock:StyledBorder>
+
+    <Grid ColumnDefinitions=""*, *"" ColumnSpacing=""10"" Margin=""0,6,0,0"">
+        <Button Grid.Column=""0"" Text=""Share a Prayer""
+            StyleClass=""btn, btn-primary""
+            Command=""{Binding PushPage}""
+            CommandParameter=""c3f6e9b4-5d17-4f8a-a029-47e1d2f6c853"" />
+        <Button Grid.Column=""1"" Text=""Private Request""
+            StyleClass=""btn, btn-secondary""
+            Command=""{Binding PushPage}""
+            CommandParameter=""d4a7f0c5-6e28-4a9b-b13a-58f2e3a7d964"" />
+    </Grid>
+
+</VerticalStackLayout>" );   // Content
+            RockMigrationHelper.AddBlockAttributeValue( "33C4D5E6-F708-4192-A3B4-C5D6E7F8091A", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "1D63D8F5-A810-477D-B9F7-24B33546990F", @"True" );   // EnableCategory
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "26EB9054-E675-4DD6-80EF-D5481F23CF51", @"5a94e584-35f0-4214-91f1-d72531cc6325" );   // ParentCategory
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "80ABC48F-99E7-404F-AAB3-0EA8551010CF", @"4b2d88f5-6e45-4b4b-8776-11118c8e8269" );   // DefaultCategory
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "42F19547-E84A-4CD8-9787-7A74255E73E4", @"True" );   // EnableAutoApprove
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "4389C4A7-CF8D-4750-812A-F4C2BD602E96", @"14" );   // ExpiresAfterDays
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "50F41A0F-858E-46D9-AF3B-506E8AB2F9E3", @"False" );   // EnableUrgentFlag
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "0C0898A4-0554-420E-BA3D-BD22AB8C44CA", @"True" );   // EnablePublicDisplayFlag
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "28332C3D-E2B2-4D6D-B8B3-9BE11FF07504", @"True" );   // DefaultToPublic
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "54273807-6E5F-47DF-A803-6251C6E2480A", @"500" );   // CharacterLimit
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "C91F9877-5605-48F8-B6CA-A797F998826D", @"False" );   // EnableCampus
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "92258CC6-9E8E-4DF3-AB5B-48114BE28BA7", @"False" );   // RequireCampus
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "E5681E4D-7CD7-475F-9F74-7E0C295BE538", @"True" );   // RequireLastName
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "238CFE61-56D7-47E2-AC5D-66B3B645D3FE", @"True" );   // EnablePersonMatching
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "22BCE7BA-ED45-480B-9833-03A503B825ED", @"0" );   // CompletionAction
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "949F7A76-8947-4457-B742-1AC1F2EC2486", @"<Rock:NotificationBox NotificationType=""Success"">
+Thank you for allowing us to pray for you.
+</Rock:NotificationBox>" );   // CompletionXaml
+            RockMigrationHelper.AddBlockAttributeValue( "66F70819-2A3B-44C5-D6E7-F8091A2B3C4D", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"<VerticalStackLayout StyleClass=""px-16, pt-24, pb-8"" Spacing=""12"">
+
+    <Label Text=""We Believe in the Power of Prayer""
+        StyleClass=""title3, bold, text-interface-strongest"" />
+
+    <Label StyleClass=""body, text-interface-strong""
+        Text=""Our prayer team has a passion for prayer and prays diligently for the needs within and outside the church, locally and globally."" />
+
+    <Label Text=""Need Prayer?""
+        StyleClass=""headline, bold, text-interface-strongest"" Margin=""0,6,0,0"" />
+
+    <Label StyleClass=""body, text-interface-strong""
+        Text=""Let us pray for you. Fill out the form below and let us know your needs. This request is private and will not appear on the prayer wall."" />
+
+    <BoxView HeightRequest=""1"" StyleClass=""bg-interface-softer"" Margin=""0,8,0,0"" />
+
+</VerticalStackLayout>" );   // Content
+            RockMigrationHelper.AddBlockAttributeValue( "66F70819-2A3B-44C5-D6E7-F8091A2B3C4D", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "1D63D8F5-A810-477D-B9F7-24B33546990F", @"True" );   // EnableCategory
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "26EB9054-E675-4DD6-80EF-D5481F23CF51", @"5a94e584-35f0-4214-91f1-d72531cc6325" );   // ParentCategory
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "80ABC48F-99E7-404F-AAB3-0EA8551010CF", @"4b2d88f5-6e45-4b4b-8776-11118c8e8269" );   // DefaultCategory
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "42F19547-E84A-4CD8-9787-7A74255E73E4", @"False" );   // EnableAutoApprove
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "4389C4A7-CF8D-4750-812A-F4C2BD602E96", @"14" );   // ExpiresAfterDays
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "50F41A0F-858E-46D9-AF3B-506E8AB2F9E3", @"False" );   // EnableUrgentFlag
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "0C0898A4-0554-420E-BA3D-BD22AB8C44CA", @"False" );   // EnablePublicDisplayFlag
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "28332C3D-E2B2-4D6D-B8B3-9BE11FF07504", @"False" );   // DefaultToPublic
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "54273807-6E5F-47DF-A803-6251C6E2480A", @"500" );   // CharacterLimit
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "C91F9877-5605-48F8-B6CA-A797F998826D", @"False" );   // EnableCampus
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "92258CC6-9E8E-4DF3-AB5B-48114BE28BA7", @"False" );   // RequireCampus
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "E5681E4D-7CD7-475F-9F74-7E0C295BE538", @"True" );   // RequireLastName
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "238CFE61-56D7-47E2-AC5D-66B3B645D3FE", @"True" );   // EnablePersonMatching
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "22BCE7BA-ED45-480B-9833-03A503B825ED", @"0" );   // CompletionAction
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "949F7A76-8947-4457-B742-1AC1F2EC2486", @"<Rock:NotificationBox NotificationType=""Success"">
+Thank you for allowing us to pray for you. Your request has been sent privately to our staff and prayer team.
+</Rock:NotificationBox>" );   // CompletionXaml
+            RockMigrationHelper.AddBlockAttributeValue( "22B3C4D5-E6F7-4081-92A3-B4C5D6E7F809", "B0B72E6D-6D4B-4C29-A3B4-2B01A8E756B1", @"False" );   // ShowCampusFilter
+            RockMigrationHelper.AddBlockAttributeValue( "22B3C4D5-E6F7-4081-92A3-B4C5D6E7F809", "6EEED035-2E74-44EF-8567-016C2CBC3E6D", @"e5b8a1d6-7f39-4bac-c24b-69a3f4b8ea75" );   // PrayerPage
+            RockMigrationHelper.AddBlockAttributeValue( "22B3C4D5-E6F7-4081-92A3-B4C5D6E7F809", "E177F02C-B1BF-4139-B354-E3C4EFFF9A0B", @"5a94e584-35f0-4214-91f1-d72531cc6325" );   // ParentCategory
+            RockMigrationHelper.AddBlockAttributeValue( "22B3C4D5-E6F7-4081-92A3-B4C5D6E7F809", "3D65A824-5C8C-4580-9E9B-5224A03D82FD", @"Prayer Session" );   // TitleText
+            RockMigrationHelper.AddBlockAttributeValue( "22B3C4D5-E6F7-4081-92A3-B4C5D6E7F809", "010BF18D-FA2E-4110-B393-96FBB6DFF02F", @"Select your categories to start a prayer session." );   // InstructionText
+            RockMigrationHelper.AddBlockAttributeValue( "55E6F708-192A-43B4-C5D6-E7F8091A2B3C", "D847C303-4FF4-4A84-A1EB-4734DCA3F886", @"True" );   // EnableHeader
+            RockMigrationHelper.AddBlockAttributeValue( "44D5E6F7-0819-42A3-B4C5-D6E7F8091A2B", "A8B76BEB-0F6F-4F0B-968C-49CB3CEBB77F", @"ffffffff-ffff-ffff-ffff-ffffffffffff|<Rock:ResponsiveLayout>
+{% for item in PrayerRequestItems %}
+    <Rock:ResponsiveColumn Medium=""6"">
+        <Rock:StyledBorder StrokeThickness=""0"" CornerRadius=""12"" Padding=""16""
+                StyleClass=""bg-interface-softest, mx-16, my-8"">
+            <Rock:StyledBorder.Shadow>
+                <Shadow Brush=""#000000"" Offset=""0,2"" Radius=""8"" Opacity=""0.10"" />
+            </Rock:StyledBorder.Shadow>
+
+            <VerticalStackLayout Spacing=""8"">
+
+                <Label Text=""{{ item.FirstName | Escape }} {{ item.LastName | Escape }}""
+                    StyleClass=""headline, bold, text-interface-strongest"" />
+
+                <Rock:StyledBorder CornerRadius=""6"" Padding=""8,3"" StrokeThickness=""0""
+                        StyleClass=""bg-interface-softer"" HorizontalOptions=""Start"">
+                    <Label Text=""{{ item.Category.Name | Escape }}""
+                        StyleClass=""caption2, text-interface-strong"" />
+                </Rock:StyledBorder>
+
+                <Label StyleClass=""body, text-interface-strong"">{{ item.Text | XamlWrap }}</Label>
+
+                <Button x:Name=""PrayedBtn{{ forloop.index }}""
+                    IsVisible=""false""
+                    StyleClass=""btn, btn-secondary""
+                    HorizontalOptions=""End""
+                    Text=""Prayed""
+                    IsEnabled=""false"" />
+
+                <Button x:Name=""PrayBtn{{ forloop.index }}""
+                    StyleClass=""btn, btn-primary""
+                    HorizontalOptions=""End""
+                    Text=""Pray""
+                    Command=""{Binding AggregateCommand}"">
+                    <Button.CommandParameter>
+                        <Rock:AggregateCommandParameters>
+                            <Rock:CommandReference Command=""{Binding PrayForRequest}""
+                                CommandParameter=""{Rock:PrayForRequestParameters Guid={{ item.Guid }}, WorkflowTypeGuid='{{ PrayedWorkflowType }}'}"" />
+                            <Rock:CommandReference Command=""{Binding SetViewProperty}""
+                                CommandParameter=""{Rock:SetViewPropertyParameters View={x:Reference PrayedBtn{{ forloop.index }}}, Name=IsVisible, Value=true}"" />
+                            <Rock:CommandReference Command=""{Binding SetViewProperty}""
+                                CommandParameter=""{Rock:SetViewPropertyParameters View={x:Reference PrayBtn{{ forloop.index }}}, Name=IsVisible, Value=false}"" />
+                        </Rock:AggregateCommandParameters>
+                    </Button.CommandParameter>
+                </Button>
+
+            </VerticalStackLayout>
+        </Rock:StyledBorder>
+    </Rock:ResponsiveColumn>
+{% endfor %}
+</Rock:ResponsiveLayout>" );   // Template
+            RockMigrationHelper.AddBlockAttributeValue( "44D5E6F7-0819-42A3-B4C5-D6E7F8091A2B", "26CD1F8C-ABA4-48CC-812E-C43520C546B4", @"False" );   // HideCampusWhenKnown
+            RockMigrationHelper.AddBlockAttributeValue( "44D5E6F7-0819-42A3-B4C5-D6E7F8091A2B", "4B794B17-84AB-4D83-9CBF-6ACB327297F2", @"5a94e584-35f0-4214-91f1-d72531cc6325" );   // Category
+            RockMigrationHelper.AddBlockAttributeValue( "44D5E6F7-0819-42A3-B4C5-D6E7F8091A2B", "1BACC328-1913-4C1B-AA05-18CD56F357F8", @"True" );   // PublicOnly
+            RockMigrationHelper.AddBlockAttributeValue( "44D5E6F7-0819-42A3-B4C5-D6E7F8091A2B", "6D362614-769B-4C0E-A305-B567FFE50F7E", @"0" );   // PrayerOrder
+            RockMigrationHelper.AddBlockAttributeValue( "44D5E6F7-0819-42A3-B4C5-D6E7F8091A2B", "A39D70B2-2AF9-42B8-8C18-CC671E299CE0", @"False" );   // LoadLastPrayedCollection
+            RockMigrationHelper.AddBlockAttributeValue( "44D5E6F7-0819-42A3-B4C5-D6E7F8091A2B", "54C2C92F-07F3-43B6-804A-47D7C9ACE4AA", @"True" );   // AlwaysHideCampus
+            RockMigrationHelper.AddBlockAttributeValue( "44D5E6F7-0819-42A3-B4C5-D6E7F8091A2B", "63A63454-1DAA-46F4-AB8C-16D454C25A32", @"False" );   // IncludeGroupRequests
+            RockMigrationHelper.AddBlockAttributeValue( "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E", "D847C303-4FF4-4A84-A1EB-4734DCA3F886", @"False" );   // EnableHeader
+            RockMigrationHelper.AddBlockAttributeValue( "88192A3B-4C5D-46E7-F809-1A2B3C4D5E6F", "7D3AE194-069E-4CE8-97C9-EB7A9CADA7B9", @"I've Prayed" );   // PrayedButtonText
+            RockMigrationHelper.AddBlockAttributeValue( "88192A3B-4C5D-46E7-F809-1A2B3C4D5E6F", "2E37A96E-9BF5-484A-8146-6E54629080CC", @"True" );   // ShowFollowButton
+            RockMigrationHelper.AddBlockAttributeValue( "88192A3B-4C5D-46E7-F809-1A2B3C4D5E6F", "52E1A831-4039-4185-8261-B39083B39C46", @"True" );   // ShowInappropriateButton
+            RockMigrationHelper.AddBlockAttributeValue( "88192A3B-4C5D-46E7-F809-1A2B3C4D5E6F", "B10629F9-DCBC-4601-A717-89B34F7ED5DE", @"True" );   // PublicOnly
+            RockMigrationHelper.AddBlockAttributeValue( "88192A3B-4C5D-46E7-F809-1A2B3C4D5E6F", "AF310A62-C62A-427A-A88E-48AA885CCCE7", @"2b0f4548-8da7-4236-9bf9-5fa3c07d762f|" );   // Template
+            RockMigrationHelper.AddBlockAttributeValue( "88192A3B-4C5D-46E7-F809-1A2B3C4D5E6F", "3382895E-1422-417E-84F2-A4750AF2AD70", @"True" );   // CreateInteractionsForPrayers
+            RockMigrationHelper.AddBlockAttributeValue( "88192A3B-4C5D-46E7-F809-1A2B3C4D5E6F", "69DF4D6F-730B-4F16-BF47-7FFEAFC2EB2D", @"False" );   // IncludeGroupRequests
 
             //
             // Mobile block settings (ProcessLavaOnServer / ProcessLavaOnClient, CssStyles, ...)
@@ -6040,10 +8039,6 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
             Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":""<VerticalStackLayout Spacing=\""14\"" StyleClass=\""p-24\"" VerticalOptions=\""Center\"">\n    <Rock:Icon IconClass=\""wifi-slash\"" IconFamily=\""FontAwesomeSolid\"" FontSize=\""40\"" StyleClass=\""text-interface-soft\"" HorizontalOptions=\""Center\"" />\n    <Label Text=\""You are offline\"" StyleClass=\""title3, bold, text-interface-strongest\"" HorizontalTextAlignment=\""Center\"" />\n    <Label Text=\""Connect to the internet to load this page.\"" StyleClass=\""body, text-interface-medium\"" HorizontalTextAlignment=\""Center\"" />\n</VerticalStackLayout>"",""CssStyles"":"""",""CacheDuration"":3600,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'FF2703A4-BF7D-4A53-A214-10AD2E850BAA'" );   // Content
             Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":""<VerticalStackLayout Spacing=\""14\"" StyleClass=\""p-24\"" VerticalOptions=\""Center\"">\n    <Rock:Icon IconClass=\""wifi-slash\"" IconFamily=\""FontAwesomeSolid\"" FontSize=\""40\"" StyleClass=\""text-interface-soft\"" HorizontalOptions=\""Center\"" />\n    <Label Text=\""You are offline\"" StyleClass=\""title3, bold, text-interface-strongest\"" HorizontalTextAlignment=\""Center\"" />\n    <Label Text=\""Connect to the internet to load this page.\"" StyleClass=\""body, text-interface-medium\"" HorizontalTextAlignment=\""Center\"" />\n</VerticalStackLayout>"",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":false,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'DDA29EBD-B8A0-44FD-A1A4-2E783F050005'" );   // Communication View
             Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":""<VerticalStackLayout Spacing=\""14\"" StyleClass=\""p-24\"" VerticalOptions=\""Center\"">\n    <Rock:Icon IconClass=\""wifi-slash\"" IconFamily=\""FontAwesomeSolid\"" FontSize=\""40\"" StyleClass=\""text-interface-soft\"" HorizontalOptions=\""Center\"" />\n    <Label Text=\""You are offline\"" StyleClass=\""title3, bold, text-interface-strongest\"" HorizontalTextAlignment=\""Center\"" />\n    <Label Text=\""Connect to the internet to load this page.\"" StyleClass=\""body, text-interface-medium\"" HorizontalTextAlignment=\""Center\"" />\n</VerticalStackLayout>"",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":false,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'DE95662D-6AD7-47F3-92F7-7851C3E9E6E8'" );   // Communication List Subscribe
-            Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":false,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":false,""ProcessLavaOnClient"":false}' WHERE [Guid] = '05137346-7182-43EC-B7BD-581237869417'" );   // Content
-            Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":false,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":false,""ProcessLavaOnClient"":false}' WHERE [Guid] = '65350FBF-7EDA-4D89-9778-6020D53B785F'" );   // Content
-            Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":false,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":false,""ProcessLavaOnClient"":false}' WHERE [Guid] = '81E84E8F-4FC6-4D89-997E-8BBF1A7B2E05'" );   // Content
-            Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":false,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":false,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'BD66F886-936E-4624-AEF5-00698C7C0BFC'" );   // Content
             Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":""<VerticalStackLayout Spacing=\""14\"" StyleClass=\""p-24\"" VerticalOptions=\""Center\"">\n    <Rock:Icon IconClass=\""wifi-slash\"" IconFamily=\""FontAwesomeSolid\"" FontSize=\""40\"" StyleClass=\""text-interface-soft\"" HorizontalOptions=\""Center\"" />\n    <Label Text=\""You are offline\"" StyleClass=\""title3, bold, text-interface-strongest\"" HorizontalTextAlignment=\""Center\"" />\n    <Label Text=\""Connect to the internet to load this page.\"" StyleClass=\""body, text-interface-medium\"" HorizontalTextAlignment=\""Center\"" />\n</VerticalStackLayout>"",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'AC2DDABC-C82A-4827-8565-248724D1C324'" );   // Content
             Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":""<VerticalStackLayout Spacing=\""14\"" StyleClass=\""p-24\"" VerticalOptions=\""Center\"">\n    <Rock:Icon IconClass=\""wifi-slash\"" IconFamily=\""FontAwesomeSolid\"" FontSize=\""40\"" StyleClass=\""text-interface-soft\"" HorizontalOptions=\""Center\"" />\n    <Label Text=\""You are offline\"" StyleClass=\""title3, bold, text-interface-strongest\"" HorizontalTextAlignment=\""Center\"" />\n    <Label Text=\""Connect to the internet to load this page.\"" StyleClass=\""body, text-interface-medium\"" HorizontalTextAlignment=\""Center\"" />\n</VerticalStackLayout>"",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":true}' WHERE [Guid] = '10E07AFD-C2EB-4E97-9121-027811648F4B'" );   // Content - Not logged in
             Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":""<VerticalStackLayout Spacing=\""14\"" StyleClass=\""p-24\"" VerticalOptions=\""Center\"">\n    <Rock:Icon IconClass=\""wifi-slash\"" IconFamily=\""FontAwesomeSolid\"" FontSize=\""40\"" StyleClass=\""text-interface-soft\"" HorizontalOptions=\""Center\"" />\n    <Label Text=\""You are offline\"" StyleClass=\""title3, bold, text-interface-strongest\"" HorizontalTextAlignment=\""Center\"" />\n    <Label Text=\""Connect to the internet to load this page.\"" StyleClass=\""body, text-interface-medium\"" HorizontalTextAlignment=\""Center\"" />\n</VerticalStackLayout>"",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = '77A80F5F-CED1-4471-BCE3-1F405BE29C6B'" );   // Content - Not signed in
@@ -6073,6 +8068,11 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
             Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":300,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = '2C7A4F19-6B83-4E05-9D24-A15C8E30B7F6'" );   // Notifications
             Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":3600,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'C519E24F-A086-4D2B-B7C4-9F203B85D67A'" );   // Podcast Feed List
             Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":60,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'D62AF350-B197-4E3C-98D5-A0314C96E78B'" );   // Podcast Feed Episode
+            Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":3600,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = '09CB6D48-3E7A-4F95-B124-5D837CA9F6E3'" );   // Lucas Miles Show List
+            Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":60,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = '1ADC7E59-4F8B-40A6-A235-6E948DBA07F4'" );   // Lucas Miles Show Episode
+            Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":3600,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'E6F93A04-7CB5-4D28-A143-90526E8BD7CA'" );   // Strong Church List
+            Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":60,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'F70A4B15-8DC6-4E39-B254-A1637F9CE8DB'" );   // Strong Church Episode
+            Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = '5A9E13C7-6B04-4F82-9D31-72E05CA8F6B1'" );   // Share My Notes
 
             //
             // Block CSS class (Advanced Settings > CSS Class - not carried by AddBlock)
@@ -6120,6 +8120,8 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
             RockMigrationHelper.AddSecurityAuthForBlock( "77A80F5F-CED1-4471-BCE3-1F405BE29C6B", 1, "View", false, "", Rock.Model.SpecialRole.AllAuthenticatedUsers, "F7873091-68D8-4D46-AD7C-14E7FCBE744E" );   // Content - Not signed in
             RockMigrationHelper.AddSecurityAuthForBlock( "B4E573CC-516E-4E32-A9B6-8E1475F8086F", 0, "View", true, "", Rock.Model.SpecialRole.AllAuthenticatedUsers, "C4C9591C-F288-4BB4-B751-E7800F6BA222" );   // Structured Content View
             RockMigrationHelper.AddSecurityAuthForBlock( "B4E573CC-516E-4E32-A9B6-8E1475F8086F", 1, "View", false, "", Rock.Model.SpecialRole.AllUnAuthenticatedUsers, "76DE382F-8014-4874-A3D2-CD876CBB92D6" );   // Structured Content View
+            RockMigrationHelper.AddSecurityAuthForBlock( "2C7A4F19-6B83-4E05-9D24-A15C8E30B7F6", 0, "View", true, "", Rock.Model.SpecialRole.AllAuthenticatedUsers, "D5144C58-6BEB-42CA-8C09-5A18FAE1A356" );   // Notifications
+            RockMigrationHelper.AddSecurityAuthForBlock( "2C7A4F19-6B83-4E05-9D24-A15C8E30B7F6", 1, "View", false, "", Rock.Model.SpecialRole.AllUsers, "A968C9BC-1FCA-4CAE-9E4E-E13BB2518801" );   // Notifications
 
             // Site page references, re-resolved by Guid.
             // Emitting the raw ids here would point the target at unrelated pages.
@@ -6190,6 +8192,14 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
                     VALUES ( @ChannelTypeId, 'App Menu', 'This content channel is used to drive generic ""App menu"" style content. Not sure if it is going to drive actual content items either, but for now just the menu.', '', 0, 0, '', '', 0, 0, '', 0, 1, 0, 1, 'DF6276E8-B00E-4E77-88D8-AB1241A4A8C7' );
                 END
                 " );   // App Menu
+            Sql( @"
+                DECLARE @ChannelTypeId INT = ( SELECT TOP 1 [Id] FROM [ContentChannelType] WHERE [Guid] = 'C0549458-DCCF-4E02-8978-B15932576F68' );
+                IF @ChannelTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [ContentChannel] WHERE [Guid] = '7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' )
+                BEGIN
+                    INSERT INTO [ContentChannel] ( [ContentChannelTypeId], [Name], [Description], [IconCssClass], [RequiresApproval], [EnableRss], [ChannelUrl], [ItemUrl], [TimeToLive], [ContentControlType], [RootImageDirectory], [IsIndexEnabled], [ItemsManuallyOrdered], [ChildItemsManuallyOrdered], [IsStructuredContent], [Guid] )
+                    VALUES ( @ChannelTypeId, 'Saved Podcast Episodes', 'Created automatically when someone saves a podcast episode in the mobile app. One item per episode, shared by everyone who saves it.', 'fa fa-podcast', 0, 0, '', '', 0, 0, '', 0, 0, 0, 0, '7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' );
+                END
+                " );   // Saved Podcast Episodes
 
             //
             // Defined types used by content channel item attributes
@@ -6309,6 +8319,25 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
                     INSERT INTO [AttributeQualifier] ( [IsSystem], [AttributeId], [Key], [Value], [Guid] )
                     SELECT 0, ( SELECT TOP 1 [Id] FROM [Attribute] WHERE [Guid] = '2F8E6A31-7C05-4D92-B4E8-1A63D905C7F4' ), 'valueprompt', 'Text to display', '9D2E51F8-6CA4-4B37-C105-84F39E6BA2D7';
                 " );   // Staff Bios . ContactLinks
+            Sql( @"
+                DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '122CAAAE-0698-4869-89FE-D818E109BAEA' );
+                DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                DECLARE @FieldTypeId INT = ( SELECT TOP 1 [Id] FROM [FieldType] WHERE [Guid] = '1EDAFDED-DFE6-4334-B019-6EECBA89E05A' );
+                IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = 'E4B182D7-06C9-4A53-9F1E-27B840C5A63D' )
+                BEGIN
+                    INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'ShowCardBlurb', 'Show Blurb on Card', 'No keeps the item''s Content body off the card while leaving it on the detail page. Use it when the body is written for the detail view and you don''t want it to display on the card.', 999, 0, 'True', 0, 0, 'E4B182D7-06C9-4A53-9F1E-27B840C5A63D' );
+                END
+                IF NOT EXISTS ( SELECT 1 FROM [AttributeQualifier] WHERE [Guid] = '7A2C5E38-91DB-4F07-8C64-3E05B9D17F42' )
+                    INSERT INTO [AttributeQualifier] ( [IsSystem], [AttributeId], [Key], [Value], [Guid] )
+                    SELECT 0, ( SELECT TOP 1 [Id] FROM [Attribute] WHERE [Guid] = 'E4B182D7-06C9-4A53-9F1E-27B840C5A63D' ), 'BooleanControlType', '0', '7A2C5E38-91DB-4F07-8C64-3E05B9D17F42';
+                IF NOT EXISTS ( SELECT 1 FROM [AttributeQualifier] WHERE [Guid] = '5B0E8A47-3C92-4D16-8FA5-91C70D2E4B68' )
+                    INSERT INTO [AttributeQualifier] ( [IsSystem], [AttributeId], [Key], [Value], [Guid] )
+                    SELECT 0, ( SELECT TOP 1 [Id] FROM [Attribute] WHERE [Guid] = 'E4B182D7-06C9-4A53-9F1E-27B840C5A63D' ), 'falsetext', 'No', '5B0E8A47-3C92-4D16-8FA5-91C70D2E4B68';
+                IF NOT EXISTS ( SELECT 1 FROM [AttributeQualifier] WHERE [Guid] = 'C93F604A-2E71-4B85-A0D6-518C7F3E29B1' )
+                    INSERT INTO [AttributeQualifier] ( [IsSystem], [AttributeId], [Key], [Value], [Guid] )
+                    SELECT 0, ( SELECT TOP 1 [Id] FROM [Attribute] WHERE [Guid] = 'E4B182D7-06C9-4A53-9F1E-27B840C5A63D' ), 'truetext', 'Yes', 'C93F604A-2E71-4B85-A0D6-518C7F3E29B1';
+                " );   // App Home Feed . ShowCardBlurb
             Sql( @"
                 DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '122CAAAE-0698-4869-89FE-D818E109BAEA' );
                 DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
@@ -7036,6 +9065,283 @@ Contained = side margins', 1006, 0, 'Contained', 0, 0, 'CE0ACC4F-161C-45DF-A908-
                     INSERT INTO [AttributeQualifier] ( [IsSystem], [AttributeId], [Key], [Value], [Guid] )
                     SELECT 0, ( SELECT TOP 1 [Id] FROM [Attribute] WHERE [Guid] = '3D95B172-8C40-4F6E-A218-97E4D0B36F51' ), 'truetext', '', 'B17E0A94-5C28-4D2C-3F03-7AE1D2025E4F';
                 " );   // App Menu . ShowDetailDate
+            Sql( @"
+                DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' );
+                DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                DECLARE @FieldTypeId INT = ( SELECT TOP 1 [Id] FROM [FieldType] WHERE [Guid] = '9C204CD0-1233-41C5-818A-C5DA439445AA' );
+                IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = 'A1B2C3D4-0001-4E5F-9A01-1122334455A1' )
+                BEGIN
+                    INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'EpisodeId', 'Episode Id', '', 0, 0, '', 0, 0, 'A1B2C3D4-0001-4E5F-9A01-1122334455A1' );
+                END
+
+                " );   // Saved Podcast Episodes . EpisodeId
+            Sql( @"
+                DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' );
+                DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                DECLARE @FieldTypeId INT = ( SELECT TOP 1 [Id] FROM [FieldType] WHERE [Guid] = 'C0D0D7E2-C3B0-4004-ABEA-4BBFAD10D5D2' );
+                IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = 'A1B2C3D4-0002-4E5F-9A02-1122334455A2' )
+                BEGIN
+                    INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'FeedUrl', 'Feed Url', '', 1, 0, '', 0, 0, 'A1B2C3D4-0002-4E5F-9A02-1122334455A2' );
+                END
+
+                " );   // Saved Podcast Episodes . FeedUrl
+            Sql( @"
+                DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' );
+                DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                DECLARE @FieldTypeId INT = ( SELECT TOP 1 [Id] FROM [FieldType] WHERE [Guid] = 'C0D0D7E2-C3B0-4004-ABEA-4BBFAD10D5D2' );
+                IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = 'A1B2C3D4-0003-4E5F-9A03-1122334455A3' )
+                BEGIN
+                    INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'AudioUrl', 'Audio Url', '', 2, 0, '', 0, 0, 'A1B2C3D4-0003-4E5F-9A03-1122334455A3' );
+                END
+
+                " );   // Saved Podcast Episodes . AudioUrl
+            Sql( @"
+                DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' );
+                DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                DECLARE @FieldTypeId INT = ( SELECT TOP 1 [Id] FROM [FieldType] WHERE [Guid] = 'C0D0D7E2-C3B0-4004-ABEA-4BBFAD10D5D2' );
+                IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = 'A1B2C3D4-0004-4E5F-9A04-1122334455A4' )
+                BEGIN
+                    INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'ImageUrl', 'Image Url', '', 3, 0, '', 0, 0, 'A1B2C3D4-0004-4E5F-9A04-1122334455A4' );
+                END
+
+                " );   // Saved Podcast Episodes . ImageUrl
+            Sql( @"
+                DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' );
+                DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                DECLARE @FieldTypeId INT = ( SELECT TOP 1 [Id] FROM [FieldType] WHERE [Guid] = '9C204CD0-1233-41C5-818A-C5DA439445AA' );
+                IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = 'A1B2C3D4-0005-4E5F-9A05-1122334455A5' )
+                BEGIN
+                    INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'Tagline', 'Tagline', '', 4, 0, '', 0, 0, 'A1B2C3D4-0005-4E5F-9A05-1122334455A5' );
+                END
+
+                " );   // Saved Podcast Episodes . Tagline
+            Sql( @"
+                DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' );
+                DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                DECLARE @FieldTypeId INT = ( SELECT TOP 1 [Id] FROM [FieldType] WHERE [Guid] = '9C204CD0-1233-41C5-818A-C5DA439445AA' );
+                IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = 'A1B2C3D4-0006-4E5F-9A06-1122334455A6' )
+                BEGIN
+                    INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'Speaker', 'Speaker', '', 5, 0, '', 0, 0, 'A1B2C3D4-0006-4E5F-9A06-1122334455A6' );
+                END
+
+                " );   // Saved Podcast Episodes . Speaker
+            Sql( @"
+                DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' );
+                DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                DECLARE @FieldTypeId INT = ( SELECT TOP 1 [Id] FROM [FieldType] WHERE [Guid] = 'BD53F9C9-EBA9-4D3F-82EA-DE5DD34A8108' );
+                IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = 'A1B2C3D4-0007-4E5F-9A07-1122334455A7' )
+                BEGIN
+                    INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'LinkAppPage', 'Button Link App Page', '', 6, 0, '', 0, 0, 'A1B2C3D4-0007-4E5F-9A07-1122334455A7' );
+                END
+
+                " );   // Saved Podcast Episodes . LinkAppPage
+            Sql( @"
+                DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' );
+                DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                DECLARE @FieldTypeId INT = ( SELECT TOP 1 [Id] FROM [FieldType] WHERE [Guid] = '9C204CD0-1233-41C5-818A-C5DA439445AA' );
+                IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = 'A1B2C3D4-0008-4E5F-9A08-1122334455A8' )
+                BEGIN
+                    INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'LinkPageParameters', 'Button Link Page Parameters', '', 7, 0, '', 0, 0, 'A1B2C3D4-0008-4E5F-9A08-1122334455A8' );
+                END
+
+                " );   // Saved Podcast Episodes . LinkPageParameters
+            Sql( @"
+                DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' );
+                DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                DECLARE @FieldTypeId INT = ( SELECT TOP 1 [Id] FROM [FieldType] WHERE [Guid] = '9C204CD0-1233-41C5-818A-C5DA439445AA' );
+                IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = 'A1B2C3D4-0009-4E5F-9A09-1122334455A9' )
+                BEGIN
+                    INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'LinkButtonText', 'Button Link Text', '', 8, 0, 'Play Episode', 0, 0, 'A1B2C3D4-0009-4E5F-9A09-1122334455A9' );
+                END
+
+                " );   // Saved Podcast Episodes . LinkButtonText
+            Sql( @"
+                DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' );
+                DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                DECLARE @FieldTypeId INT = ( SELECT TOP 1 [Id] FROM [FieldType] WHERE [Guid] = '1EDAFDED-DFE6-4334-B019-6EECBA89E05A' );
+                IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = 'A1B2C3D4-000A-4E5F-9A0A-1122334455AA' )
+                BEGIN
+                    INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'ShowDetailTitle', 'Show Detail Title', '', 9, 0, 'True', 0, 0, 'A1B2C3D4-000A-4E5F-9A0A-1122334455AA' );
+                END
+
+                " );   // Saved Podcast Episodes . ShowDetailTitle
+            Sql( @"
+                DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '7B3E9C51-4A6D-4F82-9E13-05C7A2D48B6F' );
+                DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                DECLARE @FieldTypeId INT = ( SELECT TOP 1 [Id] FROM [FieldType] WHERE [Guid] = '1EDAFDED-DFE6-4334-B019-6EECBA89E05A' );
+                IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = 'A1B2C3D4-000B-4E5F-9A0B-1122334455AB' )
+                BEGIN
+                    INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'ShowDetailDate', 'Show Detail Date', '', 10, 0, 'True', 0, 0, 'A1B2C3D4-000B-4E5F-9A0B-1122334455AB' );
+                END
+
+                " );   // Saved Podcast Episodes . ShowDetailDate
+
+            //
+            // Attribute categories - the sections the item editor groups the attributes above into.
+            // Rock qualifies these to the ContentChannelItem entity TYPE rather than to one channel,
+            // so Tap Action / Detail Page / Call-to-Action Button are shared by App Home Feed and App
+            // Menu instead of being duplicated. A category only appears while editing an item whose
+            // channel owns an attribute inside it, so this does not leak onto other channels.
+            //
+            Sql( @"
+                DECLARE @AttrEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.Attribute' );
+                DECLARE @ItemEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                IF NOT EXISTS ( SELECT 1 FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A01' )
+                    INSERT INTO [Category] ( [IsSystem], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Name], [IconCssClass], [Guid], [Order] )
+                    VALUES ( 0, @AttrEntityTypeId, 'EntityTypeId', CAST( @ItemEntityTypeId AS NVARCHAR(20) ), 'Menu Placement', 'fa fa-bars', '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A01', 0 );
+
+                DECLARE @CategoryId INT = ( SELECT TOP 1 [Id] FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A01' );
+                INSERT INTO [AttributeCategory] ( [AttributeId], [CategoryId] )
+                SELECT a.[Id], @CategoryId FROM [Attribute] a
+                 WHERE a.[Guid] IN (
+                        '99B3387C-7526-43CC-92AB-AC8E173E95F6',
+                        '7FDC1A9A-1DCE-4B93-B2F5-EAA1F5663AF7' )
+                   AND NOT EXISTS ( SELECT 1 FROM [AttributeCategory] ac WHERE ac.[AttributeId] = a.[Id] AND ac.[CategoryId] = @CategoryId );
+                " );   // Category: Menu Placement
+            Sql( @"
+                DECLARE @AttrEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.Attribute' );
+                DECLARE @ItemEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                IF NOT EXISTS ( SELECT 1 FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A02' )
+                    INSERT INTO [Category] ( [IsSystem], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Name], [IconCssClass], [Guid], [Order] )
+                    VALUES ( 0, @AttrEntityTypeId, 'EntityTypeId', CAST( @ItemEntityTypeId AS NVARCHAR(20) ), 'Content Source', 'fa fa-clone', '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A02', 1 );
+
+                DECLARE @CategoryId INT = ( SELECT TOP 1 [Id] FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A02' );
+                INSERT INTO [AttributeCategory] ( [AttributeId], [CategoryId] )
+                SELECT a.[Id], @CategoryId FROM [Attribute] a
+                 WHERE a.[Guid] IN (
+                        '9C026AB7-E28F-4B59-968A-53115C0D9726',
+                        '7C1F4E8A-3D62-4B05-9E17-2A48C0D95F63' )
+                   AND NOT EXISTS ( SELECT 1 FROM [AttributeCategory] ac WHERE ac.[AttributeId] = a.[Id] AND ac.[CategoryId] = @CategoryId );
+                " );   // Category: Content Source
+            Sql( @"
+                DECLARE @AttrEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.Attribute' );
+                DECLARE @ItemEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                IF NOT EXISTS ( SELECT 1 FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A03' )
+                    INSERT INTO [Category] ( [IsSystem], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Name], [IconCssClass], [Guid], [Order] )
+                    VALUES ( 0, @AttrEntityTypeId, 'EntityTypeId', CAST( @ItemEntityTypeId AS NVARCHAR(20) ), 'Card Content', 'fa fa-align-left', '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A03', 2 );
+
+                DECLARE @CategoryId INT = ( SELECT TOP 1 [Id] FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A03' );
+                INSERT INTO [AttributeCategory] ( [AttributeId], [CategoryId] )
+                SELECT a.[Id], @CategoryId FROM [Attribute] a
+                 WHERE a.[Guid] IN (
+                        'E4B182D7-06C9-4A53-9F1E-27B840C5A63D',
+                        'C47BC6A6-68E9-46AF-B1FC-EDD09E37C4FF',
+                        'FA6FB88D-AC36-4570-B8AF-B1BDF38A15C5',
+                        '8D6E1DED-2A74-4FD1-B69E-DBBB05DFCDE4',
+                        'CB07C7DC-7274-4D9C-9210-BAAF934D8AE7',
+                        '9E36D033-83A7-4114-B7F3-94583912E538',
+                        '75AAC674-FCFD-4C4F-A113-BDA278E14D12' )
+                   AND NOT EXISTS ( SELECT 1 FROM [AttributeCategory] ac WHERE ac.[AttributeId] = a.[Id] AND ac.[CategoryId] = @CategoryId );
+                " );   // Category: Card Content
+            Sql( @"
+                DECLARE @AttrEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.Attribute' );
+                DECLARE @ItemEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                IF NOT EXISTS ( SELECT 1 FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A04' )
+                    INSERT INTO [Category] ( [IsSystem], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Name], [IconCssClass], [Guid], [Order] )
+                    VALUES ( 0, @AttrEntityTypeId, 'EntityTypeId', CAST( @ItemEntityTypeId AS NVARCHAR(20) ), 'Card Appearance', 'fa fa-paint-brush', '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A04', 3 );
+
+                DECLARE @CategoryId INT = ( SELECT TOP 1 [Id] FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A04' );
+                INSERT INTO [AttributeCategory] ( [AttributeId], [CategoryId] )
+                SELECT a.[Id], @CategoryId FROM [Attribute] a
+                 WHERE a.[Guid] IN (
+                        'CE0ACC4F-161C-45DF-A908-24A5596CCC21',
+                        'FA7406AC-3A4D-4162-814F-FD60DCBC5E2B',
+                        'FCE7A15B-4EA0-4E06-A04D-02159B79331F' )
+                   AND NOT EXISTS ( SELECT 1 FROM [AttributeCategory] ac WHERE ac.[AttributeId] = a.[Id] AND ac.[CategoryId] = @CategoryId );
+                " );   // Category: Card Appearance
+            Sql( @"
+                DECLARE @AttrEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.Attribute' );
+                DECLARE @ItemEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                IF NOT EXISTS ( SELECT 1 FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A05' )
+                    INSERT INTO [Category] ( [IsSystem], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Name], [IconCssClass], [Guid], [Order] )
+                    VALUES ( 0, @AttrEntityTypeId, 'EntityTypeId', CAST( @ItemEntityTypeId AS NVARCHAR(20) ), 'Row Appearance', 'fa fa-list-ul', '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A05', 4 );
+
+                DECLARE @CategoryId INT = ( SELECT TOP 1 [Id] FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A05' );
+                INSERT INTO [AttributeCategory] ( [AttributeId], [CategoryId] )
+                SELECT a.[Id], @CategoryId FROM [Attribute] a
+                 WHERE a.[Guid] IN (
+                        'A05333F7-EC3B-4BFD-98A9-40C33CB7BEB0',
+                        '73690FC9-9D86-4468-BCF5-FF683B9FDDAD',
+                        '8DB428E4-702D-403F-A0E2-D5A8537C1731',
+                        '8290BE1C-646C-4C79-995F-2A17E6F4EDE5',
+                        '93240002-A37D-4578-80A1-D7E5BC8EF30A' )
+                   AND NOT EXISTS ( SELECT 1 FROM [AttributeCategory] ac WHERE ac.[AttributeId] = a.[Id] AND ac.[CategoryId] = @CategoryId );
+                " );   // Category: Row Appearance
+            Sql( @"
+                DECLARE @AttrEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.Attribute' );
+                DECLARE @ItemEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                IF NOT EXISTS ( SELECT 1 FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A06' )
+                    INSERT INTO [Category] ( [IsSystem], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Name], [IconCssClass], [Guid], [Order] )
+                    VALUES ( 0, @AttrEntityTypeId, 'EntityTypeId', CAST( @ItemEntityTypeId AS NVARCHAR(20) ), 'Tap Action', 'fa fa-hand-pointer', '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A06', 5 );
+
+                DECLARE @CategoryId INT = ( SELECT TOP 1 [Id] FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A06' );
+                INSERT INTO [AttributeCategory] ( [AttributeId], [CategoryId] )
+                SELECT a.[Id], @CategoryId FROM [Attribute] a
+                 WHERE a.[Guid] IN (
+                        '97BAEB0F-2E0B-4280-AA5B-C7CAA04C347B',
+                        '91C526A0-E675-475C-8C0C-221124BB35EB',
+                        'AA78BD64-E376-4896-A487-7F8C4C7A6778',
+                        'F24E8F59-3B62-4FDE-B2A0-AB7B0118B754',
+                        '07FDE24E-3F5E-4FD5-AE80-C952B8C0858F',
+                        'D1CA0756-964F-42C2-9839-ED121F76D986',
+                        'E2F9FC20-5C69-4733-8B14-F7817F49F021',
+                        '92E457C6-3A42-43C4-BBC8-05790F5F5941',
+                        'E77D3263-DC15-4E09-8C37-A18973FAEFBA' )
+                   AND NOT EXISTS ( SELECT 1 FROM [AttributeCategory] ac WHERE ac.[AttributeId] = a.[Id] AND ac.[CategoryId] = @CategoryId );
+                " );   // Category: Tap Action
+            Sql( @"
+                DECLARE @AttrEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.Attribute' );
+                DECLARE @ItemEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                IF NOT EXISTS ( SELECT 1 FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A07' )
+                    INSERT INTO [Category] ( [IsSystem], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Name], [IconCssClass], [Guid], [Order] )
+                    VALUES ( 0, @AttrEntityTypeId, 'EntityTypeId', CAST( @ItemEntityTypeId AS NVARCHAR(20) ), 'Detail Page', 'fa fa-file-alt', '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A07', 6 );
+
+                DECLARE @CategoryId INT = ( SELECT TOP 1 [Id] FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A07' );
+                INSERT INTO [AttributeCategory] ( [AttributeId], [CategoryId] )
+                SELECT a.[Id], @CategoryId FROM [Attribute] a
+                 WHERE a.[Guid] IN (
+                        '0C4B7F93-5D28-4A61-8E07-3F92D6C41B85',
+                        '2A6E4C81-9B37-4D50-8F62-1E05D7A93C46',
+                        '8B0D7F35-4A92-4E18-B76C-3D91C5E204A7',
+                        '7E1A9D46-B3C5-4028-95F7-6D0B84E23A19',
+                        '5C24F8B0-6E13-49A7-8D3F-0B76E1A5C92D',
+                        '3D95B172-8C40-4F6E-A218-97E4D0B36F51' )
+                   AND NOT EXISTS ( SELECT 1 FROM [AttributeCategory] ac WHERE ac.[AttributeId] = a.[Id] AND ac.[CategoryId] = @CategoryId );
+                " );   // Category: Detail Page
+            Sql( @"
+                DECLARE @AttrEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.Attribute' );
+                DECLARE @ItemEntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                IF NOT EXISTS ( SELECT 1 FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A08' )
+                    INSERT INTO [Category] ( [IsSystem], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Name], [IconCssClass], [Guid], [Order] )
+                    VALUES ( 0, @AttrEntityTypeId, 'EntityTypeId', CAST( @ItemEntityTypeId AS NVARCHAR(20) ), 'Call-to-Action Button', 'fa fa-bullhorn', '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A08', 7 );
+
+                DECLARE @CategoryId INT = ( SELECT TOP 1 [Id] FROM [Category] WHERE [Guid] = '9A1C4E60-1D3B-4A72-8E51-0C7F2B4D6A08' );
+                INSERT INTO [AttributeCategory] ( [AttributeId], [CategoryId] )
+                SELECT a.[Id], @CategoryId FROM [Attribute] a
+                 WHERE a.[Guid] IN (
+                        'E2C6B94A-1F73-4E58-B0D9-6A4E8C15F7B3',
+                        'F8D50A21-4C96-4B7E-83A1-2D9F6E0B85C4',
+                        '3B7E1D68-9A05-4C2F-B54D-7E8A0C36F91D',
+                        '6D2F81A4-3E57-4C0B-9A16-7B8E4D05C2F3',
+                        '4E9B0C57-8A31-4F6D-B25C-0D71E3A8F94B',
+                        '7A4E1C09-3D62-4B85-9F03-2E8D5A61C74B',
+                        'B85D3F27-6A14-4E90-8C5B-1D07F2A639E8',
+                        'C93A6E58-2F71-4D06-B14E-8A5C0D3B72F1',
+                        '9F3C6A18-2D74-4E85-B0A9-5C61F7D82E30',
+                        '1A8D5E62-7B04-4C39-96F1-E2A5C0B73D48' )
+                   AND NOT EXISTS ( SELECT 1 FROM [AttributeCategory] ac WHERE ac.[AttributeId] = a.[Id] AND ac.[CategoryId] = @CategoryId );
+                " );   // Category: Call-to-Action Button
 
 ﻿
             //
@@ -7415,15 +9721,51 @@ Contained = side margins', 1006, 0, 'Contained', 0, 0, 'CE0ACC4F-161C-45DF-A908-
                                          AND a.[Action] = 'Edit'
                                          AND a.[GroupId] = @MobileGroupId );
 
+                    /*
+                      Followings - the Save / heart on sermons, series and podcast
+                      episodes. Rock:FollowingIcon posts to
+                          Followings/{entityTypeId}/{entityId}
+                      and DELETEs the same route to un-save. Both are
+                      [Authenticate, Secured], so without an Auth row the POST
+                      returns 401 and the icon fills in then empties again.
+
+                      Matched by RestAction Guid, not by ApiId. The previous
+                      LIKE 'POSTapi/Followings%' matched ZERO rows - real ApiId
+                      values look like
+                          POSTFollowings^HttpResponseMessage Follow(Int32, Int32, String)
+                      with no 'api/' in them - so this grant never happened and
+                      saving never worked on a migrated server.
+
+                      Granted to All Authenticated Users (SpecialRole 2), not to
+                      the mobile role: the follow call authenticates as the
+                      signed-in person, not as the application.
+                    */
+                    DECLARE @FollowActions TABLE ( [Guid] UNIQUEIDENTIFIER );
+                    INSERT INTO @FollowActions VALUES
+                        ( '1C1F80FE-2567-463E-8BFE-E49ECB8450C7' ),   -- POST   Follow(Int32, Int32, String)
+                        ( 'AAB5800B-A429-40D2-A402-D3DE7E15776E' );   -- DELETE Delete(Int32, Int32, String)
+
                     INSERT INTO [Auth] ( [EntityTypeId], [EntityId], [Order], [Action], [AllowOrDeny], [SpecialRole], [GroupId], [Guid] )
-                    SELECT @RestActionEntityTypeId, ra.[Id], 0, 'Edit', 'A', 0, @MobileGroupId, NEWID()
+                    SELECT @RestActionEntityTypeId, ra.[Id], 0, 'Edit', 'A', 2, NULL, NEWID()
                     FROM [RestAction] ra
-                    WHERE ra.[ApiId] LIKE 'POSTapi/Followings%'
-                      AND NOT EXISTS ( SELECT 1 FROM [Auth] a
+                    JOIN @FollowActions fa ON fa.[Guid] = ra.[Guid]
+                    WHERE NOT EXISTS ( SELECT 1 FROM [Auth] a
                                        WHERE a.[EntityTypeId] = @RestActionEntityTypeId
                                          AND a.[EntityId] = ra.[Id]
                                          AND a.[Action] = 'Edit'
-                                         AND a.[GroupId] = @MobileGroupId );
+                                         AND a.[AllowOrDeny] = 'A'
+                                         AND a.[SpecialRole] = 2 );
+
+                    INSERT INTO [Auth] ( [EntityTypeId], [EntityId], [Order], [Action], [AllowOrDeny], [SpecialRole], [GroupId], [Guid] )
+                    SELECT @RestActionEntityTypeId, ra.[Id], 1, 'View', 'A', 2, NULL, NEWID()
+                    FROM [RestAction] ra
+                    JOIN @FollowActions fa ON fa.[Guid] = ra.[Guid]
+                    WHERE NOT EXISTS ( SELECT 1 FROM [Auth] a
+                                       WHERE a.[EntityTypeId] = @RestActionEntityTypeId
+                                         AND a.[EntityId] = ra.[Id]
+                                         AND a.[Action] = 'View'
+                                         AND a.[AllowOrDeny] = 'A'
+                                         AND a.[SpecialRole] = 2 );
                 END
                 " );
 
