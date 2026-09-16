@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2023 by Kingdom First Solutions
+// Copyright 2026 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,23 +16,17 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Data;
+using System.Data.Entity;
 using System.Linq;
-using System.Text;
 using System.Web;
-
+using OfficeOpenXml;
 using Rock;
 using Rock.Data;
-using Rock.Model;
-using Rock.Web.Cache;
-using Rock.Utility;
-using OfficeOpenXml;
-using System.Data;
-using System.ComponentModel;
-using System.Data.Entity;
-
-using KFSConst = rocks.kfs.ShelbyFinancials.SystemGuid;
 using Rock.Lava;
+using Rock.Model;
+using Rock.Utility;
+using Rock.Web.Cache;
 
 namespace rocks.kfs.ShelbyFinancials
 {
@@ -816,7 +810,7 @@ namespace rocks.kfs.ShelbyFinancials
             return exportColumns;
         }
 
-        public class GLTransaction : ILavaDataDictionary, ILiquidizable
+        public class GLTransaction : ILavaDataDictionary
         {
             [LavaVisible]
             public decimal Amount { get; set; }
@@ -929,46 +923,6 @@ namespace rocks.kfs.ShelbyFinancials
                 var propInfo = GetType().GetProperty( propertyKey );
 
                 return propInfo != null;
-            }
-
-            #endregion
-
-            #region ILiquidizable
-
-            /// <summary>
-            /// Determines whether the specified key contains key.
-            /// </summary>
-            /// <param name="key">The key.</param>
-            /// <returns></returns>
-            public virtual bool ContainsKey( object key )
-            {
-                string propertyKey = key.ToStringSafe();
-                var propInfo = GetType().GetProperty( propertyKey );
-
-                return propInfo != null;
-            }
-
-            /// <summary>
-            /// Gets the <see cref="System.Object"/> with the specified key.
-            /// </summary>
-            /// <value>
-            /// The <see cref="System.Object"/>.
-            /// </value>
-            /// <param name="key">The key.</param>
-            /// <returns></returns>
-            public object GetValue( object key )
-            {
-                return this[key];
-            }
-
-            /// <summary>
-            /// To the liquid.
-            /// </summary>
-            /// <returns></returns>
-            /// <exception cref="System.NotImplementedException"></exception>
-            public object ToLiquid()
-            {
-                return this;
             }
 
             #endregion

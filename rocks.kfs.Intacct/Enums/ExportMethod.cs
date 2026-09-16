@@ -19,19 +19,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace rocks.kfs.Intacct.Enums
 {
-    public enum PaymentMethod
+    public enum ExportMethod
     {
-        [Display( Name = "Check" )]
-        [Description( "Printed Check" )]
-        PrintedCheck,
-        [Display( Name = "Cash" )]
-        [Description( "Cash" )]
-        Cash,
-        [Display( Name = "Record Transfer" )]
-        [Description( "EFT" )]
-        EFT,
-        [Display( Name = "Credit Card" )]
-        [Description( "Credit Card" )]
-        CreditCard
+        Direct,
+        File
     }
 }

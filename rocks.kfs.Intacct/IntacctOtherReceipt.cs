@@ -16,17 +16,15 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
+using System.Text;
+using System.Web;
 using System.Xml;
-
 using Rock;
 using Rock.Data;
 using Rock.Model;
-using Rock.Web.Cache;
 using rocks.kfs.Intacct.Enums;
 using rocks.kfs.Intacct.Utils;
-using KFSConst = rocks.kfs.Intacct.SystemGuid;
 
 namespace rocks.kfs.Intacct
 {
@@ -146,10 +144,12 @@ namespace rocks.kfs.Intacct
                             if ( !string.IsNullOrWhiteSpace( item.ProjectId ) )
                             {
                                 writer.WriteElementString( "projectid", item.ProjectId );
-                            }
-                            if ( !string.IsNullOrWhiteSpace( item.TaskId ) )
-                            {
-                                writer.WriteElementString( "taskid", item.TaskId );
+
+                                // Task is a sub-dimension of Project in Intacct, so only include if Project is included.
+                                if ( !string.IsNullOrWhiteSpace( item.TaskId ) )
+                                {
+                                    writer.WriteElementString( "taskid", item.TaskId );
+                                }
                             }
                             if ( !string.IsNullOrWhiteSpace( item.CustomerId ) )
                             {
@@ -171,15 +171,27 @@ namespace rocks.kfs.Intacct
                             {
                                 writer.WriteElementString( "classid", item.ClassId );
                             }
+                            if ( !string.IsNullOrWhiteSpace( item.ContractId ) )
+                            {
+                                writer.WriteElementString( "contractid", item.ContractId );
+                            }
+                            if ( !string.IsNullOrWhiteSpace( item.WarehouseId ) )
+                            {
+                                writer.WriteElementString( "warehouseid", item.WarehouseId );
+                            }
 
-                            // Intacct api documentation shows support for custom fields, but we are unable to get them to work. Disabling for now.
-
+                            // Intacct XML api documentation shows support for custom fields, but we are unable to get them to work. Disabling for now.
                             //if ( item.CustomFields.Count > 0 )
                             //{
+                            //    writer.WriteStartElement( "customfields" );
                             //    foreach ( KeyValuePair<string, dynamic> customField in item.CustomFields )
                             //    {
-                            //        writer.WriteElementString( customField.Key, customField.Value ?? string.Empty );
+                            //        writer.WriteStartElement( "customfield" );
+                            //        writer.WriteElementString( "customfieldname", customField.Key );
+                            //        writer.WriteElementString( "customfieldvalue", customField.Value ?? string.Empty );
+                            //        writer.WriteEndElement();  // close customfield
                             //    }
+                            //    writer.WriteEndElement();  // close customfields
                             //}
                             writer.WriteEndElement();  // close lineitem
                         }
@@ -262,6 +274,13 @@ namespace rocks.kfs.Intacct
                 var classId = account.GetAttributeValue( "rocks.kfs.Intacct.CLASSID" );
                 var departmentId = account.GetAttributeValue( "rocks.kfs.Intacct.DEPARTMENT" );
                 var locationId = account.GetAttributeValue( "rocks.kfs.Intacct.LOCATION" );
+                var taskId = account.GetAttributeValue( "rocks.kfs.Intacct.TASKID" );
+                var customerId = account.GetAttributeValue( "rocks.kfs.Intacct.CUSTOMERID" );
+                var itemId = account.GetAttributeValue( "rocks.kfs.Intacct.ITEMID" );
+                var vendorId = account.GetAttributeValue( "rocks.kfs.Intacct.VENDORID" );
+                var employeeId = account.GetAttributeValue( "rocks.kfs.Intacct.EMPLOYEEID" );
+                var contractId = account.GetAttributeValue( "rocks.kfs.Intacct.CONTRACTID" );
+                var warehouseId = account.GetAttributeValue( "rocks.kfs.Intacct.WAREHOUSEID" );
 
                 var receiptItem = new ReceiptLineItem
                 {
@@ -272,6 +291,13 @@ namespace rocks.kfs.Intacct
                     DepartmentId = departmentId,
                     ProjectId = bTran.CreditProject,
                     ClassId = classId,
+                    TaskId = taskId,
+                    CustomerId = customerId,
+                    ItemId = itemId,
+                    VendorId = vendorId,
+                    EmployeeId = employeeId,
+                    ContractId = contractId,
+                    WarehouseId = warehouseId,
                     CustomFields = creditDimensions,
                     CustomFieldsString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) )
                 };
@@ -288,6 +314,13 @@ namespace rocks.kfs.Intacct
                         DepartmentId = departmentId,
                         ProjectId = bTran.CreditProject,
                         ClassId = classId,
+                        TaskId = taskId,
+                        CustomerId = customerId,
+                        ItemId = itemId,
+                        VendorId = vendorId,
+                        EmployeeId = employeeId,
+                        ContractId = contractId,
+                        WarehouseId = warehouseId,
                         CustomFields = creditDimensions,
                         CustomFieldsString = string.Join( Environment.NewLine, new Dictionary<string, dynamic>( creditDimensions ) )
                     };
@@ -298,7 +331,7 @@ namespace rocks.kfs.Intacct
             if ( groupingMode == GLAccountGroupingMode.DebitAndCreditLines || groupingMode == GLAccountGroupingMode.CreditLinesOnly )
             {
                 lineItemList = lineItemList
-                    .GroupBy( d => new { d.ClassId, d.DepartmentId, d.LocationId, d.ProjectId, d.GlAccountNo, d.CustomFieldsString } )
+                    .GroupBy( d => new { d.ClassId, d.DepartmentId, d.LocationId, d.ProjectId, d.GlAccountNo, d.CustomerId, d.TaskId, d.ItemId, d.VendorId, d.EmployeeId, d.ContractId, d.WarehouseId, d.CustomFieldsString } )
                     .Select( s => new ReceiptLineItem
                     {
                         Amount = s.Sum( f => f.Amount ),
@@ -307,6 +340,13 @@ namespace rocks.kfs.Intacct
                         DepartmentId = s.Key.DepartmentId,
                         LocationId = s.Key.LocationId,
                         ProjectId = s.Key.ProjectId,
+                        TaskId = s.Key.TaskId,
+                        CustomerId = s.Key.CustomerId,
+                        ItemId = s.Key.ItemId,
+                        VendorId = s.Key.VendorId,
+                        EmployeeId = s.Key.EmployeeId,
+                        ContractId = s.Key.ContractId,
+                        WarehouseId = s.Key.WarehouseId,
                         Memo = s.First().Memo,
                         CustomFields = s.First().CustomFields
                     } )
@@ -316,6 +356,283 @@ namespace rocks.kfs.Intacct
             otherReceipt.ReceiptItems.AddRange( lineItemList );
 
             return otherReceipt;
+        }
+
+        public List<GLReceiptCsvLine> GetOtherReceiptCsvLines( FinancialBatch financialBatch, ref string debugLava, PaymentMethod paymentMethod, GLAccountGroupingMode groupingMode, string bankAccountId = null, string unDepGLAccountId = null, string DescriptionLava = "" )
+        {
+            var glCsvLines = new List<GLReceiptCsvLine>();
+
+            var otherReceipt = BuildOtherReceipt( financialBatch, ref debugLava, paymentMethod, groupingMode, bankAccountId, unDepGLAccountId, DescriptionLava );
+            var entryLineNumber = 1;
+
+            foreach ( var item in otherReceipt.ReceiptItems )
+            {
+                var csvLine = new GLReceiptCsvLine()
+                {
+                    LineNumber = entryLineNumber,
+                    AccountNumber = item.GlAccountNo ?? string.Empty,
+                    AccountLabel = item.GlAccountLabel ?? string.Empty,
+                    TransactionAmount = item.Amount,
+                    Amount = item.Amount,
+                    DepartmentId = item.DepartmentId,
+                    LocationId = item.LocationId,
+                    Memo = item.Memo,
+                    ProjectId = item.ProjectId,
+                    TaskId = item.TaskId,
+                    CustomerId = item.CustomerId,
+                    ItemId = item.ItemId,
+                    VendorId = item.VendorId,
+                    EmployeeId = item.EmployeeId,
+                    ContractId = item.ContractId,
+                    WarehouseId = item.WarehouseId,
+                    ClassId = item.ClassId,
+                    CustomFields = item.CustomFields
+                };
+
+                // Only add Batch/Receipt level info to first line of the receipt.
+                if ( entryLineNumber == 1 )
+                {
+                    csvLine.ReceiptDate = otherReceipt.PaymentDate;
+                    csvLine.Payer = otherReceipt.Payer;
+                    csvLine.PaymentMethod = otherReceipt.PaymentMethod;
+                    csvLine.TransactionDate = otherReceipt.ReceivedDate;
+                    csvLine.TransactionNumber = otherReceipt.RefId;
+                    csvLine.Description = otherReceipt.Description;
+                    csvLine.DepositTo = otherReceipt.BankAccountId != null ? DepositTo.BankAccount : DepositTo.UndepositedFunds;
+                    csvLine.BankAccountId = otherReceipt.BankAccountId;
+                    csvLine.DepositDate = otherReceipt.DepositDate;
+                    csvLine.UndepositedFundsAccountId = otherReceipt.UnDepGLAccountNo;
+                    csvLine.Currency = otherReceipt.Currency;
+                    csvLine.ExchRateDate = otherReceipt.ExchRateDate;
+                    csvLine.ExchRateType = otherReceipt.ExchRateType;
+                    csvLine.ExchRate = otherReceipt.ExchRate;
+                }
+
+                glCsvLines.Add( csvLine );
+                entryLineNumber++;
+            }
+
+            return glCsvLines;
+        }
+
+        public void GLCsvExport( List<GLReceiptCsvLine> items, string fileId )
+        {
+            if ( HttpContext.Current.Session["IntacctCsvExport"] != null )
+            {
+                HttpContext.Current.Session["IntacctCsvExport"] = string.Empty;
+            }
+            if ( HttpContext.Current.Session["IntacctFileId"] != null )
+            {
+                HttpContext.Current.Session["IntacctFileId"] = string.Empty;
+            }
+
+            var customFieldCols = items.SelectMany( i => i.CustomFields.Keys ).Distinct().ToList().OrderBy( k => k );
+            var exportColumns = new ExportColumns();
+            exportColumns.CustomFieldKeys = customFieldCols.ToList();
+
+            var output = new StringBuilder();
+            output.Append( "Receipt_Date, Payer_Name, PayMethod, DocDate, DocNumber, Description" );
+            if ( items.Any( i => i.DepositTo == DepositTo.BankAccount ) )
+            {
+                output.Append( ", BankAccountId, DepositDate" );
+                exportColumns.BankAccountId = true;
+                exportColumns.DepositDate = true;
+            }
+            if ( items.Any( i => i.DepositTo == DepositTo.UndepositedFunds ) )
+            {
+                output.Append( ", DepositTo, UndepAcctNo" );
+                exportColumns.UndepAcctNo = true;
+            }
+            if ( items.Any( i => !i.Currency.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", Currency" );
+                exportColumns.Currency = true;
+            }
+            if ( items.Any( i => i.ExchRateDate.HasValue ) )
+            {
+                output.Append( ", Exch_Rate_Date" );
+                exportColumns.ExchangeRateDate = true;
+            }
+            if ( items.Any( i => !i.ExchRateType.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", Exch_Rate_Type_Id" );
+                exportColumns.ExchangeRateTypeId = true;
+            }
+            if ( items.Any( i => i.ExchRate.HasValue ) )
+            {
+                output.Append( ", Exch_Rate" );
+                exportColumns.ExchangeRate = true;
+            }
+            output.Append( ", Line_No, Acct_No" );
+            if ( items.Any( i => !i.AccountLabel.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", AccountLabel" );
+                exportColumns.AccountLabel = true;
+            }
+            output.Append( ", Trx_Amount, Amount" );
+            if ( items.Any( i => !i.DepartmentId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", Dept_Id" );
+                exportColumns.DepartmentId = true;
+            }
+            output.Append( ", Location_Id, Item_Memo" );
+            if ( items.Any( i => !i.ProjectId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", OtherReceiptsEntry_ProjectId" );
+                exportColumns.ProjectId = true;
+                if ( items.Any( i => !i.TaskId.IsNullOrWhiteSpace() ) )   // Task is a sub-dimension of Project in Intacct, so only include if Project is included.
+                {
+                    output.Append( ", OtherReceiptsEntry_TaskId" );
+                    exportColumns.TaskId = true;
+                }
+            }
+            if ( items.Any( i => !i.CustomerId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", OtherReceiptsEntry_CustomerId" );
+                exportColumns.CustomerId = true;
+            }
+            if ( items.Any( i => !i.ItemId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", OtherReceiptsEntry_ItemId" );
+                exportColumns.ItemId = true;
+            }
+            if ( items.Any( i => !i.VendorId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", OtherReceiptsEntry_VendorId" );
+                exportColumns.VendorId = true;
+            }
+            if ( items.Any( i => !i.EmployeeId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", OtherReceiptsEntry_EmployeeId" );
+                exportColumns.EmployeeId = true;
+            }
+            if ( items.Any( i => !i.ClassId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", OtherReceiptsEntry_ClassId" );
+                exportColumns.ClassId = true;
+            }
+            if ( items.Any( i => !i.ContractId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", OtherReceiptsEntry_ContractId" );
+                exportColumns.ContractId = true;
+            }
+            if ( items.Any( i => !i.WarehouseId.IsNullOrWhiteSpace() ) )
+            {
+                output.Append( ", OtherReceiptsEntry_WarehouseId" );
+                exportColumns.WarehouseId = true;
+            }
+            foreach ( var customFieldCol in customFieldCols )
+            {
+                output.AppendFormat( ", {0}", customFieldCol );
+            }
+
+            foreach ( var item in items )
+            {
+                output.Append( Environment.NewLine );
+                output.AppendFormat( "{0},{1},{2},{3},{4},{5}", item.ReceiptDate.HasValue ? item.ReceiptDate.Value.ToShortDateString() : string.Empty, item.Payer, item.PaymentMethod.HasValue ? item.PaymentMethod.GetDescription() : string.Empty, item.TransactionDate.HasValue ? item.TransactionDate.Value.ToShortDateString() : string.Empty, item.TransactionNumber, item.Description );
+                if ( exportColumns.BankAccountId )
+                {
+                    output.AppendFormat( ",{0},{1}", item.BankAccountId ?? string.Empty, item.DepositDate.HasValue ? item.DepositDate.Value.ToShortDateString() : string.Empty );
+                }
+                if ( exportColumns.UndepAcctNo )
+                {
+                    output.AppendFormat( ",{0},{1}", item.DepositTo.HasValue ? item.DepositTo.GetDescription() : string.Empty, item.UndepositedFundsAccountId ?? string.Empty );
+                }
+                if ( exportColumns.Currency )
+                {
+                    output.AppendFormat( ",{0}", item.Currency ?? string.Empty );
+                }
+                if ( exportColumns.ExchangeRateDate )
+                {
+                    output.AppendFormat( ",{0}", item.ExchRateDate.HasValue ? item.ExchRateDate.Value.ToShortDateString() : string.Empty );
+                }
+                if ( exportColumns.ExchangeRateTypeId )
+                {
+                    output.AppendFormat( ",{0}", item.ExchRateType ?? string.Empty );
+                }
+                if ( exportColumns.ExchangeRate )
+                {
+                    output.AppendFormat( ",{0}", item.ExchRate.HasValue ? item.ExchRate.Value.ToString() : string.Empty );
+                }
+                output.AppendFormat( ",{0},{1}", item.LineNumber, item.AccountNumber );
+                if ( exportColumns.AccountLabel )
+                {
+                    output.AppendFormat( ",{0}", item.AccountLabel ?? string.Empty );
+                }
+                output.AppendFormat( ",{0},{1}", item.TransactionAmount, item.Amount );
+                if ( exportColumns.DepartmentId )
+                {
+                    output.AppendFormat( ",{0}", item.DepartmentId ?? string.Empty );
+                }
+                output.AppendFormat( ",{0},{1}", item.LocationId, item.Memo );
+                if ( exportColumns.ProjectId )
+                {
+                    output.AppendFormat( ",{0}", item.ProjectId ?? string.Empty );
+
+                    // Task is a sub-dimension of Project in Intacct, so only include if Project is included.
+                    if ( exportColumns.TaskId )
+                    {
+                        output.AppendFormat( ",{0}", item.TaskId ?? string.Empty );
+                    }
+                }
+                if ( exportColumns.CustomerId )
+                {
+                    output.AppendFormat( ",{0}", item.CustomerId ?? string.Empty );
+                }
+                if ( exportColumns.ItemId )
+                {
+                    output.AppendFormat( ",{0}", item.ItemId ?? string.Empty );
+                }
+                if ( exportColumns.VendorId )
+                {
+                    output.AppendFormat( ",{0}", item.VendorId ?? string.Empty );
+                }
+                if ( exportColumns.EmployeeId )
+                {
+                    output.AppendFormat( ",{0}", item.EmployeeId ?? string.Empty );
+                }
+                if ( exportColumns.ClassId )
+                {
+                    output.AppendFormat( ",{0}", item.ClassId ?? string.Empty );
+                }
+                if ( exportColumns.ContractId )
+                {
+                    output.AppendFormat( ",{0}", item.ContractId ?? string.Empty );
+                }
+                if ( exportColumns.WarehouseId )
+                {
+                    output.AppendFormat( ",{0}", item.WarehouseId ?? string.Empty );
+                }
+                foreach ( var customFieldCol in exportColumns.CustomFieldKeys )
+                {
+                    output.AppendFormat( ",{0}", item.CustomFields.ContainsKey( customFieldCol ) ? item.CustomFields[customFieldCol] : string.Empty );
+                }
+            }
+            HttpContext.Current.Session["IntacctCsvExport"] = output.ToString();
+            HttpContext.Current.Session["IntacctFileId"] = fileId;
+        }
+
+        public class ExportColumns
+        {
+            public bool BankAccountId = false;
+            public bool DepositDate = false;
+            public bool UndepAcctNo = false;
+            public bool ExchangeRateDate = false;
+            public bool ExchangeRateTypeId = false;
+            public bool ExchangeRate = false;
+            public bool AccountLabel = false;
+            public bool Currency = false;
+            public List<string> CustomFieldKeys = new List<string>();
+            public bool DepartmentId = false;
+            public bool ProjectId = false;
+            public bool CustomerId = false;
+            public bool VendorId = false;
+            public bool EmployeeId = false;
+            public bool ItemId = false;
+            public bool ClassId = false;
+            public bool TaskId = false;
+            public bool ContractId = false;
+            public bool WarehouseId = false;
         }
     }
 }
