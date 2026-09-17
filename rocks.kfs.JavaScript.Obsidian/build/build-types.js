@@ -1,20 +1,14 @@
-const execSync = require("child_process").execSync;
-const path = require("path");
-const { exit } = require("process");
+const DeclarationBuilder = require("../../../Rock17/Rock.JavaScript.Obsidian/build/build-tools").DeclarationBuilder;
 
-const projects = [
-    "."
-];
+async function main() {
+    const builder = new DeclarationBuilder();
 
-const execPath = path.join(__dirname, "..", "..", "..", "Rock16", "Rock.JavaScript.Obsidian", "Build", "obs-tsc.js");
+    builder.arguments = ["--noEmit"];
+    builder.importProject(builder.resolveProjectFile("./"), ref => ref.match(/[/\\\\]rocks.kfs.JavaScript.Obsidian[/\\\\]/) == null);
 
-for (const project of projects) {
-    try {
-        execSync(`node "${execPath}" --noEmit -p "${project}"`, {
-            stdio: "inherit"
-        });
-    }
-    catch (error) {
-        exit(1);
-    }
+    const result = await builder.build();
+
+    process.exit(result.success ? 0 : 1);
 }
+
+main();
