@@ -2,6 +2,13 @@
 
 Canonical list of Rock domains and their casing variants. Always loaded as a project instruction.
 
+> **KFS:** This file is Rock v20's, verbatim. The domain list governs `[RockDomain]`,
+> `[Enums.EnumDomain]`, `docs/` and `specs/` folder names, and upstream contributions to
+> `SparkDevNetwork/Rock`. Two KFS notes: our own commits do not use the `+ (Domain)` release-note
+> format (see `CLAUDE.md` § Commit Messages), and block `[Category]` values carry a `KFS > `
+> prefix (see `.claude/rules/plugin-deviations.md` § 4). Those are display and process
+> conventions, not a different domain list.
+
 This is the single source of truth referenced by:
 - The `bugfix` skill (release-note classification, path-to-domain mapping).
 - The `spec` skill (`specs/completed/{folder}/` directory structure, INDEX.md `Domain` column).

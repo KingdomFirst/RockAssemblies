@@ -25,6 +25,62 @@ You are creating a git commit for Rock RMS. This skill orchestrates two pre-comm
 
 ---
 
+## KFS: Which Repo, and the Spec Check
+
+This skill is Rock v20's, verbatim. The terse output style, the release-note classification,
+the message drafting rules and every safety rule apply unchanged.
+
+**1. Establish the repo before anything else.** The working root is the Rock clone; our code is
+in two other repositories reached through junctions. A bare `git` command there operates on
+**Rock's** repo, which tracks none of our files — Phase 1's `git status --porcelain` would
+return `?? KFSRockAssemblies/` and Phase 3 would stage nothing useful.
+
+```bash
+git -C KFSRockAssemblies status --porcelain          # plugins, and this config
+git -C RockWeb/Plugins/rocks_kfs status --porcelain  # blocks
+```
+
+Prefix every command in Phases 1, 3 and 4 the same way. If both repos have changes, **they are
+two commits in two repositories** — say so and handle them separately; a change spanning both
+needs a branch and PR in each. See `CLAUDE.md` § Git: three repositories, one working tree.
+
+**2. Branch check, before drafting.** KFS version branches take changes only through a PR:
+
+```bash
+git -C [repo] branch --show-current
+```
+
+Stop if it is `master`, `hotfix-17`, `hotfix-18` or `hotfix-19`. Work branches are
+`type/initials-Description` (`bug/gem-…`, `feature/nbh-…`).
+
+**3. Phase 1 — the spec check does not apply yet.** `specs/` currently holds Spark's Rock core
+specs, inherited with these guardrails and authored by Rock's engineers. They will never be
+related to a KFS diff, and the `spec` skill's completion mode would rewrite their `INDEX.md`.
+
+**Skip Phase 1 entirely and move to Phase 2 silently** until `specs/` holds KFS-authored specs.
+Do not offer to mark a Spark spec complete.
+
+**4. Phase 2 — the release-note question does not apply.** KFS repos do not feed Rock's
+release notes, so there is no `+` / `-` decision to make. **Skip the binary question** and draft
+a plain descriptive subject naming the plugin, per `CLAUDE.md` § Commit Messages → KFS commits:
+
+```
+Fix auto-assign worker skipping inactive campuses in Steps to Care
+Add project mode support to Shelby Financials export
+```
+
+Still show the drafted message in a fenced code block and wait for confirmation — that part of
+Phase 2 is unchanged. Everything about domains, starting-word classification and the `+` / `-`
+prefixes applies only when the user says the commit is going **upstream** to
+`SparkDevNetwork/Rock`.
+
+**5. Phase 4 — skip.** It only runs if Phase 1 flagged a spec, which it will not.
+
+**6. Offer `/check`, do not impose it.** It catches the licensing and plugin-deviation issues
+that matter most here.
+
+---
+
 ## Output Style
 
 **Be terse. Do not narrate the workflow.**

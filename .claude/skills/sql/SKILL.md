@@ -26,6 +26,55 @@ You are generating SQL scripts that run against the Rock RMS database. Rock has 
 
 ---
 
+## KFS: Schema Research and Output Paths
+
+This skill is Rock v20's, verbatim. All of it applies — the formatting rules, the PersonAlias
+pattern, the audit columns, the `IsSystem` warning, Guid-based lookups, idempotency guards,
+transactions, and the sample-data people (those GUIDs are stable across Rock versions).
+
+Three adjustments.
+
+**1. Research plugin schema in the plugin, not in `Rock/Model/`.** Step 2 sends you to
+`Rock/Model/[Domain]/[Entity]/[Entity].cs`. That is right for core tables. For a KFS table it
+is `KFSRockAssemblies/rocks.kfs.[Plugin]/Model/[Entity].cs`, and the physical table carries the
+plugin prefix:
+
+```sql
+SELECT * FROM [_rocks_kfs_StepsToCare_CareNeed]
+```
+
+Plugin entities inherit `Model<T>` the same way, so the audit-column and `Guid` rules are
+unchanged. `IsSystem` is still per-entity — grep the model before including it.
+
+**2. Output location.** Rock writes to `Dev Tools/Sql/` with its `Populate_` / `CodeGen_` /
+`Tool_` / `View_` / `Report_` / `Enable_` prefixes. That folder is in the Rock core tree, which
+is read-only for us. Instead:
+
+| Kind of script | Where it goes |
+|---|---|
+| Stored procedure or view the plugin ships | `KFSRockAssemblies/rocks.kfs.[Plugin]/sql/` — or `RockWeb/Plugins/rocks_kfs/[Domain]/sql/` for a block-owned one |
+| One-off investigation or data fix, not shipped | the scratchpad — do not commit it |
+| Anything that must run on a customer database | **not a script — write a plugin migration.** Use `/plugin-migration`. |
+
+That last row is the important one. A `.sql` file in the repo does not run anywhere on its own;
+only a migration does.
+
+**3. Shipped database objects carry the plugin prefix**, matching the four that exist today:
+
+```
+_rocks_kfs_spGroup_SortByTree.sql
+_rocks_kfs_spPersonImport_CSV.sql
+_rocks_kfs_spUtility_SetAttributeValue.sql
+```
+
+Filename matches the object name. The procedure is created or altered by a plugin migration —
+see the stored-procedure pattern in `/plugin-migration`'s `references/methods-and-sql.md`,
+including the ANSI_NULLS / QUOTED_IDENTIFIER save-and-restore.
+
+`.claude/rules/plugin-deviations.md` is the authority for all of the above.
+
+---
+
 ## Reference Routing Table
 
 Load reference files progressively — only when needed.

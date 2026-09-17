@@ -30,6 +30,49 @@ You are working on a spec document. A spec captures requirements, architectural 
 
 ---
 
+## KFS: Do Not Touch the Inherited Specs
+
+`specs/` currently holds 65 documents that came with these guardrails: Spark Development
+Network's own Rock core specs, authored 2026-04-28 to 2026-09-08 by Rock's engineers (Jon
+Edmiston, Daniel Hazelbaker, Nick Airdo, Jason Hendee, Panha Sim, Kyle Henning, Joshua
+Henninger), 60 of them completed with commit hashes into `SparkDevNetwork/Rock`. Four are
+still active. None are KFS work.
+
+**Completion mode and Rejection mode must not run against any of them.** Both move the file and
+rewrite an `INDEX.md` whose header says it is skill-maintained — doing that to another
+organisation's authored documents, inside our repo, under our commit history, is not a thing
+to do by accident. If `$ARGUMENTS` names one, or auto-detection lands on one, stop and say so.
+
+The four active inherited specs, for recognition:
+
+```
+specs/260508-form-builder-updates.md
+specs/260518-lms-video-watch-completion-stuck.md
+specs/260807-ai-agent-tool-conventions.md
+specs/260817-recipient-preference-medium-handling.md
+```
+
+> Whether to keep `specs/` at all is an open decision for the team — it is currently untracked,
+> so nothing is lost either way. Raise it rather than resolving it here.
+
+### Authoring KFS specs
+
+Authoring mode is welcome, and the whole workflow below applies — the frontmatter, the
+`YYMMDD-topic-kebab.md` filename, the contributor and author prompts, the external-resource
+cross-check, the section structure. Two adjustments:
+
+- **Write to `specs/kfs/`**, keeping our specs clearly separate from the inherited tree.
+  Completion moves to `specs/kfs/completed/{domain}/` with its own `INDEX.md`; rejection to
+  `specs/kfs/rejected/{domain}/`. Create those on first use.
+- **Step 1.4 reads `git config user.name`** — run it against the repo you are working in
+  (`git -C KFSRockAssemblies config user.name`). See `CLAUDE.md` § Git: three repositories,
+  one working tree.
+
+`/commit`'s spec-detection phase is switched off until `specs/kfs/` has content; see that
+skill's KFS section.
+
+---
+
 ## Decide the Mode
 
 Read `$ARGUMENTS` and the conversation context, then pick one of three modes:

@@ -27,6 +27,54 @@ You are creating or maintaining technical documentation in the repo's `docs/` di
 
 ---
 
+## KFS: `docs/` Is Inherited Rock Core Reference
+
+The 119 files currently in `docs/` came with these guardrails. They are Spark's "as built"
+documentation of **Rock core**, written against v20, with `related_files:` frontmatter
+pointing into `Rock/`, `Rock.Blocks/` and friends. None of them document a KFS plugin.
+
+Measured against Rock v17: 60 are fully valid, 40 are partially stale, and 7 describe
+subsystems v17 does not have at all —
+
+```
+docs/ai/agent-skills-authoring.md      docs/ai/mcp-integration.md
+docs/communication/communication-flows.md   docs/core/composite-field-type-pattern.md
+docs/cms/lava-applications.md               docs/core/cascade-picker-pattern.md
+docs/engagement/outreach-toolbox.md
+```
+
+**Treat them as read-only reference.**
+
+- **Do not run Audit mode against them.** Auditing Spark's v20 docs against our v17 clone will
+  report drift that is real but not ours to fix, and "correcting" them would fork Spark's
+  content into our repo under our name.
+- **Do not run Update-From-Spec mode against them.**
+- **Do cite them** when they explain core behaviour a plugin depends on — check the Rock
+  version first via `.claude/rules/rock-version-targets.md`.
+
+### Writing KFS documentation
+
+Create / update mode is welcome for **our** subjects — a plugin's architecture, an integration's
+auth flow, a gateway's quirks. Keep them separate from the inherited tree:
+
+```
+docs/kfs/[plugin-kebab]/[topic].md
+```
+
+Everything else in this skill applies: the frontmatter block, the `related_files:` list
+(pointing at `KFSRockAssemblies/rocks.kfs.[Plugin]/…`), the code-anchored voice, the specs-vs-docs
+distinction, and the section structure.
+
+The domain-folder convention in `.claude/rules/rock-domains.md` governs the inherited tree.
+Under `docs/kfs/`, organise by plugin — that is the unit we actually think in.
+
+The **Recent Changes** step filters `git log` for subjects beginning `+ (`. KFS commits use
+plain descriptive subjects, so that filter matches nothing — select by relevance instead, and
+read the log from the right repo (`git -C KFSRockAssemblies log …`). See `CLAUDE.md`
+§ Commit Messages and § Git: three repositories, one working tree.
+
+---
+
 ## Audience and Scope
 
 - **Audience:** core Rock developers, plugin authors, and quasi-technical community members. Assume the reader can read C# and SQL but does not yet know this corner of Rock.

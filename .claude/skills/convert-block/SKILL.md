@@ -24,6 +24,99 @@ The block to convert is: **$ARGUMENTS**
 
 ---
 
+## KFS: Read This First
+
+This skill is Rock v20's, verbatim. The conversion philosophy, classification, base-class
+selection, bag rules, grid patterns, IdKey resolution, `PersonPicker` warning, and the
+canonical reference blocks all apply unchanged — **a converted KFS block should look like the
+core Rock block of similar function.** Rock core is read-only reference; read those canonical
+blocks freely.
+
+### Before you start — check you are in the right repo
+
+**KFS Obsidian conversion work happens in `KingdomFirst/RockPlugins`, not here.** That repo
+already holds converted blocks (ShelbyFinancials `BatchesToJournalList` and `BatchToJournal`)
+and uses its own layout, which is neither Rock core's nor this repo's:
+
+```
+[Product]/rocks.kfs.Next.[Product]/Blocks/[Block].cs
+[Product]/rocks.kfs.Next.[Product]/ViewModels/[Block]OptionsBag.cs
+[Product]/rocks.kfs.Next.[Product].Obsidian/src/[block].obs
+[Product]/rocks.kfs.Next.[Product].Obsidian/src/[Block]/*.partial.obs
+[Product]/rocks.kfs.Next.[Product].Obsidian/src/viewModels.d.ts   ← one consolidated file
+[Product]/WebForms/                                                ← original retained, not chopped
+```
+
+Two things to notice in that layout: bags sit flat in `ViewModels/` rather than in per-block
+folders, and there is a **single hand-maintained `viewModels.d.ts`** instead of one `.d.ts`
+per bag — which is how that repo works around `Rock.CodeGeneration` not running over plugin
+assemblies. `src/[block].obs` is flat at the src root; the plugin is the category.
+
+`RockPlugins` will get its own guardrails in a separate project. **If the user asks for a
+conversion, confirm which repo they mean first.** If it is `RockPlugins`, this skill's paths,
+the `.d.ts` steps and `validate-conversion.js` all need that layout, not the one below.
+
+If a conversion is genuinely wanted in **this** repo, note that
+`rocks.kfs.JavaScript.Obsidian` has no block precedent (one control only) and its type
+toolchain has stale paths — `build/build-types.js` requires a clone folder named `Rock17`,
+and `tsconfig.base.json` resolves `../Rock.JavaScript.Obsidian/…` against a `baseUrl` of
+`./`. Raise both in Phase 2 before planning.
+
+### Version gate
+
+Check `.claude/rules/rock-version-targets.md` before Phase 2. On **v17** specifically:
+
+- `ContentSection` / `ContentStack` / `ContentSectionContainer` **do not exist** — the edit
+  panel uses `<fieldset>`. Ignore `references/detail-block-patterns.md` § "UI Layout".
+- Icons are `fa fa-`, not `ti ti-`.
+- `safeParseJson` is absent (`references/list-block-patterns.md` recommends it).
+- `HighlightDetailColumn` has no `getCombinedFilterValue` on v17 **or v18** — keep the explicit
+  `filterValue` / `quickFilterValue` / `sortValue` props that `list-block-patterns.md` tells
+  you to delete.
+- Rock utility classes (`gap-spacing-*`, `bg-interface-*`) do not exist; use CSS variables in
+  scoped styles.
+
+### Paths
+
+| Rock core | KFS |
+|---|---|
+| `RockWeb/Blocks/[Category]/[Block].ascx` | `RockWeb/Plugins/rocks_kfs/[Domain]/[Block].ascx` |
+| `Rock.Blocks/[Category]/[Block].cs` | `KFSRockAssemblies/rocks.kfs.[Plugin]/` |
+| `Rock.ViewModels/Blocks/[Category]/[Block]/` | within the owning `rocks.kfs.[Plugin]` project |
+| `Rock.JavaScript.Obsidian.Blocks/src/[Category]/[block].obs` | `KFSRockAssemblies/rocks.kfs.JavaScript.Obsidian/src/` |
+| `Rock.JavaScript.Obsidian/Framework/ViewModels/Blocks/...` | hand-maintained in the plugin — see blocker 2 |
+
+Namespace `RockWeb.Plugins.rocks_kfs.[Domain]` for WebForms; `[Category]` is `"KFS > [Area]"`
+and must match the migration's `UpdateBlockType()` argument exactly.
+
+### Phase 3 plan — replace Steps 1, 5, 9 and 10
+
+**Step 1 (branch).** Rock's `feature-v[N]-claude-[name]` convention is not ours, and
+`git branch -a | grep "feature-v"` returns Rock's branches from the shared remote. Use:
+
+```bash
+git branch --show-current          # must not be master/hotfix-17/hotfix-18/hotfix-19
+git checkout -b feature/[initials]-[BlockName]Obsidian
+```
+
+**Step 5 (GUIDs).** `scripts/generate-guids.js` is path-independent — use it as written.
+
+**Step 9 (chop).** Deleting the `.ascx` removes a block customers have deployed. Do **not**
+chop without explicit confirmation, and pair it with a migration that re-registers the block
+type against the new entity-based registration (`AddOrUpdateEntityBlockType()`, never
+`UpdateBlockTypeByGuid()`).
+
+**Step 10 (validate).** `scripts/validate-conversion.js` checks Rock core paths only. It now
+**refuses to run** inside a KFS-junctioned tree and prints the `RockPlugins` layout instead of
+emitting bogus `FAIL`s; `--rock-core` opts out for a genuine upstream Rock contribution. Until
+it is adapted alongside the `RockPlugins` guardrails, walk
+`references/implementation-details.md`'s file checklist by hand against whichever layout
+applies.
+
+`.claude/rules/plugin-deviations.md` § 4 is the authority for all of this.
+
+---
+
 ## Conversion Philosophy
 
 **You are not a 1:1 translator.** The WebForms block is a _requirements reference_, not a code template. Your job is to produce an idiomatic Obsidian block that delivers the same _behavior_ — not to replicate the same _implementation_.

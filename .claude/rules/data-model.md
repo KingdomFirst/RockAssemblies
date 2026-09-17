@@ -2,6 +2,14 @@
 
 Rock's data layer conventions: entities, columns, foreign keys, GUIDs, and data access patterns. Always loaded.
 
+> **KFS:** This file is Rock v20's, verbatim, and applies to plugin entities in full —
+> `Model<T>` vs `Entity<T>`, standard columns, PersonAlias vs Person, cascade conventions, GUID
+> format, RockContext usage, LINQ guidance, and the `UpdateBlockTypeByGuid()` data-loss
+> warning. Plugin entities additionally require `IRockEntity`, `[DataContract]` and
+> `HasEntitySetName()`, and change table name, file location and namespace. That list is in
+> `.claude/rules/plugin-deviations.md` § 2 and is closed — keep `[RockDomain]` and
+> `[Rock.SystemGuid.EntityTypeGuid]`, which work on plugin entities.
+
 ---
 
 ## Standard Model<T> Columns

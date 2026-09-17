@@ -25,6 +25,60 @@ You are creating or reviewing a plugin migration (hotfix) in the Rock RMS codeba
 
 ---
 
+## KFS: Plugin Migrations Live Per-Plugin
+
+This skill is Rock v20's, verbatim. The mechanism is identical — `Rock.Plugin.Migration`,
+`[MigrationNumber]`, `Up()` / `Down()`, `RockMigrationHelper`, the SQL rules, the string
+escaping, the block-type safety warning, the review severity model. Only the location and
+numbering differ.
+
+`Rock/Plugin/HotFixes/` is **Rock core's own** hotfix stream. We never write there.
+
+| | Rock core | KFS plugin |
+|---|---|---|
+| Location | `Rock/Plugin/HotFixes/[NNN]_[Name].cs` | `KFSRockAssemblies/rocks.kfs.[Plugin]/Migrations/[NNN]_[Name].cs` |
+| Numbering | one global sequence (v17 is at 261, v20 at 318) | **restarts at 001 per plugin**, independent of every other plugin and of Rock's sequence |
+| Namespace | `Rock.Plugin.HotFixes` | `rocks.kfs.[Plugin].Migrations` |
+| Copyright | Spark / Rock Community License | KFS / Apache 2.0 — see `.claude/rules/code-conventions.md` |
+| Large SQL | `HotFixMigrationResource` .resx | no plugin has one; keep SQL inline or add a .resx to that plugin if it is genuinely large |
+
+**Step 2 becomes:** identify the owning plugin first, then scan only that plugin's folder.
+
+```bash
+ls KFSRockAssemblies/rocks.kfs.[Plugin]/Migrations/*.cs
+```
+
+Twelve plugins currently have migrations; `StepsToCare` is highest at 025. If the plugin has
+no `Migrations/` folder yet, migration `001` creates it.
+
+**Minimum version string:** use Rock's current scheme, not the legacy `1.x` form. Rock core
+stamps `"17.4"`, `"19.5"`. Existing KFS migrations top out at `"1.16.0"` because they predate
+v17 — do not copy that form into new work.
+
+```csharp
+[MigrationNumber( 26, "17.0" )]
+public class AddCareNeedFollowUpFields : Migration
+```
+
+**Use the typed schema API.** `Rock.Plugin.Migration` exposes `CreateTable<TColumns>`,
+`AddTable`, `AddColumn`, `AddPrimaryKey`, `AddForeignKey`, `AddIndex`, `DropColumn`,
+`DropIndex`, `DropPrimaryKey`, `DropForeignKey` and `DropTable` alongside `Sql()`. Prefer them
+for schema work exactly as Rock core does; reserve `Sql()` for data migrations, platform
+entities the helper does not cover, and stored procedures.
+
+> Several existing KFS migrations build tables with raw `Sql( "CREATE TABLE ..." )`. That is
+> drift, not a plugin requirement — do not copy it forward.
+
+Remember the plugin table prefix and PK naming when creating tables:
+`_rocks_kfs_[Plugin]_[Entity]` / `PK__rocks_kfs_[Plugin]_[Entity]`. See
+`.claude/rules/plugin-deviations.md` § 2 and § 3.
+
+**Block registration** uses the plugin path: `~/Plugins/rocks_kfs/[Domain]/[Block].ascx`, and
+the `[Category]` passed to `UpdateBlockType()` must match the block's `[Category]` attribute
+exactly (`"KFS > Steps To Care"`).
+
+---
+
 ## Reference Routing Table
 
 Load reference files progressively — only when needed.

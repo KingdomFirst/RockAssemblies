@@ -1,5 +1,7 @@
 ---
 paths:
+  - "RockWeb/Plugins/rocks_kfs/**"
+  - "KFSRockAssemblies/rocks.kfs.JavaScript.Obsidian/**"
   - "Rock.Blocks/**"
   - "Rock.JavaScript.Obsidian.Blocks/**"
   - "RockWeb/Blocks/**"
@@ -9,6 +11,13 @@ paths:
 # Block Architecture
 
 Patterns for Rock RMS block development. Loaded when working in block directories.
+
+> **KFS:** This file is Rock v20's, verbatim. It applies to KFS blocks unchanged — **a KFS
+> plugin block should follow the architecture of the core Rock block of similar function.**
+> Find the nearest core equivalent and follow it. Only the path, namespace, `[Category]`
+> prefix and registration call differ; see `.claude/rules/plugin-deviations.md` § 4.
+> The Rock core block paths above are kept so this rule also loads when reading core blocks
+> for reference.
 
 ---
 

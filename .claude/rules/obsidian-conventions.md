@@ -7,6 +7,11 @@ These rules mirror what the projects' `.eslintrc.js` files enforce. If this docu
 Source-of-truth files:
 - `Rock.JavaScript.Obsidian/.eslintrc.js`
 - `Rock.JavaScript.Obsidian.Blocks/.eslintrc.js`
+- `KFSRockAssemblies/rocks.kfs.JavaScript.Obsidian/.eslintrc.js` (KFS — a copy of Rock's, so
+  every rule below applies to KFS Obsidian code unchanged)
+
+> **KFS:** This file is Rock v20's, verbatim. The only differences are project paths and the
+> lint script coverage noted under Project Scope; see `.claude/rules/plugin-deviations.md`.
 
 Both configs extend `eslint:recommended` and `plugin:@typescript-eslint/recommended`, so dozens of additional rules (`no-empty`, `no-redeclare`, `no-explicit-any`, etc.) are active beyond what's documented here. This document covers the Rock-specific overrides and the rules that most often trip up contributors; the absence of a rule from this document does not mean the rule is off.
 
