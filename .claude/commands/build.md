@@ -13,8 +13,8 @@ builds Rock core and fails anyway (`MSB4249`, the `RockWeb` website project).
 ls KFSRock*.sln
 ```
 
-Pick the one matching the Rock clone you are in (`KFSRock17.sln` in `RockV17`,
-`KFSRock18.sln` in `RockV18`). If several match, or none do, ask — do not guess.
+Pick the one matching the Rock clone you are in (`KFSRock17.sln` in `Rock17`,
+`KFSRock18.sln` in `Rock18`). If several match, or none do, ask — do not guess.
 
 ## Build it
 

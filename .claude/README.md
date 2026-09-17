@@ -20,7 +20,7 @@ npm install -g @anthropic-ai/claude-code
 
 ### Wire up the working tree
 
-Claude Code must run from a **Rock clone root** (`RockV17\`, `RockV18\`), not from inside
+Claude Code must run from a **Rock clone root** (`Rock17\`, `Rock18\`), not from inside
 `KFSRockAssemblies\`. Every path in these rules and skills is relative to that root, and the
 plugin projects themselves only build there (`..\..\RockWeb\Bin\*.dll`).
 
@@ -38,7 +38,7 @@ clone.
 Then:
 
 ```bash
-cd C:\KFSRepo\Rock\RockV17
+cd C:\KFSRepo\Rock\Rock17
 claude
 ```
 
@@ -76,14 +76,14 @@ grep AssemblyInformationalVersion Rock.Version/AssemblySharedInfo.cs
 
 | KFS branch | Rock clone |
 |---|---|
-| `hotfix-17` | `RockV17` |
-| `hotfix-18` | `RockV18` |
+| `hotfix-17` | `Rock17` |
+| `hotfix-18` | `Rock18` |
 | `hotfix-19` | — |
 | `master` | latest |
 
 Icons, styling, several framework APIs and the build path all differ between v17 and v18+.
 `.claude/rules/rock-version-targets.md` is the single source of truth. A `hotfix-17` branch
-checked out inside `RockV18` builds against the wrong assemblies — Claude is instructed to stop
+checked out inside `Rock18` builds against the wrong assemblies — Claude is instructed to stop
 and flag that combination.
 
 ---

@@ -21,13 +21,13 @@ Branch mapping in the KFS repos (`KFSRockAssemblies`, `KFSRockBlocks`):
 
 | KFS branch | Rock clone | Rock version |
 |---|---|---|
-| `hotfix-17` | `RockV17` | McKinley 17.x |
-| `hotfix-18` | `RockV18` | McKinley 18.x |
+| `hotfix-17` | `Rock17` | McKinley 17.x |
+| `hotfix-18` | `Rock18` | McKinley 18.x |
 | `hotfix-19` | — | McKinley 19.x |
 | `master` | latest | current development |
 
 If the KFS branch and the Rock clone disagree (e.g. `hotfix-17` checked out inside
-`RockV18`), **stop and tell the user** — that combination builds against the wrong
+`Rock18`), **stop and tell the user** — that combination builds against the wrong
 assemblies and every version-gated decision below becomes unreliable.
 
 ---

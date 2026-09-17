@@ -48,14 +48,32 @@ applying these conventions to it.
 
 ## Working Root
 
-**Run Claude Code from the Rock clone root** (`RockV17\`, `RockV18\`), never from inside
-`KFSRockAssemblies\`. `CreateLinks.bat` junctions `.claude` and links `CLAUDE.md` into that
-root, so the config is version-controlled in our repo but loads with the whole tree visible.
-Plugin projects reference `..\..\RockWeb\Bin\*.dll` and the Obsidian project builds through
-Rock's toolchain — neither resolves outside the junction.
+**Run Claude Code from the Rock clone root**, never from inside `KFSRockAssemblies\`.
+`CreateLinks.bat` junctions `.claude` and links `CLAUDE.md` into that root, so the config is
+version-controlled in our repo but loads with the whole tree visible. Plugin projects
+reference `..\..\RockWeb\Bin\*.dll` and the Obsidian project builds through Rock's toolchain —
+neither resolves outside the junction.
 
 Every path in these rules and skills is relative to the Rock clone root. **Rock core trees are
 read-only reference** — we do not fork Rock.
+
+### Clone layout — a standard, not a preference
+
+Rock clones and the KFS repos are siblings under one root:
+
+```
+C:\KFSRepo\Rock\
+    Rock16\  Rock17\  Rock18\  Rock20\   <- Rock clones, named Rock<major>, no "V"
+    KFSRockAssemblies\                    <- junctioned into whichever clone you work in
+    KFSRockBlocks\
+    RockAttendedCheckin\
+    KFSRockAssets\
+```
+
+**Clone folders are `Rock<major>` — `Rock17`, not `RockV17`.** Tooling depends on it:
+`rocks.kfs.JavaScript.Obsidian/build/build-types.js` reaches a sibling clone by the relative
+path `../../../Rock17/…`, which resolves only under this naming. If a clone is named
+differently, rename the folder rather than patching the tooling.
 
 ### Git: three repositories, one working tree
 

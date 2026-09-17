@@ -57,10 +57,17 @@ conversion, confirm which repo they mean first.** If it is `RockPlugins`, this s
 the `.d.ts` steps and `validate-conversion.js` all need that layout, not the one below.
 
 If a conversion is genuinely wanted in **this** repo, note that
-`rocks.kfs.JavaScript.Obsidian` has no block precedent (one control only) and its type
-toolchain has stale paths — `build/build-types.js` requires a clone folder named `Rock17`,
-and `tsconfig.base.json` resolves `../Rock.JavaScript.Obsidian/…` against a `baseUrl` of
-`./`. Raise both in Phase 2 before planning.
+`rocks.kfs.JavaScript.Obsidian` has no block precedent (one control only), and check two
+things in its type toolchain before planning:
+
+- `build/build-types.js` requires `../../../Rock17/Rock.JavaScript.Obsidian/build/build-tools`.
+  Resolved from the project's physical location that is `C:\KFSRepo\Rock\Rock17\…`, which is
+  correct — but it is **pinned to `Rock17`**, so on a `Rock18` clone it still reaches into the
+  v17 tree. Verify before trusting generated output on v18+.
+- `tsconfig.base.json` maps `@Obsidian/*` to `../Rock.JavaScript.Obsidian/dist/…` against a
+  `baseUrl` of `./`, which resolves inside `KFSRockAssemblies/` rather than the clone root.
+  That target does not exist. Unverified whether this breaks the build or only editor type
+  resolution — check rather than assume.
 
 ### Version gate
 

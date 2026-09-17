@@ -1,5 +1,5 @@
 @echo off
-REM Run this from the root of a Rock clone (RockV17, RockV18, ...).
+REM Run this from the root of a Rock clone (Rock17, Rock18, ...).
 REM Junctions the KFS repos into the Rock tree so plugins build against Rock's
 REM assemblies and so Claude Code loads the shared guardrails with the Rock
 REM clone as its project root.
