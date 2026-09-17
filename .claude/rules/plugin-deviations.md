@@ -85,6 +85,12 @@ assemblies including plugins, and `CreateFromType` reads `[EntityTypeGuid]` to s
 `EntityType.Guid`. Registering an EntityType *only* through a migration's `UpdateEntityType()`
 call is historical KFS practice, not a requirement — declare the attribute as Rock does.
 
+> **Do not take the `[RockDomain]` value from the commit-message domain list in `CLAUDE.md`.**
+> They are different sets — that list has `API`, `Connection`, `Farm`, `Lava`, `Mobile` and
+> `Other`, none of which are legal `[RockDomain]` values, and omits `Meta`, `Security` and
+> `WebFarm`, which are. The valid list is in `.claude/rules/rock-domains.md`
+> § "Valid `[RockDomain]` values", measured from Rock's own entities.
+
 Also keep, unchanged: `partial` class keyword, `[Required]`, `[MaxLength]`, `[DataMember]` /
 `[DataMember( IsRequired = true )]`, XML doc comments on every property, `virtual` navigation
 properties, a complete `EntityTypeConfiguration` with explicit `WillCascadeOnDelete( false )`,

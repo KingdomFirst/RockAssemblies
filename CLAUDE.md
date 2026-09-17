@@ -233,6 +233,17 @@ Always include the appropriate copyright header at the top of every new file. Se
 > `SparkDevNetwork/Rock`.** Our own repositories use plain descriptive subject lines — see
 > **KFS commits** at the end of this section. Do not draft a `+ (Domain)` message for a
 > `RockAssemblies` or `RockBlocks` commit.
+>
+> **The domain list below is the release-note taxonomy — nothing else.** Three unrelated
+> things are called "domain" here, and this is the one that applies to us least:
+>
+> | Concept | Applies to KFS? | Values |
+> |---|---|---|
+> | Release-note domain (**below**) | **No** — upstream Rock commits only | the list below |
+> | `[RockDomain]` on an entity | **Yes** | a **different** set — `.claude/rules/rock-domains.md` § "Valid `[RockDomain]` values" |
+> | Block `[Category]` | **Yes** | `KFS > [Area]` — `.claude/rules/code-conventions.md` |
+>
+> Do not source a `[RockDomain]` or a `[Category]` from the list below.
 
 Commits use `+` (release notes) or `-` (trivial):
 

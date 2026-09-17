@@ -39,11 +39,20 @@ Apply these deviations on top; `.claude/rules/plugin-deviations.md` § 2 is the 
 ```csharp
 [Table( "_rocks_kfs_StepsToCare_CareNeed" )]   // prefix is mandatory
 [DataContract]                                  // in RockContext's registration filter
-[RockDomain( "Core" )]
+[RockDomain( "Core" )]                          // see the value list caveat below
 [Rock.SystemGuid.EntityTypeGuid( "87AC878D-6740-43EB-9389-B8440AC595C3" )]
 public partial class CareNeed : Rock.Data.Model<CareNeed>, Rock.Data.IRockEntity
 {
 ```
+
+> **`[RockDomain]` value — two lists in this skill are wrong.** `references/entity-patterns.md`
+> § "Valid domains" and `.claude/rules/code-conventions.md` § "Rock Domain Names" both publish
+> Rock's *namespace* list (`Cms`, `Crm`, `Lms`, `Blocks`, `Controls`, `Geography`, `Net`,
+> `Observability`). No Rock entity uses those. The values actually in use are `AI` (v18+),
+> `CMS`, `CRM`, `Check-in`, `Communication`, `Core`, `Engagement`, `Event`, `Finance`, `Group`,
+> `LMS`, `Meta`, `Prayer`, `Reporting`, `Security`, `WebFarm`, `Workflow` — see
+> `.claude/rules/rock-domains.md` § "Valid `[RockDomain]` values". Do not source it from the
+> commit-message domain list in `CLAUDE.md` either; that is a third, different set.
 
 ```csharp
 public partial class CareNeedConfiguration : EntityTypeConfiguration<CareNeed>

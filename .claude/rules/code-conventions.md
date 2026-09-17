@@ -108,6 +108,16 @@ Valid `[RockDomain]` values (also used for `[Enums.EnumDomain]` and commit messa
 
 AI, Blocks, CheckIn, Cms, Communication, Connection, Controls, Core, Crm, Engagement, Event, Finance, Geography, Group, Lms, Mobile, Net, Observability, Reporting, Security, WebFarm, Workflow
 
+> **KFS correction — do not use the line above for `[RockDomain]`.** It is Rock's *namespace*
+> list, not its domain list, and it conflates three separate things. Measured against Rock's
+> own entities in the v17, v18 and v20 clones, no entity uses `Blocks`, `Controls`,
+> `Geography`, `Net`, `Observability`, `Connection` or `Mobile`, and the casing is wrong —
+> entities use `CMS`, `CRM`, `LMS`, `Check-in`, not `Cms`, `Crm`, `Lms`, `CheckIn`.
+>
+> The measured list, the deltas, and the v17 `"Security "` trailing-space quirk are in
+> `.claude/rules/rock-domains.md` § "Valid `[RockDomain]` values". Commit-message domains are a
+> third list again, and do not apply to our repos at all — see `CLAUDE.md` § Commit Messages.
+
 ---
 
 ## Strings and Constants

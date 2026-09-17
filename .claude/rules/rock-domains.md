@@ -2,12 +2,43 @@
 
 Canonical list of Rock domains and their casing variants. Always loaded as a project instruction.
 
-> **KFS:** This file is Rock v20's, verbatim. The domain list governs `[RockDomain]`,
-> `[Enums.EnumDomain]`, `docs/` and `specs/` folder names, and upstream contributions to
-> `SparkDevNetwork/Rock`. Two KFS notes: our own commits do not use the `+ (Domain)` release-note
-> format (see `CLAUDE.md` § Commit Messages), and block `[Category]` values carry a `KFS > `
-> prefix (see `.claude/rules/plugin-deviations.md` § 4). Those are display and process
-> conventions, not a different domain list.
+> **KFS:** This file is Rock v20's, verbatim. Read the disambiguation below before using any
+> list in it — "domain" means three different things in this codebase and they are not
+> interchangeable.
+
+## KFS: Three things called "domain"
+
+| # | Concept | Applies to KFS? | Correct values |
+|---|---|---|---|
+| 1 | **Release-note domain** — the `+ (Domain)` commit subject | **No.** Upstream Rock commits only; our repos use plain subjects | The List below |
+| 2 | **`[RockDomain]` attribute** — entity grouping | **Yes**, on plugin entities | the measured list below — **not** The List |
+| 3 | **Block `[Category]`** — where the block appears in Rock's UI | **Yes**, on plugin blocks | `KFS > [Area]`, see `.claude/rules/code-conventions.md` |
+
+See `CLAUDE.md` § Commit Messages for #1 and `.claude/rules/plugin-deviations.md` § 2 and § 4
+for #2 and #3.
+
+### Valid `[RockDomain]` values
+
+The table below implies `[RockDomain]` takes the PascalCase "Namespace / Enum form"
+(`Cms`, `Crm`, `Lms`). **It does not.** These are the values actually present on Rock's
+entities, measured from `Rock/Model` in the v17, v18 and v20 clones:
+
+```
+AI (v18+)   CMS       CRM        Check-in   Communication   Core
+Engagement  Event     Finance    Group      LMS             Meta
+Prayer      Reporting Security   WebFarm    Workflow
+```
+
+Differences from The List that will bite:
+
+- **In The List but not valid `[RockDomain]` values:** `API`, `Connection`, `Farm`, `Lava`,
+  `Mobile`, `Other`. Two are actively misleading — Rock's Connection entities are tagged
+  `[RockDomain( "Engagement" )]`, and `Farm` is `WebFarm`.
+- **Valid but absent from The List:** `Meta`, `Security`, `WebFarm`.
+- **`AI` is v18+.** No v17 entity uses it.
+- **v17 quirk:** v17's sole `Security` usage is `[RockDomain( "Security " )]` — with a trailing
+  space, in `Rock/Model/Security/History/HistoryLogin.cs`. There are no clean `"Security"`
+  usages in v17; it is corrected upstream by v18. Write `"Security"` without the space.
 
 This is the single source of truth referenced by:
 - The `bugfix` skill (release-note classification, path-to-domain mapping).
