@@ -1,16 +1,24 @@
 #!/usr/bin/env node
 
 // Validates that all expected files exist (and WebForms files are deleted) after an Obsidian block conversion.
-// Usage: node validate-conversion.js <Category> <BlockName> <detail|list|custom>
+// Usage: node validate-conversion.js <Category> <BlockName> <detail|list|custom> [--rock-core]
+//
+// KFS NOTE: this validates ROCK CORE's layout only. It has not been adapted to the KFS plugin
+// layouts, so it refuses to run inside a KFS-junctioned tree unless --rock-core is passed.
+// See the guard below.
 
 const fs = require( "fs" );
 const path = require( "path" );
 
-const args = process.argv.slice( 2 );
+const rawArgs = process.argv.slice( 2 );
+
+// KFS: --rock-core opts out of the plugin-tree guard (for an upstream Rock contribution).
+const isRockCoreOptIn = rawArgs.includes( "--rock-core" );
+const args = rawArgs.filter( a => a !== "--rock-core" );
 
 if ( args.length < 3 )
 {
-    console.error( "Usage: node validate-conversion.js <Category> <BlockName> <detail|list|custom>" );
+    console.error( "Usage: node validate-conversion.js <Category> <BlockName> <detail|list|custom> [--rock-core]" );
     console.error( "Example: node validate-conversion.js Core ExceptionDetail detail" );
     process.exit( 1 );
 }
@@ -27,6 +35,38 @@ if ( !["detail", "list", "custom"].includes( blockType ) )
 
 const { execSync } = require( "child_process" );
 const repoRoot = process.cwd();
+
+// --- KFS guard -------------------------------------------------------------
+// Every path check below is a Rock core path. Run against a KFS conversion they
+// would all report FAIL for files that were never supposed to be there, which is
+// worse than not running at all. Refuse clearly instead.
+const isKfsTree = fs.existsSync( path.join( repoRoot, "RockWeb", "Plugins", "rocks_kfs" ) );
+
+if ( isKfsTree && !isRockCoreOptIn )
+{
+    console.error( "REFUSED  validate-conversion.js has not been adapted for KFS layouts." );
+    console.error( "" );
+    console.error( "  Every path it checks is a Rock core path (Rock.Blocks/, Rock.ViewModels/," );
+    console.error( "  Rock.JavaScript.Obsidian.Blocks/src/). Against a KFS conversion it reports" );
+    console.error( "  FAIL for files that were never meant to exist there." );
+    console.error( "" );
+    console.error( "  KFS Obsidian blocks live in the KingdomFirst/RockPlugins repo, which uses a" );
+    console.error( "  different layout again:" );
+    console.error( "" );
+    console.error( "    [Product]/rocks.kfs.Next.[Product]/Blocks/[Block].cs" );
+    console.error( "    [Product]/rocks.kfs.Next.[Product]/ViewModels/[Block]OptionsBag.cs" );
+    console.error( "    [Product]/rocks.kfs.Next.[Product].Obsidian/src/[block].obs" );
+    console.error( "    [Product]/rocks.kfs.Next.[Product].Obsidian/src/[Block]/*.partial.obs" );
+    console.error( "    [Product]/rocks.kfs.Next.[Product].Obsidian/src/viewModels.d.ts" );
+    console.error( "" );
+    console.error( "  Adapting this script is scheduled with that repo's own guardrails project." );
+    console.error( "  Until then, walk the file checklist in" );
+    console.error( "  .claude/skills/convert-block/references/implementation-details.md by hand." );
+    console.error( "" );
+    console.error( "  Pass --rock-core if you really are validating a Rock core conversion for an" );
+    console.error( "  upstream contribution." );
+    process.exit( 2 );
+}
 
 // camelCase helper: lowercase first character only (matches codebase convention).
 function toCamelCase( str )
@@ -99,16 +139,20 @@ console.log( "-----------------------------------------------------" );
 try
 {
     const currentBranch = execSync( "git branch --show-current", { encoding: "utf8" } ).trim();
+    const repoName = path.basename(
+        execSync( "git rev-parse --show-toplevel", { encoding: "utf8" } ).trim() );
     const forbiddenBranches = ["develop", "main", "master"];
 
     if ( forbiddenBranches.includes( currentBranch ) )
     {
-        console.log( `FAIL  Current branch is "${currentBranch}" — must be on a feature branch` );
+        console.log( `FAIL  Current branch is "${currentBranch}" (${repoName}) — must be on a feature branch` );
         failed++;
     }
     else
     {
-        console.log( `PASS  Branch: ${currentBranch}` );
+        // Name the repo: in a junctioned tree the working root is the Rock clone, so a bare
+        // git command reads Rock's repo, not whichever KFS repo the work is actually in.
+        console.log( `PASS  Branch: ${currentBranch} (${repoName})` );
         passed++;
     }
 }

@@ -29,15 +29,23 @@ converted KFS block is measured against **is** the core Rock block of similar fu
 
 Four adjustments.
 
-**1. Files are in the KFS trees.** Phase 1.2's table maps to:
+**1. Confirm the repo, then map the paths.** KFS Obsidian blocks live in
+`KingdomFirst/RockPlugins` — a separate repo with converted blocks already in it
+(ShelbyFinancials `BatchesToJournalList`, `BatchToJournal`). That repo gets its own guardrails
+in a separate project; ask which repo the user means before starting.
 
-| Rock core | KFS |
-|---|---|
-| `Rock.Blocks/[Category]/[Block].cs` | `KFSRockAssemblies/rocks.kfs.[Plugin]/` |
-| `Rock.ViewModels/Blocks/[Category]/[Block]/*.cs` | within the owning `rocks.kfs.[Plugin]` project |
-| `Rock.JavaScript.Obsidian/Framework/ViewModels/Blocks/.../*.d.ts` | hand-maintained in the plugin |
-| `Rock.JavaScript.Obsidian.Blocks/src/[Category]/[block].obs` | `KFSRockAssemblies/rocks.kfs.JavaScript.Obsidian/src/` |
-| `RockWeb/Blocks/[Category]/[Block].ascx` | `RockWeb/Plugins/rocks_kfs/[Domain]/[Block].ascx` |
+| Rock core | `RockPlugins` | this repo |
+|---|---|---|
+| `Rock.Blocks/[Cat]/[Block].cs` | `[Product]/rocks.kfs.Next.[Product]/Blocks/[Block].cs` | `KFSRockAssemblies/rocks.kfs.[Plugin]/` |
+| `Rock.ViewModels/Blocks/[Cat]/[Block]/*.cs` | `[Product]/rocks.kfs.Next.[Product]/ViewModels/*Bag.cs` (flat) | owning plugin project |
+| `.../Framework/ViewModels/Blocks/.../*.d.ts` | one `src/viewModels.d.ts`, hand-maintained | no precedent |
+| `Rock.JavaScript.Obsidian.Blocks/src/[Cat]/[block].obs` | `[Product]/rocks.kfs.Next.[Product].Obsidian/src/[block].obs` | `rocks.kfs.JavaScript.Obsidian/src/` |
+| partials `src/[Cat]/[Block]/` | `…Obsidian/src/[Block]/*.partial.obs` | — |
+| `RockWeb/Blocks/[Cat]/[Block].ascx` | `[Product]/WebForms/` — **retained, not chopped** | `RockWeb/Plugins/rocks_kfs/[Domain]/` |
+
+That last row changes the review: in `RockPlugins` the WebForms original is kept alongside the
+conversion, so Phase 1.3 usually needs no git archaeology — read it directly — and a
+"WebForms files still present" finding is **not** a defect there.
 
 **2. Phase 1.3 — recovering the WebForms original needs the right repo.** `git show develop:…`
 run from the working root queries **Rock's** repo, where our block has never existed;

@@ -176,7 +176,33 @@ Most KFS blocks are still WebForms. Converting one is a product decision, not cl
 
 ---
 
-## 7. Common false deviations
+## 7. Commit Messages and Branches
+
+Rock's `+ (Domain) Message.` format drives **Rock's** release-note generation. Our repositories
+do not feed it, so we do not use it.
+
+| | Rock core | KFS |
+|---|---|---|
+| Subject | `+ (Domain) Fixed …` / `- trivial` | plain descriptive subject, no prefix, no domain |
+| Scope marker | the domain | **name the plugin** — it is how we scan history |
+| Issue ref | `(Fixes #0000)` | `(Fixes #123)`, same |
+| Branches | Rock's own | `type/initials-Description` off a version branch |
+
+```
+Fix auto-assign worker skipping inactive campuses in Steps to Care
+Add project mode support to Shelby Financials export
+```
+
+Version branches (`hotfix-17`, `hotfix-18`, `hotfix-19`, `master`) take changes only through a
+PR, squash-merged. Each KFS repo has its own branches and its own PR — see `CLAUDE.md` § Git:
+three repositories, one working tree.
+
+Rock's format still applies verbatim to patches contributed **upstream** to
+`SparkDevNetwork/Rock`, including picking a domain from `.claude/rules/rock-domains.md`.
+
+---
+
+## 8. Common false deviations
 
 Things that look plugin-specific but are not. Follow Rock on all of these:
 

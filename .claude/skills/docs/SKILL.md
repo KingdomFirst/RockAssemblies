@@ -68,6 +68,11 @@ distinction, and the section structure.
 The domain-folder convention in `.claude/rules/rock-domains.md` governs the inherited tree.
 Under `docs/kfs/`, organise by plugin — that is the unit we actually think in.
 
+The **Recent Changes** step filters `git log` for subjects beginning `+ (`. KFS commits use
+plain descriptive subjects, so that filter matches nothing — select by relevance instead, and
+read the log from the right repo (`git -C KFSRockAssemblies log …`). See `CLAUDE.md`
+§ Commit Messages and § Git: three repositories, one working tree.
+
 ---
 
 ## Audience and Scope

@@ -54,22 +54,24 @@ git -C RockWeb/Plugins/rocks_kfs log --oneline -20 -- [Domain]/[Block].ascx.cs
 
 See `CLAUDE.md` § Git: three repositories, one working tree.
 
-**1.4 Identify the domain** — pick it from the **plugin's functional area**, not the file path
-(every path contains `rocks_kfs`, which maps to nothing). `Intacct` / `ShelbyFinancials` /
-`CyberSource` / `ClickBid` → `Finance`; `SimpleTexting` / `ScheduledGroupCommunication` →
-`Communication`; `Checkin.PagerEntry` → `Check-in`; `GroupRSVP` / `InactivateGroups` →
-`Group`. The valid list in the skill is unchanged.
+**1.4 Identify the domain — skip it for KFS fixes.** The domain exists to classify a Rock
+release note. Our repos do not produce one, and the path-to-domain table below cannot work
+here anyway: every KFS path contains `rocks_kfs`, which maps to nothing. Only run 1.4 if the
+fix is going **upstream** to `SparkDevNetwork/Rock`.
 
 **2.3 Verify** — run `/build`, not `dotnet build`. There is no test suite; `/test` explains
 what verification is actually available. If the fix touches a migration, say so explicitly —
 migrations run once against customer databases.
 
-**Phase 3 commit message** — keep the `+ (Domain) Fixed …` format, name the plugin in the
-message text, and see `CLAUDE.md` § Commit Messages for the KFS branch convention.
+**Phase 3 commit message** — do **not** use the `+ (Domain) Fixed …` format. KFS repos use a
+plain descriptive subject naming the plugin (`CLAUDE.md` § Commit Messages → KFS commits):
 
 ```
-+ (Finance) Fixed Shelby Financials export omitting project codes in journal mode. (Fixes #123)
+Fix Shelby Financials export omitting project codes in journal mode (Fixes #123)
 ```
+
+The `-` prefix for trivial commits does not apply either. If the fix is going upstream to
+Rock instead, use Rock's format and run 1.4 to pick the domain.
 
 **A bug is not licence to conform unrelated code.** Our plugins predate these guardrails; if
 you notice non-conforming code near the fix, mention it and move on. See

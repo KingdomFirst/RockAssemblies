@@ -73,8 +73,10 @@ silently removes the margin.
 | `Rock.JavaScript.Obsidian.Blocks/src/[Category]/[block].obs` | `KFSRockAssemblies/rocks.kfs.JavaScript.Obsidian/src/` |
 | `RockWeb/Styles/styles-v2/blocks/_blocks-[category].scss` | no KFS equivalent — skip the Phase 1 block-SCSS check |
 
-The KFS Obsidian surface is currently one control, so this skill has little to operate on
-until a block conversion lands.
+This repo's Obsidian surface is one control, so there is little here to operate on. The
+converted blocks live in `KingdomFirst/RockPlugins`
+(`[Product]/rocks.kfs.Next.[Product].Obsidian/src/`), which gets its own guardrails in a
+separate project — confirm which repo the user means before starting.
 
 The **custom class hook** naming rule still applies, with our prefix: `kfs-[block]-[element]`
 in kebab-case, so theme authors can tell our hooks from Rock's.

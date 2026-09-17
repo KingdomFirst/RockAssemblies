@@ -32,22 +32,35 @@ canonical reference blocks all apply unchanged — **a converted KFS block shoul
 core Rock block of similar function.** Rock core is read-only reference; read those canonical
 blocks freely.
 
-### Before you start — two blockers
+### Before you start — check you are in the right repo
 
-**1. No KFS Obsidian block exists yet.** The plugin Obsidian project contains exactly one
-control (`src/Controls/cyberSourceGatewayControl.obs`) and zero blocks. The first conversion
-is trailblazing, not pattern-following. Say so to the user in Phase 2 rather than implying a
-routine job.
+**KFS Obsidian conversion work happens in `KingdomFirst/RockPlugins`, not here.** That repo
+already holds converted blocks (ShelbyFinancials `BatchesToJournalList` and `BatchToJournal`)
+and uses its own layout, which is neither Rock core's nor this repo's:
 
-**2. The plugin type-generation toolchain has stale paths.** `Rock.CodeGeneration` does not run
-over plugin assemblies, so the `.d.ts` files Rock's Step 4 relies on have no generator here.
-Worse, `rocks.kfs.JavaScript.Obsidian/build/build-types.js` requires
-`../../../Rock17/Rock.JavaScript.Obsidian/build/build-tools` — a clone folder named `Rock17`,
-which does not exist under the current `RockV17` / `RockV18` naming. `tsconfig.base.json` has
-the same class of problem (`../Rock.JavaScript.Obsidian/...` from a `baseUrl` of `./`).
+```
+[Product]/rocks.kfs.Next.[Product]/Blocks/[Block].cs
+[Product]/rocks.kfs.Next.[Product]/ViewModels/[Block]OptionsBag.cs
+[Product]/rocks.kfs.Next.[Product].Obsidian/src/[block].obs
+[Product]/rocks.kfs.Next.[Product].Obsidian/src/[Block]/*.partial.obs
+[Product]/rocks.kfs.Next.[Product].Obsidian/src/viewModels.d.ts   ← one consolidated file
+[Product]/WebForms/                                                ← original retained, not chopped
+```
 
-Surface this in Phase 2 and get a decision before planning. Hand-maintained `.d.ts` files are
-viable but become a permanent maintenance cost. Fixing the toolchain is its own task.
+Two things to notice in that layout: bags sit flat in `ViewModels/` rather than in per-block
+folders, and there is a **single hand-maintained `viewModels.d.ts`** instead of one `.d.ts`
+per bag — which is how that repo works around `Rock.CodeGeneration` not running over plugin
+assemblies. `src/[block].obs` is flat at the src root; the plugin is the category.
+
+`RockPlugins` will get its own guardrails in a separate project. **If the user asks for a
+conversion, confirm which repo they mean first.** If it is `RockPlugins`, this skill's paths,
+the `.d.ts` steps and `validate-conversion.js` all need that layout, not the one below.
+
+If a conversion is genuinely wanted in **this** repo, note that
+`rocks.kfs.JavaScript.Obsidian` has no block precedent (one control only) and its type
+toolchain has stale paths — `build/build-types.js` requires a clone folder named `Rock17`,
+and `tsconfig.base.json` resolves `../Rock.JavaScript.Obsidian/…` against a `baseUrl` of
+`./`. Raise both in Phase 2 before planning.
 
 ### Version gate
 
@@ -93,10 +106,12 @@ chop without explicit confirmation, and pair it with a migration that re-registe
 type against the new entity-based registration (`AddOrUpdateEntityBlockType()`, never
 `UpdateBlockTypeByGuid()`).
 
-**Step 10 (validate).** `scripts/validate-conversion.js` hardcodes Rock core paths and its
-branch guard only rejects `develop`/`main`/`master`. It will not validate a KFS conversion.
-Walk `references/implementation-details.md`'s file checklist manually against the KFS paths
-above until the script is adapted.
+**Step 10 (validate).** `scripts/validate-conversion.js` checks Rock core paths only. It now
+**refuses to run** inside a KFS-junctioned tree and prints the `RockPlugins` layout instead of
+emitting bogus `FAIL`s; `--rock-core` opts out for a genuine upstream Rock contribution. Until
+it is adapted alongside the `RockPlugins` guardrails, walk
+`references/implementation-details.md`'s file checklist by hand against whichever layout
+applies.
 
 `.claude/rules/plugin-deviations.md` § 4 is the authority for all of this.
 

@@ -21,6 +21,12 @@ KFS builds **plugins** for Rock, across two repositories junctioned into a Rock 
 | `KingdomFirst/RockAssemblies` | `<RockClone>/KFSRockAssemblies` | `rocks.kfs.*` projects — entities, jobs, workflow actions, field types, gateways, Obsidian source |
 | `KingdomFirst/RockBlocks` | `<RockClone>/RockWeb/Plugins/rocks_kfs` | WebForms blocks and built Obsidian output |
 
+**These guardrails cover those two repos.** A third, `KingdomFirst/RockPlugins` (branch
+`main`), holds the newer `rocks.kfs.Next.*` products and the Obsidian block conversions
+already done there. It is **not** junctioned into the Rock tree, uses its own layout, and will
+get its own guardrails in a separate project. If a task turns out to belong there, say so
+rather than applying this repo's conventions to it.
+
 ---
 
 ## Working Root
@@ -182,6 +188,11 @@ Always include the appropriate copyright header at the top of every new file. Se
 
 ## Commit Messages
 
+> **KFS: the format below is Rock's, and applies only to patches contributed upstream to
+> `SparkDevNetwork/Rock`.** Our own repositories use plain descriptive subject lines — see
+> **KFS commits** at the end of this section. Do not draft a `+ (Domain)` message for a
+> `RockAssemblies` or `RockBlocks` commit.
+
 Commits use `+` (release notes) or `-` (trivial):
 
 ### Release note commits (`+`)
@@ -214,25 +225,30 @@ The message should be descriptive enough to serve as the full release note text.
 - Removed unused using statement.
 ```
 
-### KFS notes
+### KFS commits
 
-Pick the domain from the **plugin's functional area**, not from a file path — most plugins map
-cleanly (`Intacct`, `ShelbyFinancials`, `CyberSource`, `ClickBid` → `Finance`;
-`SimpleTexting`, `ScheduledGroupCommunication` → `Communication`; `Checkin.PagerEntry` →
-`Check-in`). Name the plugin in the message text; it is how we scan history.
+**Our repositories do not use the `+ (Domain)` format.** Write a plain, descriptive subject
+line that stands on its own in a PR:
 
 ```
-+ (Finance) Fixed Shelby Financials export omitting project codes in journal mode.
-+ (Check-in) Added pager number entry to the Steps to Care check-in flow.
+Fix auto-assign worker skipping inactive campuses in Steps to Care
+Add project mode support to Shelby Financials export
+Update obsolete methods for Rock 18 compatibility
 ```
 
-**Branches** — Rock's guardrails do not cover this. KFS uses `type/initials-Description`
-branched from the version branch you are targeting (`hotfix-17`, `hotfix-18`, `hotfix-19`,
-`master`):
+- Imperative or past tense, either is fine. No domain, no `+` / `-` prefix.
+- **Name the plugin** when the change is scoped to one — it is the main way we scan history.
+- Reference an issue with `(Fixes #123)` when there is one.
+- PRs are squash-merged; the PR title is what lands on the version branch.
+
+**Branches** — `type/initials-Description`, branched from the version branch you are targeting:
 
 ```
 bug/gem-StepsToCare_AutoAssignWorker
 feature/nbh-PageExportImportProcessor
+release/nbh-CybersourceUpdate_v15
 ```
 
-Never commit directly to a version branch — work goes through a PR.
+Version branches are `hotfix-17`, `hotfix-18`, `hotfix-19`, `master`. **Never commit directly
+to one** — work goes through a PR. Remember that each KFS repo has its own branches and its
+own PR; see § Git: three repositories, one working tree.

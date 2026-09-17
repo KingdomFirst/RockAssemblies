@@ -60,9 +60,19 @@ related to a KFS diff, and the `spec` skill's completion mode would rewrite thei
 **Skip Phase 1 entirely and move to Phase 2 silently** until `specs/` holds KFS-authored specs.
 Do not offer to mark a Spark spec complete.
 
-**4. Phase 2 — message format.** Unchanged, with the KFS notes in `CLAUDE.md` § Commit
-Messages: pick the domain from the plugin's functional area rather than the file path (every
-KFS path contains `rocks_kfs`, which maps to no domain), and name the plugin in the message.
+**4. Phase 2 — the release-note question does not apply.** KFS repos do not feed Rock's
+release notes, so there is no `+` / `-` decision to make. **Skip the binary question** and draft
+a plain descriptive subject naming the plugin, per `CLAUDE.md` § Commit Messages → KFS commits:
+
+```
+Fix auto-assign worker skipping inactive campuses in Steps to Care
+Add project mode support to Shelby Financials export
+```
+
+Still show the drafted message in a fenced code block and wait for confirmation — that part of
+Phase 2 is unchanged. Everything about domains, starting-word classification and the `+` / `-`
+prefixes applies only when the user says the commit is going **upstream** to
+`SparkDevNetwork/Rock`.
 
 **5. Phase 4 — skip.** It only runs if Phase 1 flagged a spec, which it will not.
 
