@@ -33,6 +33,37 @@ If `$ARGUMENTS` is empty, run a full-session audit. Otherwise, treat the argumen
 
 ---
 
+## KFS: Where a Bubble-Up Candidate Goes
+
+This skill is Rock v20's, verbatim, and applies unchanged — including Phase 1.2's read of
+`CLAUDE.md` and every file under `.claude/rules/`.
+
+One addition. When a candidate is a **bubble-up** — a team-shared rule rather than private
+memory — route it by what kind of rule it is:
+
+| The insight is… | Suggest it go to |
+|---|---|
+| A departure from Rock's conventions forced by plugin architecture | `.claude/rules/plugin-deviations.md` — and note that the list is closed, so it needs the user's sign-off, not a silent addition |
+| A v17-vs-v18+ behavioural difference | `.claude/rules/rock-version-targets.md` |
+| A repeatable mistake inside a skill's domain | that skill's `references/common-pitfalls.md` |
+| Anything else | `CLAUDE.md` |
+
+**Never suggest editing the inherited Rock files** (`code-conventions.md`, `data-model.md`,
+`block-architecture.md`, `rock-domains.md`, `obsidian-conventions.md`) to record a KFS
+convention. They are kept verbatim so they can be diffed against upstream; the whole point of
+`plugin-deviations.md` is that departures live in one place. The sole exception already made is
+the Copyright Headers section of `code-conventions.md`.
+
+The skill's existing rule still holds: **never write to team-shared rules yourself.** Surface
+the candidate and let the user make the change.
+
+One more caution specific to us. A pattern observed repeatedly in existing KFS plugin code is
+**not** evidence of a convention — our plugins predate these guardrails and a conformance
+project will assess them later. Do not propose a memory that codifies drift. See
+`.claude/rules/plugin-deviations.md` § How to use this file.
+
+---
+
 ## Why This Skill Exists
 
 The auto-memory system (driven by your system prompt) saves things in the moment as the user corrects you or validates non-obvious choices. That works, but it has two complementary failure modes:

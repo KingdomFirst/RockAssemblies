@@ -2,11 +2,54 @@
 
 Formatting, coding style, and project organization patterns for Rock RMS. Always loaded.
 
+> **KFS:** This file is Rock v20's, kept verbatim except for the Copyright Headers section
+> below, which is rewritten because inheriting it would apply the wrong license to KFS code.
+> For where else plugin work departs from this file — enum and Options POCO locations,
+> `[RockInternal]`, namespaces — see `.claude/rules/plugin-deviations.md`. Everything not
+> listed there follows Rock exactly, including when existing KFS code does otherwise.
+
 ---
 
 ## Copyright Headers
 
-### C# (`.cs`) and TypeScript (`.ts`)
+**This is a licensing decision, not a formatting one.**
+
+### Case 1 — New KFS-authored file (the default)
+
+C# (`.cs`) and TypeScript (`.ts`):
+
+```
+// <copyright>
+// Copyright <CURRENT YEAR> by Kingdom First Solutions
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+```
+
+Note the trailing `//` — intentional and consistent across the codebase. The year is the year
+the file is **created**; do not bump it on later edits.
+
+Obsidian Vue (`.obs`, `.partial.obs`) — one-liner, first line before `<template>`:
+
+```html
+<!-- Copyright by Kingdom First Solutions; Licensed under the Apache License -->
+```
+
+### Case 2 — File copied or derived from Rock core
+
+Keep Spark's header and the Rock Community License **exactly as they are**. Do not relicense,
+do not add a KFS line alongside.
 
 ```
 // <copyright>
@@ -27,15 +70,16 @@ Formatting, coding style, and project organization patterns for Rock RMS. Always
 //
 ```
 
-Note the trailing `//` — intentional and consistent across the codebase.
-
-### Obsidian Vue (`.obs`, `.partial.obs`)
-
-One-liner, first line before `<template>`:
-
 ```html
 <!-- Copyright by the Spark Development Network; Licensed under the Rock Community License -->
 ```
+
+### Deciding
+
+Did this file's code originate in Rock core? If yes — even partially, even heavily modified —
+Case 2. If it is original KFS work, Case 1. When a KFS file grows to contain a substantial
+verbatim block from core, note the provenance in a comment at that block rather than changing
+the file header.
 
 ---
 

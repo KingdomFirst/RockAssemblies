@@ -24,6 +24,64 @@ You are scaffolding a new entity model in the Rock RMS codebase, or reviewing an
 
 ---
 
+## KFS: Plugin Entities
+
+This skill is Rock v20's, verbatim. **Everything below applies to KFS plugin entities** —
+`Model<T>` vs `Entity<T>`, `[Required]` / `[MaxLength]` / `[DataMember]`, XML docs on every
+property, `partial` classes, `virtual` navigation properties, a complete
+`EntityTypeConfiguration` with explicit cascade behaviour, uppercase GUIDs, `IOrdered` /
+`IHasActiveFlag` / `ICacheable`, and the review-mode severity model.
+
+Apply these deviations on top; `.claude/rules/plugin-deviations.md` § 2 is the authority.
+
+**Three required additions** — a plugin entity missing any of them is broken, two silently:
+
+```csharp
+[Table( "_rocks_kfs_StepsToCare_CareNeed" )]   // prefix is mandatory
+[DataContract]                                  // in RockContext's registration filter
+[RockDomain( "Core" )]
+[Rock.SystemGuid.EntityTypeGuid( "87AC878D-6740-43EB-9389-B8440AC595C3" )]
+public partial class CareNeed : Rock.Data.Model<CareNeed>, Rock.Data.IRockEntity
+{
+```
+
+```csharp
+public partial class CareNeedConfiguration : EntityTypeConfiguration<CareNeed>
+{
+    public CareNeedConfiguration()
+    {
+        this.HasRequired( cn => cn.PersonAlias ).WithMany()
+            .HasForeignKey( cn => cn.PersonAliasId ).WillCascadeOnDelete( false );
+
+        // Required for plugin entities. Core takes its entity set name from RockContext's
+        // DbSet properties; plugins are registered dynamically by RegisterEntityType().
+        this.HasEntitySetName( "CareNeed" );
+    }
+}
+```
+
+| Step below | Rock core | KFS plugin |
+|---|---|---|
+| Step 2 — does it exist | `Rock/Model/**/{Entity}.cs` | `KFSRockAssemblies/rocks.kfs.*/Model/{Entity}.cs` |
+| Step 3 — SystemGuid | `Rock/SystemGuid/EntityType.cs` | `KFSRockAssemblies/rocks.kfs.[Plugin]/SystemGuid/[Type].cs`, namespace `rocks.kfs.[Plugin].SystemGuid`. **Option A (named constant) only** — not the inline-GUID variant. |
+| Step 4 — file path | `Rock/Model/[Domain]/[Entity]/[Entity].cs` | `KFSRockAssemblies/rocks.kfs.[Plugin]/Model/[Entity].cs` |
+| Step 4 — namespace | `Rock.Model` | `rocks.kfs.[Plugin].Model` |
+| Step 4 — class attributes | five, incl. `[CodeGenerateRest]` | four — **omit `[CodeGenerateRest]`**; it only drives `Rock.CodeGeneration` over core |
+| Step 5 — enums | `Rock.Enums/[Domain]/`, namespace `Rock.Model`, `[EnumDomain]` | owning plugin project and namespace, **no `[EnumDomain]`** (it is `internal` to `Rock.Enums`) |
+| Step 5 — Options POCO | `Rock/Model/[Domain]/[Entity]/Options/` | `rocks.kfs.[Plugin]/Model/Options/` |
+| Step 6 — next steps | run `Rock.CodeGeneration` | **skip it** — it does not run over plugin assemblies. Hand-write the service class if one is needed. |
+
+Two pitfalls in `references/common-pitfalls.md` need adjusting for plugins:
+
+- **Pitfall 2** lists five required attributes. For plugins it is the four above plus
+  `IRockEntity`; `[CodeGenerateRest]` is not one of them.
+- **Pitfall 8** says table names carry no prefix. That is core-only — plugin tables must carry
+  `_rocks_kfs_[Plugin]_`, and the PK constraint follows: `PK__rocks_kfs_[Plugin]_[Entity]`.
+
+Next step after scaffolding is `/plugin-migration`, never `/migration`.
+
+---
+
 ## Reference Routing Table
 
 Load reference files progressively — only when needed.

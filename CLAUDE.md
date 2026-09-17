@@ -1,4 +1,11 @@
-# CLAUDE.md — Rock RMS Development Guidelines
+# CLAUDE.md — KFS Rock Plugin Development Guidelines
+
+> **Provenance.** This file and `.claude/rules/*` are Spark Development Network's Rock v20
+> guardrails, kept as close to verbatim as possible so they can be diffed against upstream.
+> **Rock's conventions are the standard.** Departures are confined to
+> `.claude/rules/plugin-deviations.md`, which is a closed list — if something is not in it,
+> follow Rock, including when existing KFS code does otherwise. Our plugins predate these
+> guardrails and a conformance project will evaluate them later.
 
 ## Project Overview
 
@@ -6,6 +13,55 @@ Rock RMS is an open-source church management system. The codebase is C# (.NET) +
 - **Obsidian** = the Vue 3 + C# block framework replacing legacy WebForms (.ascx) blocks.
 - **Lava** = Rock's DotLiquid-based templating language.
 - **WebForms** = legacy ASP.NET block system being phased out.
+
+KFS builds **plugins** for Rock, across two repositories junctioned into a Rock clone:
+
+| Repo | Junctioned to | Contains |
+|---|---|---|
+| `KingdomFirst/RockAssemblies` | `<RockClone>/KFSRockAssemblies` | `rocks.kfs.*` projects — entities, jobs, workflow actions, field types, gateways, Obsidian source |
+| `KingdomFirst/RockBlocks` | `<RockClone>/RockWeb/Plugins/rocks_kfs` | WebForms blocks and built Obsidian output |
+
+---
+
+## Working Root
+
+**Run Claude Code from the Rock clone root** (`RockV17\`, `RockV18\`), never from inside
+`KFSRockAssemblies\`. `CreateLinks.bat` junctions `.claude` and links `CLAUDE.md` into that
+root, so the config is version-controlled in our repo but loads with the whole tree visible.
+Plugin projects reference `..\..\RockWeb\Bin\*.dll` and the Obsidian project builds through
+Rock's toolchain — neither resolves outside the junction.
+
+Every path in these rules and skills is relative to the Rock clone root. **Rock core trees are
+read-only reference** — we do not fork Rock.
+
+### Git: three repositories, one working tree
+
+The working root is the Rock clone, but our code lives in two *other* repositories reached
+through junctions. A bare `git` command run from the working root operates on **Rock's** repo,
+which does not track our files — it reports `?? KFSRockAssemblies/` and shows none of your
+actual changes.
+
+**Always target the right repo with `-C`:**
+
+| Working on | Command prefix | Repo |
+|---|---|---|
+| Plugins, and this config | `git -C KFSRockAssemblies ...` | `KingdomFirst/RockAssemblies` |
+| Blocks | `git -C RockWeb/Plugins/rocks_kfs ...` | `KingdomFirst/RockBlocks` |
+| Rock core (read-only) | `git ...` | `SparkDevNetwork/Rock` |
+
+This applies to `status`, `diff`, `log`, `branch`, `add`, `commit` — everything. A change that
+spans both KFS repos needs a branch, PR and merge in each; they are versioned independently.
+
+Note also that the two repos keep their own branches. `git branch` from the working root lists
+**Rock's** branches (including `develop` and Rock's own `feature-*`), not ours.
+
+---
+
+## Rock Version
+
+KFS ships against several Rock majors at once. **Before writing code, establish which version
+you are on** and read `.claude/rules/rock-version-targets.md`. Icons, styling, several
+framework APIs and the build path differ between v17 and v18+.
 
 ---
 
@@ -29,7 +85,9 @@ This does **not** apply to questions already settled by Rock conventions (rules,
 
 ## Project Architecture
 
-| What you're creating | Where it goes |
+Rock core layout, for reference when reading core code (read-only for us):
+
+| What you're reading | Where it lives |
 |---|---|
 | C# block class | `Rock.Blocks/[Domain]/` |
 | ViewModels / bags | `Rock.ViewModels/Blocks/[Domain]/[BlockName]/` |
@@ -39,6 +97,23 @@ This does **not** apply to questions already settled by Rock conventions (rules,
 | Enums | `Rock.Enums/[Domain]/` |
 | Migrations | `Rock.Migrations/Migrations/` |
 | SystemGuid constants | `Rock/SystemGuid/` |
+
+KFS plugin layout — the same structures, relocated. Paths from the Rock clone root:
+
+| What you're creating | Where it goes |
+|---|---|
+| WebForms block | `RockWeb/Plugins/rocks_kfs/[Domain]/[BlockName].ascx` + `.ascx.cs` |
+| Obsidian source | `KFSRockAssemblies/rocks.kfs.JavaScript.Obsidian/src/` |
+| C# block class / bags | within the owning `KFSRockAssemblies/rocks.kfs.[Plugin]/` |
+| Entity model | `KFSRockAssemblies/rocks.kfs.[Plugin]/Model/[EntityName].cs` |
+| Enums | `KFSRockAssemblies/rocks.kfs.[Plugin]/` — Rock's structural rules, plugin assembly |
+| Migrations | `KFSRockAssemblies/rocks.kfs.[Plugin]/Migrations/[NNN]_[Name].cs` |
+| SystemGuid constants | `KFSRockAssemblies/rocks.kfs.[Plugin]/SystemGuid/` |
+| Jobs / workflow actions / field types | `KFSRockAssemblies/rocks.kfs.[Plugin]/Jobs/`, `rocks.kfs.Workflow.Action.[Domain]/`, `[Plugin]/Field/Types/` |
+
+**A KFS plugin block follows the architecture of the core Rock block of similar function.**
+Only the path, namespace, `[Category]` prefix and registration call differ. See
+`.claude/rules/plugin-deviations.md`.
 
 ---
 
@@ -138,3 +213,26 @@ The message should be descriptive enough to serve as the full release note text.
 - Fixed typo in variable name.
 - Removed unused using statement.
 ```
+
+### KFS notes
+
+Pick the domain from the **plugin's functional area**, not from a file path — most plugins map
+cleanly (`Intacct`, `ShelbyFinancials`, `CyberSource`, `ClickBid` → `Finance`;
+`SimpleTexting`, `ScheduledGroupCommunication` → `Communication`; `Checkin.PagerEntry` →
+`Check-in`). Name the plugin in the message text; it is how we scan history.
+
+```
++ (Finance) Fixed Shelby Financials export omitting project codes in journal mode.
++ (Check-in) Added pager number entry to the Steps to Care check-in flow.
+```
+
+**Branches** — Rock's guardrails do not cover this. KFS uses `type/initials-Description`
+branched from the version branch you are targeting (`hotfix-17`, `hotfix-18`, `hotfix-19`,
+`master`):
+
+```
+bug/gem-StepsToCare_AutoAssignWorker
+feature/nbh-PageExportImportProcessor
+```
+
+Never commit directly to a version branch — work goes through a PR.

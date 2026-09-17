@@ -26,6 +26,61 @@ You are refactoring CSS in Obsidian .obs block files to follow Rock's styling pr
 
 ---
 
+## KFS: Check the Rock Version First
+
+This skill is Rock v20's, verbatim, and is **fully applicable on v18+**. On **v17 the top two
+priorities do not exist**, which changes the outcome of nearly every finding. Establish the
+version before Phase 2 — see `.claude/rules/rock-version-targets.md`.
+
+### On v17
+
+Rock v17 styles with LESS. There is no `styles-v2`, and the Rock utility classes are not
+defined anywhere — zero occurrences of `gap-spacing`, `mb-spacing`, `p-spacing` or
+`bg-interface` across the whole tree. The priority order collapses:
+
+| Priority | v17 |
+|---|---|
+| 1. Rock utility classes | **unavailable** |
+| 2. Utility combinations | **unavailable** |
+| 3. Block classes | `RockWeb/Styles/_blocks-*.less` (Rock core, read-only for us) |
+| 4. **Scoped styles with tokenized values** | ← the only reachable option |
+
+`references/utility-catalog.md` describes classes that do not exist on v17. Its **CSS
+Variables** subsections are still correct — v17 defines the full token set in
+`RockWeb/Styles/_rock-core.less`: `--spacing-*`, `--font-size-*`, `--font-weight-*`,
+`--rounded-*`, `--color-interface-*`, `--line-height-*`. Use those and ignore the class tables.
+
+So on v17 this is worth running, but the work is tokenizing scoped styles, not eliminating
+them:
+
+```css
+/* correct on v17 and v18+ */
+.care-need-header {
+    gap: var(--spacing-xsmall);
+    color: var(--color-interface-medium);
+    border-radius: var(--rounded-medium);
+}
+```
+
+Do **not** report "should use `.gap-spacing-xs`" against a v17 block. Do **not** convert
+Bootstrap `mb-3` to `mb-spacing-sm` there — the target class does not exist and the change
+silently removes the margin.
+
+### Paths
+
+| Rock core | KFS |
+|---|---|
+| `Rock.JavaScript.Obsidian.Blocks/src/[Category]/[block].obs` | `KFSRockAssemblies/rocks.kfs.JavaScript.Obsidian/src/` |
+| `RockWeb/Styles/styles-v2/blocks/_blocks-[category].scss` | no KFS equivalent — skip the Phase 1 block-SCSS check |
+
+The KFS Obsidian surface is currently one control, so this skill has little to operate on
+until a block conversion lands.
+
+The **custom class hook** naming rule still applies, with our prefix: `kfs-[block]-[element]`
+in kebab-case, so theme authors can tell our hooks from Rock's.
+
+---
+
 ## CSS Priority Order
 
 This is the hierarchy. Always prefer a higher-priority option before falling to the next:

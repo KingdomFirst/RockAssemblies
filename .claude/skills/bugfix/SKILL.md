@@ -22,6 +22,61 @@ You are fixing a known bug in the Rock RMS codebase. Your job is to understand t
 
 ---
 
+## KFS: Where to Look, and Which Repo
+
+This skill is Rock v20's, verbatim. The triage discipline, root-cause-over-symptom rule,
+cross-layer tracing, engineering notes, verification checklist and escalation triggers all
+apply unchanged. `references/rock-bug-patterns.md` is equally valid for plugin code — the
+cache, PersonAlias, lazy-load, singleton and thread-safety patterns are Rock behaviours we
+inherit.
+
+**1.2 Locate the code** — search the KFS trees, not Rock core:
+
+| Symptom mentions | Search |
+|---|---|
+| A block | `RockWeb/Plugins/rocks_kfs/[Domain]/` (WebForms), `rocks.kfs.JavaScript.Obsidian/src/` (Obsidian) |
+| An entity or service | `KFSRockAssemblies/rocks.kfs.*/Model/` |
+| A job | `KFSRockAssemblies/rocks.kfs.*/Jobs/` |
+| A workflow action | `KFSRockAssemblies/rocks.kfs.Workflow.Action.*/` |
+| A field type | `KFSRockAssemblies/rocks.kfs.*/Field/Types/` |
+| A gateway | `rocks.kfs.CyberSource/`, `rocks.kfs.ClickBid/`, … |
+
+Rock core is read-only reference — read it freely to understand behaviour we depend on, but a
+fix that requires editing core is an escalation (§ 2.4), not a change you make.
+
+**1.3 Step C — recent history** needs the right repo. From the working root, `git log` queries
+**Rock's** repo. Use:
+
+```bash
+git -C KFSRockAssemblies log --oneline -20 -- rocks.kfs.[Plugin]/
+git -C RockWeb/Plugins/rocks_kfs log --oneline -20 -- [Domain]/[Block].ascx.cs
+```
+
+See `CLAUDE.md` § Git: three repositories, one working tree.
+
+**1.4 Identify the domain** — pick it from the **plugin's functional area**, not the file path
+(every path contains `rocks_kfs`, which maps to nothing). `Intacct` / `ShelbyFinancials` /
+`CyberSource` / `ClickBid` → `Finance`; `SimpleTexting` / `ScheduledGroupCommunication` →
+`Communication`; `Checkin.PagerEntry` → `Check-in`; `GroupRSVP` / `InactivateGroups` →
+`Group`. The valid list in the skill is unchanged.
+
+**2.3 Verify** — run `/build`, not `dotnet build`. There is no test suite; `/test` explains
+what verification is actually available. If the fix touches a migration, say so explicitly —
+migrations run once against customer databases.
+
+**Phase 3 commit message** — keep the `+ (Domain) Fixed …` format, name the plugin in the
+message text, and see `CLAUDE.md` § Commit Messages for the KFS branch convention.
+
+```
++ (Finance) Fixed Shelby Financials export omitting project codes in journal mode. (Fixes #123)
+```
+
+**A bug is not licence to conform unrelated code.** Our plugins predate these guardrails; if
+you notice non-conforming code near the fix, mention it and move on. See
+`.claude/rules/plugin-deviations.md` § How to use this file.
+
+---
+
 ## Scale to the Bug
 
 Not every bug needs the full investigation process. Match effort to complexity:

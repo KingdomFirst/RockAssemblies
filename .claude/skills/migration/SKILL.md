@@ -17,6 +17,30 @@ metadata:
 
 # Rock RMS EF Migration Builder & Reviewer
 
+## KFS: STOP — this is almost certainly the wrong skill
+
+EF migrations live in `Rock.Migrations/Migrations/Version NN.0/` and are **Rock core's**. We do
+not fork Rock, so KFS work never produces one.
+
+**If the user asked for a migration for a KFS plugin, use `/plugin-migration` instead.** That
+covers schema changes, data fixes, pages, blocks, block-type attributes, defined types and
+jobs — everything a plugin needs — through `Rock.Plugin.Migration`, whose typed schema API
+(`CreateTable`, `AddColumn`, `AddForeignKey`, `AddIndex`, `DropTable`) mirrors the EF methods
+documented below.
+
+Continue with this skill only when the user has explicitly said they are contributing a
+migration **upstream to `SparkDevNetwork/Rock`**. In that case Rock's conventions apply in
+full, including Spark's copyright header and the `+ (Domain)` commit format — not ours. The
+`Add-Migration` gate in Step 1 requires a writable Rock core clone, which our junctioned
+read-only reference tree is not.
+
+The reference files here (`ef-patterns.md`, `migration-helper-methods.md`,
+`common-pitfalls.md`) remain useful reading for plugin work — `RockMigrationHelper` is shared,
+and the pitfalls about NOT NULL defaults, string escaping, `dbo.` prefixes, operation ordering
+and the `UpdateBlockTypeByGuid()` data-loss risk all apply to plugin migrations too.
+
+---
+
 You are writing or reviewing the Up() and Down() method bodies for an Entity Framework migration in the Rock RMS codebase. The developer has already scaffolded the migration files via `Add-Migration` in Package Manager Console — your job is to either write the migration logic or review what's already been written.
 
 **The user's request:** $ARGUMENTS

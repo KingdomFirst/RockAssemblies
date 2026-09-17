@@ -1,22 +1,16 @@
-# Claude Code for Rock RMS
+# Claude Code for KFS Rock RMS Plugins
 
-A developer guide for using [Claude Code](https://code.claude.com/docs/en/overview) in the Rock RMS codebase.
+A developer guide for using [Claude Code](https://code.claude.com/docs/en/overview) across the
+KFS plugin repositories.
 
-> **Note:** This guide is written for the terminal (CLI) experience. Claude Code is also available as a [VS Code extension](https://code.claude.com/docs/en/vs-code) and through the [Claude desktop app](https://code.claude.com/docs/en/desktop). The core concepts -- skills, rules, MCP, context management -- apply everywhere, but the commands and examples below assume you're working in a terminal.
-
----
-
-## 1. Overview
-
-Claude Code is an agentic coding tool that reads files, writes code, runs commands, and operates within the context of this repository.
-
-**How we use it:** Claude Code accelerates Rock development -- block conversions, entity scaffolding, migrations, SQL scripts, bug fixes, and code review. The `.claude/` directory is checked into the repo so the entire team shares the same configuration, rules, and skills.
-
-**Philosophy:** Claude Code is a tool for leverage, not a replacement for engineering judgment. You own the output. Review what it produces, understand what it changed, and verify it works before committing.
+> **Provenance.** This configuration is adapted from the guardrails Spark Development Network
+> ships in Rock RMS v20 (`SparkDevNetwork/Rock`, `.claude/`). This is a copy that has been
+> been rewritten and adapted for plugin development. When you pull improvements from
+> upstream, diff against Rock's version and re-apply our adaptations — do not overwrite.
 
 ---
 
-## 2. Setup
+## 1. Setup
 
 ### Install
 
@@ -24,23 +18,35 @@ Claude Code is an agentic coding tool that reads files, writes code, runs comman
 npm install -g @anthropic-ai/claude-code
 ```
 
-Then open a terminal at the repo root and run:
+### Wire up the working tree
+
+Claude Code must run from a **Rock clone root** (`RockV17\`, `RockV18\`), not from inside
+`KFSRockAssemblies\`. Every path in these rules and skills is relative to that root, and the
+plugin projects themselves only build there (`..\..\RockWeb\Bin\*.dll`).
+
+From the Rock clone root, once per clone:
+
+```
+CreateLinks.bat
+```
+
+That junctions the KFS repos in and links `.claude` + `CLAUDE.md` from `RockAssemblies` into
+the Rock root, so the config is version-controlled in our repo but loads with the whole tree
+visible. It also adds both to `.git/info/exclude` so they do not show as untracked in the Rock
+clone.
+
+Then:
 
 ```bash
+cd C:\KFSRepo\Rock\RockV17
 claude
 ```
 
-Claude Code automatically picks up the shared `CLAUDE.md` and `.claude/` configuration. On first run it will walk you through authentication -- follow the prompts.
-
-### LSP Setup
-
-LSP gives Claude the same code navigation your IDE has -- go-to-definition, find references, type resolution, and diagnostics. In a codebase this large, that difference matters.
-
-Install both from within a Claude Code session:
+### LSP (optional but worth it)
 
 ```
-/plugin install typescript-lsp@claude-plugins-official
 /plugin install csharp-lsp@claude-plugins-official
+/plugin install typescript-lsp@claude-plugins-official
 ```
 
 - **TypeScript LSP** -- Type-aware navigation across the Obsidian frontend (Vue 3 + TypeScript)
@@ -60,6 +66,28 @@ Install both from within a Claude Code session:
 
 ---
 
+## 2. Know Your Rock Version First
+
+KFS ships against several Rock major versions at once. **Before any code task**, establish which one:
+
+```bash
+grep AssemblyInformationalVersion Rock.Version/AssemblySharedInfo.cs
+```
+
+| KFS branch | Rock clone |
+|---|---|
+| `hotfix-17` | `RockV17` |
+| `hotfix-18` | `RockV18` |
+| `hotfix-19` | — |
+| `master` | latest |
+
+Icons, styling, several framework APIs and the build path all differ between v17 and v18+.
+`.claude/rules/rock-version-targets.md` is the single source of truth. A `hotfix-17` branch
+checked out inside `RockV18` builds against the wrong assemblies — Claude is instructed to stop
+and flag that combination.
+
+---
+
 ## 3. Project Configuration
 
 The `.claude/` directory is checked into the repo. Everything here is shared -- treat it like production code.
@@ -72,173 +100,117 @@ The `.claude/` directory is checked into the repo. Everything here is shared -- 
   commands/              -- Slash commands (/build, /test, /check)
   hooks/                 -- Safety hooks (block destructive git operations)
   rules/                 -- Contextual rules (auto-loaded based on file paths)
-    block-architecture.md     Loads when editing block files
-    code-conventions.md       Always loaded (formatting, SQL, enums, etc.)
-    data-model.md             Always loaded (entities, FKs, GUIDs, etc.)
-  skills/                -- On-demand workflows (/convert-block, /bugfix, etc.)
+    plugin-deviations.md      always -- KFS: the closed list of departures from Rock
+    rock-version-targets.md   always -- KFS: v17 vs v18+ differences
+    code-conventions.md       always -- Rock's, verbatim except Copyright Headers
+    data-model.md             always -- Rock's, verbatim
+    rock-domains.md           always -- Rock's, verbatim
+    block-architecture.md     Rock's, verbatim; paths extended to the KFS block trees
+    obsidian-conventions.md   Rock's, verbatim; KFS eslintrc added as source-of-truth
+  skills/                -- multi-step workflows
 ```
 
-### How the pieces work together
-
-| Component | Location | When it loads | Purpose |
-|---|---|---|---|
-| `CLAUDE.md` | Repo root | Always | Core guidelines: architecture, naming, critical rules, commit format |
-| Rules | `.claude/rules/` | Always or by file path | Additional coding standards and domain conventions |
-| Skills | `.claude/skills/` | On demand (`/command` or keyword) | Multi-step workflows with reference material |
-| Commands | `.claude/commands/` | On demand (`/command`) | Simple one-shot operations |
-| Settings | `.claude/settings.json` | Always | Permission allowlist and safety hooks |
-
-**Rules** deserve special attention: `block-architecture.md` only activates when Claude is working on files in `Rock.Blocks/`, `Rock.JavaScript.Obsidian.Blocks/`, `RockWeb/Blocks/`, or `Rock.ViewModels/Blocks/`. The other two rules load on every session. This keeps Claude's context focused -- it gets block patterns when working on blocks, not when writing a migration.
+| Component | When it loads |
+|---|---|
+| `CLAUDE.md` (repo root, hard-linked into the Rock clone) | Always |
+| `rules/*.md` without `paths:` frontmatter | Always |
+| `rules/*.md` with `paths:` frontmatter | Only when working in those directories |
+| `skills/` | On demand — `/name` or keyword trigger |
+| `commands/` | On demand — `/name` |
+| `settings.json` | Always |
 
 ---
 
-## 4. Using Skills & Commands
+## 4. Rock Is the Standard
 
-### Skills
+The rules in `.claude/rules/` are Spark's Rock v20 guardrails, kept verbatim so they can be
+diffed against upstream. **Follow Rock's patterns.** Departures live in one closed list —
+`.claude/rules/plugin-deviations.md` — and if something is not in it, follow Rock.
 
-Skills are on-demand workflows that encode Rock-specific knowledge. They live in `.claude/skills/` and are invoked by `/` command or keyword triggers.
+Our plugins predate these guardrails and some do not conform. **Existing KFS code is not
+evidence of a convention.** A conformance project will evaluate them separately; until then,
+do not infer a pattern from surrounding code. Report, but do not "fix" unrelated non-conforming code
+while doing other work.
 
-| Skill | Triggers | Purpose |
-|---|---|---|
-| `/bugfix` | "fix this bug", "debug this", error + fix intent | Root cause analysis and minimal correct fix |
-| `/convert-block` | "convert block", "obsidian conversion", WebForms path | Converts WebForms (.ascx) to Obsidian (Vue 3 + C#) |
-| `/css-cleanup` | "clean up css", "style audit", "use rock utilities" | Replaces inline styles with Rock utility classes |
-| `/entity-model` | "create entity", "new model", "scaffold entity" | Scaffolds entity class, config, SystemGuid, service |
-| `/migration` | "write migration", "EF migration", "review migration" | Writes/reviews Up() and Down() for EF migrations |
-| `/plugin-migration` | "plugin migration", "hotfix", "new hotfix" | Creates plugin migration .cs files in HotFixes/ |
-| `/review-conversion` | "review conversion", "check the conversion" | Audits completed Obsidian conversion against WebForms original |
-| `/sql` | "write sql", "seed data", "insert data" | Generates Rock-safe SQL with proper conventions |
+Two deviations are worth knowing before you read the list:
 
-Skills can be invoked two ways:
-- **Directly:** Type `/convert-block` in the prompt
-- **By keyword:** Describe the task naturally -- "convert `RockWeb/Blocks/Core/CampusList.ascx` to Obsidian" triggers the conversion skill automatically
+**Copyright and licensing.** New KFS files get `Copyright <year> by Kingdom First Solutions`
+under **Apache 2.0**. Files derived from Rock core keep Spark's header and the **Rock Community
+License** — 35 of the 76 blocks in `RockBlocks` are in that second category and are correct as
+they stand. Getting this wrong is a licensing defect, not a style nit.
 
-Each skill has a `SKILL.md` (the workflow definition) and a `references/` folder (domain knowledge, patterns, common pitfalls). **Read the skill files** to understand what each one does -- this is the best way to learn the patterns.
+**Plugin entities need three additions.** `IRockEntity` (Rock's own documented plugin hook),
+`[DataContract]` (required by `RockContext`'s registration filter), and `HasEntitySetName()`
+(core gets this from its `DbSet` properties; plugins are registered dynamically). Table name,
+file location and namespace change. Everything else in `data-model.md` — including
+`[RockDomain]` and `[Rock.SystemGuid.EntityTypeGuid]`, which do work on plugin entities —
+applies unchanged.
 
-Full docs: https://code.claude.com/docs/en/skills
+---
 
-### Commands
-
-Commands are lightweight slash commands for build and verification.
+## 5. Commands
 
 | Command | Purpose |
 |---|---|
-| `/build` | Build Rock.sln, report errors |
-| `/test` | Run Rock.Tests, report results |
-| `/check` | Pre-commit verification: build + test + diff review |
+| `/build` | `nuget restore` + `msbuild` on the version-matched `KFSRock*.sln` |
+| `/test` | Reports what verification actually exists — **there is no test suite** |
+| `/check` | Pre-commit: build, branch sanity, diff review (licensing, data model, migrations, version-sensitive APIs) |
 
-### After code generation
-
-When Claude creates new ViewModels (bags) or block types, you need to run the **Rock.CodeGeneration** tool to generate the corresponding TypeScript types before working on the Obsidian frontend. Claude cannot run this for you -- it's a WPF app. Run it from Visual Studio after Claude finishes the C# side.
+`dotnet build` does not work here. All 37 plugin projects are legacy-format csproj on every
+Rock version, and `Rock.sln` fails with `MSB4249` regardless.
 
 ---
 
-## 5. Permissions & Safety
+## 6. Permissions & Safety
 
-### Shared permissions
+`settings.json` pre-approves file operations, read-only git, `msbuild`/`nuget restore`, and the
+npm lint/test scripts. Everything else prompts.
 
-`settings.json` pre-approves common operations so Claude doesn't prompt for every file read or git status. The current allowlist covers:
+Two permissions from Rock's original config were **deliberately removed**:
 
-- **File operations** -- read, write, edit, glob, grep (all pre-approved)
-- **Git read operations** -- status, diff, log, show, branch, blame (pre-approved)
-- **Git write operations** -- add, create branches, push to origin (pre-approved)
-- **Build and test** -- `dotnet build`, `dotnet test` (pre-approved)
-- **Everything else** -- requires your approval when prompted
+- `Bash(git push origin*)` — our version branches take changes through PRs, and pushing is
+  outward-facing. Confirm each push.
+- `Bash(git remote*)` — our remote URLs currently embed a PAT in cleartext, so this would print
+  a credential on every call.
 
-### Safety hooks
-
-A `PreToolUse` hook (`hooks/prevent-destructive.sh`) intercepts every Bash command and blocks dangerous git operations before they execute:
-
-- Force push (`--force`, `-f`) and hard reset (`--hard`)
-- Rebase onto main or develop
-- Amend commits, skip hooks (`--no-verify`)
-- Force-delete branches (`-D`), drop/clear stashes
-- Blanket discard (`checkout .`, `restore .`, `clean -f`)
-
-These protect the team from accidental data loss in autonomous mode. If you need to do something the hook blocks, do it manually outside Claude Code.
-
-### Personal overrides
-
-Create `.claude/settings.local.json` (gitignored) for personal preferences -- additional MCP servers, adjusted permission prompts, or tool-specific settings that don't affect the team.
+A `PreToolUse` hook (`hooks/prevent-destructive.sh`) blocks force push, hard reset, rebase onto
+main/develop, `--amend`, `--no-verify`, force-delete branch, stash drop/clear, and blanket
+discard. If you need one of those, do it manually outside Claude Code.
 
 ### Team guidelines
 
-- **Do not modify skills you didn't author** without coordinating with the team. They encode tested workflows that others depend on.
-- **Do not edit `settings.json`** without team review. It controls permissions and safety hooks for everyone.
-- **Test skill changes before pushing.** Run the skill against a known input and verify the output.
-
-### Contributing to shared knowledge
-
-When Claude makes a repeatable mistake, add it to the relevant `common-pitfalls.md` in the skill's `references/` directory:
+- **Do not edit `settings.json` without team review** — it governs permissions for everyone.
+- **Do not modify a skill you did not author** without coordinating.
+- When Claude makes a repeatable mistake, add it to the relevant `references/common-pitfalls.md`:
 
 ```markdown
 ### Pitfall: [Short name]
 **Symptom:** What Claude does wrong
 **Cause:** Why it happens
 **Fix:** What to do instead
-**Added:** [date] by [your name]
+**Added:** [date] by [your initials]
 ```
-
-This builds institutional knowledge over time -- the more pitfalls documented, the fewer repeated mistakes across the team.
-
----
-
-## 6. MCP (Model Context Protocol)
-
-MCP lets Claude Code connect to external services -- design tools, databases, project management -- without custom integration. Instead of copy-pasting between tools, Claude pulls context directly from the source.
-
-**Example -- Figma:** Share a Figma URL and Claude reads the design specs directly, implements the UI, and can compare against the original design.
-
-### Managing servers
-
-Type `/mcp` to manage servers -- enable, disable, reconnect, or authenticate. You can also edit `settings.json` or `settings.local.json` directly.
-
-Scope options:
-- `--scope local` (default) -- your machine only
-- `--scope project` -- checked into `.mcp.json`, shared with the team
-- `--scope user` -- global across all projects
-
-Full docs: https://code.claude.com/docs/en/mcp
 
 ---
 
 ## 7. Context Management
 
-### Choosing a model
+- **`/clear` between unrelated tasks** — leftover context reduces accuracy.
+- **`/compact` with a focus** — `/compact keep the migration changes`.
+- **`@filename`** to reference a file instead of pasting it.
+- **`/context`** to see what is consuming space.
 
-**Opus** is the default and should be used for all work -- especially planning, where deep reasoning matters most. If you have a solid plan and want faster execution, you can switch to **Sonnet** mid-session with `/model`.
-
-### Working with context
-
-Opus supports ~1M tokens of context -- large enough to hold entire block conversions in a single session. But context is finite. Manage it intentionally:
-
-- **`/clear` between unrelated tasks.** Leftover context adds noise and reduces accuracy.
-- **`/compact` to reclaim space.** Add a focus: `/compact keep the migration changes` preserves what matters.
-- **Reference files with `@filename`** instead of pasting contents into prompts.
-- **`/context`** to see what's consuming space.
-
-### Statusline
-
-Optional but worth setting up. Pins context usage, model, git branch, cost, and elapsed time to the bottom of your terminal so you always know where you stand. Run `/statusline` to configure.
-
-Full docs: https://code.claude.com/docs/en/statusline
+Note that this tree is large: the Rock clone plus both KFS repos. Scope requests to a plugin
+("in `rocks.kfs.StepsToCare`, ...") rather than letting Claude search the whole tree.
 
 ---
 
-## 8. Resources
+## 8. Upstream
 
-### Core references
+Rock's guardrails: `SparkDevNetwork/Rock` → `.claude/`. Worth watching for new skills and
+pitfalls. Two standing caveats when pulling from it:
 
-The principles and guidelines behind this setup were shaped by these resources:
-
-- [Claude Code Best Practices](https://code.claude.com/docs/en/best-practices) -- Prompting, context management, and verification loops
-- [The Complete Guide to Building Skills for Claude](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf) -- Skill design, structure, and patterns
-- [Real-world Claude Code workflows](https://x.com/trq212/status/2033949937936085378) -- Practical patterns from production use
-
-### Community & extensions
-
-The Claude Code ecosystem is growing quickly. These are worth exploring:
-
-- [Anthropic Skills](https://github.com/anthropics/skills/) -- Anthropic's official skill library covering code review, TDD, security, and more
-- [Everything Claude Code](https://github.com/affaan-m/everything-claude-code) -- Comprehensive collection of skills, agents, rules, and multi-agent patterns
-- [Skills Marketplace](https://skillsmp.com/) -- Searchable directory of community-contributed skills
+1. Its content targets Rock core on the **current** version. Check anything you copy against
+   `.claude/rules/rock-version-targets.md` before trusting it on v17.
+2. Its conventions are Spark's — copyright, entity attributes, migration layout, commit format
+   and branch naming all differ from ours.

@@ -21,6 +21,61 @@ You are performing a thorough review of a completed Rock RMS Obsidian block conv
 
 ---
 
+## KFS: Paths, Git and Version
+
+This skill is Rock v20's, verbatim. The parity audit, the exhaustiveness mandate, the code
+quality scan and `references/review-checklist.md` all apply unchanged — the standard a
+converted KFS block is measured against **is** the core Rock block of similar function.
+
+Four adjustments.
+
+**1. Files are in the KFS trees.** Phase 1.2's table maps to:
+
+| Rock core | KFS |
+|---|---|
+| `Rock.Blocks/[Category]/[Block].cs` | `KFSRockAssemblies/rocks.kfs.[Plugin]/` |
+| `Rock.ViewModels/Blocks/[Category]/[Block]/*.cs` | within the owning `rocks.kfs.[Plugin]` project |
+| `Rock.JavaScript.Obsidian/Framework/ViewModels/Blocks/.../*.d.ts` | hand-maintained in the plugin |
+| `Rock.JavaScript.Obsidian.Blocks/src/[Category]/[block].obs` | `KFSRockAssemblies/rocks.kfs.JavaScript.Obsidian/src/` |
+| `RockWeb/Blocks/[Category]/[Block].ascx` | `RockWeb/Plugins/rocks_kfs/[Domain]/[Block].ascx` |
+
+**2. Phase 1.3 — recovering the WebForms original needs the right repo.** `git show develop:…`
+run from the working root queries **Rock's** repo, where our block has never existed;
+`develop` there is Rock v20's branch. Blocks live in `KingdomFirst/RockBlocks`:
+
+```bash
+git -C RockWeb/Plugins/rocks_kfs show master:[Domain]/[Block].ascx.cs
+git -C RockWeb/Plugins/rocks_kfs show master:[Domain]/[Block].ascx
+```
+
+Substitute the version branch (`hotfix-17`) if the conversion targets one. If the files are
+still in the working tree, read them directly. To find a deletion:
+
+```bash
+git -C RockWeb/Plugins/rocks_kfs log --diff-filter=D --format=%H -1 -- "[Domain]/[Block].ascx.cs"
+```
+
+See `CLAUDE.md` § Git: three repositories, one working tree.
+
+**3. Phase 1.1 — branch auto-detect.** Rock's `feature-v{N}-claude-{name}` pattern is not ours.
+KFS branches are `feature/[initials]-[Name]`; read the current branch with
+`git -C RockWeb/Plugins/rocks_kfs branch --show-current`. If it does not resolve to a block,
+ask rather than guessing.
+
+**4. Version-gate the checklist.** Against v17, several checklist items invert — see
+`.claude/rules/rock-version-targets.md`:
+
+- Do **not** flag a missing `ContentSection` / `ContentStack`; they do not exist on v17.
+- Do **not** flag redundant `filterValue` / `quickFilterValue` on `HighlightDetailColumn`;
+  `getCombinedFilterValue` is absent on v17 **and** v18, so those props are required.
+- Icons should be `fa fa-` on v17, `ti ti-` on v18+.
+- Do **not** flag hard-coded spacing in favour of Rock utility classes on v17; they do not
+  exist. CSS variables are the correct target there.
+
+`.claude/rules/plugin-deviations.md` § 4 is the authority for the structural differences.
+
+---
+
 ## Exhaustiveness Mandate
 
 **This is the ONLY review pass.** Every issue must be found in this execution. No follow-up review will happen.
