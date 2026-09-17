@@ -16,16 +16,33 @@ Rock RMS is an open-source church management system. The codebase is C# (.NET) +
 
 KFS builds **plugins** for Rock, across two repositories junctioned into a Rock clone:
 
+`CreateLinks.bat` junctions **four** KFS repositories into the Rock clone:
+
 | Repo | Junctioned to | Contains |
 |---|---|---|
-| `KingdomFirst/RockAssemblies` | `<RockClone>/KFSRockAssemblies` | `rocks.kfs.*` projects — entities, jobs, workflow actions, field types, gateways, Obsidian source |
-| `KingdomFirst/RockBlocks` | `<RockClone>/RockWeb/Plugins/rocks_kfs` | WebForms blocks and built Obsidian output |
+| `KingdomFirst/RockAssemblies` | `KFSRockAssemblies` | `rocks.kfs.*` projects — entities, jobs, workflow actions, field types, gateways, Obsidian source |
+| `KingdomFirst/RockBlocks` | `RockWeb/Plugins/rocks_kfs` | WebForms blocks and built Obsidian output |
+| `KingdomFirst/rock-attended-checkin` | `RockAttendedCheckin` **and** `RockWeb/Plugins/cc_newspring` | Attended check-in — **one repo, two junction points**: the C# project, and its 5 `.ascx` blocks under `cc_newspring/AttendedCheckin` |
+| `KFS/rockassets` (self-hosted, `repo.kingdomfirstsolutions.com`) | `RockWeb/Content/KFSRockAssets` | Content library — ~278 Lava templates, 93 SQL scripts, 24 workflow exports, plus Less, XSL, ZPL |
 
-**These guardrails cover those two repos.** A third, `KingdomFirst/RockPlugins` (branch
-`main`), holds the newer `rocks.kfs.Next.*` products and the Obsidian block conversions
-already done there. It is **not** junctioned into the Rock tree, uses its own layout, and will
-get its own guardrails in a separate project. If a task turns out to belong there, say so
-rather than applying this repo's conventions to it.
+**These guardrails were written for the first two.** The other two are in the working tree and
+build alongside them (`rock-attended-checkin` is in `KFSRock*.sln`), but their conventions have
+not been worked through:
+
+- **`rock-attended-checkin` is a NewSpring fork.** Namespaces are `cc.newspring.AttendedCheckIn.*`
+  and `RockWeb.Plugins.cc_newspring.*`, and its `.cs` files carry **no copyright header**. Our
+  `rocks.kfs.*` naming, `_rocks_kfs_` table prefix and KFS/Apache header do **not** apply to it
+  as they stand. Do not "conform" it — ask first.
+- **`rockassets` is content, not compiled code.** Lava, SQL, workflow exports. The SQL
+  formatting rules in `.claude/rules/code-conventions.md` and the Lava guidance in Critical
+  Rules are the relevant parts; most of the rest of these guardrails is not.
+
+A fifth repo, `KingdomFirst/RockPlugins` (branch `main`), holds the newer `rocks.kfs.Next.*`
+products and the Obsidian block conversions already done there. It is **not** junctioned, uses
+its own layout, and gets its own guardrails in a separate project.
+
+**If a task turns out to belong to any repo other than the first two, say so** rather than
+applying these conventions to it.
 
 ---
 
@@ -53,10 +70,16 @@ actual changes.
 |---|---|---|
 | Plugins, and this config | `git -C KFSRockAssemblies ...` | `KingdomFirst/RockAssemblies` |
 | Blocks | `git -C RockWeb/Plugins/rocks_kfs ...` | `KingdomFirst/RockBlocks` |
+| Attended check-in (either junction) | `git -C RockAttendedCheckin ...` | `KingdomFirst/rock-attended-checkin` |
+| Lava / SQL / workflow assets | `git -C RockWeb/Content/KFSRockAssets ...` | `KFS/rockassets` (self-hosted) |
 | Rock core (read-only) | `git ...` | `SparkDevNetwork/Rock` |
 
 This applies to `status`, `diff`, `log`, `branch`, `add`, `commit` — everything. A change that
-spans both KFS repos needs a branch, PR and merge in each; they are versioned independently.
+spans two KFS repos needs a branch, PR and merge in each; they are versioned independently.
+
+Note the third row: `RockAttendedCheckin` and `RockWeb/Plugins/cc_newspring` are two junctions
+into the **same** repo, so a change touching both is still one commit. `git -C` against either
+path resolves there.
 
 Note also that the two repos keep their own branches. `git branch` from the working root lists
 **Rock's** branches (including `develop` and Rock's own `feature-*`), not ours.
