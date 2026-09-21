@@ -41,7 +41,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             //
             RockMigrationHelper.AddSite( "Nfluence Church App", "Nfluence Church App for Rock", "", "1D501408-CA88-4565-8822-BD318F255A59" );
             Sql( @"UPDATE [Site] SET [SiteType] = 1, [IsSystem] = 0 WHERE [Guid] = '1D501408-CA88-4565-8822-BD318F255A59'" );
-            Sql( @"UPDATE [Site] SET [AdditionalSettings] = N'{""LastDeploymentDate"":""2026-09-03T17:14:58.5770298-06:00"",""LastDeploymentVersionId"":1788477298,""PhoneUpdatePackageUrl"":""https://8e0e-2601-8c0-100-6e80-b41e-290-14a-a4be.ngrok-free.app:443/GetFile.ashx?id=3049"",""TabletUpdatePackageUrl"":""https://8e0e-2601-8c0-100-6e80-b41e-290-14a-a4be.ngrok-free.app:443/GetFile.ashx?id=3050"",""ShellType"":2,""TabLocation"":1,""CssStyle"":"""",""ApiKeyId"":1012,""ProfilePageId"":16822,""PersonAttributeCategories"":[0],""BarBackgroundColor"":"""",""IOSEnableBarTransparency"":false,""IOSBarBlurStyle"":0,""MenuButtonColor"":null,""ActivityIndicatorColor"":null,""FlyoutXaml"":""<ListView SeparatorVisibility=\""None\"" \n    HasUnevenRows=\""true\"" \n    ItemsSource=\""{Binding MenuItems}\"">\n\n    <ListView.Header>\n        <StackLayout VerticalOptions=\""FillAndExpand\""\n            Orientation=\""Vertical\"">\n\n            <Rock:LoginStatus Padding=\""20, 70, 20, 50\"" \n                ImageSize=\""120\"" \n                ImageBorderColor=\""rgba(255, 255, 255, 0.4)\"" \n                ImageBorderSize=\""5\"" />\n\n            <BoxView HeightRequest=\""1\"" BackgroundColor=\""rgba(255, 255, 255, 0.2)\""\n                HorizontalOptions=\""FillAndExpand\""/>\n\n        </StackLayout>\n    </ListView.Header>\n\n    <ListView.ItemTemplate>\n        <DataTemplate>\n            <Rock:ViewCell SelectedBackgroundColor=\""rgba(255, 255, 255, 0.2)\"">\n            \n                <StackLayout VerticalOptions=\""FillAndExpand\"" \n                    Orientation=\""Vertical\"">\n\n                    <ContentView StyleClass=\""pt-16, pb-12\"">\n                        <Label StyleClass=\""text-white, ml-32, flyout-menu-item\""\n                            Text=\""{Binding Title}\"" \n                            VerticalOptions=\""Center\"" \n                            HorizontalOptions=\""FillAndExpand\"" />\n                    </ContentView>\n\n                    <BoxView HeightRequest=\""1\""\n                        BackgroundColor=\""rgba(255, 255, 255, 0.4)\""\n                        HorizontalOptions=\""FillAndExpand\"" />\n\n                </StackLayout>\n\n            </Rock:ViewCell>\n        </DataTemplate>\n    </ListView.ItemTemplate>\n\n</ListView>"",""LockedPhoneOrientation"":1,""LockedTabletOrientation"":0,""DownhillSettings"":{""SpacingValues"":{""0"":""0"",""4"":""4"",""8"":""8"",""16"":""16"",""24"":""24"",""48"":""48"",""80"":""80"",""1"":""1"",""2"":""2"",""12"":""12"",""32"":""32"",""64"":""64""},""SpacingUnits"":"""",""FontSizes"":{""xs"":0.75,""sm"":0.875,""base"":1.0,""lg"":1.125,""xl"":1.25,""2xl"":1.5,""3xl"":1.875,""4xl"":2.25,""5xl"":3.0,""6xl"":4.0},""BorderWidths"":[0,1,2,4,8],""Platform"":0,""BorderUnits"":"""",""FontUnits"":"""",""FontSizeDefault"":16.0,""ApplicationColors"":{""Primary"":""#007bff"",""Secondary"":""#6c757d"",""Success"":""#28a745"",""Danger"":""#dc3545"",""Warning"":""#ffc107"",""Info"":""#17a2b8"",""Light"":""#f8f9fa"",""Dark"":""#343a40"",""White"":""#ffffff"",""Brand"":""#007bff"",""InterfaceStrongest"":""#000000"",""InterfaceStronger"":""#1c1c1e"",""InterfaceStrong"":""#5d5d6f"",""InterfaceMedium"":""#8b8ba7"",""InterfaceSoft"":""#d9d9e3"",""InterfaceSofter"":""#f2f2f7"",""InterfaceSoftest"":""#ffffff"",""PrimaryStrong"":""#de5a25"",""PrimarySoft"":""#eeab90"",""SecondaryStrong"":""#53b1fd"",""SecondarySoft"":""#eff8ff"",""BrandStrong"":""#de5a25"",""BrandSoft"":""#eeab90"",""SuccessStrong"":""#248a3d"",""SuccessSoft"":""#d7f4de"",""InfoStrong"":""#007aff"",""InfoSoft"":""#d6eaff"",""DangerStrong"":""#d70015"",""DangerSoft"":""#ffccd1"",""WarningStrong"":""#e58600"",""WarningSoft"":""#ffecd1""},""RadiusBase"":0.0,""TextColor"":""#676767"",""HeadingColor"":""#333333"",""BackgroundColor"":""#ffffff"",""AdditionalCssToParse"":{},""SupplyTailwindCss"":true,""MobileStyleFramework"":2},""NavigationBarActionXaml"":""<Rock:LoginStatusPhoto StyleClass=\""p-8\"" NotLoggedInCommand=\""{Binding PushPage}\"" NotLoggedInPhotoFillColor=\""{AppThemeBinding Light=#4B5563, Dark=#FFFFFF}\""\n NotLoggedInCommandParameter=\""9d8435bd-8583-4325-aefc-af073d0e9020\"" LoggedInCommand=\""{Binding PushPage}\""\n LoggedInCommandParameter=\""9d8435bd-8583-4325-aefc-af073d0e9020\"" ProfilePhotoCircle=\""true\"" ProfilePhotoStrokeWidth=\""1\"" HeightRequest=\""50\"" />"",""HomepageRoutingLogic"":"""",""CampusFilterDataViewId"":null,""CommunicationViewPageId"":16846,""InteractiveExperiencePageId"":null,""SmsConversationPageId"":null,""EnableNotificationsAutomatically"":true,""PushTokenUpdateValue"":"""",""IsDeepLinkingEnabled"":false,""BundleIdentifier"":null,""TeamIdentifier"":null,""PackageName"":null,""CertificateFingerprint"":null,""DeepLinkPathPrefix"":null,""DeepLinkRoutes"":[],""DeepLinkDomains"":null,""IsPackageCompressionEnabled"":true,""Auth0Domain"":"""",""Auth0ClientId"":"""",""Auth0ConnectionStatusValueId"":66,""Auth0RecordStatusValueId"":5,""EntraClientId"":"""",""EntraTenantId"":"""",""EntraAuthenticationComponent"":null}' WHERE [Guid] = '1D501408-CA88-4565-8822-BD318F255A59'" );
+            Sql( @"UPDATE [Site] SET [AdditionalSettings] = N'{""LastDeploymentDate"":""2026-09-17T15:09:59.8529615-06:00"",""LastDeploymentVersionId"":1789679399,""PhoneUpdatePackageUrl"":""https://09c6-2601-8c0-100-6e80-4563-f0d1-18e9-383d.ngrok-free.app:443/GetFile.ashx?id=3061"",""TabletUpdatePackageUrl"":""https://09c6-2601-8c0-100-6e80-4563-f0d1-18e9-383d.ngrok-free.app:443/GetFile.ashx?id=3062"",""ShellType"":2,""TabLocation"":1,""CssStyle"":"""",""ApiKeyId"":1012,""ProfilePageId"":16822,""PersonAttributeCategories"":[0],""BarBackgroundColor"":"""",""IOSEnableBarTransparency"":false,""IOSBarBlurStyle"":0,""MenuButtonColor"":null,""ActivityIndicatorColor"":null,""FlyoutXaml"":""<ListView SeparatorVisibility=\""None\"" \n    HasUnevenRows=\""true\"" \n    ItemsSource=\""{Binding MenuItems}\"">\n\n    <ListView.Header>\n        <StackLayout VerticalOptions=\""FillAndExpand\""\n            Orientation=\""Vertical\"">\n\n            <Rock:LoginStatus Padding=\""20, 70, 20, 50\"" \n                ImageSize=\""120\"" \n                ImageBorderColor=\""rgba(255, 255, 255, 0.4)\"" \n                ImageBorderSize=\""5\"" />\n\n            <BoxView HeightRequest=\""1\"" BackgroundColor=\""rgba(255, 255, 255, 0.2)\""\n                HorizontalOptions=\""FillAndExpand\""/>\n\n        </StackLayout>\n    </ListView.Header>\n\n    <ListView.ItemTemplate>\n        <DataTemplate>\n            <Rock:ViewCell SelectedBackgroundColor=\""rgba(255, 255, 255, 0.2)\"">\n            \n                <StackLayout VerticalOptions=\""FillAndExpand\"" \n                    Orientation=\""Vertical\"">\n\n                    <ContentView StyleClass=\""pt-16, pb-12\"">\n                        <Label StyleClass=\""text-white, ml-32, flyout-menu-item\""\n                            Text=\""{Binding Title}\"" \n                            VerticalOptions=\""Center\"" \n                            HorizontalOptions=\""FillAndExpand\"" />\n                    </ContentView>\n\n                    <BoxView HeightRequest=\""1\""\n                        BackgroundColor=\""rgba(255, 255, 255, 0.4)\""\n                        HorizontalOptions=\""FillAndExpand\"" />\n\n                </StackLayout>\n\n            </Rock:ViewCell>\n        </DataTemplate>\n    </ListView.ItemTemplate>\n\n</ListView>"",""LockedPhoneOrientation"":1,""LockedTabletOrientation"":0,""DownhillSettings"":{""SpacingValues"":{""0"":""0"",""4"":""4"",""8"":""8"",""16"":""16"",""24"":""24"",""48"":""48"",""80"":""80"",""1"":""1"",""2"":""2"",""12"":""12"",""32"":""32"",""64"":""64""},""SpacingUnits"":"""",""FontSizes"":{""xs"":0.75,""sm"":0.875,""base"":1.0,""lg"":1.125,""xl"":1.25,""2xl"":1.5,""3xl"":1.875,""4xl"":2.25,""5xl"":3.0,""6xl"":4.0},""BorderWidths"":[0,1,2,4,8],""Platform"":0,""BorderUnits"":"""",""FontUnits"":"""",""FontSizeDefault"":16.0,""ApplicationColors"":{""Primary"":""#007bff"",""Secondary"":""#6c757d"",""Success"":""#28a745"",""Danger"":""#dc3545"",""Warning"":""#ffc107"",""Info"":""#17a2b8"",""Light"":""#f8f9fa"",""Dark"":""#343a40"",""White"":""#ffffff"",""Brand"":""#007bff"",""InterfaceStrongest"":""#000000"",""InterfaceStronger"":""#1c1c1e"",""InterfaceStrong"":""#5d5d6f"",""InterfaceMedium"":""#8b8ba7"",""InterfaceSoft"":""#d9d9e3"",""InterfaceSofter"":""#f2f2f7"",""InterfaceSoftest"":""#ffffff"",""PrimaryStrong"":""#de5a25"",""PrimarySoft"":""#eeab90"",""SecondaryStrong"":""#53b1fd"",""SecondarySoft"":""#eff8ff"",""BrandStrong"":""#de5a25"",""BrandSoft"":""#eeab90"",""SuccessStrong"":""#248a3d"",""SuccessSoft"":""#d7f4de"",""InfoStrong"":""#007aff"",""InfoSoft"":""#d6eaff"",""DangerStrong"":""#d70015"",""DangerSoft"":""#ffccd1"",""WarningStrong"":""#e58600"",""WarningSoft"":""#ffecd1""},""RadiusBase"":0.0,""TextColor"":""#676767"",""HeadingColor"":""#333333"",""BackgroundColor"":""#ffffff"",""AdditionalCssToParse"":{},""SupplyTailwindCss"":true,""MobileStyleFramework"":2},""NavigationBarActionXaml"":""<Rock:LoginStatusPhoto StyleClass=\""p-8\"" NotLoggedInCommand=\""{Binding PushPage}\"" NotLoggedInPhotoFillColor=\""{AppThemeBinding Light=#4B5563, Dark=#FFFFFF}\""\n NotLoggedInCommandParameter=\""9d8435bd-8583-4325-aefc-af073d0e9020\"" LoggedInCommand=\""{Binding PushPage}\""\n LoggedInCommandParameter=\""9d8435bd-8583-4325-aefc-af073d0e9020\"" ProfilePhotoCircle=\""true\"" ProfilePhotoStrokeWidth=\""1\"" HeightRequest=\""50\"" />"",""HomepageRoutingLogic"":"""",""CampusFilterDataViewId"":null,""CommunicationViewPageId"":16846,""InteractiveExperiencePageId"":null,""SmsConversationPageId"":null,""EnableNotificationsAutomatically"":true,""PushTokenUpdateValue"":"""",""IsDeepLinkingEnabled"":false,""BundleIdentifier"":null,""TeamIdentifier"":null,""PackageName"":null,""CertificateFingerprint"":null,""DeepLinkPathPrefix"":null,""DeepLinkRoutes"":[],""DeepLinkDomains"":null,""IsPackageCompressionEnabled"":true,""Auth0Domain"":"""",""Auth0ClientId"":"""",""Auth0ConnectionStatusValueId"":66,""Auth0RecordStatusValueId"":5,""EntraClientId"":"""",""EntraTenantId"":"""",""EntraAuthenticationComponent"":null}' WHERE [Guid] = '1D501408-CA88-4565-8822-BD318F255A59'" );
 
             //
             // Layouts
@@ -333,6 +333,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- comment -%} ===== If an Event Item is linked, drive the card from the event ===== {%- endcomment -%}
   {%- assign appRoot = 'Global' | Attribute:'PublicApplicationRoot' -%}
   {%- assign evGuid = item | Attribute:'EventItem','RawValue' -%}
+  {%- assign lnMeta = '' -%}{%- assign srcCommand = '' -%}{%- assign srcParam = '' -%}
   {%- assign isEvent = false -%}{%- assign evName = '' -%}{%- assign evImg = '' -%}
   {%- assign evStart = '' -%}{%- assign evEnd = '' -%}{%- assign occGuid = '' -%}
   {%- if evGuid != '' -%}
@@ -475,6 +476,57 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- endif -%}
   {%- endcapture -%}
   {% assign image = item | Attribute:'Image','Url' %}{% assign imageUrl = item | Attribute:'ImageUrl','RawValue' %}{% assign subtitle = item | Attribute:'Subtitle' %}{% assign cardWidth = item | Attribute:'CardWidth' %}{% assign elevation = item | Attribute:'ShadowDepth' %}{% assign showDetailsButton = item | Attribute:'DisplayDetailsButton' | AsBoolean %}{% assign showTitle = item | Attribute:'ShowTitle' | AsBoolean %}{% assign tagline = item | Attribute:'Tagline' %}{% assign imageAspectRatio = item | Attribute:'ImageAspectRatio' %}
+  {%- comment -%} ===== Registration Instance: build the card from a registration =====
+      Runs only if nothing above already claimed the card. A registration has no
+      photo in Rock, so lnImg stays empty and the item's own Image wins if set.
+      Tapping opens the PUBLIC registration page in a browser - there is no
+      in-app registration block. {%- endcomment -%}
+  {%- assign regRaw = item | Attribute:'RegistrationInstance','RawValue' -%}
+  {%- unless isEvent or isLinked -%}
+  {%- if regRaw != '' and regRaw != null -%}
+    {% registrationinstance where:'Guid == ""{{ regRaw }}""' securityenabled:'false' %}
+      {%- for ri in registrationinstanceItems -%}
+        {%- assign isLinked = true -%}
+        {%- assign lnTitle = ri.Name -%}
+        {%- assign lnSummary = ri.Details | StripHtml | HtmlDecode | Trim -%}
+        {%- if lnSummary == '' or lnSummary == null -%}
+          {%- assign lnSummary = ri.RegistrationTemplate.Description | StripHtml | HtmlDecode | Trim -%}
+        {%- endif -%}
+        {%- if ri.EndDateTime and ri.EndDateTime != '' -%}
+          {%- capture lnMeta -%}Registration closes {{ ri.EndDateTime | Date:'MMMM d, yyyy' }}{%- endcapture -%}
+        {%- endif -%}
+        {%- assign srcCommand = 'OpenBrowser' -%}
+        {%- capture srcParam -%}{{ appRoot }}Registration?RegistrationInstanceId={{ ri.Id }}{%- endcapture -%}
+      {%- endfor -%}
+    {% endregistrationinstance %}
+  {%- endif -%}
+  {%- endunless -%}
+
+  {%- comment -%} ===== Group: build the card from a group =====
+      Same precedence rule. Groups carry no photo either, so art comes from the
+      feed item. Tapping pushes the app's Group Detail page. {%- endcomment -%}
+  {%- assign grpRaw = item | Attribute:'LinkedGroup','RawValue' -%}
+  {%- unless isEvent or isLinked -%}
+  {%- if grpRaw != '' and grpRaw != null -%}
+    {% group where:'Guid == ""{{ grpRaw }}""' securityenabled:'false' %}
+      {%- for g in groupItems -%}
+        {%- assign isLinked = true -%}
+        {%- assign lnTitle = g.Name -%}
+        {%- assign lnSummary = g.Description | StripHtml | HtmlDecode | Trim -%}
+        {%- assign srcCommand = 'PushPage' -%}
+        {%- capture srcParam -%}73143e47-3c0e-44bc-8815-0021f88e9f72?GroupGuid={{ g.Guid }}{%- endcapture -%}
+      {%- endfor -%}
+    {% endgroup %}
+  {%- endif -%}
+  {%- endunless -%}
+
+  {%- comment -%} Default the source command so the Linked Content Item branch,
+      which predates these, keeps pushing a page exactly as before. {%- endcomment -%}
+  {%- if srcCommand == '' or srcCommand == null -%}
+    {%- assign srcCommand = 'PushPage' -%}
+    {%- capture srcParam -%}{{ lnPage }}{{ lnQuery }}{%- endcapture -%}
+  {%- endif -%}
+
   {%- if isEvent -%}
   <Rock:StyledBorder StrokeThickness=""0"" Padding=""0"" CornerRadius=""16"" StyleClass=""bg-interface-softest,mx-16,my-8"">
       <Rock:StyledBorder.Shadow><Shadow Brush=""#000000"" Offset=""0,4"" Radius=""12"" Opacity=""0.15"" /></Rock:StyledBorder.Shadow>
@@ -512,7 +564,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
       <Rock:StyledBorder.Shadow><Shadow Brush=""#000000"" Offset=""0,4"" Radius=""12"" Opacity=""0.15"" /></Rock:StyledBorder.Shadow>
       {%- endif -%}
       <Rock:StyledBorder.GestureRecognizers>
-          <TapGestureRecognizer Command=""{Binding PushPage}"" CommandParameter=""{{ lnPage }}{{ lnQuery }}"" />
+          <TapGestureRecognizer Command=""{Binding {{ srcCommand }}}"" CommandParameter=""{{ srcParam }}"" />
       </Rock:StyledBorder.GestureRecognizers>
       <VerticalStackLayout Spacing=""0"">
           {%- comment -%} the feed item's own image wins if one was set, so a card
@@ -534,12 +586,15 @@ namespace rocks.kfs.MobileAppMigration.Migrations
               {%- if subtitle != '' -%}
               <Label Text=""{{ subtitle | Escape }}"" StyleClass=""footnote,text-interface-soft"" />
               {%- endif -%}
+              {%- if lnMeta != '' -%}
+              <Label Text=""{{ lnMeta | Escape }}"" StyleClass=""footnote,text-interface-soft"" />
+              {%- endif -%}
               {%- if lnSummary != '' -%}
               <Label Text=""{{ lnSummary | TruncateWords:50 | Escape }}"" StyleClass=""subheadline,text-interface-strong,mt-4"" />
               {%- endif -%}
               {%- if showDetailsButton -%}
               <Button Text=""SEE DETAILS"" StyleClass=""btn,btn-primary,mt-12"" HorizontalOptions=""Start""
-                  Command=""{Binding PushPage}"" CommandParameter=""{{ lnPage }}{{ lnQuery }}"" />
+                  Command=""{Binding {{ srcCommand }}}"" CommandParameter=""{{ srcParam }}"" />
               {%- endif -%}
           </VerticalStackLayout>
       </VerticalStackLayout>
@@ -8096,6 +8151,10 @@ Thank you for allowing us to pray for you. Your request has been sent privately 
             Sql( @"UPDATE [Block] SET [CssClass] = N'm-16' WHERE [Guid] = '5C92D3E7-6F48-4B01-9025-7D31A4CE86BF'" );   // Sign Up for Serving
             Sql( @"UPDATE [Block] SET [CssClass] = N'm-16' WHERE [Guid] = '6DA3E4F8-7059-4C12-A136-8E42B5DF97C0'" );   // Schedule Unavailability
             Sql( @"UPDATE [Block] SET [CssClass] = N'my-16' WHERE [Guid] = '2C7A4F19-6B83-4E05-9D24-A15C8E30B7F6'" );   // Notifications
+            Sql( @"UPDATE [Block] SET [CssClass] = N'm-16' WHERE [Guid] = '22B3C4D5-E6F7-4081-92A3-B4C5D6E7F809'" );   // Prayer Session Setup
+            Sql( @"UPDATE [Block] SET [CssClass] = N'm-16' WHERE [Guid] = '55E6F708-192A-43B4-C5D6-E7F8091A2B3C'" );   // Prayer Request Details
+            Sql( @"UPDATE [Block] SET [CssClass] = N'm-16' WHERE [Guid] = '7708192A-3B4C-45D6-E7F8-091A2B3C4D5E'" );   // Prayer Request Details
+            Sql( @"UPDATE [Block] SET [CssClass] = N'm-16' WHERE [Guid] = '88192A3B-4C5D-46E7-F809-1A2B3C4D5E6F'" );   // Prayer Session
 
             //
             // Page advanced settings (CSS class, icon, description, keywords, header content)
@@ -8723,11 +8782,33 @@ Contained = side margins', 1006, 0, 'Contained', 0, 0, 'CE0ACC4F-161C-45DF-A908-
             Sql( @"
                 DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '122CAAAE-0698-4869-89FE-D818E109BAEA' );
                 DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                DECLARE @FieldTypeId INT = ( SELECT TOP 1 [Id] FROM [FieldType] WHERE [Guid] = 'F4399CEF-827B-48B2-A735-F7806FCFE8E8' );
+                IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = '0C8F3A26-7B14-4D09-A5E3-62B7C10D4F85' )
+                BEGIN
+                    INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'LinkedGroup', 'Group', 'Point this at a group and the card is built from it - its name and description. Tapping opens the group in the app. Groups carry no photo in Rock, so set Image on this item if you want art on the card.', 1023, 0, '', 0, 0, '0C8F3A26-7B14-4D09-A5E3-62B7C10D4F85' );
+                END
+
+                " );   // App Home Feed . LinkedGroup
+            Sql( @"
+                DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '122CAAAE-0698-4869-89FE-D818E109BAEA' );
+                DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
+                DECLARE @FieldTypeId INT = ( SELECT TOP 1 [Id] FROM [FieldType] WHERE [Guid] = '5F0F6D6A-DEB7-47AD-93C7-4CCC88EF932D' );
+                IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = '9B2E4D71-0A63-4C58-8F27-1D6E5A0B3C94' )
+                BEGIN
+                    INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'RegistrationInstance', 'Registration Instance', 'Point this at a registration and the card is built from it - its name, its details, and when registration closes. Tapping opens the public registration page. Leave the other fields blank unless you want to override what the card shows.', 1024, 0, '', 0, 0, '9B2E4D71-0A63-4C58-8F27-1D6E5A0B3C94' );
+                END
+
+                " );   // App Home Feed . RegistrationInstance
+            Sql( @"
+                DECLARE @ChannelId INT = ( SELECT TOP 1 [Id] FROM [ContentChannel] WHERE [Guid] = '122CAAAE-0698-4869-89FE-D818E109BAEA' );
+                DECLARE @EntityTypeId INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.ContentChannelItem' );
                 DECLARE @FieldTypeId INT = ( SELECT TOP 1 [Id] FROM [FieldType] WHERE [Guid] = '19BFB635-DC31-4C1E-8BB5-CDA120890BDE' );
                 IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = '7C1F4E8A-3D62-4B05-9E17-2A48C0D95F63' )
                 BEGIN
                     INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
-                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'LinkedItem', 'Linked Content Item', 'Point this at an existing content channel item (a message, series, notes item...) and the card is built from THAT item - its title, image and summary - instead of re-entering them here. Tapping opens the linked item. Leave the other fields blank unless you want to override what the card shows.', 1023, 0, '', 0, 0, '7C1F4E8A-3D62-4B05-9E17-2A48C0D95F63' );
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'LinkedItem', 'Linked Content Item', 'Point this at an existing content channel item (a message, series, notes item...) and the card is built from THAT item - its title, image and summary - instead of re-entering them here. Tapping opens the linked item. Leave the other fields blank unless you want to override what the card shows.', 1025, 0, '', 0, 0, '7C1F4E8A-3D62-4B05-9E17-2A48C0D95F63' );
                 END
 
                 " );   // App Home Feed . LinkedItem
@@ -9221,6 +9302,8 @@ Contained = side margins', 1006, 0, 'Contained', 0, 0, 'CE0ACC4F-161C-45DF-A908-
                 SELECT a.[Id], @CategoryId FROM [Attribute] a
                  WHERE a.[Guid] IN (
                         '9C026AB7-E28F-4B59-968A-53115C0D9726',
+                        '0C8F3A26-7B14-4D09-A5E3-62B7C10D4F85',
+                        '9B2E4D71-0A63-4C58-8F27-1D6E5A0B3C94',
                         '7C1F4E8A-3D62-4B05-9E17-2A48C0D95F63' )
                    AND NOT EXISTS ( SELECT 1 FROM [AttributeCategory] ac WHERE ac.[AttributeId] = a.[Id] AND ac.[CategoryId] = @CategoryId );
                 " );   // Category: Content Source
