@@ -39,12 +39,39 @@ later edits.
 
 ## Case 2 — File copied or derived from Rock core
 
-Keep Spark's header and the Rock Community License **exactly as they are**. Do not relicense, do
-not add a KFS line alongside. Use the verbatim block in `rock/code-conventions.md`.
+Keep Spark's header and the Rock Community License **exactly as they are**. Do not relicense, and
+do not add a KFS copyright line. Use the verbatim block in `rock/code-conventions.md`.
+
+Directly after the closing `// </copyright>` and its trailing `//`, add a `<notice>` block that
+marks the file as a derivative work and lists what KFS changed:
+
+```
+// </copyright>
+//
+// <notice>
+// This file contains modifications by Kingdom First Solutions
+// and is a derivative work.
+//
+// Modification (including but not limited to):
+// * Added filters to Grid
+// * Added sorting to Grid
+// * Removed reordering due to sorting
+// </notice>
+//
+```
+
+- The first three lines and the `Modification (including but not limited to):` line are fixed
+  wording. Copy them exactly.
+- Write one `* ` bullet per behavioural change, describing what changed rather than how. See
+  `RockWeb/Plugins/rocks_kfs/Core/DefinedValueList.ascx.cs` and
+  `rocks.kfs.Workflow.Action.CheckIn/LoadBalanceLocations.cs`.
+- **When you edit a file that already has a notice, add a bullet** for any new behavioural change.
+  Don't add bullets for refactors or fixes that don't change behaviour.
+- The notice goes in the code-behind (`.cs`), not in the `.ascx` markup.
 
 This is common: 35 of the 76 blocks in `RockBlocks` began as core blocks and correctly retain
 Spark's header. When you fork a core block into `RockWeb/Plugins/rocks_kfs/`, the header travels
-with it.
+with it, and you add the notice in the same change.
 
 ## Deciding
 
