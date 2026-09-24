@@ -56,6 +56,11 @@ Nothing is copied into a KFS repo, so pulling `Rock20` refreshes Rock's guardrai
 | `hooks/` | `prevent-destructive.sh` |
 | `CLAUDE-kfs.md` | Imported after Rock's `CLAUDE.md` |
 | `setup.ps1` | Builds the overlay |
+| `specs/`, `docs/` | Where `/spec` and `/docs` write. Not part of the overlay — content, not config. |
+
+Rock's own specs and docs are **not** copied here. They are read-only reference in the `Rock20`
+clone (`Rock20/specs/`, `Rock20/docs/`); 276 duplicated files were removed from this repo. See the
+README in each folder.
 
 ## The principle
 

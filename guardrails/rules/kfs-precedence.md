@@ -28,8 +28,32 @@ pattern, deprecation, and the `UpdateBlockTypeByGuid()` data-loss warning.
 
 ## Skill routing
 
-`/migration` is Rock core's EF migration skill and opens by saying so. For KFS work use
-`/plugin-migration`. Rock's skills load as `rock-*`; where a `kfs-*` variant exists, prefer it.
+Rock's 12 skills load under their own names (`entity-model`, `plugin-migration`, `convert-block`, …)
+from the `Rock20` clone. Three have KFS variants — **prefer the `kfs-*` one**, which reads Rock's
+reference material and then applies the deltas:
+
+| Use | Not |
+|---|---|
+| `/kfs-entity-model` | `/entity-model` — scaffolds core entities: wrong attributes, table name, paths |
+| `/kfs-plugin-migration` | `/plugin-migration` — writes to Rock core's own hotfix stream |
+| `/kfs-convert-block` | `/convert-block` — core paths, core branch convention, validator refuses |
+| `/kfs-plugin-migration` | `/migration` — core EF; it opens by saying it is the wrong skill |
+
+### `/spec` and `/docs` write to the guardrails layer
+
+Both skills assume `specs/` and `docs/` at the project root. Here the project root is a **Rock
+clone we do not own**, where anything written is untracked and lost on a clean. Write instead to:
+
+```
+KFSRockAssemblies/guardrails/specs/      (KFS-authored specs)
+KFSRockAssemblies/guardrails/docs/        (KFS-authored docs, organised by plugin)
+```
+
+Rock's own specs and docs are read-only reference in the `Rock20` clone (`Rock20/specs/`,
+`Rock20/docs/`). Never run `/spec`'s completion or rejection mode, or `/docs`'s audit or
+update-from-spec mode, against them — those modes move files and rewrite an `INDEX.md` belonging to
+another organisation. `/commit`'s spec-detection phase finds nothing at the project root, which is
+correct; skip it.
 
 ## Existing KFS code is not evidence
 
