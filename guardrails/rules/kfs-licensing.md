@@ -28,7 +28,7 @@ formatting one** — getting it wrong puts the wrong copyright and licence on sh
 //
 ```
 
-The trailing `//` is intentional. The year is the year the file is **created** — do not bump it on
+The trailing `//` is intentional. The year is the year the file is **created** — it should be bumped on
 later edits.
 
 `.obs` / `.partial.obs` — one line, before `<template>`:

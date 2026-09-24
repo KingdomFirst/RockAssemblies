@@ -23,10 +23,9 @@ while a release is in preparation.
 
 | KFS branch | Rock clone |
 |---|---|
-| `hotfix-17` | `Rock17` |
 | `hotfix-18` | `Rock18` |
 | `hotfix-19` | `Rock19` |
-| `master` | latest |
+| `master` | latest publicly available |
 
 If the KFS branch and the clone disagree — `hotfix-17` checked out inside `Rock18` — **stop and tell
 the user.** That combination builds against the wrong assemblies and every decision below becomes
