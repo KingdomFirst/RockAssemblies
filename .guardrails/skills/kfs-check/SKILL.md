@@ -1,12 +1,17 @@
 ---
-description: Pre-commit verification (build + test + diff review). Use before committing, when the user says "check", "verify", "pre-commit", or wants to validate changes before pushing.
+name: kfs-check
+description: >-
+  Pre-commit verification for a KFS change (build + test + diff review). Use before committing,
+  when the user says "check", "verify", "pre-commit", or wants to validate changes before pushing.
+  Prefer this over the core `check`, which builds `Rock.sln` with `dotnet`, runs `Rock.Tests` and
+  has none of the KFS checks.
 ---
 
 Pre-commit verification. Run these checks in order and stop at the first failure:
 
-1. **Build** — run `/build` (must succeed)
-2. **Tests** — run `/test`. There is no KFS test suite; report what it says rather than
-   treating a green run as verification.
+1. **Build** — run the `kfs-build` skill (must succeed)
+2. **Tests** — run the `kfs-test` skill. There is no KFS test suite; report what it says rather
+   than treating a green run as verification.
 3. **Diff review** — Run `git diff --cached` (or `git diff` if nothing is staged) and scan for:
    - Missing copyright headers on new files
    - `DateTime` usage instead of `RockDateTime`
@@ -56,7 +61,7 @@ deviations listed in `.claude/rules/kfs/kfs-precedence.md`.
 
 ### Version-sensitive
 
-Per `.claude/rules/rock-version-targets.md`, against the branch's target version:
+Per `.claude/rules/kfs/kfs-rock-versions.md`, against the branch's target version:
 
 - Icon prefix (`fa fa-` on v17, `ti ti-` on v18+).
 - APIs absent on the target: `safeParseJson`, `ContentSection` / `ContentStack`,
@@ -72,7 +77,7 @@ Per `.claude/rules/rock-version-targets.md`, against the branch's target version
 
 ---
 
-**Do not fix anything automatically.** This command reports; the user decides.
+**Do not fix anything automatically.** This skill reports; the user decides.
 
 Close by naming what was *not* verified. Compilation plus the static checks above is the whole
 of it — anything behavioural needs manual testing. Call out migrations specifically: they run

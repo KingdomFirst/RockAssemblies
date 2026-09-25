@@ -1,5 +1,9 @@
 ---
-description: Report what automated verification is available for a KFS change and run it. Use when the user says "run tests", "test", or wants to verify changes haven't broken anything.
+name: kfs-test
+description: >-
+  Report what automated verification is available for a KFS change and run it. Use when the user
+  says "run tests", "test", or wants to verify changes haven't broken anything. Prefer this over the
+  core `test`, which runs Rock core's `Rock.Tests` and says nothing about a plugin change.
 ---
 
 **There is no automated test suite in the KFS repos.** Do not imply otherwise, and do not run
@@ -12,7 +16,7 @@ State that plainly, then run whatever verification actually applies to the chang
 
 | Check | Command | Covers |
 |---|---|---|
-| Compile | `/build` | All 37 plugin projects |
+| Compile | `/kfs-build` | All 37 plugin projects |
 | TypeScript lint | `cd KFSRockAssemblies/rocks.kfs.JavaScript.Obsidian && npm run lint` | `.ts` under `src` only — **not** `.obs` |
 | Jest | `npm test` in the same project | **Zero test files.** `tests/blocks.ts` and `tests/utils.ts` are helpers for tests nobody has written. A green run means nothing. |
 

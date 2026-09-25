@@ -5,7 +5,8 @@ what differs between them.
 
 **The guardrails are sourced from a `Rock20` clone regardless of what you are building against.**
 That is deliberate — Rock's conventions are current, and the version-specific deltas live here. Do
-not conclude from the guardrail source that you are targeting v20.
+not conclude from the guardrail source that you are targeting v20. A v19 clone tracks an early
+`CLAUDE.md` of Rock's own; `setup.ps1` skips it so it does not compete with Rock20's.
 
 **Never state a version-specific pattern as if it were universal.** If a row below differs, the
 answer depends on the clone you are in — establish that first.
@@ -15,8 +16,11 @@ answer depends on the clone you are in — establish that first.
 ## Which version am I on?
 
 ```bash
-grep AssemblyInformationalVersion Rock.Version/AssemblySharedInfo.cs
+grep -hE 'AssemblyInformationalVersion|<InformationalVersion>' Rock.Version/AssemblySharedInfo.cs Directory.Build.props 2>/dev/null
 ```
+
+v17 and v18 stamp the version in `Rock.Version/AssemblySharedInfo.cs`; v19 moved it to
+`Directory.Build.props`. The command reads whichever the clone has.
 
 Read it from the clone, not from the branch name — a `hotfix-17.9` branch can still stamp `17.8.2`
 while a release is in preparation.

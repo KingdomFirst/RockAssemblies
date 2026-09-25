@@ -19,6 +19,11 @@ misnamed folder rather than patching the tooling.
 `Rock.Enums/`, `Rock.Migrations/`, `RockWeb/Blocks/`. We do not fork Rock. If a task appears to
 require editing core, stop and raise it.
 
+**So are Rock's guardrail files**, in a clone that tracks them: `CLAUDE.md` from v19, and in the
+`Rock20` clone its `.claude/` files, `specs/` and `docs/`. Change the KFS layer in
+`KFSRockAssemblies/.guardrails/`; `setup.ps1` generates the clone's `CLAUDE.local.md` and
+`.claude/settings.local.json` from it.
+
 ## The repositories
 
 `CreateLinks.bat` junctions four KFS repositories into the Rock clone:
@@ -75,9 +80,9 @@ Omit `[Enums.EnumDomain]`; it is `internal` to that project.
 `nuget restore` + `msbuild` on the version-matched `KFSRock*.sln` at the clone root. All 37 plugin
 projects are legacy-format csproj on every Rock version, so `dotnet build` will not build them, and
 `Rock.sln` fails regardless (`MSB4249` — it contains the `RockWeb` website project; the .NET CLI
-refuses a whole solution over one such entry). See `/build`.
+refuses a whole solution over one such entry). See `/kfs-build`.
 
-There is no unit-test suite. See `/test` for what verification actually exists.
+There is no unit-test suite. See `/kfs-test` for what verification actually exists.
 
 ## Branches and commits
 

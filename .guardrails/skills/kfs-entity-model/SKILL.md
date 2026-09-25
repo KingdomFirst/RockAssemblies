@@ -57,5 +57,5 @@ three differ.
 
 ## Step 3 — Next
 
-The table comes from `/plugin-migration`, never `/migration`. Use the typed schema API there, not
+The table comes from `/kfs-plugin-migration`, never `/plugin-migration` or `/migration`. Use the typed schema API there, not
 raw `CREATE TABLE` SQL.

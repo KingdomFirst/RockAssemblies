@@ -1,5 +1,9 @@
 ---
-description: Build the KFS plugin solution and report errors. Use when the user says "build", "compile", "check build", or after making code changes that may have introduced errors.
+name: kfs-build
+description: >-
+  Build the KFS plugin solution and report errors. Use when the user says "build", "compile",
+  "check build", or after making code changes that may have introduced errors. Prefer this over the
+  core `build`, which runs `dotnet build Rock.sln` and cannot build the plugin projects.
 ---
 
 Build the KFS plugin solution and report the result.
@@ -14,7 +18,8 @@ ls KFSRock*.sln
 ```
 
 Pick the one matching the Rock clone you are in (`KFSRock17.sln` in `Rock17`,
-`KFSRock18.sln` in `Rock18`). If several match, or none do, ask — do not guess.
+`KFSRock18.sln` in `Rock18`). If several match, or none do, ask — do not guess, and never fall
+back to `Rock.sln`.
 
 ## Build it
 
@@ -22,8 +27,8 @@ All 37 KFS plugin projects are legacy-format csproj on every Rock version, so `d
 will not build them. Use MSBuild:
 
 ```bash
-nuget restore KFSRock17.sln
-msbuild KFSRock17.sln /p:Configuration=Debug /v:m /nologo
+nuget restore <solution>.sln
+msbuild <solution>.sln /p:Configuration=Debug /v:m /nologo
 ```
 
 If `msbuild` is not on PATH, it ships with Visual Studio — locate it with `vswhere` rather than
@@ -49,4 +54,4 @@ automatically — just report.**
 | Types from `Rock.*` not found | Plugin csproj HintPaths point at `..\..\RockWeb\Bin\`. Either the junctions are missing (run `CreateLinks.bat`) or Rock core has not been built into `RockWeb/Bin` yet. |
 | `MSB4249` website project error | You targeted `Rock.sln`. Use `KFSRock*.sln`. |
 | Package not found | Run `nuget restore` first, not `dotnet restore`. |
-| API missing that you expected to exist | Version mismatch — check `.claude/rules/rock-version-targets.md` and confirm the KFS branch matches the Rock clone. |
+| API missing that you expected to exist | Version mismatch — check `.claude/rules/kfs/kfs-rock-versions.md` and confirm the KFS branch matches the Rock clone. |

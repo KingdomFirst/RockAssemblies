@@ -1,8 +1,10 @@
 # KFS Precedence
 
 **Rock's conventions are the standard.** The `rock/` rules loaded alongside these are Spark
-Development Network's Rock v20 guardrails, junctioned in unmodified from a `Rock20` clone. Follow
-them for everything except the points listed below.
+Development Network's Rock v20 guardrails, unmodified. In most clones they are junctioned in from the
+`Rock20` clone under `.claude/rules/rock/`; in the `Rock20` clone they are its own `.claude/rules/`.
+These rules call them `rock/…` either way. Follow them for everything except the points listed
+below.
 
 Rules are context, not enforced configuration, and two rules that contradict each other resolve
 arbitrarily. So the conflicts are named here explicitly rather than left to inference.
@@ -29,8 +31,9 @@ pattern, deprecation, and the `UpdateBlockTypeByGuid()` data-loss warning.
 ## Skill routing
 
 Rock's 12 skills load under their own names (`entity-model`, `plugin-migration`, `convert-block`, …)
-from the `Rock20` clone. Three have KFS variants — **prefer the `kfs-*` one**, which reads Rock's
-reference material and then applies the deltas:
+from the `Rock20` clone. In the `Rock20` clone, Rock's `/build`, `/check` and `/test` commands load
+too. Where a KFS variant exists, **prefer the `kfs-*` one**. The skill variants read Rock's reference
+material and then apply the deltas; the build, check and test variants replace Rock's outright:
 
 | Use | Not |
 |---|---|
@@ -38,6 +41,9 @@ reference material and then applies the deltas:
 | `/kfs-plugin-migration` | `/plugin-migration` — writes to Rock core's own hotfix stream |
 | `/kfs-convert-block` | `/convert-block` — core paths, core branch convention, validator refuses |
 | `/kfs-plugin-migration` | `/migration` — core EF; it opens by saying it is the wrong skill |
+| `/kfs-build` | `/build` — `dotnet build Rock.sln`, which cannot build the plugin projects |
+| `/kfs-check` | `/check` — Rock core's pre-commit list: `dotnet` build, `Rock.Tests`, no KFS checks |
+| `/kfs-test` | `/test` — runs `Rock.Tests`, which tests Rock, not us |
 
 ### `/spec` and `/docs` write to the guardrails layer
 
@@ -52,8 +58,8 @@ KFSRockAssemblies/.guardrails/docs/       (KFS-authored docs, organised by plugi
 Rock's own specs and docs are read-only reference in the `Rock20` clone (`Rock20/specs/`,
 `Rock20/docs/`). Never run `/spec`'s completion or rejection mode, or `/docs`'s audit or
 update-from-spec mode, against them — those modes move files and rewrite an `INDEX.md` belonging to
-another organisation. `/commit`'s spec-detection phase finds nothing at the project root, which is
-correct; skip it.
+another organisation. Skip `/commit`'s spec-detection phase. In most clones it finds nothing at the
+project root; in the `Rock20` clone it finds Rock's own specs, which are not ours to complete.
 
 ## Existing KFS code is not evidence
 
