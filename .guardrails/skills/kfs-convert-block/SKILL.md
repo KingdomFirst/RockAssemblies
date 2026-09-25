@@ -56,8 +56,11 @@ lists **Rock's** branches. Use:
 
 ```bash
 git -C RockWeb/Plugins/rocks_kfs branch --show-current   # not master/hotfix-*
-git -C RockWeb/Plugins/rocks_kfs checkout -b feature/[initials]-[Block]Obsidian hotfix-NN
+git -C RockWeb/Plugins/rocks_kfs checkout -b feature/[initials]-[Block]Obsidian [base]
 ```
+
+`[base]` is `master` for the generally available Rock version, or `hotfix-NN` for an Early Access
+version that has one. See `kfs-rock-versions.md` § Version branches.
 
 **Chopping.** Deleting the `.ascx` removes a block customers have deployed. Do **not** chop without
 explicit confirmation, and pair it with a migration that re-registers the block type against the

@@ -64,9 +64,10 @@ Per `.claude/rules/rock-version-targets.md`, against the branch's target version
 
 ### Branch and secrets
 
-- Current branch must not be `master`, `hotfix-17`, `hotfix-18` or `hotfix-19` — those take
-  changes only through a PR.
-- Branch's target Rock version must match the clone you are in.
+- The current branch must not be `master` or any `hotfix-*`. Those take changes only through a
+  PR.
+- The branch's target Rock version must match the clone you are in. See
+  `kfs-rock-versions.md` § Version branches.
 - No API keys, connection strings, tokens or credentials in the diff.
 
 ---

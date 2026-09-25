@@ -21,14 +21,26 @@ grep AssemblyInformationalVersion Rock.Version/AssemblySharedInfo.cs
 Read it from the clone, not from the branch name — a `hotfix-17.9` branch can still stamp `17.8.2`
 while a release is in preparation.
 
-| KFS branch | Rock clone |
-|---|---|
-| `hotfix-18` | `Rock18` |
-| `hotfix-19` | `Rock19` |
-| `master` | latest generally available |
+### Version branches
 
-If the KFS branch and the clone disagree — `hotfix-17` checked out inside `Rock18` — **stop and tell
-the user.** That combination builds against the wrong assemblies and every decision below becomes
+| KFS branch | Targets | Rock clone |
+|---|---|---|
+| `master` | The latest **generally available** Rock version, as Spark defines it | That version's clone |
+| `hotfix-NN` | An **Early Access** Rock version NN | `RockNN` |
+
+- **`master` changes version over time.** When a new Rock version becomes generally available,
+  `master` moves to it. As of September 2026 that version is **17.8**, so `master` builds in
+  `Rock17`. Check it before relying on it.
+- **`hotfix-NN` branches are created only when needed.** One exists only when a repo needs changes
+  for Early Access version NN that won't work on `master`. Not every Rock version gets one, and not
+  every repo gets one. Check with `git -C <repo> branch -a` rather than assuming.
+- **When version NN becomes generally available,** `hotfix-NN` is merged into `master` and then
+  deleted. A branch can outlive its merge: `hotfix-17` has been merged but not yet deleted. Never
+  target a hotfix branch whose version is now generally available. Use `master`.
+
+If the KFS branch and the clone disagree, **stop and tell the user**. Examples are `hotfix-18`
+checked out inside `Rock17`, or `master` inside `Rock18` while 17.8 is the generally available
+version. That combination builds against the wrong assemblies, and every decision below becomes
 unreliable.
 
 ---

@@ -82,8 +82,9 @@ There is no unit-test suite. See `/test` for what verification actually exists.
 ## Branches and commits
 
 Work branches are `type/initials-Description` (`bug/gem-…`, `feature/nbh-…`) off the version branch
-you are targeting: `hotfix-17`, `hotfix-18`, `hotfix-19`, `master`. Never commit directly to a
-version branch — work goes through a PR, squash-merged.
+you are targeting. That's `master` for the generally available Rock version, or `hotfix-NN` for an
+Early Access version that has one. `kfs-rock-versions.md` § Version branches explains when each
+exists. Never commit directly to a version branch. Work goes through a PR and is squash-merged.
 
 **Commit subjects are plain and descriptive.** We do not use Rock's `+ (Domain)` release-note
 format; our repos do not feed Rock's changelog.
