@@ -25,7 +25,7 @@ while a release is in preparation.
 |---|---|
 | `hotfix-18` | `Rock18` |
 | `hotfix-19` | `Rock19` |
-| `master` | latest publicly available |
+| `master` | latest generally available |
 
 If the KFS branch and the clone disagree — `hotfix-17` checked out inside `Rock18` — **stop and tell
 the user.** That combination builds against the wrong assemblies and every decision below becomes
@@ -53,13 +53,13 @@ Treat "v18+" as one bucket unless a row says otherwise.
 > **KFS plugin projects are legacy csproj on every version** — all 37, plus 7 `packages.config`
 > files. `dotnet build` does not build them regardless of clone. Always `nuget restore` + `msbuild`.
 
-### v20-only — do not use on v17 or v18
+### v19+ — do not use on v17 or v18
 
 | Topic | Note |
 |---|---|
 | `getCombinedFilterValue` on `HighlightDetailColumn` | Absent in **both** v17 and v18. There a name+subtitle column still needs its own `filterValue` / `quickFilterValue` / `sortValue` props — do not delete them. |
-| `Rock.Frontend.Styles` project | v20 relocated the SCSS sources here. |
-| `Rock/Model/AI/`, `Rock.Blocks/AI/`, MCP integration | v20 only. `[RockDomain( "AI" )]` is v18+. |
+| `Rock.Frontend.Styles` project | v19 relocated the SCSS sources here. |
+| `Rock/Model/AI/`, `Rock.Blocks/AI/`, MCP integration | v19+. `[RockDomain( "AI" )]` is v18+. |
 
 ---
 

@@ -1,3 +1,8 @@
+rd .\KFSRockAssemblies 2>nul
+rd .\RockAttendedCheckin 2>nul
+rd .\RockWeb\Plugins\rocks_kfs 2>nul
+rd .\RockWeb\Plugins\cc_newspring 2>nul
+rd .\RockWeb\Content\KFSRockAssets 2>nul
 @echo off
 REM Run this from the root of a Rock clone (Rock17, Rock18, ...).
 REM Junctions the KFS repos into the Rock tree so plugins build against Rock's assemblies.
