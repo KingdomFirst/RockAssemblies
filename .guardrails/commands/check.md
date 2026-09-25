@@ -22,7 +22,7 @@ Report a pass/fail summary. For failures, list each issue with file and line num
 ## KFS additions to step 3
 
 Everything above is Rock's list and applies unchanged. Add these, which cover the sanctioned
-deviations in `.claude/rules/plugin-deviations.md`.
+deviations listed in `.claude/rules/kfs/kfs-precedence.md`.
 
 ### Licensing — check first
 
