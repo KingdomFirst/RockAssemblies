@@ -28,8 +28,17 @@ formatting one** — getting it wrong puts the wrong copyright and licence on sh
 //
 ```
 
-The trailing `//` is intentional. The year is the year the file is **created** — it should be bumped on
-later edits.
+The trailing `//` is intentional.
+
+**The year is the year of the file's most recent change.**
+
+- **New file:** use the current year.
+- **Editing an existing KFS file:** if the header year is earlier than the current year, replace it
+  with the current year in the same change. Replace it with a single year, not a range
+  (`2021-2026`). If the header already shows the current year, leave it.
+
+This applies only to the KFS header in Case 1. Spark's header in Case 2 has no year, so there is
+nothing to update.
 
 `.obs` / `.partial.obs` — one line, before `<template>`:
 

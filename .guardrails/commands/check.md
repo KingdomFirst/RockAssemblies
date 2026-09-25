@@ -30,7 +30,9 @@ deviations in `.claude/rules/plugin-deviations.md`.
   KFS / Apache 2.0.
 - File derived from Rock core that has had Spark's header **replaced** with the KFS one →
   that is a relicensing error; restore Spark's.
-- Wrong year on a new KFS header (should be the year the file was created).
+- KFS header year on a new or changed file isn't the current year. A new file gets the year it
+  was created. An edited file's year is replaced with the current year, as a single year, not a
+  range.
 
 ### Plugin entity
 
