@@ -7,7 +7,7 @@ untracked and lost on a clean.
 From the project root (a Rock clone), that path is:
 
 ```
-KFSRockAssemblies/guardrails/docs/
+KFSRockAssemblies/.guardrails/docs/
 ```
 
 Organise by **plugin**, not by Rock domain — that is the unit we work in:

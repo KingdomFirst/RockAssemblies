@@ -37,7 +37,7 @@
 **/SqlServerTypes/*
 rocks.kfs.JavaScript.Obsidian/node_modules/
 
-# Claude Code guardrail overlay (generated per Rock clone by guardrails/setup.ps1)
+# Claude Code guardrail overlay (generated per Rock clone by .guardrails/setup.ps1)
 #####################################################################
 .claude/
 /CLAUDE.md

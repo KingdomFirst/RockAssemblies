@@ -15,11 +15,11 @@ mklink /J RockWeb\Content\KFSRockAssets c:\KFSRepo\Rock\KFSRockAssets
 
 REM --- Claude Code guardrails -------------------------------------------------
 REM Not set up here. The overlay is built from two sources (a Rock20 clone for
-REM Rock's guardrails, and KFSRockAssemblies\guardrails for ours), so it needs
+REM Rock's guardrails, and KFSRockAssemblies\.guardrails for ours), so it needs
 REM more than a junction. Run this once per Rock clone instead:
 REM
 REM     powershell -ExecutionPolicy Bypass -File ^
-REM         c:\KFSRepo\Rock\KFSRockAssemblies\guardrails\setup.ps1 -Target %CD%
+REM         c:\KFSRepo\Rock\KFSRockAssemblies\.guardrails\setup.ps1 -Target %CD%
 REM
 REM It creates .claude\ and CLAUDE.md, adds both to .git\info\exclude, and wires
 REM the skills into ~\.claude\skills. Re-run it after pulling guardrail changes.

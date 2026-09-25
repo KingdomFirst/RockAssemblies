@@ -9,7 +9,7 @@ Once per Rock clone:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File `
-    C:\KFSRepo\Rock\KFSRockAssemblies\guardrails\setup.ps1 -Target C:\KFSRepo\Rock\Rock17
+    C:\KFSRepo\Rock\KFSRockAssemblies\.guardrails\setup.ps1 -Target C:\KFSRepo\Rock\Rock17
 ```
 
 That builds `<clone>\.claude\` and `<clone>\CLAUDE.md`, adds both to the clone's
@@ -33,15 +33,15 @@ it), and the repo junctions from `CreateLinks.bat`.
 ```
 Rock20\.claude\rules\     ──┐
                             ├──> <clone>\.claude\rules\{rock,kfs}\   (junctions)
-guardrails\rules\         ──┘
+.guardrails\rules\        ──┘
 
 Rock20\CLAUDE.md          ──┐
                             ├──> <clone>\CLAUDE.md   (generated, @imports both)
-guardrails\CLAUDE-kfs.md  ──┘
+.guardrails\CLAUDE-kfs.md ──┘
 
 Rock20\.claude\skills\    ──┐
                             ├──> ~\.claude\skills\   (junctions, machine-wide)
-guardrails\skills\        ──┘
+.guardrails\skills\       ──┘
 ```
 
 Nothing is copied into a KFS repo, so pulling `Rock20` refreshes Rock's guardrails with no merge.
@@ -74,12 +74,12 @@ it to `kfs-precedence.md` as well as the rule that carries it.
 ## Editing
 
 These files are tracked in `RockAssemblies`, so they move with the branch. If you switch to a
-branch that predates them, the overlay's `kfs` junction goes empty. Either land `guardrails/` on the
+branch that predates them, the overlay's `kfs` junction goes empty. Either land `.guardrails/` on the
 branches you work from, or pin the overlay to a worktree:
 
 ```
 git worktree add C:\KFSRepo\Rock\KFSRockAssemblies-guardrails master
-setup.ps1 -Target ... -Guardrails C:\KFSRepo\Rock\KFSRockAssemblies-guardrails\guardrails
+setup.ps1 -Target ... -Guardrails C:\KFSRepo\Rock\KFSRockAssemblies-guardrails\.guardrails
 ```
 
 `setup.ps1` prints which branch the guardrails source is on, so a stale pin is visible.

@@ -45,8 +45,8 @@ Both skills assume `specs/` and `docs/` at the project root. Here the project ro
 clone we do not own**, where anything written is untracked and lost on a clean. Write instead to:
 
 ```
-KFSRockAssemblies/guardrails/specs/      (KFS-authored specs)
-KFSRockAssemblies/guardrails/docs/        (KFS-authored docs, organised by plugin)
+KFSRockAssemblies/.guardrails/specs/     (KFS-authored specs)
+KFSRockAssemblies/.guardrails/docs/       (KFS-authored docs, organised by plugin)
 ```
 
 Rock's own specs and docs are read-only reference in the `Rock20` clone (`Rock20/specs/`,

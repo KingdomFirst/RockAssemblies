@@ -60,8 +60,8 @@ KFS repos is two commits and two PRs. `git branch` at the root lists **Rock's** 
 | WebForms block | `RockWeb/Plugins/rocks_kfs/[Domain]/[Block].ascx` + `.ascx.cs` |
 | Obsidian source | `KFSRockAssemblies/rocks.kfs.JavaScript.Obsidian/src/` |
 | Shipped SQL object | `rocks.kfs.[Plugin]/sql/_rocks_kfs_sp*.sql`, deployed by a migration |
-| KFS spec | `KFSRockAssemblies/guardrails/specs/` — **not** `specs/` at the project root |
-| KFS doc | `KFSRockAssemblies/guardrails/docs/[plugin-kebab]/` — **not** `docs/` at the project root |
+| KFS spec | `KFSRockAssemblies/.guardrails/specs/` — **not** `specs/` at the project root |
+| KFS doc | `KFSRockAssemblies/.guardrails/docs/[plugin-kebab]/` — **not** `docs/` at the project root |
 
 Those last two matter because the project root is a Rock clone: `specs/` and `docs/` there are
 untracked and lost on a clean. Rock's own specs and docs are read-only reference in the `Rock20`
