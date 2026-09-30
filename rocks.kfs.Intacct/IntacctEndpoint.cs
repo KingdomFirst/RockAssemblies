@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
@@ -92,16 +93,26 @@ namespace rocks.kfs.Intacct
                     ExceptionLogService.LogException( $"Intacct Request: {Regex.Replace( Regex.Replace( xmlDoc.InnerXml, "<login>.*</login>", "<login>HIDDEN</login>" ), "<password>.*</password>", "<password>HIDDEN</password>" )}" );
                 }
 
-                string sXml = xmlDoc.InnerXml;
-                req.ContentLength = sXml.Length;
-                var sw = new StreamWriter( req.GetRequestStream() );
-                sw.Write( sXml );
-                sw.Close();
+                // Content-Length is a count of bytes, so it has to be measured after encoding rather than taken
+                // from the string's length. UTF-8 never uses fewer bytes than characters, so a single accented
+                // name or curly apostrophe anywhere in the batch made the write exceed the declared length and the
+                // request failed before it ever reached Intacct.
+                byte[] requestBytes = Encoding.UTF8.GetBytes( xmlDoc.InnerXml );
+                req.ContentLength = requestBytes.Length;
+
+                using ( var requestStream = req.GetRequestStream() )
+                {
+                    requestStream.Write( requestBytes, 0, requestBytes.Length );
+                }
 
                 res = ( HttpWebResponse ) req.GetResponse();
-                Stream responseStream = res.GetResponseStream();
-                var streamReader = new StreamReader( responseStream );
-                var responseString = streamReader.ReadToEnd();
+
+                string responseString;
+                using ( var responseStream = res.GetResponseStream() )
+                using ( var streamReader = new StreamReader( responseStream ) )
+                {
+                    responseString = streamReader.ReadToEnd();
+                }
 
                 //Read the response into an xml document
                 var xml = new XmlDocument();
@@ -124,12 +135,43 @@ namespace rocks.kfs.Intacct
                     ExceptionLogService.LogException( $"Intacct Exception generated with this request: {Regex.Replace( Regex.Replace( xmlDoc.InnerXml, "<login>.*</login>", "<login>HIDDEN</login>" ), "<password>.*</password>", "<password>HIDDEN</password>" )}" );
                 }
             }
+            finally
+            {
+                // Left undisposed, a run of failures leaks pooled connections, which presents later as Intacct
+                // timing out rather than as anything to do with the original failure.
+                if ( res != null )
+                {
+                    res.Close();
+                }
+            }
 
             return response;
         }
 
+        /// <summary>
+        /// Determines whether a document returned by <see cref="PostToIntacct"/> actually holds a response.
+        /// </summary>
+        /// <remarks>
+        /// PostToIntacct logs whatever went wrong and then returns the empty document it started with, so a
+        /// transport failure is indistinguishable from a real response until it is checked. Handing an empty
+        /// document to XDocument.Load throws "The XmlReader state should be Interactive" from several frames away,
+        /// which buries the actual cause - that is already in the exception log, written by PostToIntacct a moment
+        /// earlier.
+        /// </remarks>
+        /// <param name="xmlDocument">The document returned by <see cref="PostToIntacct"/>.</param>
+        /// <returns><c>true</c> if the document has a root element and is safe to parse.</returns>
+        private static bool HasResponseContent( XmlDocument xmlDocument )
+        {
+            return xmlDocument != null && xmlDocument.DocumentElement != null;
+        }
+
         public bool ParseEndpointResponse( XmlDocument xmlDocument, int BatchId, bool Log = false )
         {
+            if ( !HasResponseContent( xmlDocument ) )
+            {
+                return false;
+            }
+
             try
             {
                 var resultX = XDocument.Load( new XmlNodeReader( xmlDocument ) );
@@ -187,6 +229,14 @@ namespace rocks.kfs.Intacct
         public List<CheckingAccount> ParseListCheckingAccountsResponse( XmlDocument xmlDocument, int BatchId )
         {
             var bankAccountList = new List<CheckingAccount>();
+
+            // Unlike ParseEndpointResponse this method has no try/catch, so without this guard an empty document
+            // throws out into the calling block rather than being logged.
+            if ( !HasResponseContent( xmlDocument ) )
+            {
+                return bankAccountList;
+            }
+
             var resultX = XDocument.Load( new XmlNodeReader( xmlDocument ) );
 
             var xResponseXml = resultX.Elements( "response" ).FirstOrDefault();
