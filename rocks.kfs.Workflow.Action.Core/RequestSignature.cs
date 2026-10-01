@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -7,10 +7,12 @@ using System.Linq;
 
 using Rock;
 using Rock.Attribute;
+using Rock.Communication;
 using Rock.Data;
 using Rock.Model;
-using Rock.Security;
+using Rock.Web;
 using Rock.Web.Cache;
+using Rock.Web.UI.Controls;
 using Rock.Workflow;
 
 namespace rocks.kfs.Workflow.Action.Core
@@ -18,20 +20,35 @@ namespace rocks.kfs.Workflow.Action.Core
     #region Action Attributes
 
     [ActionCategory( "KFS: Core" )]
-    [Description( "Creates a new signature request for the workflow." )]
+    [Description( "Emails a person a link to sign a document with Rock's electronic signatures. Place Rock's Electronic Signature action in an activity assigned to the signer; the link opens that activity on the Workflow Entry page." )]
     [Export( typeof( ActionComponent ) )]
     [ExportMetadata( "ComponentName", "Request Signature" )]
 
     #endregion
 
     #region Action Settings
-    [CustomDropdownListField( "Signature Document Template", "The signature document template to send out when this action runs.", "SELECT Id AS Value, Name AS Text FROM SignatureDocumentTemplate ORDER BY Name", true, order: 0, key: AttributeKeys.DocumentTemplate )]
-    [WorkflowAttribute( "Signature Document", "The attribute to store the created digital signature document in. On this action it will be used to check if the document has been signed before sending the invite again.", true, "", "", 1, AttributeKeys.SignatureDocument, new string[] { "Rock.Field.Types.FileFieldType" } )]
-    [WorkflowAttribute( "Signer", "The workflow attribute of the person the signature request will go to. ", true, "", "", 2, AttributeKeys.Person, new string[] { "Rock.Field.Types.PersonFieldType" } )]
+
+    [CustomDropdownListField( "Signature Document Template", "The Rock electronic signature template the person will sign. Templates that use a legacy signature provider are not supported.", "SELECT Id AS Value, Name AS Text FROM SignatureDocumentTemplate WHERE ProviderEntityTypeId IS NULL ORDER BY Name", true, order: 0, key: AttributeKeys.DocumentTemplate )]
+    [WorkflowAttribute( "Signature Document", "The attribute to store the signed document in. If the person has already signed this template, the document is stored here and no request is sent.", true, "", "", 1, AttributeKeys.SignatureDocument, new string[] { "Rock.Field.Types.FileFieldType" } )]
+    [WorkflowAttribute( "Signer", "The workflow attribute of the person the signature request will go to.", true, "", "", 2, AttributeKeys.Person, new string[] { "Rock.Field.Types.PersonFieldType" } )]
+    [LinkedPage( "Workflow Entry Page", "The page with a Workflow Entry block where the person signs. The link includes this workflow's type and Guid.", true, "", "", 3, AttributeKeys.WorkflowEntryPage )]
+    /*
+        9/30/2026 - CLAUDE
+
+        The CodeEditorField constructor below is obsolete from Rock 18.1 in favor of the
+        name-only constructor, but Rock 17 has only this one. Switch to the name-only form
+        when Rock 17 support is dropped.
+
+        Reason: Must compile on Rock 17 (source) and Rock 20 (target).
+    */
+    [TextField( "Email Subject","The subject of the signature request email. <span class='tip tip-lava'></span>", true, "Signature requested: {{ DocumentTemplate.Name }}", "", 4, AttributeKeys.EmailSubject )]
+    [CodeEditorField( "Email Body", "The body of the signature request email. Merge fields: Person, Workflow, DocumentTemplate, SignatureUrl. <span class='tip tip-lava'></span>", CodeEditorMode.Lava, CodeEditorTheme.Rock, 300, true, DefaultEmailBody, "", 5, AttributeKeys.EmailBody )]
+
     #endregion
 
     /// <summary>
-    /// Creates a new prayer request.
+    /// Requests an electronic signature by emailing the signer a link to the workflow's
+    /// Workflow Entry page, where Rock's Electronic Signature action collects it.
     /// </summary>
     public class RequestSignature : ActionComponent
     {
@@ -42,9 +59,32 @@ namespace rocks.kfs.Workflow.Action.Core
             public const string SignatureDocument = "SignatureDocument";
             public const string DocumentTemplate = "SignatureDocumentTemplate";
             public const string Person = "Person";
+            public const string WorkflowEntryPage = "WorkflowEntryPage";
+            public const string EmailSubject = "EmailSubject";
+            public const string EmailBody = "EmailBody";
         }
 
         #endregion
+
+        private const string DefaultEmailBody = @"{{ 'Global' | Attribute:'EmailHeader' }}
+<p>{{ Person.NickName }},</p>
+<p>Please review and sign <strong>{{ DocumentTemplate.Name }}</strong>.</p>
+<p><a href=""{{ SignatureUrl }}&{{ Person | PersonTokenCreate:4320,1 }}"">Review and sign</a></p>
+{{ 'Global' | Attribute:'EmailFooter' }}";
+
+        /*
+            9/30/2026 - CLAUDE
+
+            Rewritten for Rock's built-in electronic signatures. The previous version sent
+            requests through a legacy signature provider (e.g. SignNow) with
+            DigitalSignatureContainer and SendDigitalSignatureRequestTransaction, which Rock
+            20 removed. The signature itself is now collected by Rock's Electronic Signature
+            action on the Workflow Entry page; this action only sends the request. Everything
+            used here exists from Rock 17 through 20, so one version ships for all.
+
+            Reason: Rock 20 removed legacy digital signature providers.
+        */
+
         /// <summary>
         /// Executes the action.
         /// </summary>
@@ -52,30 +92,12 @@ namespace rocks.kfs.Workflow.Action.Core
         /// <param name="action">The workflow action.</param>
         /// <param name="entity">The entity.</param>
         /// <param name="errorMessages">The error messages.</param>
-        /// <returns></returns>
+        /// <returns><c>true</c> when the request was sent or the document was already signed.</returns>
         public override bool Execute( RockContext rockContext, WorkflowAction action, Object entity, out List<string> errorMessages )
         {
             errorMessages = new List<string>();
 
-            var documentTemplateId = GetAttributeValue( action, AttributeKeys.DocumentTemplate ).AsIntegerOrNull();
-            Person person = null;
-            DigitalSignatureComponent DigitalSignatureComponent = null;
-
-            // get person
-            Guid? personAttributeGuid = GetAttributeValue( action, AttributeKeys.Person ).AsGuidOrNull();
-            if ( personAttributeGuid.HasValue )
-            {
-                Guid? personAliasGuid = action.GetWorkflowAttributeValue( personAttributeGuid.Value ).AsGuidOrNull();
-                if ( personAliasGuid.HasValue )
-                {
-                    var personAlias = new PersonAliasService( rockContext ).Get( personAliasGuid.Value );
-                    if ( personAlias != null )
-                    {
-                        person = personAlias.Person;
-                    }
-                }
-            }
-
+            var person = GetSigner( rockContext, action );
             if ( person == null )
             {
                 errorMessages.Add( "There is no person set on the attribute. Please try again." );
@@ -88,84 +110,132 @@ namespace rocks.kfs.Workflow.Action.Core
                 return false;
             }
 
-            if ( documentTemplateId.HasValue )
+            var documentTemplateId = GetAttributeValue( action, AttributeKeys.DocumentTemplate ).AsIntegerOrNull();
+            var documentTemplate = documentTemplateId.HasValue ? new SignatureDocumentTemplateService( rockContext ).Get( documentTemplateId.Value ) : null;
+            if ( documentTemplate == null )
             {
-                var signatureDocument = new SignatureDocumentService( rockContext )
-                   .Queryable().AsNoTracking()
-                   .Where( d =>
-                       d.SignatureDocumentTemplateId == documentTemplateId.Value &&
-                       d.AppliesToPersonAlias != null &&
-                       d.AppliesToPersonAlias.PersonId == person.Id &&
-                       d.LastStatusDate.HasValue &&
-                       d.Status == SignatureDocumentStatus.Signed &&
-                       d.BinaryFile != null )
-                   .OrderByDescending( d => d.LastStatusDate.Value )
-                   .FirstOrDefault();
-
-                var documentTemplate = new SignatureDocumentTemplateService( rockContext ).Get( documentTemplateId.Value );
-                if ( documentTemplate.ProviderEntityType != null )
-                {
-                    var provider = DigitalSignatureContainer.GetComponent( documentTemplate.ProviderEntityType.Name );
-                    if ( provider != null && provider.IsActive )
-                    {
-                        DigitalSignatureComponent = provider;
-                    }
-                }
-
-                if ( documentTemplate != null && signatureDocument != null )
-                {
-                    // get the attribute to store the document/file guid
-                    var signatureDocumentAttributeGuid = GetAttributeValue( action, AttributeKeys.SignatureDocument ).AsGuidOrNull();
-                    if ( signatureDocumentAttributeGuid.HasValue )
-                    {
-                        var signatureDocumentAttribute = AttributeCache.Get( signatureDocumentAttributeGuid.Value, rockContext );
-                        if ( signatureDocumentAttribute != null )
-                        {
-                            if ( signatureDocumentAttribute.FieldTypeId == FieldTypeCache.Get( Rock.SystemGuid.FieldType.FILE.AsGuid(), rockContext ).Id )
-                            {
-                                SetWorkflowAttributeValue( action, signatureDocumentAttributeGuid.Value, signatureDocument.BinaryFile.Guid.ToString() );
-                                return true;
-                            }
-                            else
-                            {
-                                errorMessages.Add( "Invalid field type for signature document attribute set." );
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            errorMessages.Add( "Invalid signature document attribute set." );
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        errorMessages.Add( "Signature document attribute must be set." );
-                        return false;
-                    }
-                }
-                else if ( DigitalSignatureComponent != null )
-                {
-                    var sendDocumentTxn = new Rock.Transactions.SendDigitalSignatureRequestTransaction();
-                    sendDocumentTxn.SignatureDocumentTemplateId = documentTemplateId.Value;
-                    sendDocumentTxn.AppliesToPersonAliasId = person.PrimaryAliasId ?? 0;
-                    sendDocumentTxn.AssignedToPersonAliasId = person.PrimaryAliasId ?? 0;
-                    sendDocumentTxn.DocumentName = string.Format( "{0}_{1}", action.Activity.Workflow.Name.RemoveSpecialCharacters(), person.FullName.RemoveSpecialCharacters() );
-                    sendDocumentTxn.Email = person.Email;
-                    Rock.Transactions.RockQueue.TransactionQueue.Enqueue( sendDocumentTxn );
-                    return true;
-                }
-                else
-                {
-                    errorMessages.Add( "There was an error loading the Digital Signature component, please check your document template." );
-                    return false;
-                }
-            }
-            else
-            {
-                errorMessages.Add( "There was no valid document template id set on this action" );
+                errorMessages.Add( "There was no valid document template id set on this action." );
                 return false;
             }
+
+            if ( documentTemplate.ProviderEntityTypeId.HasValue )
+            {
+                errorMessages.Add( $"The '{documentTemplate.Name}' template uses a legacy signature provider, which is no longer supported. Choose a template that uses Rock's electronic signatures." );
+                return false;
+            }
+
+            // Already signed: store the document and move on without sending a request.
+            var signedDocument = new SignatureDocumentService( rockContext )
+                .Queryable().AsNoTracking()
+                .Where( d =>
+                    d.SignatureDocumentTemplateId == documentTemplate.Id &&
+                    d.AppliesToPersonAlias != null &&
+                    d.AppliesToPersonAlias.PersonId == person.Id &&
+                    d.LastStatusDate.HasValue &&
+                    d.Status == SignatureDocumentStatus.Signed &&
+                    d.BinaryFile != null )
+                .OrderByDescending( d => d.LastStatusDate.Value )
+                .FirstOrDefault();
+
+            if ( signedDocument != null )
+            {
+                return StoreSignedDocument( rockContext, action, signedDocument, errorMessages );
+            }
+
+            return SendRequest( action, person, documentTemplate, errorMessages );
+        }
+
+        private Person GetSigner( RockContext rockContext, WorkflowAction action )
+        {
+            var personAttributeGuid = GetAttributeValue( action, AttributeKeys.Person ).AsGuidOrNull();
+            if ( !personAttributeGuid.HasValue )
+            {
+                return null;
+            }
+
+            var personAliasGuid = action.GetWorkflowAttributeValue( personAttributeGuid.Value ).AsGuidOrNull();
+            if ( !personAliasGuid.HasValue )
+            {
+                return null;
+            }
+
+            return new PersonAliasService( rockContext ).Get( personAliasGuid.Value )?.Person;
+        }
+
+        private bool StoreSignedDocument( RockContext rockContext, WorkflowAction action, SignatureDocument signedDocument, List<string> errorMessages )
+        {
+            var signatureDocumentAttributeGuid = GetAttributeValue( action, AttributeKeys.SignatureDocument ).AsGuidOrNull();
+            if ( !signatureDocumentAttributeGuid.HasValue )
+            {
+                errorMessages.Add( "Signature document attribute must be set." );
+                return false;
+            }
+
+            var signatureDocumentAttribute = AttributeCache.Get( signatureDocumentAttributeGuid.Value, rockContext );
+            if ( signatureDocumentAttribute == null )
+            {
+                errorMessages.Add( "Invalid signature document attribute set." );
+                return false;
+            }
+
+            if ( signatureDocumentAttribute.FieldTypeId != FieldTypeCache.Get( Rock.SystemGuid.FieldType.FILE.AsGuid(), rockContext ).Id )
+            {
+                errorMessages.Add( "Invalid field type for signature document attribute set." );
+                return false;
+            }
+
+            SetWorkflowAttributeValue( action, signatureDocumentAttributeGuid.Value, signedDocument.BinaryFile.Guid.ToString() );
+            return true;
+        }
+
+        private bool SendRequest( WorkflowAction action, Person person, SignatureDocumentTemplate documentTemplate, List<string> errorMessages )
+        {
+            var workflow = action.Activity.Workflow;
+
+            // The link reopens this workflow, so it must be saved to the database.
+            if ( !workflow.IsPersisted && !( workflow.WorkflowTypeCache?.IsPersisted ?? false ) )
+            {
+                errorMessages.Add( "The workflow must be persisted so the signer can reopen it from the email link. Enable 'Automatically Persisted' on the workflow type, or persist it before this action." );
+                return false;
+            }
+
+            var pageReference = new PageReference( GetAttributeValue( action, AttributeKeys.WorkflowEntryPage ), new Dictionary<string, string>
+            {
+                { "WorkflowTypeId", workflow.WorkflowTypeId.ToString() },
+                { "WorkflowGuid", workflow.Guid.ToString() }
+            } );
+
+            if ( pageReference.PageId <= 0 )
+            {
+                errorMessages.Add( "A valid Workflow Entry Page must be set on this action." );
+                return false;
+            }
+
+            var appRoot = GlobalAttributesCache.Get().GetValue( "PublicApplicationRoot" ).EnsureTrailingForwardslash();
+            var signatureUrl = appRoot + pageReference.BuildUrl().TrimStart( '/' );
+
+            var mergeFields = GetMergeFields( action );
+            mergeFields.AddOrReplace( "Person", person );
+            mergeFields.AddOrReplace( "DocumentTemplate", documentTemplate );
+            mergeFields.AddOrReplace( "SignatureUrl", signatureUrl );
+
+            var emailMessage = new RockEmailMessage
+            {
+                Subject = GetAttributeValue( action, AttributeKeys.EmailSubject ).ResolveMergeFields( mergeFields ),
+                Message = GetAttributeValue( action, AttributeKeys.EmailBody ),
+                AppRoot = appRoot,
+                CreateCommunicationRecord = true
+            };
+            emailMessage.AddRecipient( new RockEmailMessageRecipient( person, mergeFields ) );
+
+            if ( !emailMessage.Send( out var sendErrors ) )
+            {
+                errorMessages.AddRange( sendErrors );
+                return false;
+            }
+
+            action.AddLogEntry( $"Signature request for '{documentTemplate.Name}' sent to {person.FullName}." );
+            return true;
         }
     }
 }

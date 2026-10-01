@@ -124,7 +124,7 @@ namespace rocks.kfs.SimpleTexting.Communications.Transport
                                     FromPerson = smsMessage.CurrentPerson,
                                     ToPersonAliasId = recipientPerson?.PrimaryAliasId,
                                     Message = message,
-                                    FromPhone = smsMessage.FromNumber,
+                                    FromSystemPhoneNumber = smsMessage.FromSystemPhoneNumber,
                                     CommunicationName = smsMessage.CommunicationName,
                                     ResponseCode = string.Empty,
                                     SystemCommunicationId = smsMessage.SystemCommunicationId
@@ -146,7 +146,7 @@ namespace rocks.kfs.SimpleTexting.Communications.Transport
                             }
                             else
                             {
-                                Object response = simpleTextClient.SendMessage( recipient.To, message, accountPhone: smsMessage.FromNumber?.Value, mediaItems: attachmentUris );
+                                Object response = simpleTextClient.SendMessage( recipient.To, message, accountPhone: smsMessage.FromSystemPhoneNumber?.Number, mediaItems: attachmentUris );
 
                                 var responseType = response.GetType();
 
@@ -221,7 +221,9 @@ namespace rocks.kfs.SimpleTexting.Communications.Transport
                     string publicAppRoot = globalAttributes.GetValue( "PublicApplicationRoot" );
                     var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, currentPerson );
 
-                    string fromPhone = communication.SMSFromDefinedValue?.Value;
+                    string fromPhone = communication.SmsFromSystemPhoneNumberId.HasValue
+                        ? SystemPhoneNumberCache.Get( communication.SmsFromSystemPhoneNumberId.Value )?.Number
+                        : null;
 
                     var personEntityTypeId = EntityTypeCache.Get( "Rock.Model.Person" ).Id;
                     var communicationEntityTypeId = EntityTypeCache.Get( "Rock.Model.Communication" ).Id;
