@@ -63,11 +63,11 @@ namespace rocks.kfs.Microsoft365Utilities.Shortcodes
             <li><strong>tenantid</strong> REQUIRED - The Directory (tenant) ID in Microsoft Azure for the registered application that has access to the target mailbox. This value can be either encrypted or non-encrypted. It is recommended this value be stored in the global attribute EWS Azure Tenant ID and passed to the shortcode directly from the global attribute value for higher security.</li>
             <li><strong>appsecret</strong> REQUIRED - The Secret Value in Microsoft Azure for the registered application that has access to the target mailbox. This value can be either encrypted or non-encrypted. It is recommended this value be stored in the global attribute EWS Azure Secret and passed to the shortcode directly from the global attribute value for higher security.</li>
             <li><strong>calendarmailbox</strong> REQUIRED - The address of the mailbox for the target calendar.</li>
-            <li><strong>impersonate</strong> The user account to impersonate that has access to the calendarmailbox. If not provided, the calendarmailbox address will be used.</li>
+            <li><strong>impersonate</strong> - The user account to impersonate that has access to the calendarmailbox. If not provided, the calendarmailbox address will be used.</li>
             <li><strong>serverurl</strong> - The url for the Microsoft Exchange server. Default: https://outlook.office365.com/EWS/Exchange.asmx</li>
             <li><strong>order</strong> - An optional parameter to change the ordering of the returned items based on their Start value. By default items are ordered by Start ascending. Set value to 'desc' will cause the results to be orded by Start descending.</li>
-            <li><strong>daysback</strong> (0)- The number of days to look back to find calendar items.</li>
-            <li><strong>daysforward</strong> (7)- The number of days to look forward to find calendar items.</li>
+            <li><strong>daysback</strong> (0) - The number of days to look back to find calendar items.</li>
+            <li><strong>daysforward</strong> (7) - The number of days to look forward to find calendar items.</li>
         </ul>
         <p>The shortcode returns a liquid object named CalendarItems that contains a list of calendar items pulled from the Exchange server that meet the requested parameters.</p>
         <p>Each calendar item in the list has the following merge fields available.</p>
@@ -311,7 +311,7 @@ namespace rocks.kfs.Microsoft365Utilities.Shortcodes
                 catch ( Exception ex )
                 {
                     ExceptionLogService.LogException( ex, HttpContext.Current );
-                    result.Write( string.Format( "<div class='alert alert-warning'>{0}</div>", ex.Message ) );
+                    result.Write( string.Format( "<div class='alert alert-warning'>{0}</div>", GetErrorMessage( ex ) ) );
                     return;
                 }
                 if ( calendarItems.Count() == 0 )
@@ -356,9 +356,27 @@ namespace rocks.kfs.Microsoft365Utilities.Shortcodes
             catch ( Exception ex )
             {
                 ExceptionLogService.LogException( ex, HttpContext.Current );
-                result.Write( string.Format( "<div class='alert alert-warning'>{0}</div>", ex.Message ) );
+                result.Write( string.Format( "<div class='alert alert-warning'>{0}</div>", GetErrorMessage( ex ) ) );
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Gets the message to show for an exception. Waiting on an async call (such as the
+        /// MSAL token request) wraps the real error in an AggregateException whose own message
+        /// is only "One or more errors occurred.", so show the underlying error instead.
+        /// </summary>
+        /// <param name="ex">The exception.</param>
+        /// <returns>The message to display.</returns>
+        private static string GetErrorMessage( Exception ex )
+        {
+            var aggregateException = ex as AggregateException;
+            if ( aggregateException != null )
+            {
+                return aggregateException.GetBaseException().Message;
+            }
+
+            return ex.Message;
         }
 
         /// <summary>
@@ -380,6 +398,7 @@ namespace rocks.kfs.Microsoft365Utilities.Shortcodes
             parms.Add( EWS_APPSECRET, "" );
             parms.Add( SERVER_URL, "https://outlook.office365.com/EWS/Exchange.asmx" );
             parms.Add( CALENDAR_MAILBOX, "" );
+            parms.Add( IMPERSONATE, "" );
             parms.Add( ORDER, "" );
             parms.Add( DAYS_BACK, "0" );
             parms.Add( DAYS_FORWARD, "7" );
