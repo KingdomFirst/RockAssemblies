@@ -277,7 +277,7 @@ namespace com.kfs.Security.ExternalAuthentication
 
         private Uri WeglotUrlProxySafe( HttpRequest request )
         {
-            var isRequestForwardedFromWeglot = request.Headers["Weglot-Forwarded-Host"].IsNotNull() && request.Headers["Weglot-Forwarded-Proto"].IsNotNull();
+            var isRequestForwardedFromWeglot = request.Headers["Weglot-Forwarded-Host"] != null && request.Headers["Weglot-Forwarded-Proto"] != null;
 
             if ( !isRequestForwardedFromWeglot )
             {
