@@ -73,7 +73,7 @@ source, point `-Rock20` at that clone.
 | | |
 |---|---|
 | `rules/kfs-*.md` | The curated delta. `kfs-precedence.md` is the override contract. |
-| `skills/kfs-*/` | KFS variants where Rock's would misfire: `kfs-build`, `kfs-check`, `kfs-test`, `kfs-entity-model`, `kfs-plugin-migration`, `kfs-convert-block` |
+| `skills/kfs-*/` | KFS variants where Rock's would misfire: `kfs-build`, `kfs-check`, `kfs-test`, `kfs-entity-model`, `kfs-plugin-migration`, `kfs-convert-block`; plus KFS-only `kfs-compat-preflight` and `kfs-compat-test` (plugin compatibility testing against a new Rock version) |
 | `hooks/` | `prevent-destructive.sh` |
 | `settings.json` | Permissions and hooks, merged into each clone's `settings.local.json` |
 | `CLAUDE-kfs.md` | Imported after Rock's `CLAUDE.md` |
