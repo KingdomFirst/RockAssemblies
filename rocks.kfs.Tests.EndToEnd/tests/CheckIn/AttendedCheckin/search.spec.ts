@@ -23,7 +23,7 @@ import { expect, test } from "./attendedCheckin.fixture";
     plugin's "Family Search" workflow activity, so a broken check-in workflow action
     shows up here.
 */
-test.describe( "Attended Check-in: Search", () => {
+test.describe( "Attended Checkin: Search", () => {
     test.beforeEach( async ( { checkin, checkinPages } ) => {
         await checkinPages.startCheckin( { kioskId: checkin.setup.kioskId, areaId: checkin.setup.areaId } );
     } );

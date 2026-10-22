@@ -52,3 +52,20 @@ function Resolve-ContentSource( [string] $Relative, [string] $BlocksRepo ) {
     }
     return [pscustomobject]@{ Kind = "Other" }
 }
+
+# Rock Packages folder names that are not KFS plugins (excluded-plugins.txt beside this file),
+# as a hashtable of folder name -> reason. Packaging and testing skip these folders entirely.
+function Get-ExcludedPlugins {
+    $excluded = @{}
+    $listPath = Join-Path $PSScriptRoot "excluded-plugins.txt"
+    if ( Test-Path $listPath ) {
+        foreach ( $line in Get-Content $listPath ) {
+            if ( $line -match '^\s*#' -or -not $line.Trim() ) {
+                continue
+            }
+            $parts = $line -split '\|', 2
+            $excluded[ $parts[ 0 ].Trim() ] = if ( $parts.Count -gt 1 ) { $parts[ 1 ].Trim() } else { "" }
+        }
+    }
+    return $excluded
+}

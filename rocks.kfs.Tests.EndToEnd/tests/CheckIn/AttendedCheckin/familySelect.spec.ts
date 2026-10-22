@@ -23,7 +23,7 @@ import { expect, test } from "./attendedCheckin.fixture";
     these tests works in a new family of its own (createRunFamily) and never touches the
     persistent test family; teardown inactivates everyone they create.
 */
-test.describe( "Attended Check-in: Family Select", () => {
+test.describe( "Attended Checkin: Family Select", () => {
     test.beforeEach( async ( { checkin, checkinPages } ) => {
         await checkinPages.startCheckin( { kioskId: checkin.setup.kioskId, areaId: checkin.setup.areaId } );
     } );

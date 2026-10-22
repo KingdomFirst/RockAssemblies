@@ -28,7 +28,7 @@ const AgeClassifications = [ "Unknown", "Adult", "Child" ] as const;
     electronic signature (typed, no provider, no completion email), so signing sends
     nothing. Signing makes Rock render a PDF on the server.
 */
-test.describe( "Person Attribute Forms Advanced: signature document", () => {
+test.describe( "Person Attributes Form Advanced: signature document", () => {
     test( "Submit_SignatureTemplate_ShowsDocumentThenSavesSignedDocument", async ( { page, pafa, block } ) => {
         const middleName = `Sig${Date.now()}`;
         await pafa.configure( { SignatureDocumentTemplate: String( pafa.signatureTemplateId ) } );

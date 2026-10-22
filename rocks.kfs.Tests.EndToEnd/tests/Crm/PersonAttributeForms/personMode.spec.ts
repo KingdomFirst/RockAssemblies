@@ -22,7 +22,7 @@ import { expect, test } from "./personAttributeForms.fixture";
     displays and functions as expected with each combination of Display Family Member
     Picker/Person Mode", plus the Person page parameter rules each mode enforces.
 */
-test.describe( "Person Attribute Forms Advanced: person mode", () => {
+test.describe( "Person Attributes Form Advanced: person mode", () => {
     const pickerMatrix = [
         { personMode: "Family Members", displayPicker: true, isPickerShown: true },
         { personMode: "Family Members", displayPicker: false, isPickerShown: false },

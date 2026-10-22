@@ -23,7 +23,7 @@ import { expect, test } from "./fundraisingProgress.fixture";
     any Rock error page or block error). Every number shown is checked against the goals
     and gifts the fixture recorded.
 */
-test.describe( "Fundraising Progress: GroupId and GroupMemberId parameters", () => {
+test.describe( "KFS Fundraising Progress: GroupId and GroupMemberId parameters", () => {
     test( "PageLoad_GroupIdParameter_ShowsGroupTotalsAndEachMembersProgress", async ( { page, afp, block } ) => {
         await afp.open( page, { GroupId: afp.group.id } );
 

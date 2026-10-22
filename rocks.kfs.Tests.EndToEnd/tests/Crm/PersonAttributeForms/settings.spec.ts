@@ -28,7 +28,7 @@ type SavedForm = {
     it must open, show the configured forms, and save them back without loss. A change in
     Rock's pickers, grids or JSON handling usually shows up here first.
 */
-test.describe( "Person Attribute Forms Advanced: Edit Forms and Fields", () => {
+test.describe( "Person Attributes Form Advanced: Edit Forms and Fields", () => {
     test( "EditFormsAndFields_OpenAndSave_PreservesConfiguration", async ( { page, pafa, block } ) => {
         await pafa.configure( {
             Workflow: pafa.workflows.groupMember.guid,

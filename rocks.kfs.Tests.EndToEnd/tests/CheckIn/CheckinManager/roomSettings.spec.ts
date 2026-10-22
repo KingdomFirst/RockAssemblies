@@ -22,7 +22,7 @@ import { expect, openManagerPage, test, verifyManagerCanCloseRooms } from "./che
     Location navigation mode. The fixture puts the shared test room back to open with no
     thresholds before and after every test.
 */
-test.describe( "Advanced Check-in Manager: open and close rooms", () => {
+test.describe( "Advanced Check-in Monitor: open and close rooms", () => {
     // The toggles are shown only to people who may close rooms (README: one-time setup).
     test.beforeEach( async ( { checkinManager } ) => {
         await verifyManagerCanCloseRooms( checkinManager );
@@ -55,7 +55,7 @@ test.describe( "Advanced Check-in Manager: open and close rooms", () => {
     } );
 } );
 
-test.describe( "Advanced Check-in Manager: thresholds", () => {
+test.describe( "Advanced Check-in Monitor: thresholds", () => {
     test( "Threshold_SoftThresholdSet_ShowsCountOutOfThreshold", async ( { page, checkinManager, block } ) => {
         await checkinManager.api.patch( "Locations", checkinManager.setup.roomId, { SoftRoomThreshold: 5 } );
 
@@ -99,7 +99,7 @@ test.describe( "Advanced Check-in Manager: thresholds", () => {
     } );
 } );
 
-test.describe( "Advanced Check-in Manager: Location navigation mode", () => {
+test.describe( "Advanced Check-in Monitor: Location navigation mode", () => {
     test( "Navigate_LocationMode_CampusLocationThenRoomListsCheckedInPerson", async ( { page, checkinManager, block } ) => {
         await checkinManager.configure( { Mode: "L" } );
 

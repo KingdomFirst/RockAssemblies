@@ -23,7 +23,7 @@ import { expect, openManagerPage, test } from "./checkinManager.fixture";
     "Launch Check-in manager page". The chart is the riskiest piece on new Rock versions:
     Rock 20 deleted the chart options class the block used, so it now carries its own copy.
 */
-test.describe( "Advanced Check-in Manager: Launch", () => {
+test.describe( "Advanced Check-in Monitor: Launch", () => {
     test( "Setup_CopiedPage_CarriesCoreBlockSettings", async ( { checkinManager } ) => {
         // The core block's page links must survive the swap, or Person and Area Select stop working.
         expect( checkinManager.copiedSettingKeys ).toEqual( expect.arrayContaining( [ "Mode", "PersonPage", "AreaSelectPage" ] ) );

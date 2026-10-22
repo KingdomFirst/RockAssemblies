@@ -9,6 +9,7 @@
     "summary": "node scripts/openReport.js summary",
     "report": "node scripts/openReport.js html",
     "runs": "node scripts/openReport.js index",
+    "coverage": "playwright test --list --reporter=./shared/coverageReporter.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

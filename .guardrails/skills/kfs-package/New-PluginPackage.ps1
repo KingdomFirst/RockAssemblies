@@ -53,6 +53,11 @@ $ErrorActionPreference = "Stop"
 . "$PSScriptRoot\PackageCommon.ps1"
 Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
 
+$excludedPlugins = Get-ExcludedPlugins
+if ( $excludedPlugins.ContainsKey( $Plugin ) ) {
+    throw "'$Plugin' is not a KFS plugin: $( $excludedPlugins[ $Plugin ] ) (excluded-plugins.txt)"
+}
+
 $pluginFolder = Join-Path $PackagesRoot $Plugin
 $previous = Get-LatestPackageVersion -PluginFolder $pluginFolder
 $newVersion = ConvertTo-PackageVersion $Version

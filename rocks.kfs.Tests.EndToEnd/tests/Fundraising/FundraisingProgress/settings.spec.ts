@@ -22,7 +22,7 @@ import { expect, test } from "./fundraisingProgress.fixture";
     Not in the manual plan: the show/hide settings and the Excel export that this
     advanced block adds to Rock's core Fundraising Progress block.
 */
-test.describe( "Fundraising Progress: display settings and export", () => {
+test.describe( "KFS Fundraising Progress: display settings and export", () => {
     test( "PageLoad_DisplaySettingsOff_HidesTitleTotalsMemberDetailsAndExport", async ( { page, afp, block } ) => {
         await afp.configure( {
             ShowGroupTitle: "False",

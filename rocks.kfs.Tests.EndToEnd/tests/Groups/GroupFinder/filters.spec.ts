@@ -23,7 +23,7 @@ import { DayOfWeek, TopicKey, expect, test } from "./groupFinder.fixture";
     hidden), aimed at a test group type with four groups whose differences each filter
     should pick out.
 */
-test.describe( "Group Finder: filters", () => {
+test.describe( "Advanced Group Finder: filters", () => {
     test( "PageLoad_AutoLoad_ListsPublicGroupsWithRoom", async ( { page, gf } ) => {
         const block = await gf.open( page );
 

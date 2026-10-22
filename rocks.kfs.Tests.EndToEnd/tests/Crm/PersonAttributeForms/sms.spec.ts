@@ -28,7 +28,7 @@ const testMobileNumber = "6155550187";
     mobile number, with SMS (messaging) enabled or not. Each test starts with the person
     having no mobile number.
 */
-test.describe( "Person Attribute Forms Advanced: SMS checkbox", () => {
+test.describe( "Person Attributes Form Advanced: SMS checkbox", () => {
     test.beforeEach( async ( { pafa } ) => {
         await pafa.configure( { Forms: pafa.buildCustomFormJson( [ { field: PersonFieldType.MobilePhone } ] ) } );
         for ( const phone of await getMobilePhones( pafa ) ) {

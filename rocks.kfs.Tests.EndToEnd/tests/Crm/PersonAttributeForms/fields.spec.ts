@@ -23,7 +23,7 @@ import { expect, test } from "./personAttributeForms.fixture";
     Person workflow entity: Person Field and Person Attribute values are saved, and the
     configured workflow runs.
 */
-test.describe( "Person Attribute Forms Advanced: fields", () => {
+test.describe( "Person Attributes Form Advanced: fields", () => {
     test( "PageLoad_LoggedInPerson_RendersPersonFieldsAndPersonAttribute", async ( { page, pafa, block } ) => {
         await openPageAsPerson( page, pafa.api, { pageId: pafa.blockPage.pageId, personId: pafa.person.id } );
 

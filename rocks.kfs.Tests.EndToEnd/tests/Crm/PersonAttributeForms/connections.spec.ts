@@ -25,7 +25,7 @@ import { expect, test } from "./personAttributeForms.fixture";
     from OpportunityId and launching the Connection Request workflow with either the new
     request or an existing one passed as ConnectionRequestId.
 */
-test.describe( "Person Attribute Forms Advanced: connections", () => {
+test.describe( "Person Attributes Form Advanced: connections", () => {
     test( "Submit_OpportunityId_CreatesConnectionRequestInDefaultStatus", async ( { page, pafa, block } ) => {
         await pafa.configure( { AllowConnectionOpportunity: "True" } );
 

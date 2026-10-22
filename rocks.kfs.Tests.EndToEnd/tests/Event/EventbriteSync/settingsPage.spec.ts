@@ -26,7 +26,7 @@ test.use( { trace: "off" } );
     shows in "Linked Groups". The test page holds the settings block as installed on the
     site, pointed at the test group type and parent group.
 */
-test.describe( "Eventbrite Sync: settings page", () => {
+test.describe( "Eventbrite: settings page", () => {
     test( "PageLoad_TokenAndOrganizationSet_ShowsAuthenticatedWithLinkedGroupsAndEvents", async ( { page, eb } ) => {
         const block = await eb.openSettings( page );
 

@@ -20,7 +20,7 @@ import { DayOfWeek, expect, test } from "./groupFinder.fixture";
     Beyond page 800's configuration: block settings the KFS version adds or changes
     (README "Summary"), each switched on for one test.
 */
-test.describe( "Group Finder: settings", () => {
+test.describe( "Advanced Group Finder: settings", () => {
     test( "ShowAllGroups_On_ListsNonPublicGroup", async ( { page, gf } ) => {
         await gf.configure( { ShowAllGroups: "True" } );
 

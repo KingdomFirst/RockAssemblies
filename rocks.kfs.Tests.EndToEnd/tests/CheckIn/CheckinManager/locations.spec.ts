@@ -22,7 +22,7 @@ import { expect, openManagerPage, test } from "./checkinManager.fixture";
     with Move, Checkout, Delete and View Labels. Each test starts with the test child
     checked into the test room (see resetState in the fixture).
 */
-test.describe( "Advanced Check-in Manager: Room", () => {
+test.describe( "Advanced Check-in Monitor: Room", () => {
     test( "Navigate_AreaGroupRoom_ListsCheckedInPersonWithActions", async ( { page, checkinManager, block } ) => {
         await openManagerPage( page, checkinManager );
         await block.navigate( CheckinName.area, CheckinName.group, CheckinName.room );

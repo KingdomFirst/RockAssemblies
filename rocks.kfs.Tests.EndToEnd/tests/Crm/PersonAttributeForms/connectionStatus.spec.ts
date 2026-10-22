@@ -34,7 +34,7 @@ import { PersonFieldType, expect, test } from "./personAttributeForms.fixture";
 
     Reason: The fallback is unreachable through the UI; test what users can actually do.
 */
-test.describe( "Person Attribute Forms Advanced: Connection Status field", () => {
+test.describe( "Person Attributes Form Advanced: Connection Status field", () => {
     test.beforeEach( async ( { pafa } ) => {
         await pafa.configure( { Forms: pafa.buildCustomFormJson( [ { field: PersonFieldType.ConnectionStatus } ] ) } );
         await setConnectionStatus( pafa, SystemGuid.DefinedValue.ConnectionStatusAttendee );

@@ -23,7 +23,7 @@ import { expect, openManagerPage, test } from "./checkinManager.fixture";
     room and saving), Move All, and View Labels. Each test starts with the test child
     checked into the test room.
 */
-test.describe( "Advanced Check-in Manager: Move and labels", () => {
+test.describe( "Advanced Check-in Monitor: Move and labels", () => {
     test( "Move_PersonToAnotherRoom_EndsOldAttendanceAndChecksIntoNewRoom", async ( { page, checkinManager, block, resetState: attendanceId } ) => {
         const { api, setup, familyChild, moveRoomId } = checkinManager;
 

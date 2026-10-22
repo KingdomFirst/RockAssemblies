@@ -23,7 +23,7 @@ import { expect, test } from "./attendedCheckin.fixture";
     workflow activities), and the row Edit and Delete buttons work. The test kiosk has no
     printer and the test area has no labels, so nothing is ever sent to a printer.
 */
-test.describe( "Attended Check-in: Confirm", () => {
+test.describe( "Attended Checkin: Confirm", () => {
     test.beforeEach( async ( { checkin, checkinPages } ) => {
         await checkinPages.startCheckin( { kioskId: checkin.setup.kioskId, areaId: checkin.setup.areaId } );
         await checkinPages.searchForFamily( CheckinFamily.lastName );

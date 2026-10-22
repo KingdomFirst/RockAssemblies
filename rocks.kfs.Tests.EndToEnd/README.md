@@ -70,7 +70,7 @@ Fill in `.env`:
 > **Only point this at a beta/test site.** The suite creates and deletes data. `.env` is
 > git-ignored; never commit a real key.
 
-The plugin under test must be installed on the site. For Person Attribute Forms Advanced, that
+The plugin under test must be installed on the site. For Person Attributes Form Advanced, that
 means `~/Plugins/rocks_kfs/Crm/PersonAttributeForms.ascx` must be deployed and registered.
 
 ## Running
@@ -84,6 +84,7 @@ npm run test:headed                        # watch it in a browser window
 npm run summary                            # open the last run's summary
 npm run report                             # open the last run's Playwright HTML report
 npm run runs                               # open the list of every kept run
+npm run coverage                           # regenerate TEST-COVERAGE.md (runs no tests)
 ```
 
 `npm run summary -- <run id>` and `npm run report -- <run id>` open an earlier run.
@@ -120,6 +121,24 @@ Results in the summary:
 `playwright.config.ts`, and the run then leaves no report. If you need a different console
 reporter, keep the others: `npx playwright test --reporter=line,json,html,./shared/summaryReporter.ts`
 (the JSON and HTML reporters then write to Playwright's default locations, not the run folder).
+
+### Coverage document
+
+[`TEST-COVERAGE.md`](TEST-COVERAGE.md) says in plain language what the tests check for each
+KFS plugin, what they do not, known plugin bugs and manual checks. It is for people who will
+not read test code. `npm run coverage` regenerates it without running anything:
+
+- The list of tests comes from the suite itself (`playwright test --list`), so it cannot drift.
+  Each test name, `Action_Scenario_ExpectedResult`, becomes a sentence: *Keeps existing status
+  (submit, connection status left blank)*.
+- What each plugin does, what is not covered, known issues and manual steps come from
+  `shared/coverageNotes.ts`. Keep those current.
+- The compile column comes from the newest compatibility preflight report on this machine
+  (`rocks.kfs.Tests.Compile/results`). Run the preflight first if it is missing or old.
+
+The file has no dates, so it only changes when coverage does. Regenerate and commit it with
+any change to the tests or the notes. The generator lists any problems at the end of the
+file and in the console (a plugin with no notes, a name that is not a current plugin).
 
 ### Known issues
 
@@ -160,6 +179,9 @@ rocks.kfs.Tests.EndToEnd/
     systemGuids.ts            # Rock system Guids / type names used by tests
     runDirectory.ts           # the run's folder under test-results/runs
     summaryReporter.ts        # writes summary.html/.md/.json and test-results/index.html
+    plugins.ts                # test folder -> plugin (Rock Packages name), for reports
+    coverageReporter.ts       # npm run coverage: writes TEST-COVERAGE.md
+    coverageNotes.ts          # per-plugin notes for TEST-COVERAGE.md (what it does, not covered)
     releaseScreenshot.ts      # RockShop screenshots, when RELEASE_SCREENSHOTS_DIR is set
     testData/                 # like Rock.Tests.Integration/TestData: builders + cleanup
       cms.ts people.ts groups.ts connections.ts workflows.ts attributes.ts checkin.ts signatures.ts
@@ -172,7 +194,7 @@ rocks.kfs.Tests.EndToEnd/
       *.spec.ts               # the tests
 ```
 
-## Person Attribute Forms Advanced
+## Person Attributes Form Advanced
 
 `tests/Crm/PersonAttributeForms/`: 50 tests.
 
@@ -247,7 +269,7 @@ block's own `FieldVisibilityWrapper` (end of `PersonAttributeForms.ascx.cs`) and
 Not covered: the Prospect fallback for a blank Connection Status. The block never records a blank
 person field, so the fallback cannot be reached from the form (see `connectionStatus.spec.ts`).
 
-## Attended Check-in
+## Attended Checkin
 
 `tests/CheckIn/AttendedCheckin/`: 21 tests, run against the plugin's own pages
 (`/attendedcheckin/admin`, `/search`, `/family`, `/confirm`, `/activity`) on the site under test.
@@ -292,10 +314,9 @@ route, even `/login`, returns 404 while `/page/{id}` works, recycle the app pool
 Not covered yet: label printing (needs a printer), changing a person's group, room or schedule
 on Activity Select, the Override button, the keypad, and geolocation kiosk matching.
 
-## Advanced Check-in Manager
+## Advanced Check-in Monitor
 
-`tests/CheckIn/CheckinManager/`: 22 tests for the *KFS > Check-in > Manager > Locations* block
-(RockShop: Advanced Check-in Monitor).
+`tests/CheckIn/CheckinManager/`: 22 tests for the *KFS > Check-in > Manager > Locations* block.
 
 **Setup the fixture does each run**, matching the manual plan's first step: it copies Rock's
 Check-in Manager *Live Metrics* page (same parent, layout and other blocks, hidden from
@@ -430,7 +451,7 @@ on **Personal Note** and on **Group Member Note**. The fixture checks for both r
 | Type a note, Save Note; note saved, workflow ran | `groupMemberMode › SaveNote_GroupMemberWorkflowEntity_SavesNoteAndLaunchesWorkflowForGroupMember`, `SaveNote_SetStatusActiveWorkflow_ActivatesPendingMember` (uses the beta site's *Group Member - Set Status Active*; skipped if absent) |
 | *(beyond the manual plan)* | `personMode › SaveNote_NoteWorkflowEntity_LaunchesWorkflowForNote` |
 
-## Advanced Fundraising Progress
+## KFS Fundraising Progress
 
 `tests/Fundraising/FundraisingProgress/`: 8 tests for the *Fundraising Progress* block
 (KFS > Fundraising).
@@ -494,7 +515,7 @@ went to, the subject, the greeting, the group, the gift amount and the delivery 
 
 No security setup is needed: nothing is opened in a browser.
 
-## Eventbrite Sync
+## Eventbrite
 
 `tests/Event/EventbriteSync/`: 5 tests for the *Eventbrite Settings* and *Eventbrite Sync
 Button* blocks and the plugin's two field types. They call the live Eventbrite API through the
@@ -785,7 +806,13 @@ No security setup is needed.
 Never add tests for anything under a `ZZZ_Archive` folder (in `KFSRockAssemblies` or
 `KFSRockBlocks`). Those plugins are retired and obsolete by KFS practice.
 
-1. Create `tests/{Domain}/{Plugin}/` using the Rock domain the plugin belongs to.
+1. Create `tests/{Domain}/{Plugin}/` using the Rock domain the plugin belongs to, and map
+   that folder to the plugin's Rock Packages folder name in `shared/plugins.ts`. Title each
+   suite `"<package name>: <area>"`, and use the package name for this README's section. The
+   reports group by that name, as the compatibility preflight does; a run warns about a
+   folder missing from `plugins.ts` or a name that is not a current KFS plugin. Plugins listed
+   in `.guardrails/skills/kfs-package/excluded-plugins.txt` are not ours: never add tests for
+   them.
 2. Write a fixture that builds everything the tests need through `shared/testData` (add
    builders there when a new entity type is needed), and tears it down in `finally`.
    Name everything with `TestNamePrefix`, and delete leftovers by name before creating.
@@ -796,6 +823,8 @@ Never add tests for anything under a `ZZZ_Archive` folder (in `KFSRockAssemblies
 3. Write a page object that selects controls by server ID suffix (`[id$='_tbEmail']`), which
    stays stable across Rock versions.
 4. Turn each step of the manual test plan into a test, and record the mapping in this README.
+5. Add the plugin's entry to `shared/coverageNotes.ts` (what it does, what is not covered),
+   then run `npm run coverage` and commit `TEST-COVERAGE.md`.
 
 ## Test rules
 

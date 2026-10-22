@@ -22,7 +22,7 @@ or propose tests for them.
 |---|---|---|
 | Compile | `/kfs-build` | All 37 plugin projects |
 | Compile preflight | `/kfs-compat-preflight` | Every KFS DLL project and WebForms block, compiled against a Rock clone. Catches removed or changed Rock APIs, not behavior. |
-| End-to-end | `/kfs-compat-test` (needs a test site and `.env`) | Plugins listed in `rocks.kfs.Tests.EndToEnd/README.md`. Currently Person Attribute Forms Advanced only. |
+| End-to-end | `/kfs-compat-test` (needs a test site and `.env`) | Plugins listed in `rocks.kfs.Tests.EndToEnd/README.md` (13, named by their RockShop packages; `shared/plugins.ts`). |
 | TypeScript lint | `cd KFSRockAssemblies/rocks.kfs.JavaScript.Obsidian && npm run lint` | `.ts` under `src` only — **not** `.obs` |
 | Jest | `npm test` in the same project | **Zero test files.** `tests/blocks.ts` and `tests/utils.ts` are helpers for tests nobody has written. A green run means nothing. |
 

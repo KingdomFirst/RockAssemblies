@@ -17,44 +17,62 @@
 
 <#
 .SYNOPSIS
-    Compatibility preflight: compiles every KFS plugin against a Rock clone's assemblies.
+    Compatibility preflight: compiles every active KFS plugin against a Rock clone's assemblies,
+    and reports the results by plugin.
 
 .DESCRIPTION
-    Finds code that no longer compiles against a new Rock version, across all plugins at once,
-    without a running site or database:
+    Finds code that no longer compiles against a new Rock version, for all active plugins at
+    once, without a running site or database.
 
-      1. Junctions  - runs CreateLinks.bat only if the KFS junctions are missing.
-      2. Plugin DLLs - builds every project in KFSRock.sln.kfs from each source ($sources:
-                       KFSRockAssemblies and the Attended Check-in fork, RockAttendedCheckin)
-                       against RockWeb\Bin (their post-build step copies the DLLs into RockWeb\Bin).
-      3. Blocks     - precompiles every WebForms block in each source's tree (rocks_kfs and
-                      cc_newspring) with aspnet_compiler, the same compiler IIS uses on first
-                      page load.
+    A plugin is a RockShop package in the shared Rock Packages folder; its code is what its
+    newest package ships (PluginCatalog.ps1). A plugin is active when it ships code from our
+    repos: DLLs built by KFSRockAssemblies or RockAttendedCheckin projects, and WebForms
+    pages (.ascx/.aspx/.ashx) under Plugins\rocks_kfs or Plugins\cc_newspring. Code that no
+    package ships is not tested; the report lists those plugins that are not tested and why.
 
-    The report's Coverage table gives DLL and block counts per source. A source that contributes
-    no DLL project or no blocks stops the run (exit 2) instead of being skipped silently.
+      1. Junctions   - runs CreateLinks.bat only if the KFS junctions are missing.
+      2. Plugin DLLs - builds each active plugin's projects against RockWeb\Bin (their
+                       post-build step copies the DLLs into RockWeb\Bin).
+      3. Pages       - precompiles each active plugin's pages with aspnet_compiler, the same
+                       compiler IIS uses on first page load.
 
-    aspnet_compiler stops at the first failing file, so failing blocks are set aside and the
+    aspnet_compiler stops at the first failing file, so failing pages are set aside and the
     compile is repeated until what remains is clean. Every failure is recorded.
 
     Also reports calls to Rock APIs marked [Obsolete] (CS0618/CS0612): those are the breaks
     coming in a future Rock version.
 
-    Exit code: 0 = everything compiles, 1 = compile errors found, 2 = environment problem.
+    Exit code: 0 = every plugin compiles, 1 = compile errors found, 2 = environment problem.
 
 .PARAMETER RockRoot
     The Rock clone to test against (e.g. C:\KFSRepo\Rock\Rock20). Defaults to the current
     directory. Rock core must already be built into RockWeb\Bin.
 
+.PARAMETER RockPackagesRoot
+    The shared Rock Packages folder, which defines the plugins (read only).
+
+.PARAMETER Plugin
+    Test only these plugins (Rock Packages folder names, with or without "(Unreleased)").
+    Default: every active plugin.
+
+.PARAMETER ListPlugins
+    List the plugins and the code each one ships, then stop. Builds and compiles nothing.
+
 .PARAMETER SkipBuild
-    Skip building the plugin DLLs (reuse whatever rocks.kfs.*.dll are already in RockWeb\Bin).
+    Skip building the plugin DLLs (reuse whatever DLLs are already in RockWeb\Bin).
 
 .EXAMPLE
     .\Invoke-CompatPreflight.ps1 -RockRoot C:\KFSRepo\Rock\Rock20
+
+.EXAMPLE
+    .\Invoke-CompatPreflight.ps1 -RockRoot C:\KFSRepo\Rock\Rock20 -Plugin "Steps to Care", "Eventbrite"
 #>
 [CmdletBinding()]
 param(
     [string] $RockRoot = ( Get-Location ).Path,
+    [string] $RockPackagesRoot = ( Join-Path $env:USERPROFILE "OneDrive - Kingdom First Solutions Inc\Shared Documents - Kingdom First Solutions Inc. Team Site\Rock Packages" ),
+    [string[]] $Plugin,
+    [switch] $ListPlugins,
     [switch] $SkipBuild
 )
 
@@ -71,22 +89,19 @@ function Exit-Environment( [string] $message ) {
     exit 2
 }
 
-# The code this preflight covers. Every source must contribute DLL projects and blocks; one that
-# silently drops out (e.g. removed from KFSRock.sln.kfs, or a missing junction) stops the run.
-$sources = @(
-    [pscustomobject]@{ Name = "KFS plugins"; Repo = "KFSRockAssemblies, KFSRockBlocks"; ProjectRoot = "KFSRockAssemblies"; BlockRoot = "rocks_kfs" },
-    [pscustomobject]@{ Name = "Attended Check-in"; Repo = "rock-attended-checkin (NewSpring fork)"; ProjectRoot = "RockAttendedCheckin"; BlockRoot = "cc_newspring" }
-)
+. ( Join-Path $PSScriptRoot "PluginCatalog.ps1" )
 
-# Project paths are relative to the Rock clone, e.g. "RockAttendedCheckin\cc.newspring.AttendedCheckIn.csproj".
-function Get-ProjectSource( [string] $project ) {
-    return ( $sources | Where-Object { $project.StartsWith( $_.ProjectRoot + "\", "OrdinalIgnoreCase" ) } | Select-Object -First 1 ).Name
-}
-
-# Block paths are relative to the staged app, e.g. "Plugins\cc_newspring\AttendedCheckin\Admin.ascx".
-function Get-BlockSource( [string] $block ) {
-    $relative = $block -replace '^Plugins\\', ''
-    return ( $sources | Where-Object { $relative.StartsWith( $_.BlockRoot + "\", "OrdinalIgnoreCase" ) } | Select-Object -First 1 ).Name
+# The repo a project or page comes from. Project paths are relative to the Rock clone
+# ("RockAttendedCheckin\cc.newspring.AttendedCheckIn.csproj"); page paths to RockWeb
+# ("Plugins\cc_newspring\AttendedCheckin\Admin.ascx").
+function Get-CodeRepo( [string] $path ) {
+    if ( $path -match '^(RockAttendedCheckin|Plugins\\cc_newspring)\\' ) {
+        return "rock-attended-checkin"
+    }
+    if ( $path -match '^Plugins\\' ) {
+        return "KFSRockBlocks"
+    }
+    return "KFSRockAssemblies"
 }
 
 #region Validate the Rock clone
@@ -146,6 +161,52 @@ else {
         Exit-Environment "Junctions still missing after CreateLinks.bat: $( $stillMissing -join ', ' )"
     }
 }
+
+#endregion
+
+#region Plugins
+
+Write-Step "Plugins"
+
+if ( -not ( Test-Path $RockPackagesRoot ) ) {
+    Exit-Environment "Rock Packages folder not found: $RockPackagesRoot. It defines the plugins; pass -RockPackagesRoot."
+}
+
+$catalog = @( Get-PluginCatalog -RockRoot $RockRoot -PackagesRoot $RockPackagesRoot )
+
+if ( $Plugin ) {
+    $unknown = @( $Plugin | Where-Object { $name = $_; -not ( $catalog | Where-Object { $_.Name -eq $name -or $_.Folder -eq $name } ) } )
+    if ( $unknown.Count -gt 0 ) {
+        Exit-Environment "Unknown plugin(s): $( $unknown -join ', ' ). Plugins: $( ( $catalog | ForEach-Object { $_.Name } ) -join ', ' )"
+    }
+    $catalog = @( $catalog | Where-Object { $_.Name -in $Plugin -or $_.Folder -in $Plugin } )
+}
+
+$activePlugins = @( $catalog | Where-Object { $_.Status -eq "Active" } )
+$untestedPlugins = @( $catalog | Where-Object { $_.Status -ne "Active" } )
+
+foreach ( $entry in $catalog ) {
+    $label = if ( $entry.Unreleased ) { "$( $entry.Name ) (unreleased)" } else { $entry.Name }
+    Write-Host ( "   {0,-13} {1,-38} {2,-10} {3} DLL project(s), {4} page(s)" -f $entry.Status, $label, $entry.Version, $entry.Projects.Count, $entry.Pages.Count )
+    if ( $ListPlugins ) {
+        $entry.Projects | ForEach-Object { Write-Host "                   project  $_" }
+        $entry.Pages | ForEach-Object { Write-Host "                   page     $_" }
+        $entry.Missing | ForEach-Object { Write-Host "                   missing  $_" -ForegroundColor Yellow }
+    }
+}
+
+if ( $ListPlugins ) {
+    exit 0
+}
+
+if ( $activePlugins.Count -eq 0 ) {
+    Exit-Environment "No active plugins to test (none of the selected packages ships code from our repos)."
+}
+
+# The code under test: every project and page an active plugin ships, each tested once.
+$projects = @( $activePlugins | ForEach-Object { $_.Projects } | Sort-Object -Unique )
+$pages = @( $activePlugins | ForEach-Object { $_.Pages } | Sort-Object -Unique )
+Write-Host "Testing $( $activePlugins.Count ) active plugin(s): $( $projects.Count ) DLL project(s), $( $pages.Count ) page(s)."
 
 #endregion
 
@@ -316,22 +377,8 @@ else {
         Exit-Environment "MSBuild not found through vswhere."
     }
 
-    # The solution template lists the active KFS projects (archived ones are excluded from it).
-    $template = Join-Path $RockRoot "KFSRockAssemblies\KFSRock.sln.kfs"
-    # Anything under a ZZZ_Archive folder is retired by KFS practice and never tested.
-    $projectRoots = ( $sources | ForEach-Object { [regex]::Escape( $_.ProjectRoot ) } ) -join "|"
-    $projects = @( [regex]::Matches( ( Get-Content $template -Raw ), "`"((?:$projectRoots)\\[^`"]+\.csproj)`"" ) |
-        ForEach-Object { $_.Groups[ 1 ].Value } |
-        Where-Object { $_ -notmatch '\\ZZZ_Archive\\' } |
-        Sort-Object -Unique )
-
-    foreach ( $source in $sources ) {
-        if ( -not ( $projects | Where-Object { ( Get-ProjectSource $_ ) -eq $source.Name } ) ) {
-            Exit-Environment "KFSRock.sln.kfs lists no $( $source.Name ) project under $( $source.ProjectRoot )\. The preflight would silently skip it."
-        }
-    }
-
-    Write-Host "Building $( $projects.Count ) projects from KFSRock.sln.kfs with $msbuild"
+    # $projects: the active plugins' projects (see Plugins). Archived projects never appear there.
+    Write-Host "Building $( $projects.Count ) projects with $msbuild"
 
     foreach ( $project in $projects ) {
         $projectPath = Join-Path $RockRoot $project
@@ -350,7 +397,7 @@ else {
             ForEach-Object { ( $_.Groups[ 'text' ].Value -replace '\s*\[[^\]]+\.csproj\]\s*$', '' ).Replace( "$RockRoot\", "" ).Trim() } |
             Sort-Object -Unique )
 
-        $dllResults += [pscustomobject]@{ Project = $name; Source = ( Get-ProjectSource $project ); Succeeded = $succeeded; Errors = $errors }
+        $dllResults += [pscustomobject]@{ Project = $name; Path = $project; Repo = ( Get-CodeRepo $project ); Succeeded = $succeeded; Errors = $errors }
 
         if ( $succeeded ) {
             Write-Host ( "   ok     {0}" -f $name )
@@ -374,31 +421,31 @@ foreach ( $conflict in $dependencyConflicts ) {
 
 #region 3. Blocks
 
-Write-Step "Blocks"
+Write-Step "Pages"
 
 $aspnetCompiler = Join-Path $env:WINDIR "Microsoft.NET\Framework64\v4.0.30319\aspnet_compiler.exe"
 if ( -not ( Test-Path $aspnetCompiler ) ) {
     Exit-Environment "aspnet_compiler.exe not found at $aspnetCompiler (.NET Framework 4.x is required)."
 }
 
-# Blocks: each source's block tree, minus archived code and built Obsidian output.
-foreach ( $source in $sources ) {
-    robocopy ( Join-Path $rockWeb "Plugins\$( $source.BlockRoot )" ) ( Join-Path $app "Plugins\$( $source.BlockRoot )" ) *.ascx *.ascx.cs *.cs *.lava /S /XD ZZZ_Archive .git Obsidian node_modules /NFL /NDL /NJH /NJS /NP | Out-Null
-}
-
-$allBlocks = @( Get-ChildItem -Recurse ( Join-Path $app "Plugins" ) -Filter *.ascx | ForEach-Object { $_.FullName.Substring( $app.Length + 1 ) } )
-
-foreach ( $source in $sources ) {
-    if ( -not ( $allBlocks | Where-Object { ( Get-BlockSource $_ ) -eq $source.Name } ) ) {
-        Exit-Environment "No $( $source.Name ) blocks found under RockWeb\Plugins\$( $source.BlockRoot ). The preflight would silently skip them."
+# Stage only the active plugins' pages (blocks, .aspx pages, .ashx handlers) and their code-behind.
+foreach ( $page in $pages ) {
+    $destination = Join-Path $app $page
+    New-Item -ItemType Directory -Force ( Split-Path $destination -Parent ) | Out-Null
+    Copy-Item ( Join-Path $rockWeb $page ) $destination
+    if ( Test-Path ( Join-Path $rockWeb "$page.cs" ) ) {
+        Copy-Item ( Join-Path $rockWeb "$page.cs" ) "$destination.cs"
     }
 }
 
-Write-Host "Compiling $( $allBlocks.Count ) blocks ($( ( $sources | ForEach-Object { $name = $_.Name; '{0}: {1}' -f $name, @( $allBlocks | Where-Object { ( Get-BlockSource $_ ) -eq $name } ).Count } ) -join ', ' ))"
+# Page paths relative to the staged app, e.g. "Plugins\rocks_kfs\Crm\PersonAttributeForms.ascx".
+$allBlocks = $pages
+
+Write-Host "Compiling $( $allBlocks.Count ) pages"
 
 $blockErrors = @{}
 $obsoleteUsages = @{}
-$errorPattern = '(?m)^(?<file>[A-Za-z]:\\[^\r\n(]+?\.(?:ascx|ascx\.cs|cs))\((?<line>\d+)\): (?<kind>error|warning) (?<code>\w+): (?<msg>[^\r\n]+)'
+$errorPattern = '(?m)^(?<file>[A-Za-z]:\\[^\r\n(]+?\.(?:(?:ascx|aspx|ashx)(?:\.cs)?|cs))\((?<line>\d+)\): (?<kind>error|warning) (?<code>\w+): (?<msg>[^\r\n]+)'
 
 for ( $pass = 1; $pass -le $allBlocks.Count + 1; $pass++ ) {
     $output = & $aspnetCompiler -v "/kfscheck$pass" -p $app 2>&1 | Out-String
@@ -456,30 +503,91 @@ for ( $pass = 1; $pass -le $allBlocks.Count + 1; $pass++ ) {
 
 #region Report
 
-# A block whose errors are all "type or namespace not found" for a KFS assembly is blocked by a DLL build failure, not broken itself.
+# A page whose errors are all "type or namespace not found" for a KFS assembly is blocked by a DLL build failure, not broken itself.
 $failedDllNames = @( $dllResults | Where-Object { -not $_.Succeeded } | ForEach-Object { $_.Project } )
 $kfsNamespacePattern = 'rocks\.kfs|''rocks''|EventbriteDotNetFramework|ZoomDotNetFramework|VimeoDotNet|cc\.newspring'
 
-$brokenBlocks = @()
-$blockedBlocks = @()
-foreach ( $block in ( $blockErrors.Keys | Sort-Object ) ) {
-    $errors = $blockErrors[ $block ]
+# Every page's result, keyed by its path relative to RockWeb ("Plugins\...").
+$pageResults = @{}
+foreach ( $page in $allBlocks ) {
+    $errors = if ( $blockErrors.ContainsKey( $page ) ) { @( $blockErrors[ $page ] ) } else { @() }
     $missingKfsTypes = @( $errors | Where-Object { $_ -match '(CS0246|CS0234|CS0103)' -and $_ -match $kfsNamespacePattern } )
-    $record = [pscustomobject]@{ Block = $block.Replace( "Plugins\", "" ); Source = ( Get-BlockSource $block ); Errors = $errors }
-
-    if ( $failedDllNames.Count -gt 0 -and $missingKfsTypes.Count -gt 0 ) {
-        $blockedBlocks += $record
-    }
-    else {
-        $brokenBlocks += $record
-    }
+    $result = if ( $errors.Count -eq 0 ) { "compiles" }
+        elseif ( $failedDllNames.Count -gt 0 -and $missingKfsTypes.Count -gt 0 ) { "not checked" }
+        else { "broken" }
+    $pageResults[ $page ] = [pscustomobject]@{ Page = $page; Repo = ( Get-CodeRepo $page ); Result = $result; Errors = $errors }
 }
 
-$cleanCount = $allBlocks.Count - $blockErrors.Count
+# Obsolete-API warnings, by page ("Plugins\...\X.ascx.cs(12): CS0618 ..." -> "Plugins\...\X.ascx").
+$obsoleteByPage = @{}
+foreach ( $usage in $obsoleteUsages.Keys ) {
+    $page = ( $usage -replace '\(\d+\):.*$', '' ) -replace '\.cs$', ''
+    if ( -not $obsoleteByPage.ContainsKey( $page ) ) {
+        $obsoleteByPage[ $page ] = @()
+    }
+    $obsoleteByPage[ $page ] += $usage
+}
+
+function Get-ObsoleteApiGroups( [string[]] $usages ) {
+    return @( $usages | ForEach-Object {
+        $api = if ( $_ -match "'(?<api>[^']+)' is obsolete" ) { $Matches.api } else { "(unparsed)" }
+        $note = if ( $_ -match "is obsolete: '(?<note>[^']*)'" ) { $Matches.note } else { "" }
+        [pscustomobject]@{ Api = $api; Note = $note; Page = ( ( $_ -replace '\(\d+\):.*$', '' ) -replace '\.cs$', '' ) }
+    } | Group-Object Api | Sort-Object Count -Descending )
+}
+
+$icon = @{
+    Pass       = [char]::ConvertFromUtf32( 0x2705 )
+    Fail       = [char]::ConvertFromUtf32( 0x274C )
+    Incomplete = [char]::ConvertFromUtf32( 0x26A0 )
+}
+
+# Each active plugin's result, from its own projects and pages.
+$pluginResults = @( foreach ( $entry in $activePlugins ) {
+    $dlls = @( $entry.Projects | ForEach-Object {
+        $path = $_
+        $dllResults | Where-Object { $_.Path -eq $path } | Select-Object -First 1
+    } | Where-Object { $_ } )
+    $pluginPages = @( $entry.Pages | ForEach-Object { $pageResults[ $_ ] } )
+    $obsolete = @( $entry.Pages | ForEach-Object { if ( $obsoleteByPage.ContainsKey( $_ ) ) { $obsoleteByPage[ $_ ] } } )
+    $projectNames = @( $entry.Projects | ForEach-Object { [IO.Path]::GetFileNameWithoutExtension( $_ ) } )
+    $conflicts = @( $dependencyConflicts | Where-Object { @( $_.CopiedBy | Where-Object { $_ -in $projectNames } ).Count -gt 0 } )
+
+    $failedDllCount = @( $dlls | Where-Object { -not $_.Succeeded } ).Count
+    $brokenPageCount = @( $pluginPages | Where-Object { $_.Result -eq "broken" } ).Count
+    $uncheckedPageCount = @( $pluginPages | Where-Object { $_.Result -eq "not checked" } ).Count
+
+    $result = if ( $failedDllCount + $brokenPageCount + $conflicts.Count -gt 0 ) { "Fail" }
+        elseif ( $uncheckedPageCount -gt 0 ) { "Incomplete" }
+        else { "Pass" }
+
+    $notes = @()
+    if ( $entry.Unreleased ) { $notes += "unreleased" }
+    if ( $failedDllCount ) { $notes += "$failedDllCount DLL(s) do not build" }
+    if ( $brokenPageCount ) { $notes += "$brokenPageCount page(s) broken" }
+    if ( $uncheckedPageCount ) { $notes += "$uncheckedPageCount page(s) not checked" }
+    if ( $conflicts.Count ) { $notes += "overwrites $( $conflicts.Count ) Rock dependency(ies)" }
+    if ( $entry.Missing.Count ) { $notes += "$( $entry.Missing.Count ) shipped file(s) not on this branch" }
+    if ( $entry.Obsidian.Count ) { $notes += "Obsidian files not compiled" }
+
+    [pscustomobject]@{
+        Plugin = $entry.Name; Folder = $entry.Folder; Version = $entry.Version; Unreleased = $entry.Unreleased
+        Result = $result; Notes = $notes
+        Dlls = $dlls; Pages = $pluginPages; Obsolete = $obsolete; Conflicts = $conflicts
+        Missing = $entry.Missing; Obsidian = $entry.Obsidian; Dependencies = $entry.Dependencies
+    }
+} )
+
+$passing = @( $pluginResults | Where-Object { $_.Result -eq "Pass" } ).Count
+$failing = @( $pluginResults | Where-Object { $_.Result -eq "Fail" } ).Count
+$incomplete = @( $pluginResults | Where-Object { $_.Result -eq "Incomplete" } ).Count
 $failedDlls = @( $dllResults | Where-Object { -not $_.Succeeded } )
+$cleanCount = @( $pageResults.Values | Where-Object { $_.Result -eq "compiles" } ).Count
 
 $resultsDir = Join-Path $PSScriptRoot ( "results\" + $versionLabel )
 New-Item -ItemType Directory -Force $resultsDir | Out-Null
+
+$scope = if ( $Plugin ) { "selected plugins: $( $Plugin -join ', ' )" } else { "every plugin in Rock Packages" }
 
 $lines = @()
 $lines += "# KFS compatibility preflight"
@@ -487,170 +595,164 @@ $lines += ""
 $lines += "- Rock clone: ``$RockRoot``"
 $lines += "- Rock.dll: $rockVersion"
 $lines += "- Run: $( $started.ToString( 's' ) ), $( [int]( ( Get-Date ) - $started ).TotalSeconds ) s"
+$lines += "- Scope: $scope (plugins are defined by their packages in ``$RockPackagesRoot``)"
 $lines += ""
 $lines += "| Check | Result |"
 $lines += "|---|---|"
+$lines += "| Plugins | $passing of $( $pluginResults.Count ) active plugins pass; $failing fail; $incomplete incomplete; $( $untestedPlugins.Count ) not tested |"
 if ( $SkipBuild ) {
     $lines += "| Plugin DLLs | skipped |"
 }
 else {
     $lines += "| Plugin DLLs | $( $dllResults.Count - $failedDlls.Count ) of $( $dllResults.Count ) build |"
 }
-$lines += "| Blocks | $cleanCount of $( $allBlocks.Count ) compile; $( $brokenBlocks.Count ) broken; $( $blockedBlocks.Count ) blocked by a failed DLL |"
+$lines += "| Pages | $cleanCount of $( $allBlocks.Count ) compile |"
 $lines += "| Rock dependencies overwritten by a plugin | $( $dependencyConflicts.Count ) |"
 $lines += "| Obsolete Rock APIs in use | $( $obsoleteUsages.Count ) call sites |"
 
-# Per-source counts, so every repo the preflight covers is visibly accounted for.
-$coverageLines = @()
-$coverageLines += ""
-$coverageLines += "## Coverage"
-$coverageLines += ""
-$coverageLines += "| Source | Repo | Plugin DLLs | Blocks |"
-$coverageLines += "|---|---|---|---|"
-foreach ( $source in $sources ) {
-    $sourceDlls = @( $dllResults | Where-Object { $_.Source -eq $source.Name } )
-    $dllCell = if ( $SkipBuild ) { "skipped" } else { "$( @( $sourceDlls | Where-Object { $_.Succeeded } ).Count ) of $( $sourceDlls.Count ) build" }
-    $sourceBlocks = @( $allBlocks | Where-Object { ( Get-BlockSource $_ ) -eq $source.Name } )
-    $sourceFailed = @( $blockErrors.Keys | Where-Object { ( Get-BlockSource $_ ) -eq $source.Name } )
-    $coverageLines += "| $( $source.Name ) | $( $source.Repo ) | $dllCell | $( $sourceBlocks.Count - $sourceFailed.Count ) of $( $sourceBlocks.Count ) compile |"
+$summaryLines = @()
+$summaryLines += ""
+$summaryLines += "## Results by plugin"
+$summaryLines += ""
+$summaryLines += "| Result | Plugin | Version | DLLs build | Pages compile | Obsolete calls | Notes |"
+$summaryLines += "|---|---|---|---|---|---|---|"
+foreach ( $p in $pluginResults ) {
+    $dllCell = if ( $SkipBuild ) { "skipped" } elseif ( $p.Dlls.Count ) { "$( @( $p.Dlls | Where-Object { $_.Succeeded } ).Count ) of $( $p.Dlls.Count )" } else { "-" }
+    $pageCell = if ( $p.Pages.Count ) { "$( @( $p.Pages | Where-Object { $_.Result -eq 'compiles' } ).Count ) of $( $p.Pages.Count )" } else { "-" }
+    $summaryLines += "| $( $icon[ $p.Result ] ) $( $p.Result ) | [$( $p.Plugin )](#$( ( $p.Plugin.ToLower() -replace '[^a-z0-9 -]', '' ) -replace ' ', '-' )) | $( $p.Version ) | $dllCell | $pageCell | $( $p.Obsolete.Count ) | $( $p.Notes -join '; ' ) |"
 }
-$lines += $coverageLines
+$lines += $summaryLines
 
-if ( $dependencyConflicts.Count -gt 0 ) {
+if ( $untestedPlugins.Count -gt 0 ) {
     $lines += ""
-    $lines += "## Plugin DLLs that overwrite a Rock dependency"
+    $lines += "## Not tested"
     $lines += ""
-    $lines += "A plugin's build copies its own version of a library Rock depends on into RockWeb\Bin. On a site this replaces Rock's copy, and ASP.NET fails to start or load the assembly."
+    $lines += "These packages ship no WebForms or DLL code from our repos, so the preflight has nothing to compile for them."
     $lines += ""
-    $lines += "| DLL | Rock needs | Plugin supplies | Copied by |"
-    $lines += "|---|---|---|---|"
-    foreach ( $conflict in $dependencyConflicts ) {
-        $lines += "| ``$( $conflict.Dll )`` | $( $conflict.RockVersion ) | $( $conflict.FoundVersion ) | $( $conflict.CopiedBy -join ', ' ) |"
-    }
-}
-
-if ( $failedDlls.Count -gt 0 ) {
-    $lines += ""
-    $lines += "## Plugin DLLs that do not build"
-    foreach ( $dll in $failedDlls ) {
-        $lines += ""
-        $lines += "### $( $dll.Project )"
-        $dll.Errors | Select-Object -First 15 | ForEach-Object { $lines += "- ``$_``" }
-        if ( $dll.Errors.Count -gt 15 ) {
-            $lines += "- ... and $( $dll.Errors.Count - 15 ) more"
-        }
-    }
-}
-
-foreach ( $section in @( @{ Title = "Broken blocks"; Items = $brokenBlocks }, @{ Title = "Blocks that could not be checked (depend on a plugin DLL that failed to build)"; Items = $blockedBlocks } ) ) {
-    if ( $section.Items.Count -eq 0 ) {
-        continue
-    }
-    $lines += ""
-    $lines += "## $( $section.Title )"
-    foreach ( $item in $section.Items ) {
-        $lines += ""
-        $lines += "### $( $item.Block )"
-        $item.Errors | ForEach-Object { $lines += "- ``$( $_.Replace( 'Plugins\', '' ) )``" }
-    }
-}
-
-# Every check's own result, so the report records what passed as well as what failed.
-$blockResults = @( $allBlocks | Sort-Object | ForEach-Object {
-    $name = $_.Replace( "Plugins\", "" )
-    $result = if ( $brokenBlocks | Where-Object { $_.Block -eq $name } ) { "broken" }
-        elseif ( $blockedBlocks | Where-Object { $_.Block -eq $name } ) { "not checked (a plugin DLL it needs failed to build)" }
-        else { "compiles" }
-    [pscustomobject]@{ Block = $name; Source = ( Get-BlockSource $_ ); Result = $result }
-} )
-
-$lines += ""
-$lines += "## Results: plugin DLLs"
-$lines += ""
-if ( $SkipBuild ) {
-    $lines += "Not built (-SkipBuild); the DLLs already in RockWeb\Bin were used."
-}
-else {
-    $lines += "| Result | Project | Source |"
+    $lines += "| Plugin | Version | Why |"
     $lines += "|---|---|---|"
-    foreach ( $dll in ( $dllResults | Sort-Object Source, Project ) ) {
-        $result = if ( $dll.Succeeded ) { "$( [char]::ConvertFromUtf32( 0x2705 ) ) builds" } else { "$( [char]::ConvertFromUtf32( 0x274C ) ) does not build ($( @( $dll.Errors ).Count ) errors)" }
-        $lines += "| $result | $( $dll.Project ) | $( $dll.Source ) |"
+    foreach ( $entry in $untestedPlugins ) {
+        $why = switch ( $entry.Status ) {
+            "Obsidian only" { "Ships only built Obsidian files, which this preflight does not compile" }
+            "No KFS code" { "Ships no code from our repos (a vendor plugin)" }
+            default { "No package found in its folder" }
+        }
+        if ( $entry.Missing.Count ) {
+            $missingFiles = ( $entry.Missing | ForEach-Object { ( $_ -split ' \(' )[ 0 ] } ) -join ", "
+            $why += "; not on this branch: $missingFiles"
+        }
+        $lines += "| $( $entry.Name ) | $( $entry.Version ) | $why |"
     }
 }
 
-$lines += ""
-$lines += "## Results: blocks"
-$lines += ""
-$lines += "| Result | Block | Source |"
-$lines += "|---|---|---|"
-foreach ( $block in ( $blockResults | Sort-Object Source, Block ) ) {
-    $icon = switch -Wildcard ( $block.Result ) { "compiles" { [char]::ConvertFromUtf32( 0x2705 ) } "broken" { [char]::ConvertFromUtf32( 0x274C ) } default { [char]::ConvertFromUtf32( 0x26A0 ) } }
-    $lines += "| $icon $( $block.Result ) | $( $block.Block ) | $( $block.Source ) |"
+foreach ( $p in $pluginResults ) {
+    $lines += ""
+    $lines += "## $( $p.Plugin )"
+    $lines += ""
+    $lines += "$( $icon[ $p.Result ] ) **$( $p.Result )**. Package $( $p.Version ) (``$( $p.Folder )``)."
+    $lines += ""
+    $lines += "| Result | Code | Kind | Repo |"
+    $lines += "|---|---|---|---|"
+    foreach ( $dll in $p.Dlls ) {
+        $cell = if ( $dll.Succeeded ) { "$( $icon.Pass ) builds" } else { "$( $icon.Fail ) does not build" }
+        $lines += "| $cell | $( $dll.Project ) | DLL project | $( $dll.Repo ) |"
+    }
+    if ( $SkipBuild -and $p.Dlls.Count -eq 0 -and $activePlugins.Where( { $_.Name -eq $p.Plugin } )[ 0 ].Projects.Count ) {
+        $lines += "| skipped | $( ( $activePlugins.Where( { $_.Name -eq $p.Plugin } )[ 0 ].Projects | ForEach-Object { [IO.Path]::GetFileNameWithoutExtension( $_ ) } ) -join ', ' ) | DLL project | (-SkipBuild) |"
+    }
+    foreach ( $page in $p.Pages ) {
+        $cell = switch ( $page.Result ) { "compiles" { "$( $icon.Pass ) compiles" } "broken" { "$( $icon.Fail ) broken" } default { "$( $icon.Incomplete ) not checked (a DLL it needs failed to build)" } }
+        $kind = switch -Regex ( $page.Page ) { '\.ascx$' { "block" } '\.aspx$' { "page" } default { "handler" } }
+        $lines += "| $cell | $( $page.Page -replace '^Plugins\\', '' ) | $kind | $( $page.Repo ) |"
+    }
+
+    foreach ( $dll in @( $p.Dlls | Where-Object { -not $_.Succeeded } ) ) {
+        $lines += ""
+        $lines += "**$( $dll.Project ) does not build:**"
+        $dll.Errors | Select-Object -First 15 | ForEach-Object { $lines += "- ``$_``" }
+        if ( @( $dll.Errors ).Count -gt 15 ) {
+            $lines += "- ... and $( @( $dll.Errors ).Count - 15 ) more"
+        }
+    }
+    foreach ( $page in @( $p.Pages | Where-Object { $_.Result -ne "compiles" } ) ) {
+        $lines += ""
+        $lines += "**$( $page.Page -replace '^Plugins\\', '' ) ($( $page.Result )):**"
+        $page.Errors | ForEach-Object { $lines += "- ``$( $_ -replace '^Plugins\\', '' )``" }
+    }
+    foreach ( $conflict in $p.Conflicts ) {
+        $lines += ""
+        $lines += "**Overwrites Rock's ``$( $conflict.Dll )``:** Rock needs $( $conflict.RockVersion ), the build copies $( $conflict.FoundVersion ) (by $( $conflict.CopiedBy -join ', ' )). On a site this replaces Rock's copy."
+    }
+    if ( $p.Missing.Count ) {
+        $lines += ""
+        $lines += "Shipped by the package but not on this branch (not tested):"
+        $p.Missing | ForEach-Object { $lines += "- ``$_``" }
+    }
+    if ( $p.Obsidian.Count ) {
+        $lines += ""
+        $lines += "Obsidian files the package ships (not compiled by the preflight): $( ( $p.Obsidian | ForEach-Object { Split-Path $_ -Leaf } ) -join ', ' )"
+    }
+    if ( $p.Obsolete.Count ) {
+        $lines += ""
+        $lines += "Obsolete Rock APIs used ($( $p.Obsolete.Count ) call sites):"
+        foreach ( $group in Get-ObsoleteApiGroups $p.Obsolete ) {
+            $lines += "- ``$( $group.Name )`` x$( $group.Count ): $( $group.Group[ 0 ].Note )"
+        }
+    }
 }
 
-if ( $obsoleteUsages.Count -gt 0 ) {
+# Conflicts no active plugin's project causes (e.g. left in Bin by an earlier build of other code).
+$otherConflicts = @( $dependencyConflicts | Where-Object { $c = $_; -not ( $pluginResults | Where-Object { $c -in $_.Conflicts } ) } )
+if ( $otherConflicts.Count -gt 0 ) {
     $lines += ""
-    $lines += "## Obsolete Rock APIs in use (will break in a future Rock version)"
+    $lines += "## Rock dependencies overwritten by code outside the active plugins"
     $lines += ""
-    $lines += "Grouped by API, most-used first. Only blocks that compiled are included; the DLL builds are not scanned for these."
-    $lines += ""
-    $lines += "| API | Uses | Blocks | Rock's note |"
+    $lines += "| DLL | Rock needs | Bin has | Copied by |"
     $lines += "|---|---|---|---|"
-
-    $groups = $obsoleteUsages.Keys | ForEach-Object {
-        $usage = $_
-        $api = if ( $usage -match "'(?<api>[^']+)' is obsolete" ) { $Matches.api } else { "(unparsed)" }
-        $note = if ( $usage -match "is obsolete: '(?<note>[^']*)'" ) { $Matches.note } else { "" }
-        $block = ( $usage -replace '\(\d+\):.*$', '' ) -replace '^Plugins\\', '' -replace '\.cs$', ''
-        [pscustomobject]@{ Api = $api; Note = $note; Block = $block }
-    } | Group-Object Api | Sort-Object Count -Descending
-
-    foreach ( $group in $groups ) {
-        # Folder\File, so blocks with common names (Admin.ascx, Confirm.ascx) say whose they are.
-        $blocks = @( $group.Group | ForEach-Object { ( $_.Block -split '\\' | Select-Object -Last 2 ) -join '\' } | Sort-Object -Unique )
-        $blockList = ( $blocks | Select-Object -First 4 ) -join ", "
-        if ( $blocks.Count -gt 4 ) {
-            $blockList += " +$( $blocks.Count - 4 ) more"
-        }
-        $lines += "| ``$( $group.Name )`` | $( $group.Count ) | $blockList | $( $group.Group[ 0 ].Note.Replace( '|', '/' ) ) |"
+    foreach ( $conflict in $otherConflicts ) {
+        $lines += "| ``$( $conflict.Dll )`` | $( $conflict.RockVersion ) | $( $conflict.FoundVersion ) | $( ( @( $conflict.CopiedBy ) -join ', ' ) -replace '^$', '(unknown)' ) |"
     }
 }
 
 $lines += ""
 $lines += "Note: the compiler stops at the first failing file, and a file can hide further errors behind the ones listed. Re-run after fixing."
 
-$reportPath = Join-Path $resultsDir "preflight.md"
+# A run limited with -Plugin must not replace the all-plugins report.
+$reportName = if ( $Plugin ) { "preflight-selected" } else { "preflight" }
+$reportPath = Join-Path $resultsDir "$reportName.md"
 $lines | Set-Content -Encoding UTF8 $reportPath
 
 [pscustomobject]@{
     rockRoot = $RockRoot
     rockVersion = $rockVersion
     started = $started.ToString( 's' )
-    dlls = $dllResults
-    blocksTotal = $allBlocks.Count
-    blocksClean = $cleanCount
-    blocks = $blockResults
-    brokenBlocks = $brokenBlocks
-    blockedBlocks = $blockedBlocks
+    scope = $scope
+    plugins = @( $pluginResults | ForEach-Object {
+        [pscustomobject]@{
+            plugin = $_.Plugin; folder = $_.Folder; version = $_.Version; unreleased = $_.Unreleased; result = $_.Result; notes = $_.Notes
+            dlls = @( $_.Dlls | ForEach-Object { [pscustomobject]@{ project = $_.Project; path = $_.Path; succeeded = $_.Succeeded; errors = $_.Errors } } )
+            pages = @( $_.Pages | ForEach-Object { [pscustomobject]@{ page = $_.Page; result = $_.Result; errors = $_.Errors } } )
+            obsoleteUsages = $_.Obsolete; dependencyConflicts = $_.Conflicts; missing = $_.Missing; obsidian = $_.Obsidian
+        }
+    } )
+    notTested = @( $untestedPlugins | ForEach-Object { [pscustomobject]@{ plugin = $_.Name; version = $_.Version; status = $_.Status; missing = $_.Missing } } )
     dependencyConflicts = $dependencyConflicts
-    obsoleteUsages = @( $obsoleteUsages.Keys | Sort-Object )
-} | ConvertTo-Json -Depth 5 | Set-Content -Encoding UTF8 ( Join-Path $resultsDir "preflight.json" )
+} | ConvertTo-Json -Depth 6 | Set-Content -Encoding UTF8 ( Join-Path $resultsDir "$reportName.json" )
 
 # Keep each run: the files above are overwritten by the next run against this Rock version.
 $historyDir = Join-Path $resultsDir "history"
 New-Item -ItemType Directory -Force $historyDir | Out-Null
 $stamp = $started.ToString( "yyyy-MM-dd_HHmmss" )
-Copy-Item $reportPath ( Join-Path $historyDir "preflight_$stamp.md" )
-Copy-Item ( Join-Path $resultsDir "preflight.json" ) ( Join-Path $historyDir "preflight_$stamp.json" )
+Copy-Item $reportPath ( Join-Path $historyDir "$( $reportName )_$stamp.md" )
+Copy-Item ( Join-Path $resultsDir "$reportName.json" ) ( Join-Path $historyDir "$( $reportName )_$stamp.json" )
 
 Write-Step "Summary"
-$lines | Select-Object -Skip 6 -First 6 | ForEach-Object { Write-Host $_ }
-$coverageLines | Select-Object -Skip 3 | ForEach-Object { Write-Host $_ }
+$lines | Select-Object -Skip 7 -First 7 | ForEach-Object { Write-Host $_ }
+$summaryLines | Select-Object -Skip 3 | ForEach-Object { Write-Host ( $_ -replace '\[([^\]]+)\]\(#[^)]*\)', '$1' ) }
 Write-Host ""
 Write-Host "Report: $reportPath"
 
-if ( $failedDlls.Count -gt 0 -or $brokenBlocks.Count -gt 0 -or $blockedBlocks.Count -gt 0 -or $dependencyConflicts.Count -gt 0 ) {
+if ( $failing -gt 0 -or $incomplete -gt 0 -or $otherConflicts.Count -gt 0 ) {
     exit 1
 }
 exit 0

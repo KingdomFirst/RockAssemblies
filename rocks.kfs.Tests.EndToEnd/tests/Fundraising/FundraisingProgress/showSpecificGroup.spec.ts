@@ -21,7 +21,7 @@ import { expect, test } from "./fundraisingProgress.fixture";
     Covers the manual plan's last steps: set "Show Specific Group" to the fundraising
     group, open the page with no group in the URL, and check the block shows that group.
 */
-test.describe( "Fundraising Progress: Show Specific Group setting", () => {
+test.describe( "KFS Fundraising Progress: Show Specific Group setting", () => {
     // Fail (not skip): the manual plan requires this setting, so an installed block without it is a finding.
     test.beforeEach( ( { afp } ) => {
         expect( afp.showSpecificGroupMissing, "Show Specific Group setting" ).toBeNull();

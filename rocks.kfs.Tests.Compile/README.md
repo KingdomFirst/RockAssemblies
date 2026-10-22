@@ -1,12 +1,9 @@
 # rocks.kfs.Tests.Compile — compatibility preflight
 
-Compiles **every** KFS plugin against a Rock clone's assemblies and lists everything that no
-longer compiles. It is the first check to run when a new Rock version drops. It needs no
-site, no database and no test data, and it covers all plugins in one pass.
-
-It catches the most common kind of break: Rock removed or changed an API the plugin calls
-(a system Guid constant, a method overload, a type). It does **not** catch behavior changes;
-that is what each plugin's end-to-end tests in `rocks.kfs.Tests.EndToEnd` are for.
+Compiles every **active KFS plugin** against a Rock clone's assemblies and reports, plugin by
+plugin, everything that no longer compiles. It is the first check to run when a new Rock
+version drops. It needs no site, no database and no test data, and one run covers every
+plugin.
 
 ## Running
 
@@ -18,73 +15,107 @@ KFSRockAssemblies\rocks.kfs.Tests.Compile\Invoke-CompatPreflight.ps1 -RockRoot C
 
 Or in Claude Code: `/kfs-compat-preflight`.
 
-Prerequisites: Rock core built into `RockWeb\Bin` in that clone, Visual Studio (for MSBuild),
-.NET Framework 4.x (for `aspnet_compiler`), and the .NET SDK (to restore any missing
-RockWeb packages).
+| Option | Does |
+|---|---|
+| *(none)* | Tests every active plugin. |
+| `-Plugin "Steps to Care", "Eventbrite"` | Tests only these plugins (Rock Packages folder names; "(Unreleased)" is optional). |
+| `-ListPlugins` | Lists every plugin and the code it ships, then stops. Builds nothing. |
+| `-SkipBuild` | Reuses the DLLs already in `RockWeb\Bin` instead of building them. |
+| `-RockPackagesRoot <path>` | The Rock Packages folder, if it is not at the usual OneDrive path. |
 
-**Retired plugins are never tested.** Anything under a `ZZZ_Archive` folder, in either
-`KFSRockAssemblies` or `KFSRockBlocks`, is retired and obsolete by KFS practice. The preflight
-skips those projects and blocks, and their errors are never reported or fixed.
+Prerequisites: Rock core built into `RockWeb\Bin` in that clone, Visual Studio (for MSBuild),
+.NET Framework 4.x (for `aspnet_compiler`), the .NET SDK (to restore any missing RockWeb
+packages), and the shared Rock Packages folder synced locally.
+
+## What a plugin is
+
+A plugin is a **RockShop package** in the shared *Rock Packages* folder: the same plugins the
+end-to-end suite (`rocks.kfs.Tests.EndToEnd`) and `/kfs-package` work with. Its code is what
+its newest package ships (`PluginCatalog.ps1`, using the same "newest version" rule as
+`/kfs-package`). Folders listed in `.guardrails/skills/kfs-package/excluded-plugins.txt` are
+not KFS plugins (e.g. QuickBooks Online, no longer our IP) and are skipped entirely: not
+tested, listed or reported.
+
+| Shipped file | Tested as |
+|---|---|
+| `bin\<assembly>.dll` built by a project in `KFSRockAssemblies` or `RockAttendedCheckin` | That project is built |
+| `.ascx`, `.aspx`, `.ashx` under `Plugins\rocks_kfs` or `Plugins\cc_newspring` | Precompiled with its code-behind |
+| Other `bin\*.dll` (third-party libraries) | Not compiled; they ship as-is |
+| Built Obsidian files (`.obs.js`) | Not compiled (the preflight does not cover Obsidian yet) |
+| Files under another vendor's `Plugins\` folder | Not ours; not tested |
+
+A plugin is **active** when its package ships at least one project or page from our repos.
+The rest are listed under *Not tested* with the reason: Obsidian only, a vendor plugin, or no
+package. Code that no package ships is **not tested at all**; to test it, it has to be in a
+plugin's package. A shipped file that is not on this branch (e.g. its project was archived) is
+listed under its plugin and not tested.
+
+When a project or page is shipped by more than one plugin, it is built or compiled once and
+its result appears under each plugin.
+
+**Retired code is never tested.** Anything under a `ZZZ_Archive` folder, in either
+`KFSRockAssemblies` or `KFSRockBlocks`, is retired by KFS practice; a package that still ships
+it reports it as archived.
 
 ## What it does
 
 1. **Junctions.** If any KFS junction is missing from the clone, it runs `CreateLinks.bat`.
    Otherwise it leaves the clone alone.
-2. **Plugin DLLs.** It builds every project listed in `KFSRock.sln.kfs` from both sources
-   below against the clone's `RockWeb\Bin`. Each project's post-build step copies its DLL
-   into `RockWeb\Bin`, exactly as a normal build would. `-SkipBuild` skips this step and uses
-   whatever `rocks.kfs.*.dll` and `cc.newspring.*.dll` are already there.
-3. **Blocks.** It precompiles every WebForms block under `RockWeb\Plugins\rocks_kfs` and
-   `RockWeb\Plugins\cc_newspring` (excluding `ZZZ_Archive`) with `aspnet_compiler`, the
-   compiler IIS runs on first page load. This happens in a staging copy under
-   `%TEMP%\kfsc-<clone>`, so the clone's `RockWeb` is not touched.
+2. **Plugins.** It reads the plugin definitions from Rock Packages (`-ListPlugins` stops here).
+3. **Plugin DLLs.** It builds each active plugin's projects against the clone's `RockWeb\Bin`.
+   Each project's post-build step copies its DLL into `RockWeb\Bin`, exactly as a normal
+   build would.
+4. **Pages.** It precompiles each active plugin's pages with `aspnet_compiler`, the compiler
+   IIS runs on first page load. This happens in a staging copy under `%TEMP%\kfsc-<clone>`
+   holding only those pages, so the clone's `RockWeb` is not touched.
 
-It covers two sources, listed in `$sources` at the top of the script:
+`aspnet_compiler` stops at the first failing file. The script sets each failing page aside
+and compiles the rest again until what remains is clean, so one run lists every broken page.
 
-| Source | Repo | DLL projects | Blocks |
-|---|---|---|---|
-| KFS plugins | KFSRockAssemblies, KFSRockBlocks | `KFSRockAssemblies\…` in `KFSRock.sln.kfs` | `RockWeb\Plugins\rocks_kfs` |
-| Attended Check-in | rock-attended-checkin (NewSpring fork) | `RockAttendedCheckin\cc.newspring.AttendedCheckIn.csproj` | `RockWeb\Plugins\cc_newspring` |
-
-The report's **Coverage** table gives the DLL and block counts for each. If a source has no
-DLL project in `KFSRock.sln.kfs` or no blocks under its folder, the run stops with exit code 2
-instead of quietly skipping it. The Attended Check-in fork is tested here, but fixes to it are
-asked about first, never made to "conform" it.
-
-`aspnet_compiler` stops at the first failing file. The script sets each failing block aside
-and compiles the rest again until what remains is clean, so one run lists every broken
-block.
-
-It also lists every call to a Rock API marked `[Obsolete]`. Those calls will break in a
-future Rock version: Person Attribute Forms' `PERSON_CONNECTION_STATUS_WEB_PROSPECT` was
+It also lists every call to a Rock API marked `[Obsolete]`, by plugin. Those calls will break
+in a future Rock version: Person Attribute Forms' `PERSON_CONNECTION_STATUS_WEB_PROSPECT` was
 flagged obsolete in Rock 1.13, seven years before v20 removed it.
+
+The Attended Check-in plugin is a NewSpring fork (`RockAttendedCheckin`). It is tested here,
+but fixes to it are asked about first, never made to "conform" it.
 
 ## Output
 
-`results\<rock version>\preflight.md` (for people) and `preflight.json` (for tools). The
-report opens with the summary counts, then lists the failures in detail, then gives **every**
-plugin DLL and block with its own result (*Results: plugin DLLs*, *Results: blocks*), so it
-records what passed as well as what failed. Each run also keeps a copy in
-`results\<rock version>\history\preflight_<date>_<time>.md` (and `.json`), because the next
-run against the same Rock version overwrites `preflight.md`. Exit codes:
+`results\<rock version>\preflight.md` (for people) and `preflight.json` (for tools):
+
+1. **Summary**: plugins passing, DLLs building, pages compiling, Rock dependencies
+   overwritten, obsolete calls.
+2. **Results by plugin**: one row per active plugin with its result, package version, DLL and
+   page counts, obsolete calls and notes.
+3. **Not tested**: the packages with no code of ours to compile, and why.
+4. **One section per plugin**: every DLL project and page with its own result, then the
+   errors for anything that failed, Rock dependencies it overwrites, shipped files not on this
+   branch, and the obsolete Rock APIs it uses.
+
+A plugin's result:
+
+| Result | Meaning |
+|---|---|
+| Pass | Every project builds and every page compiles |
+| Fail | A project does not build, a page is broken, or its build overwrites a Rock dependency |
+| Incomplete | Nothing is broken, but a page could not be checked because a DLL it needs failed to build. Fix the DLL first. |
+
+A run with `-Plugin` writes `preflight-selected.md` / `.json` instead, so `preflight.md` always
+holds the latest all-plugins run. Every run also keeps a dated copy in
+`results\<rock version>\history\`. Exit codes:
 
 | Code | Meaning |
 |---|---|
-| 0 | Everything compiles |
-| 1 | Compile errors found (see the report) |
-| 2 | Environment problem (missing tools, Rock not built, staging failure). No verdict on the plugins. |
+| 0 | Every tested plugin passes |
+| 1 | A plugin fails or is incomplete, or a Rock dependency is overwritten (see the report) |
+| 2 | Environment problem (missing tools, Rock not built, Rock Packages not found, staging failure). No verdict on the plugins. |
 
-Blocks are classified as:
-
-- **Broken**: the block's own code no longer compiles against this Rock.
-- **Could not be checked**: the block depends on a KFS plugin DLL that failed to build.
-  Fix the DLL first; the block may be fine.
-
-It also reports **Rock dependencies overwritten by a plugin**. A plugin's post-build step can
-copy its own version of a library Rock depends on into `RockWeb\Bin`, replacing Rock's. On a
-site, ASP.NET then fails to start or to load that assembly. Each such DLL is listed with the
-version Rock needs, the version the plugin supplies, and the project that copies it. The block
-compile always uses Rock's declared version, so one of these does not stop the scan.
+**Rock dependencies overwritten.** A plugin's post-build step can copy its own version of a
+library Rock depends on into `RockWeb\Bin`, replacing Rock's. On a site, ASP.NET then fails to
+start or to load that assembly (Microsoft 365 Utilities 1.0.1–1.2 did this with MSAL). Each
+such DLL is reported under the plugin whose project copies it, with the version Rock needs and
+the version found. The page compile always uses Rock's declared version, so one of these does
+not stop the scan.
 
 Because plugin builds copy into the clone's real `RockWeb\Bin`, a conflicting DLL stays there
 after a preflight, as it would after any normal build. Restore Rock's copy from the path in the

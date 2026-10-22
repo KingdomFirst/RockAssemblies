@@ -27,7 +27,7 @@ test.use( { trace: "off" } );
     page is a copy of Rock's Group Viewer (Group Detail, the Eventbrite Sync Button,
     Group Member List) under the test pages.
 */
-test.describe( "Eventbrite Sync: group viewer", () => {
+test.describe( "Eventbrite: group viewer", () => {
     test( "SaveGroup_EventbriteEventSelected_LinksGroupAndShowsEventbriteButtons", async ( { page, eb } ) => {
         const groupId = await eb.createGroup( { linked: false } );
         const viewer = await eb.openGroupViewer( page, groupId );

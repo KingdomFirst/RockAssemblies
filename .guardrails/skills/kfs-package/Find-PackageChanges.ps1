@@ -35,6 +35,11 @@ param(
 $ErrorActionPreference = "Stop"
 . "$PSScriptRoot\PackageCommon.ps1"
 
+$excludedPlugins = Get-ExcludedPlugins
+if ( $excludedPlugins.ContainsKey( $Plugin ) ) {
+    throw "'$Plugin' is not a KFS plugin: $( $excludedPlugins[ $Plugin ] ) (excluded-plugins.txt)"
+}
+
 function Get-MergingPr( [string] $repo, [string] $sha ) {
     $subject = git -C $repo log -1 --format=%s $sha
     if ( $subject -match '\(#(\d+)\)\s*$' ) { return "#$( $Matches[1] )" }

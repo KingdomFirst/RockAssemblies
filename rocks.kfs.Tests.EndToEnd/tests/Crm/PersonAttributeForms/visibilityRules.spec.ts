@@ -26,7 +26,7 @@ const showValue = "show";
     when the test attribute's value changes (its text box posts back on change), and must
     not save a hidden field's value.
 */
-test.describe( "Person Attribute Forms Advanced: field visibility rules", () => {
+test.describe( "Person Attributes Form Advanced: field visibility rules", () => {
     test.beforeEach( async ( { pafa } ) => {
         await pafa.configure( {
             Forms: pafa.buildCustomFormJson( [

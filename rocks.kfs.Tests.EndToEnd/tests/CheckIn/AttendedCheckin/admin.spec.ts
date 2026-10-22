@@ -22,7 +22,7 @@ import { expect, test } from "./attendedCheckin.fixture";
     smoothly": the kiosk list, the area list for the chosen kiosk, the validation
     messages, and handing off to Search with a working check-in session.
 */
-test.describe( "Attended Check-in: Admin", () => {
+test.describe( "Attended Checkin: Admin", () => {
     test( "Admin_Load_ListsTestKiosk", async ( { checkinPages } ) => {
         await checkinPages.openAdmin();
 

@@ -27,7 +27,7 @@ import { RecipientStatus, SentReminder, expect, jobName, test } from "./customGr
     group type's own attribute, so only the test groups are ever processed. The Edify and
     phone checks stay manual: each sending test adds a "manual-check" annotation.
 */
-test.describe( "Custom Group Reminder: job", () => {
+test.describe( "Custom Group Reminder Emails: job", () => {
     test( "Run_SendUsingEmailMeetingTomorrow_EmailsMembersOfReminderGroupOnly", async ( { page, cgr } ) => {
         await cgr.editJob( page, { sendUsing: "Email", daysPrior: "1" } );
         const { job, firstCommunicationId, list } = await cgr.runJob( page );

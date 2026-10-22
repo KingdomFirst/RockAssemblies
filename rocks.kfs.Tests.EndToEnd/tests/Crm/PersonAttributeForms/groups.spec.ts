@@ -25,7 +25,7 @@ import { expect, test } from "./personAttributeForms.fixture";
     honoring Allowed Group Types and Group Member Status, and the Group Member workflow
     entity.
 */
-test.describe( "Person Attribute Forms Advanced: groups", () => {
+test.describe( "Person Attributes Form Advanced: groups", () => {
     const groupSettings = {
         AllowGroupMembership: "True",
         EnablePassingGroupId: "True",

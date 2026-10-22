@@ -22,7 +22,11 @@ Helper scripts live beside this file (`.guardrails/skills/kfs-package/`):
   Kingdom First Solutions Inc. Team Site\Rock Packages`. One folder per plugin, one subfolder
   per version, plus `Screenshots` (some plugins spell it `ScreenShots`) and `Documentation`.
 - **A KFS RockShop plugin** is a plugin with a folder there. A changed project or block with no
-  package folder is not one. Skip it and say so. `_Package Icons` is not a plugin.
+  package folder is not one. Skip it and say so. `_Package Icons` is not a plugin, and neither
+  is any folder listed in `excluded-plugins.txt` beside this file (e.g. a plugin that is no
+  longer KFS intellectual property): never package, change or report those. The scripts refuse
+  them. When a plugin stops being ours, add its folder there; the preflight and the end-to-end
+  reports read the same list.
 - **A version folder** holds the `.plugin` zip and its unpacked `content\`, `install\` and
   `uninstall\`. A few old ones nest these one level down (`v1.0\rocks_kfs\`). New versions use
   the flat layout. Folder and zip names follow the previous version's style (`v2.3`, `2_7`,

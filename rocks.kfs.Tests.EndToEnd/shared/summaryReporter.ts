@@ -19,6 +19,7 @@ import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import { redactSecrets } from "./config";
+import { findUnknownPluginNames, getPluginForFolder } from "./plugins";
 import { getRunDirectory, getRunId, runIdPattern, runsRoot } from "./runDirectory";
 
 /*
@@ -63,6 +64,8 @@ export type RunSummary = {
     overall: string;
     command: string;
     testCode: string;
+    /** Problems with the report itself, e.g. a plugin name that is not a current KFS plugin. */
+    warnings: string[];
     totals: Record<Status, number> & { total: number };
     plugins: Array<{ plugin: string; counts: Record<Status, number>; durationMs: number }>;
     tests: TestRow[];
@@ -112,6 +115,9 @@ export default class SummaryReporter implements Reporter {
         console.log( `Summary: ${t.passed} passed, ${t.failed + t[ "timed out" ]} failed, ${t[ "known issue" ]} known issue, ${t.flaky} flaky, ${t.skipped} skipped (of ${t.total}).` );
         console.log( `Report:  ${path.join( runDirectory, "summary.html" )}` );
         console.log( `All runs: ${path.join( runsRoot, "..", "index.html" )}` );
+        for ( const warning of summary.warnings ) {
+            console.log( `Warning: ${warning}` );
+        }
     }
 
     private toRow( test: TestCase, runDirectory: string ): TestRow {
@@ -120,10 +126,11 @@ export default class SummaryReporter implements Reporter {
         const describes = test.titlePath().slice( 3, -1 ).filter( title => title );
         const relativeFile = path.relative( this.testDir, test.location.file );
         const folder = path.dirname( relativeFile ).split( path.sep ).join( "/" );
-        // Suites are titled "<Plugin>: <area>"; fall back to the folder. The area alone is
-        // shown beside the test, since the report already groups by plugin.
+        // The plugin is its Rock Packages name, from the test's folder (plugins.ts). Suites are
+        // titled "<Plugin>: <area>"; the area alone is shown beside the test, since the report
+        // already groups by plugin.
         const hasPluginPrefix = describes.length > 0 && describes[ 0 ].includes( ":" );
-        const plugin = hasPluginPrefix ? describes[ 0 ].split( ":" )[ 0 ].trim() : folder;
+        const plugin = getPluginForFolder( folder ) ?? `${folder} (not in plugins.ts)`;
         if ( hasPluginPrefix ) {
             describes[ 0 ] = describes[ 0 ].substring( describes[ 0 ].indexOf( ":" ) + 1 ).trim();
         }
@@ -205,6 +212,7 @@ export default class SummaryReporter implements Reporter {
             overall,
             command: [ "playwright", ...process.argv.slice( 2 ) ].join( " " ),
             testCode: describeTestCode(),
+            warnings: pluginNameWarnings( [ ...byPlugin.keys() ] ),
             totals,
             plugins: [ ...byPlugin.entries() ]
                 .map( ( [ plugin, entry ] ) => ( { plugin, ...entry } ) )
@@ -239,6 +247,9 @@ export function renderMarkdown( s: RunSummary ): string {
     lines.push( `| Duration | ${formatDuration( s.durationMs )} |` );
     lines.push( `| Command | \`${cell( s.command )}\` |` );
     lines.push( `| Test code | ${cell( s.testCode )} |` );
+    for ( const warning of s.warnings ?? [] ) {
+        lines.push( "", `> **Warning:** ${warning}` );
+    }
 
     lines.push( "", "## By plugin", "", "| Plugin | Tests | Passed | Failed | Known issue | Flaky | Skipped | Time |", "|---|---|---|---|---|---|---|---|" );
     for ( const p of s.plugins ) {
@@ -324,6 +335,7 @@ export function renderHtml( s: RunSummary ): string {
 <tr><th>Command</th><td class="mono">${esc( s.command )}</td></tr>
 <tr><th>Test code</th><td>${esc( s.testCode )}</td></tr>
 </table>
+${( s.warnings ?? [] ).map( w => `<p class="warning">Warning: ${esc( w )}</p>` ).join( "" )}
 <h2>By plugin</h2>
 <div class="scroll"><table><thead><tr><th>Plugin</th><th class="n">Tests</th><th class="n">Passed</th><th class="n">Failed</th><th class="n">Known issue</th><th class="n">Flaky</th><th class="n">Skipped</th><th class="n">Time</th></tr></thead>
 <tbody>${pluginRows}</tbody></table></div>
@@ -334,7 +346,7 @@ ${pluginSections}
 }
 
 /** test-results/index.html: every kept run, newest first. */
-function writeIndex(): void {
+export function writeIndex(): void {
     const runs = listRunIds().reverse().map( id => {
         try {
             return JSON.parse( fs.readFileSync( path.join( runsRoot, id, "summary.json" ), "utf8" ) ) as RunSummary;
@@ -375,6 +387,7 @@ table { width:100%; border-collapse:collapse; } th, td { text-align:left; paddin
 .pill { display:inline-block; padding:1px 8px; border-radius:999px; font-size:12px; font-weight:600; white-space:nowrap; background:var(--card); }
 .p-passed { background:var(--goodbg); color:var(--good); } .p-failed, .p-timed-out, .p-interrupted { background:var(--badbg); color:var(--bad); }
 .p-known-issue, .p-flaky, .p-passed-except-known-issues { background:var(--warnbg); color:var(--warn); }
+.warning { color:var(--warn); background:var(--warnbg); padding:6px 10px; border-radius:6px; }
 .tag { font-size:11px; font-weight:700; color:var(--warn); text-transform:uppercase; }
 .title { font-weight:600; } .title, .mono { overflow-wrap:anywhere; } .scroll { overflow-x:auto; }
 .tests td:first-child { width:1%; } .mono.nowrap { white-space:nowrap; overflow-wrap:normal; } .note { margin-top:4px; } details { margin-top:4px; } pre { white-space:pre-wrap; word-break:break-word; background:var(--card); padding:8px; border-radius:6px; font-size:12px; max-height:360px; overflow:auto; }
@@ -384,6 +397,20 @@ img { max-width:100%; border:1px solid var(--line); border-radius:6px; margin-to
 // #endregion
 
 // #region Helpers
+
+/** Warns when a reported plugin name is not a current KFS plugin, so plugins.ts is kept in step with Rock Packages. */
+function pluginNameWarnings( names: string[] ): string[] {
+    const unmapped = names.filter( name => name.endsWith( "(not in plugins.ts)" ) );
+    const unknown = findUnknownPluginNames( names.filter( name => !unmapped.includes( name ) ) ) ?? [];
+    const warnings: string[] = [];
+    if ( unmapped.length > 0 ) {
+        warnings.push( `Test folder(s) with no plugin in shared/plugins.ts: ${unmapped.map( name => name.replace( " (not in plugins.ts)", "" ) ).join( ", " )}.` );
+    }
+    if ( unknown.length > 0 ) {
+        warnings.push( `Not a current KFS plugin in Rock Packages: ${unknown.join( ", " )}. Update shared/plugins.ts.` );
+    }
+    return warnings;
+}
 
 function keepRuns(): number {
     const value = Number( process.env.KFS_E2E_KEEP_RUNS );
