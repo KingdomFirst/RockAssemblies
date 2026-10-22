@@ -122,6 +122,115 @@ export class CheckinManagerLocationsBlock {
         await expect( this.moveDialog ).toBeVisible();
         await expectNoRockError( this.page );
     }
+
+    public async openMoveAllDialog(): Promise<void> {
+        await this.moveAllButton.click();
+        await waitForPostback( this.page );
+        await expect( this.moveDialog ).toBeVisible();
+        await expectNoRockError( this.page );
+    }
+
+    /*
+        10/13/2026 - CLAUDE
+
+        The location picker loads its tree from Rock's v1 REST API (api/locations/
+        getactivechildren), and Rock's v1 API refuses impersonated sessions: every call
+        returns 401, even api/People/GetCurrentPerson. The tests sign in only by
+        impersonation token (no passwords), so the tree cannot load here. completeMove
+        therefore sets the picker's selection the way its tree does, in the picker's
+        hidden id and name fields, and then uses the dialog's real Save. Everything the
+        plugin does with the selection is still exercised; only Rock's own tree is not.
+
+        Reason: Rock's v1 REST API rejects impersonated (rckipid) sessions.
+    */
+
+    /** In the open Move dialog, selects a location in the picker and saves the dialog. */
+    public async completeMove( locationId: number, locationName: string ): Promise<void> {
+        const picker = this.moveDialog.locator( ".picker" ).first();
+        await expect( picker ).toBeVisible();
+        await picker.evaluate( ( element, selection ) => {
+            const setValue = ( selector: string, value: string ): void => {
+                const input = element.querySelector<HTMLInputElement>( selector );
+                if ( !input ) {
+                    throw new Error( `Location picker has no ${selector}` );
+                }
+                input.value = value;
+            };
+            setValue( ".js-item-id-value", String( selection.id ) );
+            setValue( ".js-item-name-value", selection.name );
+            const label = element.querySelector( ".selected-names" );
+            if ( label ) {
+                label.textContent = selection.name;
+            }
+        }, { id: locationId, name: locationName } );
+
+        await this.moveDialog.locator( "[id$='_dlgMoveLocation_serverSaveLink']" ).click();
+        await waitForPostback( this.page );
+        await expectNoRockError( this.page );
+        await expect( this.moveDialog ).toBeHidden();
+    }
+
+    // #region Labels
+
+    /** The label list in the Print Label dialog. */
+    public get labelSelect(): Locator {
+        return this.printLabelDialog.locator( "select[id$='_ddlLabelToPrint']" );
+    }
+
+    /** The label preview: an embedded PDF the server rendered (through labelary.com). */
+    public get labelPreview(): Locator {
+        return this.printLabelDialog.locator( ".pdfObject object" );
+    }
+
+    public async openPrintLabelDialog( name: string | RegExp ): Promise<void> {
+        await this.personRow( name ).locator( "[id$='_lbPrintLabel']" ).click();
+        await waitForPostback( this.page );
+        await expect( this.printLabelDialog ).toBeVisible();
+        await expectNoRockError( this.page );
+    }
+
+    // #endregion
+
+    // #region Room settings (heading of a room)
+
+    /** The heading's Open/Close toggle; shown to people who may close rooms. */
+    public get headingToggle(): Locator {
+        return this.root.locator( "[id$='_tglHeadingRoom']" );
+    }
+
+    /** The Open/Close toggle on a room in a navigation list. */
+    public navToggle( name: string ): Locator {
+        return this.navItem( name ).locator( "[id$='_tglRoom']" );
+    }
+
+    /** Clicks the Open or Close half of a Rock toggle and waits for the postback it fires. */
+    public async setToggle( toggle: Locator, open: boolean ): Promise<void> {
+        await toggle.locator( open ? ".js-toggle-on" : ".js-toggle-off" ).click();
+        await waitForPostback( this.page );
+        await expectNoRockError( this.page );
+    }
+
+    public get thresholdPanel(): Locator {
+        return this.root.locator( "[id$='_pnlThreshold']" );
+    }
+
+    /** The threshold shown in the room heading. */
+    public get thresholdLabel(): Locator {
+        return this.thresholdPanel.locator( "[id$='_lThreshold']" );
+    }
+
+    /** Edits the room's threshold in its heading and saves it. */
+    public async editThreshold( value: number ): Promise<void> {
+        await this.thresholdPanel.locator( ".js-threshold-btn-edit" ).click();
+        const input = this.thresholdPanel.locator( "input[id$='_nbThreshold']" );
+        await expect( input ).toBeVisible();
+        await input.fill( String( value ) );
+        await this.thresholdPanel.locator( "[id$='_lbUpdateThreshold']" ).click();
+        await waitForPostback( this.page );
+        await expectNoRockError( this.page );
+    }
+
+    // #endregion
 }
 
 function escapeRegExp( value: string ): string {

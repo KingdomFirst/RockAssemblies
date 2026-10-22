@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 //
+import { releaseScreenshot } from "../../../shared/releaseScreenshot";
 import { expect, test } from "./fundraisingProgress.fixture";
 
 /*
@@ -35,6 +36,8 @@ test.describe( "Fundraising Progress: Show Specific Group setting", () => {
         await expect( block.totalRaised ).toHaveText( `$${afp.expectedTotals.raised}` );
         await expect( block.groupTotalAmounts ).toHaveText( `$${afp.expectedTotals.raised}/$${afp.expectedTotals.goal}` );
         await expect( block.memberRows ).toHaveCount( afp.participants.length );
+
+        await releaseScreenshot( block.root, "FundraisingProgress_ShowSpecificGroup" );
     } );
 
     // Not in the manual plan: the setting's description says the URL parameter still wins.

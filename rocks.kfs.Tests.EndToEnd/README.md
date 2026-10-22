@@ -94,6 +94,19 @@ Output:
 
 `npm run typecheck` and `npm run test:list` need no site and no `.env`.
 
+### RockShop screenshots
+
+Tests that cover a UI change call `releaseScreenshot()` (`shared/releaseScreenshot.ts`) after
+their assertions pass. It does nothing unless `RELEASE_SCREENSHOTS_DIR` is set:
+
+```bash
+RELEASE_SCREENSHOTS_DIR="$TEMP/release-shots" npx playwright test tests/Fundraising/FundraisingProgress
+```
+
+Each such test writes `<PluginName>_<WhatItShows>.png` there. The `/kfs-package` skill copies
+them into the plugin's RockShop `Screenshots` folder. When you add a UI change to a plugin, add
+the call to the test that covers it.
+
 ## Layout
 
 ```
@@ -115,7 +128,7 @@ rocks.kfs.Tests.EndToEnd/
 
 ## Person Attribute Forms Advanced
 
-`tests/Crm/PersonAttributeForms/`: 32 tests.
+`tests/Crm/PersonAttributeForms/`: 50 tests.
 
 **One-time setup per site.** The test page is created under `KFS E2E Test Pages` (the fixture
 creates that page on its first run) and inherits its security. Only the adult test person
@@ -164,9 +177,29 @@ How the manual test plan maps to the tests:
 | Family Member Picker × Person Mode, every combination | `person mode › PageLoad_*` (6 tests), `SelectFamilyMember_…` |
 | Person Mode rules for `?Person=` | `person mode › Submit_*Mode*` (4 tests) |
 | "Edit Forms and Fields" dialog | `settings › EditFormsAndFields_OpenAndSave_PreservesConfiguration` |
+| *(beyond the manual plan)* Connection Status field: lists Rock's statuses, saves a choice, blank keeps the current status | `connection status › *` (3 tests) |
+| *(beyond the manual plan)* Display SMS Checkbox on Mobile Phone: shown/hidden; checked/unchecked saves messaging on the number | `sms › *` (4 tests) |
+| *(beyond the manual plan)* Field visibility rules: evaluated on load and on change; hidden values not saved | `visibility rules › *` (5 tests) |
+| *(beyond the manual plan)* Signature Document Template, Disable Form for Children, Disable Form Warning Text | `signature document › *` (6 tests) |
 
-Not covered yet: the signature document settings (they need an electronic signature
-template), the SMS checkbox, and field visibility rules.
+The fixture creates a second Person text attribute (the field the visibility rules show and
+hide) and an electronic signature template (typed signature, no provider, no completion email,
+so signing sends nothing). Signing renders a PDF on the server. The child tests need Rock to
+classify the fixture's child as a Child; they check that first.
+
+**Known failures (plugin bugs, not test drift), as of v2.7 on Rock 20.0.9.** Both are in the
+block's own `FieldVisibilityWrapper` (end of `PersonAttributeForms.ascx.cs`) and date from 2022:
+
+- `visibility rules › PageLoad_PersonFieldHiddenByRule_RendersFormWithoutTheField`: a rule that
+  hides a *person* field crashes the page. The wrapper is keyed by the PersonFieldType number
+  (Middle Name = 14) and reads the control through `AttributeCache.Get( 14 )`, an unrelated
+  attribute.
+- `visibility rules › Edit_ValueChangedAwayFromRule_HidesDependentFieldAndDoesNotSaveIt`: a
+  value typed into a field that a rule then hides is still saved. The wrapper clears values
+  only for fields that are visible when the rules run, and the rebuilt field is already hidden.
+
+Not covered: the Prospect fallback for a blank Connection Status. The block never records a blank
+person field, so the fallback cannot be reached from the form (see `connectionStatus.spec.ts`).
 
 ## Attended Check-in
 
@@ -215,7 +248,7 @@ on Activity Select, the Override button, the keypad, and geolocation kiosk match
 
 ## Advanced Check-in Manager
 
-`tests/CheckIn/CheckinManager/`: 11 tests for the *KFS > Check-in > Manager > Locations* block
+`tests/CheckIn/CheckinManager/`: 22 tests for the *KFS > Check-in > Manager > Locations* block
 (RockShop: Advanced Check-in Monitor).
 
 **Setup the fixture does each run**, matching the manual plan's first step: it copies Rock's
@@ -247,6 +280,11 @@ cache is cleared. So, in Rock:
    Security** job. Rock refuses token sign-in for Extreme accounts, and only that job lowers a
    person's account protection profile.
 
+4. For the open/close tests only: on the *Rock Check-in Manager* site's security, add an
+   **Administrate** Allow rule for `KFS E2E Plugin Testers`. The block shows its Open/Close
+   toggles only to people with Administrate (or its own CloseLocations right). Those two tests
+   check this and fail with the step if it is missing; the rest of the suite does not need it.
+
 The fixture checks the role membership and the protection profile before opening any page,
 and stops with a message naming the step that is missing.
 
@@ -258,12 +296,33 @@ First passing run: 11 of 11 on Rock 17.9.0 (rockbeta, 2026-10-05).
 | Launch the Check-in Manager page | `launch › Launch_ManagerPage_ShowsCheckinTypeWithoutWarning`, `Launch_ManagerPage_DrawsAttendanceChart`, `Launch_AreaCount_IncludesCheckedInPerson` |
 | *(Plugin features)* | `room › Navigate_AreaGroupRoom_ListsCheckedInPersonWithActions`, `Navigate_HeadingClicked_GoesUpALevel`, `Search_ByName_FindsCheckedInPerson`, `Checkout_Person_EndsAttendanceAndLeavesRoom`, `Delete_Person_RemovesAttendance`, `Move_Person_OpensLocationDialog`, `Settings_AttendeeActionsOff_HidesButtons` |
 
+| *(Plugin features)* Move to another room, Move All | `move and labels › Move_PersonToAnotherRoom_…`, `MoveAll_TwoPeopleInRoom_…` |
+| *(Plugin features)* View Labels (reprint preview) | `move and labels › ViewLabel_CheckedInPerson_ShowsRenderedLabelPdf` |
+| *(Plugin features)* Open/close a room from its heading and from the group's room list | `open and close rooms › *` (2 tests; one-time setup step 4) |
+| *(Plugin features)* Thresholds: count against threshold, full flag, edit in heading, hidden when none | `thresholds › *` (4 tests) |
+| *(Settings)* Navigation Mode = Location | `Location navigation mode › *` (2 tests) |
+
 The chart test is the one most likely to catch a Rock upgrade break: Rock 20 deleted the chart
 options class the block used, and the block now carries its own copy.
 
-Not covered yet: completing a Move (the location picker), Move All, View Labels / reprint
-(needs label data from a real check-in), opening/closing rooms, thresholds, and Location
-navigation mode.
+The fixture keeps a second persistent room, *KFS E2E Check-in Move Room*, beside the test room
+as the Move target. It is not linked to the check-in group, so check-in never offers it. The
+room tests open, close and set thresholds on the shared test room; the fixture puts it back to
+open with no thresholds before and after every test, because Attended Check-in uses it too.
+
+**Move uses the location picker's hidden fields, not its tree.** The tree loads from Rock's v1
+REST API, which refuses impersonated (`rckipid`) sessions: every call returns 401, even
+`api/People/GetCurrentPerson`. The test sets the selection the way the tree would and uses the
+dialog's real Save, so the plugin's Move logic is fully exercised; Rock's tree is not.
+
+**View Labels needs what a real check-in leaves behind.** The test gives the test area a
+check-in label for its duration (the site's first check-in label file; Rock installs samples)
+and gives the attendance a security code, then removes both. The block renders the label by
+sending ZPL to labelary.com from the Rock server, so the server needs outbound internet access.
+
+Not covered yet: Close Occurrence mode (needs the KFS Load Balance Locations check-in
+workflow), Include Group Move, Advanced Print Options, Search By Code, and sending a label
+to a printer (the plugin's ZPL print button is disabled in code).
 
 ## Scheduled Group Communication
 

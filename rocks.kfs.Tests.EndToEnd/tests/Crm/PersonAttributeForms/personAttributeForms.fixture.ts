@@ -27,6 +27,7 @@ import { TestConnectionSetup, createConnectionSetup, deleteConnectionRequests, d
 import { TestGroup, createGroup, deleteGroup, deleteGroupMembers, deleteLeftoverGroups } from "../../../shared/testData/groups";
 import { TestPerson, ensureFamilyMember, ensurePerson } from "../../../shared/testData/people";
 import { verifyRoleAccess } from "../../../shared/testData/security";
+import { createSignatureTemplate, deleteLeftoverSignatureTemplates, deleteSignatureDocuments, deleteSignatureTemplate } from "../../../shared/testData/signatures";
 import { EntityCaptureWorkflowType, deleteLeftoverWorkflowTypes, deleteWorkflowType, deleteWorkflowsOfType, findEntityCaptureWorkflowType } from "../../../shared/testData/workflows";
 import { PersonAttributeFormsBlock, confirmationCssClass } from "./personAttributeFormsBlock";
 
@@ -36,12 +37,29 @@ export const blockType = { name: "Person Attribute Forms Advanced", category: "K
 const FormFieldSource = { PersonAttribute: 0, PersonField: 1 } as const;
 
 /** Values of the block's PersonFieldType enum. */
-export const PersonFieldType = { Email: 4, MiddleName: 14 } as const;
+export const PersonFieldType = { Email: 4, MobilePhone: 8, ConnectionStatus: 12, MiddleName: 14 } as const;
+
+/** Rock's ComparisonType and FilterExpressionType values used by field visibility rules. */
+export const VisibilityRule = { EqualTo: 1, GroupAll: 1 } as const;
+
+/** One field of a custom form built with buildCustomFormJson. */
+export type CustomFormField = {
+    /** A person field (PersonFieldType value), or one of the two test attributes. */
+    field: number | "attribute" | "dependentAttribute";
+    /** Adds a visibility rule: show this field only while the test attribute equals this value. */
+    showWhenAttributeEquals?: string;
+};
+
+/** The block's default "Disable Form Warning Text". */
+export const defaultDisableFormWarningText = "<p>You are not eligible to fill out this form due to a required signature document and your age classification.</p>";
 
 const names = {
     page: "PAFA Test Page",
+    signatureTemplate: "PAFA Signature Template",
     attributeKey: "KFSE2EPafaText",
     attributeName: "PAFA Text",
+    dependentAttributeKey: "KFSE2EPafaDependent",
+    dependentAttributeName: "PAFA Dependent Text",
     allowedGroup: "PAFA Small Group",
     disallowedGroup: "PAFA Serving Team",
     connectionType: "PAFA Connections",
@@ -64,6 +82,13 @@ export type PersonAttributeFormsFixture = {
     outsider: TestPerson;
 
     personAttributeId: number;
+    /** The test attribute's Guid (lower case): a form keys its field by it, and visibility rules compare to it. */
+    personAttributeGuid: string;
+    /** A second text attribute, used as the field a visibility rule shows and hides. */
+    dependentAttributeId: number;
+
+    /** An active, typed-signature electronic signature template with no provider. */
+    signatureTemplateId: number;
 
     /** Small Group: an allowed group type. */
     allowedGroup: TestGroup;
@@ -90,6 +115,13 @@ export type PersonAttributeFormsFixture = {
 
     /** Builds the Forms setting JSON. By default one form with Middle Name, Email and the test attribute. */
     buildFormsJson( formCount?: number ): string;
+
+    /**
+     * Builds the Forms setting JSON for one form with exactly these fields, in order. A
+     * person field with showWhenAttributeEquals gets a visibility rule: shown only while
+     * the test attribute equals that value.
+     */
+    buildCustomFormJson( fields: CustomFormField[] ): string;
 };
 
 export const test = base.extend<{ block: PersonAttributeFormsBlock; resetState: void }, { pafa: PersonAttributeFormsFixture }>( {
@@ -108,6 +140,8 @@ export const test = base.extend<{ block: PersonAttributeFormsBlock; resetState: 
         await deleteLeftoverGroups( api, names.disallowedGroup );
         await deleteLeftoverConnectionTypes( api, names.connectionType );
         await deleteLeftoverPersonAttribute( api, names.attributeKey );
+        await deleteLeftoverPersonAttribute( api, names.dependentAttributeKey );
+        await deleteLeftoverSignatureTemplates( api, names.signatureTemplate );
 
         const person = await ensurePerson( api, {
             guid: "6B0A9E43-2C5A-4E0B-9D0C-6F1F2B8A7E01",
@@ -153,10 +187,14 @@ export const test = base.extend<{ block: PersonAttributeFormsBlock; resetState: 
         // block at it and checks which entity the workflow received (see workflows.ts).
         const captureWorkflowType = await findEntityCaptureWorkflowType( api );
 
-        const created: { blockPage?: TestBlockPage; personAttributeId?: number; groups: TestGroup[]; connectionTypeId?: number; workflowTypeIds: number[] } = { groups: [], workflowTypeIds: [] };
+        const created: CreatedEntities = { groups: [], workflowTypeIds: [] };
 
         try {
             created.personAttributeId = await createPersonTextAttribute( api, { key: names.attributeKey, name: names.attributeName } );
+            created.dependentAttributeId = await createPersonTextAttribute( api, { key: names.dependentAttributeKey, name: names.dependentAttributeName } );
+            const dependentAttributeId = created.dependentAttributeId;
+            created.signatureTemplateId = await createSignatureTemplate( api, names.signatureTemplate );
+            const signatureTemplateId = created.signatureTemplateId;
 
             const allowedGroup = await createGroup( api, { name: names.allowedGroup, groupTypeGuid: SystemGuid.GroupType.SmallGroup } );
             created.groups.push( allowedGroup );
@@ -227,6 +265,45 @@ export const test = base.extend<{ block: PersonAttributeFormsBlock; resetState: 
                 return JSON.stringify( forms );
             };
 
+            const dependentAttributeGuid = String( ( await api.getById( "Attributes", dependentAttributeId ) ).Guid ).toLowerCase();
+            const buildCustomFormJson = ( fields: CustomFormField[] ): string => JSON.stringify( [ {
+                Guid: randomUUID(),
+                Name: "KFS E2E Custom Form",
+                Header: "",
+                Footer: "",
+                Order: 0,
+                Expanded: true,
+                Fields: fields.map( ( field, order ) => {
+                    const isAttribute = typeof field.field === "string";
+                    const attribute = field.field === "dependentAttribute"
+                        ? { id: dependentAttributeId, guid: dependentAttributeGuid }
+                        : { id: personAttributeId, guid: personAttributeGuid };
+                    return {
+                        // An attribute field is keyed by its attribute's Guid; see buildFormsJson.
+                        Guid: isAttribute ? attribute.guid : randomUUID(),
+                        AttributeId: isAttribute ? attribute.id : null,
+                        ShowCurrentValue: true,
+                        IsRequired: false,
+                        Order: order,
+                        PreText: "",
+                        PostText: "",
+                        FieldSource: isAttribute ? FormFieldSource.PersonAttribute : FormFieldSource.PersonField,
+                        RegistrationFieldSource: 0,
+                        PersonFieldType: typeof field.field === "number" ? field.field : 0,
+                        RegistrationPersonFieldType: 0,
+                        FieldVisibilityRules: {
+                            FilterExpressionType: VisibilityRule.GroupAll,
+                            RuleList: field.showWhenAttributeEquals === undefined ? [] : [ {
+                                Guid: randomUUID(),
+                                ComparedToFormFieldGuid: personAttributeGuid,
+                                ComparisonType: VisibilityRule.EqualTo,
+                                ComparedToValue: field.showWhenAttributeEquals
+                            } ]
+                        }
+                    };
+                } )
+            } ] );
+
             const baseline = (): Record<string, string> => ( {
                 AllowConnectionOpportunity: "False",
                 AllowGroupMembership: "False",
@@ -245,7 +322,8 @@ export const test = base.extend<{ block: PersonAttributeFormsBlock; resetState: 
                 Forms: buildFormsJson(),
                 ConfirmationText: `<p class="${confirmationCssClass}">KFS E2E form complete.</p>`,
                 SignatureDocumentTemplate: "",
-                DisableFormforChildren: "False"
+                DisableFormforChildren: "False",
+                DisableFormWarningText: defaultDisableFormWarningText
             } );
 
             const fixture: PersonAttributeFormsFixture = {
@@ -256,6 +334,9 @@ export const test = base.extend<{ block: PersonAttributeFormsBlock; resetState: 
                 familyMember,
                 outsider,
                 personAttributeId,
+                personAttributeGuid,
+                dependentAttributeId,
+                signatureTemplateId,
                 allowedGroup,
                 disallowedGroup,
                 connection,
@@ -268,7 +349,8 @@ export const test = base.extend<{ block: PersonAttributeFormsBlock; resetState: 
                 configure: async ( overrides = {} ) => {
                     await setBlockSettings( api, blockPage, { ...baseline(), ...overrides } );
                 },
-                buildFormsJson
+                buildFormsJson,
+                buildCustomFormJson
             };
 
             markSetupDone();
@@ -297,9 +379,12 @@ export const test = base.extend<{ block: PersonAttributeFormsBlock; resetState: 
             await deleteWorkflowsOfType( api, workflowTypeId );
         }
 
+        await deleteSignatureDocuments( api, pafa.signatureTemplateId );
+
         for ( const testPerson of [ pafa.person, pafa.familyMember, pafa.outsider ] ) {
             await api.patch( "People", testPerson.id, { MiddleName: "" } );
             await api.setAttributeValue( pafa.personAttributeId, testPerson.id, "" );
+            await api.setAttributeValue( pafa.dependentAttributeId, testPerson.id, "" );
         }
 
         await pafa.configure();
@@ -315,7 +400,9 @@ export const test = base.extend<{ block: PersonAttributeFormsBlock; resetState: 
 export { expect } from "@playwright/test";
 
 /** Best-effort teardown: keeps going past failures so one stuck record does not strand the rest. */
-async function cleanUp( api: RockApi, created: { blockPage?: TestBlockPage; personAttributeId?: number; groups: TestGroup[]; connectionTypeId?: number; workflowTypeIds: number[] } ): Promise<void> {
+type CreatedEntities = { blockPage?: TestBlockPage; personAttributeId?: number; dependentAttributeId?: number; signatureTemplateId?: number; groups: TestGroup[]; connectionTypeId?: number; workflowTypeIds: number[] };
+
+async function cleanUp( api: RockApi, created: CreatedEntities ): Promise<void> {
     const steps: Array<[ string, () => Promise<void> ]> = [];
 
     if ( created.blockPage ) {
@@ -331,6 +418,14 @@ async function cleanUp( api: RockApi, created: { blockPage?: TestBlockPage; pers
     }
     for ( const group of created.groups ) {
         steps.push( [ `group ${group.id}`, () => deleteGroup( api, group.id ) ] );
+    }
+    if ( created.signatureTemplateId ) {
+        const signatureTemplateId = created.signatureTemplateId;
+        steps.push( [ "signature template", () => deleteSignatureTemplate( api, signatureTemplateId ) ] );
+    }
+    if ( created.dependentAttributeId ) {
+        const dependentAttributeId = created.dependentAttributeId;
+        steps.push( [ "dependent person attribute", () => deletePersonAttribute( api, dependentAttributeId ) ] );
     }
     if ( created.personAttributeId ) {
         const personAttributeId = created.personAttributeId;

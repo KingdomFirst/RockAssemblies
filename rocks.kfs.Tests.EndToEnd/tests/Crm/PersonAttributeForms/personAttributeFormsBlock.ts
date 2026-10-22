@@ -46,6 +46,51 @@ export class PersonAttributeFormsBlock {
         return this.root.locator( `input[id$='_attribute_field_${attributeId}']` );
     }
 
+    public get mobilePhoneInput(): Locator {
+        return this.root.locator( "input[id$='_ppMobile']" );
+    }
+
+    /** The SMS checkbox beside Mobile Phone. Always rendered; its column is hidden when the setting is off. */
+    public get smsCheckBox(): Locator {
+        return this.root.locator( "input[type='checkbox'][id$='_cbSms']" );
+    }
+
+    public get connectionStatusPicker(): Locator {
+        return this.root.locator( "select[id$='_dvpConnectionStatus']" );
+    }
+
+    // #region Electronic signature
+
+    public get signaturePanel(): Locator {
+        return this.root.locator( "[id$='_pnlElectronicSignature']" );
+    }
+
+    /** The iframe holding the signature document's HTML (the template's Lava, rendered). */
+    public get signatureDocumentFrame(): Locator {
+        return this.root.locator( "iframe.js-signaturedocument-iframe" );
+    }
+
+    public get typedSignatureInput(): Locator {
+        return this.root.locator( "input[id$='_tbSignatureTyped']" );
+    }
+
+    /** Types a signature, clicks Sign, then Complete, and waits for the form's confirmation. */
+    public async signAndComplete( signedName: string ): Promise<void> {
+        await this.typedSignatureInput.fill( signedName );
+        await this.root.locator( "[id$='_btnSignSignature']" ).click();
+        await waitForPostback( this.page );
+        await expectNoRockError( this.page );
+
+        const complete = this.root.locator( "[id$='_btnCompleteSignature']" );
+        await expect( complete, "Signing did not move on to the Complete step" ).toBeVisible();
+        await complete.click();
+        await waitForPostback( this.page );
+        await expectNoRockError( this.page );
+        await expect( this.confirmation, "Confirmation text did not appear after Complete" ).toBeVisible();
+    }
+
+    // #endregion
+
     public get familyMemberPicker(): Locator {
         return this.root.locator( "select[id$='_ddlFamilyMembers']" );
     }

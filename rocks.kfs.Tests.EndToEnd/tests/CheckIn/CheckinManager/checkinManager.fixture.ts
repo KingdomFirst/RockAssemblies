@@ -19,7 +19,7 @@ import { getTestSettings } from "../../../shared/config";
 import { guardFixtureSetup } from "../../../shared/runGuard";
 import { RockApi, RockEntity } from "../../../shared/rockApi";
 import { openPageAsPerson } from "../../../shared/rockBrowser";
-import { CheckinFamily, CheckinGuid, CheckinSetup, createCurrentAttendance, deleteGroupAttendance, ensureCheckinSetup, ensureRoomUnderDefaultCampus, refreshCheckinCaches, verifyCheckinLinks } from "../../../shared/testData/checkin";
+import { CheckinFamily, CheckinGuid, CheckinSetup, createCurrentAttendance, deleteGroupAttendance, ensureCheckinSetup, ensureMoveRoom, ensureRoomUnderDefaultCampus, refreshCheckinCaches, removeAreaCheckinLabel, resetRoom, verifyCheckinLinks } from "../../../shared/testData/checkin";
 import { CopiedPage, copyBlockSettings, createPageCopy, deleteBlockPage, deleteLeftoverTestPages, getBlockAttributeIds, getBlockTypeId, setBlockSettings } from "../../../shared/testData/cms";
 import { TestPerson, ensureFamilyMember, ensurePerson } from "../../../shared/testData/people";
 import { verifyRoleAccess } from "../../../shared/testData/security";
@@ -43,6 +43,10 @@ export type CheckinManagerFixture = {
     rockVersion: string;
     setup: CheckinSetup;
     campus: RockEntity;
+    /** Name of the campus's location, the top level of Location navigation mode. */
+    campusLocationName: string;
+    /** A second room beside the test room, for Move. */
+    moveRoomId: number;
 
     /** Copy of Rock's Live Metrics page with the KFS Locations block in place of the core one. */
     managerPage: CopiedPage;
@@ -75,6 +79,10 @@ export const test = base.extend<{ block: CheckinManagerLocationsBlock; resetStat
             setup = await ensureCheckinSetup( api );
             await verifyCheckinLinks( api, setup );
             const campus = await ensureRoomUnderDefaultCampus( api, setup );
+            const campusLocationName = String( ( await api.getById( "Locations", campus.LocationId as number ) ).Name );
+            const moveRoomId = await ensureMoveRoom( api, setup );
+            await resetRoom( api, setup.roomId );
+            await removeAreaCheckinLabel( api, setup );
             await refreshCheckinCaches( api, setup );
             await deleteGroupAttendance( api, setup.groupId );
 
@@ -145,6 +153,8 @@ export const test = base.extend<{ block: CheckinManagerLocationsBlock; resetStat
                 rockVersion,
                 setup,
                 campus,
+                campusLocationName,
+                moveRoomId,
                 managerPage: page,
                 copiedSettingKeys,
                 manager,
@@ -158,7 +168,9 @@ export const test = base.extend<{ block: CheckinManagerLocationsBlock; resetStat
         finally {
             for ( const [ label, step ] of [
                 [ "manager page", async () => managerPage && deleteBlockPage( api, managerPage ) ],
-                [ "attendance", async () => setup && deleteGroupAttendance( api, setup.groupId ) ]
+                [ "attendance", async () => setup && deleteGroupAttendance( api, setup.groupId ) ],
+                [ "test room settings", async () => setup && resetRoom( api, setup.roomId ) ],
+                [ "area check-in label", async () => setup && removeAreaCheckinLabel( api, setup ) ]
             ] as Array<[ string, () => Promise<unknown> ]> ) {
                 try {
                     await step();
@@ -181,10 +193,13 @@ export const test = base.extend<{ block: CheckinManagerLocationsBlock; resetStat
         test.info().annotations.push( { type: "rock-version", description: checkinManager.rockVersion } );
 
         await deleteGroupAttendance( api, setup.groupId );
+        await resetRoom( api, setup.roomId );
         await checkinManager.configure();
         const attendanceId = await createCurrentAttendance( api, setup, checkinManager.familyChild );
 
         await use( attendanceId );
+
+        await resetRoom( api, setup.roomId );
     }, { auto: true } ],
 
     block: async ( { page, checkinManager }, use ) => {
@@ -197,6 +212,36 @@ export { expect } from "@playwright/test";
 /** Opens the copied manager page as the test staff member. */
 export async function openManagerPage( page: import( "@playwright/test" ).Page, checkinManager: CheckinManagerFixture ): Promise<void> {
     await openPageAsPerson( page, checkinManager.api, { pageId: checkinManager.managerPage.pageId, personId: checkinManager.manager.id } );
+}
+
+/**
+ * Checks the one-time setup the open/close tests need: the block shows its Open/Close
+ * toggles only to people with Administrate, or the block's own CloseLocations right.
+ */
+export async function verifyManagerCanCloseRooms( checkinManager: CheckinManagerFixture ): Promise<void> {
+    const { api, manager } = checkinManager;
+    const page = await api.getByGuid( "Pages", CoreLiveMetrics.pageGuid );
+    const layout = await api.getById( "Layouts", page?.LayoutId as number );
+    const errors: string[] = [];
+
+    for ( const action of [ "CloseLocations", "Administrate" ] ) {
+        try {
+            await verifyRoleAccess( api, {
+                person: manager,
+                entityTypeName: "Rock.Model.Site",
+                entityId: layout.SiteId as number,
+                entityLabel: "the Rock Check-in Manager site",
+                action,
+                suggestedRole: "KFS E2E Plugin Testers"
+            } );
+            return;
+        }
+        catch ( error ) {
+            errors.push( ( error as Error ).message );
+        }
+    }
+
+    throw new Error( errors[ errors.length - 1 ] );
 }
 
 /** Checks the one-time setup that lets the staff test person open Check-in Manager pages. */

@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 //
+import { releaseScreenshot } from "../../../shared/releaseScreenshot";
 import { expect, test } from "./fundraisingProgress.fixture";
 
 /*
@@ -54,6 +55,8 @@ test.describe( "Fundraising Progress: GroupId and GroupMemberId parameters", () 
         await expect( block.memberAmounts( participant.person.fullName ) ).toHaveText( `$${participant.expected.raised}/$${participant.expected.goal}` );
         // Fixed in v1.1: up to v1.0 the display settings re-showed the group totals here.
         await expect( block.groupTotals ).toHaveCount( 0 );
+
+        await releaseScreenshot( block.root, "FundraisingProgress_GroupMemberView" );
     } );
 
     // Not in the manual plan: what a page without a group shows.

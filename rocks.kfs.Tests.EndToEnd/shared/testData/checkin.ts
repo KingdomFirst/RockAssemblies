@@ -42,6 +42,8 @@ export const CheckinGuid = {
     schedule: "C4EC0E2E-E2E0-4C0E-8C0E-0000000000A5",
     groupLocation: "C4EC0E2E-E2E0-4C0E-8C0E-0000000000A6",
     kiosk: "C4EC0E2E-E2E0-4C0E-8C0E-0000000000A7",
+    /** A second room for Move tests. Not linked to the group, so check-in never offers it. */
+    moveRoom: "C4EC0E2E-E2E0-4C0E-8C0E-0000000000A8",
     familyAdult: "C4EC0E2E-E2E0-4C0E-8C0E-0000000000B1",
     familyChild: "C4EC0E2E-E2E0-4C0E-8C0E-0000000000B2"
 } as const;
@@ -51,6 +53,7 @@ export const CheckinName = {
     area: `${TestNamePrefix} Check-in Area`,
     group: `${TestNamePrefix} Check-in Group`,
     room: `${TestNamePrefix} Check-in Room`,
+    moveRoom: `${TestNamePrefix} Check-in Move Room`,
     schedule: `${TestNamePrefix} Always Open`,
     kiosk: `${TestNamePrefix} Kiosk`
 } as const;
@@ -221,6 +224,115 @@ export async function ensureMobilePhone( api: RockApi, personId: number, number:
     } );
 }
 
+/**
+ * Finds or creates the persistent second room and keeps it beside the test room (same
+ * parent location), so the Move dialog's location picker shows them together.
+ * Returns its Id.
+ */
+export async function ensureMoveRoom( api: RockApi, setup: CheckinSetup ): Promise<number> {
+    const moveRoomId = await findOrCreate( api, "Locations", CheckinGuid.moveRoom, async () => ( {
+        Name: CheckinName.moveRoom,
+        LocationTypeValueId: await api.getIdByGuid( "DefinedValues", SystemGuid.DefinedValue.LocationTypeRoom ),
+        IsActive: true
+    } ) );
+
+    const room = await api.getById( "Locations", setup.roomId );
+    const moveRoom = await api.getById( "Locations", moveRoomId );
+    if ( moveRoom.ParentLocationId !== room.ParentLocationId ) {
+        await api.patch( "Locations", moveRoomId, { ParentLocationId: room.ParentLocationId } );
+    }
+
+    return moveRoomId;
+}
+
+/**
+ * Puts the test room back to its baseline: active, no thresholds. Room tests open/close it
+ * and set thresholds; Attended Check-in shares the room and needs it open and unlimited.
+ */
+export async function resetRoom( api: RockApi, roomId: number ): Promise<void> {
+    const room = await api.getById( "Locations", roomId );
+    if ( room.IsActive !== true || room.SoftRoomThreshold != null || room.FirmRoomThreshold != null ) {
+        await api.patch( "Locations", roomId, { IsActive: true, SoftRoomThreshold: null, FirmRoomThreshold: null } );
+    }
+}
+
+// #region Labels
+
+/** Key of the temporary check-in label attribute put on the test area by addAreaCheckinLabel. */
+const areaLabelAttributeKey = "KFSE2ECheckinLabel";
+
+export type AreaCheckinLabel = {
+    attributeId: number;
+    /** The label file's name, which the manager's Print Label dialog lists. */
+    fileName: string;
+};
+
+/*
+    10/13/2026 - CLAUDE
+
+    Check-in labels are configured per area: a Label attribute on the area's group type
+    whose value is a check-in label file. The test area normally has none, so Attended
+    Check-in never prints, so this adds one only for the label tests and
+    removeAreaCheckinLabel takes it off again. It reuses a label file the site already
+    has (Rock installs its sample labels) rather than uploading ZPL, which REST cannot do.
+
+    Reason: The test area must stay label-free for the Attended Check-in suite.
+*/
+
+/** Gives the test area a check-in label, using the site's first check-in label file. */
+export async function addAreaCheckinLabel( api: RockApi, setup: CheckinSetup ): Promise<AreaCheckinLabel> {
+    await removeAreaCheckinLabel( api, setup );
+
+    const labelTypeId = await api.getIdByGuid( "BinaryFileTypes", SystemGuid.BinaryFileType.CheckinLabel );
+    const labelFile = await api.first( "BinaryFiles", `BinaryFileTypeId eq ${labelTypeId} and IsTemporary eq false`, "&$orderby=Id" );
+    if ( !labelFile ) {
+        throw new Error( "The site has no check-in label files (Admin Tools > Check-in > Check-in Labels). Add one, e.g. Rock's sample Child Label, so the label tests have one to show." );
+    }
+
+    const attributeId = await api.post( "/api/Attributes", {
+        Guid: randomUUID(),
+        EntityTypeId: await api.getEntityTypeId( "Rock.Model.GroupType" ),
+        EntityTypeQualifierColumn: "Id",
+        EntityTypeQualifierValue: String( setup.areaId ),
+        FieldTypeId: await api.getIdByGuid( "FieldTypes", SystemGuid.FieldType.Label ),
+        Key: areaLabelAttributeKey,
+        Name: `${TestNamePrefix} Check-in Label`,
+        Description: "Created by rocks.kfs.Tests.EndToEnd for the label tests. Safe to delete.",
+        Order: 0,
+        IsGridColumn: false,
+        IsMultiValue: false,
+        IsRequired: false,
+        IsSystem: false
+    } );
+    await api.post( "/api/AttributeQualifiers", {
+        AttributeId: attributeId,
+        Key: "binaryFileType",
+        Value: SystemGuid.BinaryFileType.CheckinLabel,
+        IsSystem: false
+    } );
+    // Re-save the attribute so Rock's attribute cache picks up the qualifier added after it.
+    await api.patch( "Attributes", attributeId, { Description: "Created by rocks.kfs.Tests.EndToEnd for the label tests. Safe to delete." } );
+    await api.setAttributeValue( attributeId, setup.areaId, String( labelFile.Guid ).toLowerCase() );
+
+    return { attributeId, fileName: String( labelFile.FileName ) };
+}
+
+/** Removes the temporary label attribute (and its value) from the test area, if present. */
+export async function removeAreaCheckinLabel( api: RockApi, setup: CheckinSetup ): Promise<void> {
+    const groupTypeEntityTypeId = await api.getEntityTypeId( "Rock.Model.GroupType" );
+    for ( const attribute of await api.query( "Attributes", `EntityTypeId eq ${groupTypeEntityTypeId} and Key eq '${areaLabelAttributeKey}' and EntityTypeQualifierValue eq '${setup.areaId}'` ) ) {
+        for ( const value of await api.query( "AttributeValues", `AttributeId eq ${attribute.Id}` ) ) {
+            await api.delete( "AttributeValues", value.Id );
+        }
+        for ( const qualifier of await api.query( "AttributeQualifiers", `AttributeId eq ${attribute.Id}` ) ) {
+            await api.delete( "AttributeQualifiers", qualifier.Id );
+        }
+        await api.delete( "Attributes", attribute.Id );
+    }
+}
+
+// #endregion
+
 // #region Attendance
 
 /** Gets attendance records in the test group, optionally for one person. */
@@ -259,6 +371,21 @@ export async function deleteGroupAttendance( api: RockApi, groupId: number ): Pr
 
     Reason: Attendance times must be in Rock's time zone, which the tests cannot see.
 */
+
+/**
+ * Finds the person's open attendance in the test group at a location, or null. Used to
+ * check where a Move put someone.
+ */
+export async function getOpenAttendanceAt( api: RockApi, setup: CheckinSetup, person: TestPerson, locationId: number ): Promise<RockEntity | null> {
+    for ( const occurrence of await api.query( "AttendanceOccurrences", `GroupId eq ${setup.groupId} and LocationId eq ${locationId}` ) ) {
+        const open = await api.first( "Attendances", `OccurrenceId eq ${occurrence.Id} and PersonAliasId eq ${person.primaryAliasId} and EndDateTime eq null` );
+        if ( open ) {
+            return open;
+        }
+    }
+
+    return null;
+}
 
 /** Checks a person into the test group, room and schedule right now (Rock's time), as a kiosk would. */
 export async function createCurrentAttendance( api: RockApi, setup: CheckinSetup, person: TestPerson ): Promise<number> {

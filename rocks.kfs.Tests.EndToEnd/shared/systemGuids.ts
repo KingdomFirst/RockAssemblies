@@ -31,8 +31,17 @@ export const SystemGuid = {
         PersonTimelineNote: "66A1B9D7-7EFA-40F3-9415-E54437977D60",
         GroupMemberNote: "FFFC3644-60CD-4D14-A714-E8DCC202A0E1"
     },
+    BinaryFileType: {
+        CheckinLabel: "DE0E5C50-234B-474C-940C-C571F385E65F",
+        DigitallySignedDocuments: "40871411-4E2D-45C2-9E21-D9FCBA5FC340"
+    },
+    FieldType: {
+        Label: "8814CF68-435F-40F4-9A4C-ED6582835E0E"
+    },
     DefinedValue: {
         CheckinTemplatePurpose: "4A406CB0-495B-4795-B788-52BDFDE00B01",
+        ConnectionStatusAttendee: "39F491C5-D6AC-4A9B-8AC0-C431CB17D588",
+        ConnectionStatusProspect: "368DD475-242C-49C4-A42C-7278BE690CC2",
         DeviceTypeCheckinKiosk: "BC809626-1389-4543-B8BB-6FAC79C27AFD",
         LocationTypeRoom: "107C6DA1-266D-4E1C-A443-1CD37064601D",
         PhoneTypeMobile: "407E7E45-7B2E-4FCD-9605-ECB1339F2453",
