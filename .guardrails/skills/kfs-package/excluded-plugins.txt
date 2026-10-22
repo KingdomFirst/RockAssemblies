@@ -1,0 +1,7 @@
+# Folders in the shared Rock Packages folder that are NOT KFS plugins.
+#
+# Each line: <Rock Packages folder name> | <why>. Lines starting with # are comments.
+# Packaging (/kfs-package) and testing (the preflight and the end-to-end suite) skip these
+# folders entirely: they are not listed, packaged, tested or reported.
+QuickBooks Online (Simple) | No longer KFS intellectual property (now Simple Donation's plugin).
+Protect My Ministry 3.0 | Protect My Ministry's own plugin (com.protectmyministry); not KFS code.
