@@ -93,7 +93,9 @@ export default class SummaryReporter implements Reporter {
 
     public async onEnd( result: FullResult ): Promise<void> {
         const tests = this.rootSuite?.allTests() ?? [];
-        if ( tests.length === 0 ) {
+        // `playwright test --list` (npm run test:list) runs nothing: no test has a result. It is
+        // not a run, so it must not leave a report of every test "skipped".
+        if ( tests.length === 0 || tests.every( test => test.results.length === 0 ) ) {
             return;
         }
 

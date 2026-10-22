@@ -56,7 +56,8 @@ export default defineConfig( {
 
         Reason: Every run must leave a summary report.
     */
-    reporter: [
+    // --list (npm run test:list) runs nothing, so it must not create a run folder or report.
+    reporter: process.argv.includes( "--list" ) ? [ [ "list" ] ] : [
         [ "list" ],
         [ "json", { outputFile: path.join( runDirectory, "results.json" ) } ],
         [ "html", { outputFolder: path.join( runDirectory, "html" ), open: "never" } ],
