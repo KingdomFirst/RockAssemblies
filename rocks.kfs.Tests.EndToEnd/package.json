@@ -6,7 +6,9 @@
     "test": "playwright test",
     "test:list": "playwright test --list",
     "test:headed": "playwright test --headed",
-    "report": "playwright show-report test-results/html",
+    "summary": "node scripts/openReport.js summary",
+    "report": "node scripts/openReport.js html",
+    "runs": "node scripts/openReport.js index",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

@@ -17,15 +17,19 @@
 import { defineConfig } from "@playwright/test";
 import * as dotenv from "dotenv";
 import * as path from "path";
+import { getRunDirectory } from "./shared/runDirectory";
 
 dotenv.config( { path: path.join( __dirname, ".env" ) } );
 
 const channel = process.env.BROWSER_CHANNEL || "msedge";
 
+// Everything a run produces goes in its own folder, test-results/runs/<run id>; see runDirectory.ts.
+const runDirectory = getRunDirectory();
+
 export default defineConfig( {
     testDir: "./tests",
     globalSetup: "./shared/globalSetup.ts",
-    outputDir: "./test-results/artifacts",
+    outputDir: path.join( runDirectory, "artifacts" ),
 
     /*
         9/23/2026 - CLAUDE
@@ -43,10 +47,20 @@ export default defineConfig( {
     timeout: 90_000,
     expect: { timeout: 15_000 },
 
+    /*
+        10/22/2026 - CLAUDE
+
+        Passing --reporter on the command line replaces this whole list, and the run then
+        leaves no report behind. Use the npm scripts, or add the summary reporter to any
+        --reporter override (README: Running).
+
+        Reason: Every run must leave a summary report.
+    */
     reporter: [
         [ "list" ],
-        [ "json", { outputFile: "test-results/results.json" } ],
-        [ "html", { outputFolder: "test-results/html", open: "never" } ]
+        [ "json", { outputFile: path.join( runDirectory, "results.json" ) } ],
+        [ "html", { outputFolder: path.join( runDirectory, "html" ), open: "never" } ],
+        [ "./shared/summaryReporter.ts" ]
     ],
 
     use: {

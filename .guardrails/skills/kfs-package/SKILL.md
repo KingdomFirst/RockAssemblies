@@ -166,6 +166,9 @@ a `deletefile.lst` change, a run.sql change.
 
 ## Report
 
+If the packages were validated on the test site with the E2E suite, give the path to that
+run's `summary.html` (`/kfs-compat-test` step 4); it is the test record for the submission.
+
 Per plugin: the new version folder, the dll version where there is one, the PRs covered, the
 Description HTML, and screenshots taken or pending. Then list the changed code that maps to no
 RockShop plugin. Never upload to the RockShop or change a previous version's folder.

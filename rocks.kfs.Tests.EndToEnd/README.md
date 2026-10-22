@@ -81,16 +81,58 @@ npx playwright test tests/Crm/PersonAttributeForms
 npx playwright test tests/CheckIn/AttendedCheckin
 npx playwright test -g "Submit_GroupId"    # by name
 npm run test:headed                        # watch it in a browser window
-npm run report                             # open the HTML report of the last run
+npm run summary                            # open the last run's summary
+npm run report                             # open the last run's Playwright HTML report
+npm run runs                               # open the list of every kept run
 ```
 
-Output:
+`npm run summary -- <run id>` and `npm run report -- <run id>` open an earlier run.
 
-- `test-results/results.json`: machine-readable results. Each test carries a `rock-version`
-  annotation with the version it ran against.
-- `test-results/html/`: HTML report.
-- `test-results/artifacts/`: a screenshot and a Playwright trace for every failure
-  (`npx playwright show-trace <zip>`).
+### Reports
+
+Every run gets its own folder, `test-results/runs/<run id>` (e.g. `2026-10-22_143005`), so a
+run's report is never overwritten by the next one:
+
+| File | What it is |
+|---|---|
+| `summary.html` | The run at a glance: site, Rock version, totals, a table per plugin, every test with its result and time, and for each failure the error, screenshot and links to its trace. Opens straight from disk; no server needed. |
+| `summary.md` | The same summary as Markdown, for pasting into a PR, ticket or RockShop note. |
+| `summary.json` | The same, for tools. |
+| `results.json` | Playwright's full machine-readable results. Each test carries a `rock-version` annotation. |
+| `html/` | Playwright's HTML report, for step-by-step traces (`npm run report`). |
+| `artifacts/` | A screenshot, error context and trace for every failure (`npx playwright show-trace <zip>`). |
+
+`test-results/index.html` lists every kept run with its result. The last 30 runs are kept;
+older run folders are deleted at the end of each run (set `KFS_E2E_KEEP_RUNS` to keep more).
+The console prints the totals and the summary's path when a run ends.
+
+Results in the summary:
+
+| Result | Meaning |
+|---|---|
+| passed | Passed (on the first try) |
+| failed / timed out | A new failure: triage it (`/kfs-compat-test` step 3) |
+| known issue | Failed because of a plugin bug already recorded. The test carries a `known-issue` annotation naming the bug; see "Known issues" below. A run whose only failures are known issues reads *Passed except known issues*. |
+| flaky | Failed, then passed on retry |
+| skipped | Not run |
+
+**Do not pass `--reporter` on the command line.** It replaces every reporter in
+`playwright.config.ts`, and the run then leaves no report. If you need a different console
+reporter, keep the others: `npx playwright test --reporter=line,json,html,./shared/summaryReporter.ts`
+(the JSON and HTML reporters then write to Playwright's default locations, not the run folder).
+
+### Known issues
+
+When a test fails because of a real plugin bug that will not be fixed right away, keep the
+test (it should pass once the bug is fixed) and mark it so reports separate it from new
+failures. At the start of the test:
+
+```ts
+test.info().annotations.push( { type: "known-issue", description: "What is wrong, where, and since when." } );
+```
+
+Remove the annotation when the bug is fixed. Never use it for test drift or environment
+problems; fix those instead.
 
 `npm run typecheck` and `npm run test:list` need no site and no `.env`.
 
@@ -116,8 +158,12 @@ rocks.kfs.Tests.EndToEnd/
     rockApi.ts                # Rock v1 REST client (query, create, patch, delete, attribute values)
     rockBrowser.ts            # sign in by impersonation, detect Rock error pages, wait for UpdatePanels
     systemGuids.ts            # Rock system Guids / type names used by tests
+    runDirectory.ts           # the run's folder under test-results/runs
+    summaryReporter.ts        # writes summary.html/.md/.json and test-results/index.html
+    releaseScreenshot.ts      # RockShop screenshots, when RELEASE_SCREENSHOTS_DIR is set
     testData/                 # like Rock.Tests.Integration/TestData: builders + cleanup
-      cms.ts people.ts groups.ts connections.ts workflows.ts attributes.ts checkin.ts
+      cms.ts people.ts groups.ts connections.ts workflows.ts attributes.ts checkin.ts signatures.ts
+  scripts/openReport.js       # npm run summary / report / runs
   setup/                      # one-time SQL a plugin needs that REST cannot create
   tests/
     {Domain}/{Plugin}/        # organized by Rock domain, like Rock's test projects

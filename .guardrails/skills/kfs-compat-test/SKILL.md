@@ -43,11 +43,17 @@ npx playwright test                         # whole suite
 npx playwright test tests/Crm/PersonAttributeForms   # one plugin, if the user named one
 ```
 
-The first line of output shows `Rock version under test: …`. Include it in the report.
+Never pass `--reporter`: it replaces the configured reporters and the run leaves no report.
+When the run ends, the console prints the totals and the path to the run's summary,
+`test-results/runs/<run id>/summary.html` (and `summary.md` beside it). Read `summary.md`
+rather than scrolling the console; it records the site, Rock version, every test's result
+and each failure's error and artifacts.
 
 ## 3. Triage every failure
 
-Open the failure's `error-context.md`, screenshot and trace under `test-results/artifacts/`.
+Open the failure's `error-context.md`, screenshot and trace under the run's `artifacts/`
+folder (`summary.md` links each one). Failures already marked **known issue** are recorded
+plugin bugs: list them, but do not triage them again.
 Classify each failure as one of the following before reporting it:
 
 | Class | Signs | Meaning |
@@ -61,6 +67,9 @@ For a plugin break, find the cause in the plugin source (`RockWeb/Plugins/rocks_
 changed. **Do not fix it in this skill.** Offer `/bugfix`.
 
 ## 4. Report
+
+Give the user the path to the run's `summary.html`; it is the record of the run and survives
+later runs (`npm run summary` reopens the latest, `npm run runs` lists them all). Then:
 
 - Site and Rock version tested.
 - Per plugin: pass/fail counts, then each failure with its class, a one-line cause, and the

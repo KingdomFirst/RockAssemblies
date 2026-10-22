@@ -61,8 +61,12 @@ flagged obsolete in Rock 1.13, seven years before v20 removed it.
 
 ## Output
 
-`results\<rock version>\preflight.md` (for people) and `preflight.json` (for tools). Exit
-codes:
+`results\<rock version>\preflight.md` (for people) and `preflight.json` (for tools). The
+report opens with the summary counts, then lists the failures in detail, then gives **every**
+plugin DLL and block with its own result (*Results: plugin DLLs*, *Results: blocks*), so it
+records what passed as well as what failed. Each run also keeps a copy in
+`results\<rock version>\history\preflight_<date>_<time>.md` (and `.json`), because the next
+run against the same Rock version overwrites `preflight.md`. Exit codes:
 
 | Code | Meaning |
 |---|---|

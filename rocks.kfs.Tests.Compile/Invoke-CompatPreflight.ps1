@@ -555,6 +555,40 @@ foreach ( $section in @( @{ Title = "Broken blocks"; Items = $brokenBlocks }, @{
     }
 }
 
+# Every check's own result, so the report records what passed as well as what failed.
+$blockResults = @( $allBlocks | Sort-Object | ForEach-Object {
+    $name = $_.Replace( "Plugins\", "" )
+    $result = if ( $brokenBlocks | Where-Object { $_.Block -eq $name } ) { "broken" }
+        elseif ( $blockedBlocks | Where-Object { $_.Block -eq $name } ) { "not checked (a plugin DLL it needs failed to build)" }
+        else { "compiles" }
+    [pscustomobject]@{ Block = $name; Source = ( Get-BlockSource $_ ); Result = $result }
+} )
+
+$lines += ""
+$lines += "## Results: plugin DLLs"
+$lines += ""
+if ( $SkipBuild ) {
+    $lines += "Not built (-SkipBuild); the DLLs already in RockWeb\Bin were used."
+}
+else {
+    $lines += "| Result | Project | Source |"
+    $lines += "|---|---|---|"
+    foreach ( $dll in ( $dllResults | Sort-Object Source, Project ) ) {
+        $result = if ( $dll.Succeeded ) { "$( [char]::ConvertFromUtf32( 0x2705 ) ) builds" } else { "$( [char]::ConvertFromUtf32( 0x274C ) ) does not build ($( @( $dll.Errors ).Count ) errors)" }
+        $lines += "| $result | $( $dll.Project ) | $( $dll.Source ) |"
+    }
+}
+
+$lines += ""
+$lines += "## Results: blocks"
+$lines += ""
+$lines += "| Result | Block | Source |"
+$lines += "|---|---|---|"
+foreach ( $block in ( $blockResults | Sort-Object Source, Block ) ) {
+    $icon = switch -Wildcard ( $block.Result ) { "compiles" { [char]::ConvertFromUtf32( 0x2705 ) } "broken" { [char]::ConvertFromUtf32( 0x274C ) } default { [char]::ConvertFromUtf32( 0x26A0 ) } }
+    $lines += "| $icon $( $block.Result ) | $( $block.Block ) | $( $block.Source ) |"
+}
+
 if ( $obsoleteUsages.Count -gt 0 ) {
     $lines += ""
     $lines += "## Obsolete Rock APIs in use (will break in a future Rock version)"
@@ -596,11 +630,19 @@ $lines | Set-Content -Encoding UTF8 $reportPath
     dlls = $dllResults
     blocksTotal = $allBlocks.Count
     blocksClean = $cleanCount
+    blocks = $blockResults
     brokenBlocks = $brokenBlocks
     blockedBlocks = $blockedBlocks
     dependencyConflicts = $dependencyConflicts
     obsoleteUsages = @( $obsoleteUsages.Keys | Sort-Object )
 } | ConvertTo-Json -Depth 5 | Set-Content -Encoding UTF8 ( Join-Path $resultsDir "preflight.json" )
+
+# Keep each run: the files above are overwritten by the next run against this Rock version.
+$historyDir = Join-Path $resultsDir "history"
+New-Item -ItemType Directory -Force $historyDir | Out-Null
+$stamp = $started.ToString( "yyyy-MM-dd_HHmmss" )
+Copy-Item $reportPath ( Join-Path $historyDir "preflight_$stamp.md" )
+Copy-Item ( Join-Path $resultsDir "preflight.json" ) ( Join-Path $historyDir "preflight_$stamp.json" )
 
 Write-Step "Summary"
 $lines | Select-Object -Skip 6 -First 6 | ForEach-Object { Write-Host $_ }

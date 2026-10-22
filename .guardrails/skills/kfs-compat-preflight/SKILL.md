@@ -31,7 +31,9 @@ that clone's `RockWeb\Bin`. Allow 10 to 15 minutes; run it in the background.
 
 ## 3. Report
 
-Read `results\<version>\preflight.md` and report:
+Read `results\<version>\preflight.md` and give the user its path: it is the record of the run,
+listing every DLL and block with its result, and a dated copy is kept in
+`results\<version>\history\`. Then report:
 
 - The Rock version, and counts: DLLs building, blocks clean, broken, and not checked.
 - The **Coverage** table: counts for each source (KFS plugins, and the Attended Check-in fork

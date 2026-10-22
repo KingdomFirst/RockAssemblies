@@ -69,6 +69,7 @@ test.describe( "Person Attribute Forms Advanced: field visibility rules", () => 
     } );
 
     test( "Edit_ValueChangedAwayFromRule_HidesDependentFieldAndDoesNotSaveIt", async ( { page, pafa, block } ) => {
+        test.info().annotations.push( { type: "known-issue", description: "PAFA saves a value typed into a field that a visibility rule then hides (block's FieldVisibilityWrapper; since 2022)." } );
         await pafa.api.setAttributeValue( pafa.personAttributeId, pafa.person.id, showValue );
 
         await openPageAsPerson( page, pafa.api, { pageId: pafa.blockPage.pageId, personId: pafa.person.id } );
@@ -96,6 +97,7 @@ test.describe( "Person Attribute Forms Advanced: field visibility rules", () => 
         Reason: Pins a real plugin bug; it should pass once the block handles person fields.
     */
     test( "PageLoad_PersonFieldHiddenByRule_RendersFormWithoutTheField", async ( { page, pafa, block } ) => {
+        test.info().annotations.push( { type: "known-issue", description: "PAFA crashes when a visibility rule hides a person field (block's FieldVisibilityWrapper keys person fields by field-type number; since 2022)." } );
         await pafa.configure( {
             Forms: pafa.buildCustomFormJson( [
                 { field: "attribute" },
