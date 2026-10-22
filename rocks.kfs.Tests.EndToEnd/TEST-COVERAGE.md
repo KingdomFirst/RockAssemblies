@@ -7,7 +7,7 @@ What the automated tests check for each KFS RockShop plugin, in plain language. 
 - **Functional tests** (`rocks.kfs.Tests.EndToEnd`) use each plugin on a running Rock test site, the way a person would, and check the result. They are listed below, plugin by plugin.
 - **The compatibility preflight** (`rocks.kfs.Tests.Compile`) checks that each plugin's code still builds and compiles against a new Rock version. It does not run the plugin.
 
-167 functional tests cover 13 of 21 plugins. Compile coverage is from the newest preflight report (Rock 20.0).
+167 functional tests cover 13 of 20 plugins. Compile coverage is from the newest preflight report (Rock 20.0).
 
 Plugins are named as in the shared Rock Packages folder. Setup steps for each suite are in its README.
 
@@ -34,7 +34,6 @@ Plugins are named as in the shared Rock Packages folder. Setup steps for each su
 | [Round Robin Group Assignment](#round-robin-group-assignment) | 4 | Job | Yes (1 DLL) | - |
 | [Scheduled Group Communication](#scheduled-group-communication) | 5 | Email, SMS | Yes (1 DLL) | - |
 | [Steps to Care](#steps-to-care) | 18 | Actions and notes, Entering care needs, Care configuration, Notification preference | Yes (1 DLL, 4 pages) | - |
-| [Vimeo Sync](#vimeo-sync) | none | - | Yes (1 DLL, 2 pages) | - |
 | [Zoom Room Management](#zoom-room-management) | none | - | Yes (2 DLLs, 1 page) | - |
 
 ## Advanced Check-in Monitor
@@ -591,14 +590,6 @@ A workflow action that creates a prayer request (KFS: Prayer > Add Prayer Reques
 Functional tests: **none**. Compile check: Yes (1 DLL).
 
 No functional tests yet. The compatibility preflight still checks that it builds.
-
-### Vimeo Sync
-
-Syncs video details from Vimeo into Rock content channel items, one item or a whole channel at a time.
-
-Functional tests: **none**. Compile check: Yes (1 DLL, 2 pages).
-
-No functional tests yet. The compatibility preflight still checks that it builds and its pages compile.
 
 ### Zoom Room Management
 

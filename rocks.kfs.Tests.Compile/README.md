@@ -54,8 +54,11 @@ When a project or page is shipped by more than one plugin, it is built or compil
 its result appears under each plugin.
 
 **Retired code is never tested.** Anything under a `ZZZ_Archive` folder, in either
-`KFSRockAssemblies` or `KFSRockBlocks`, is retired by KFS practice; a package that still ships
-it reports it as archived.
+`KFSRockAssemblies` or `KFSRockBlocks`, is retired by KFS practice. When **all** of a package's
+KFS code has been moved there, the plugin is *archived*: it is skipped entirely, like an
+excluded plugin, and not reported (`-ListPlugins` still shows it as Archived). Archiving a
+plugin's code is all it takes; no list needs updating. A plugin with only some of its code
+archived stays active, and the archived files are noted under it.
 
 ## What it does
 

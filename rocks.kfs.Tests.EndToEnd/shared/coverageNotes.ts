@@ -172,10 +172,6 @@ export const CoverageNotes: Record<string, PluginNotes> = {
         about: "Exports Rock financial batches to Shelby Financials as journal entries (Excel).",
         notCovered: [ "No functional tests yet. The compatibility preflight still checks that it builds and its pages compile." ]
     },
-    "Vimeo Sync": {
-        about: "Syncs video details from Vimeo into Rock content channel items, one item or a whole channel at a time.",
-        notCovered: [ "No functional tests yet. The compatibility preflight still checks that it builds and its pages compile." ]
-    },
     "Cybersource Gateway": {
         about: "A CyberSource payment gateway for Rock giving and registrations (unreleased).",
         notCovered: [ "No functional tests yet. The compatibility preflight checks that it builds; its Obsidian control is not compiled by either suite." ]

@@ -92,10 +92,15 @@ export default class CoverageReporter implements Reporter {
             warnings.push( "No compatibility preflight report found (rocks.kfs.Tests.Compile/results); the compile column is empty. Run the preflight, then regenerate." );
         }
 
-        const plugins = [ ...new Set( [ ...byPlugin.keys(), ...Object.keys( CoverageNotes ), ...compiled.keys() ] ) ].sort( ( a, b ) => a.localeCompare( b ) );
+        // The document covers the plugins with tests or notes. The preflight report on this
+        // machine can be older than the code (e.g. a plugin since archived), so a plugin only it
+        // lists is reported in the console, not added to the document.
+        const plugins = [ ...new Set( [ ...byPlugin.keys(), ...Object.keys( CoverageNotes ) ] ) ].sort( ( a, b ) => a.localeCompare( b ) );
         for ( const plugin of plugins.filter( p => !CoverageNotes[ p ] ) ) {
             warnings.push( `${plugin} has no entry in shared/coverageNotes.ts.` );
         }
+        const consoleOnly = [ ...compiled.keys() ].filter( p => !plugins.includes( p ) )
+            .map( p => `${p} is in the preflight report but not in shared/coverageNotes.ts, so it is left out. Add notes for a new plugin; if it was archived, re-run the preflight.` );
         const unknown = findUnknownPluginNames( plugins );
         if ( unknown && unknown.length > 0 ) {
             warnings.push( `Not a current KFS plugin in Rock Packages: ${unknown.join( ", " )}. Update shared/plugins.ts or shared/coverageNotes.ts.` );
@@ -145,7 +150,7 @@ export default class CoverageReporter implements Reporter {
 
         console.log( `${changed ? "Wrote" : "Unchanged:"} ${outputFile}` );
         console.log( `${total} tests, ${tested.length} plugins with functional tests, ${untested.length} without.` );
-        warnings.forEach( w => console.log( `Warning: ${w}` ) );
+        warnings.concat( consoleOnly ).forEach( w => console.log( `Warning: ${w}` ) );
     }
 }
 

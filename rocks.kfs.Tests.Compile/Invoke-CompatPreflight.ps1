@@ -183,7 +183,8 @@ if ( $Plugin ) {
 }
 
 $activePlugins = @( $catalog | Where-Object { $_.Status -eq "Active" } )
-$untestedPlugins = @( $catalog | Where-Object { $_.Status -ne "Active" } )
+# Archived plugins (all their code in ZZZ_Archive) are retired: skipped entirely, not reported.
+$untestedPlugins = @( $catalog | Where-Object { $_.Status -notin "Active", "Archived" } )
 
 foreach ( $entry in $catalog ) {
     $label = if ( $entry.Unreleased ) { "$( $entry.Name ) (unreleased)" } else { $entry.Name }
@@ -200,7 +201,7 @@ if ( $ListPlugins ) {
 }
 
 if ( $activePlugins.Count -eq 0 ) {
-    Exit-Environment "No active plugins to test (none of the selected packages ships code from our repos)."
+    Exit-Environment "No active plugins to test (none of the selected packages ships code from our repos that is not archived)."
 }
 
 # The code under test: every project and page an active plugin ships, each tested once.
@@ -505,7 +506,7 @@ for ( $pass = 1; $pass -le $allBlocks.Count + 1; $pass++ ) {
 
 # A page whose errors are all "type or namespace not found" for a KFS assembly is blocked by a DLL build failure, not broken itself.
 $failedDllNames = @( $dllResults | Where-Object { -not $_.Succeeded } | ForEach-Object { $_.Project } )
-$kfsNamespacePattern = 'rocks\.kfs|''rocks''|EventbriteDotNetFramework|ZoomDotNetFramework|VimeoDotNet|cc\.newspring'
+$kfsNamespacePattern = 'rocks\.kfs|''rocks''|EventbriteDotNetFramework|ZoomDotNetFramework|cc\.newspring'
 
 # Every page's result, keyed by its path relative to RockWeb ("Plugins\...").
 $pageResults = @{}

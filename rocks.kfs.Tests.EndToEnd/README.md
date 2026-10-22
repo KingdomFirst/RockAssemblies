@@ -136,6 +136,10 @@ not read test code. `npm run coverage` regenerates it without running anything:
 - The compile column comes from the newest compatibility preflight report on this machine
   (`rocks.kfs.Tests.Compile/results`). Run the preflight first if it is missing or old.
 
+When a plugin is archived, remove its tests (if any) and its entry in `coverageNotes.ts`.
+Until the preflight runs again, the generator warns in the console that the plugin is still in
+the old preflight report; that is expected.
+
 The file has no dates, so it only changes when coverage does. Regenerate and commit it with
 any change to the tests or the notes. The generator lists any problems at the end of the
 file and in the console (a plugin with no notes, a name that is not a current plugin).

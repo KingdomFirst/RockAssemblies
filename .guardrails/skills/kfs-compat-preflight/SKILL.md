@@ -14,7 +14,8 @@ Packages folder ships (`PluginCatalog.ps1`), the same plugins the end-to-end sui
 `/kfs-package` use. Code that no package ships is not tested; do not add it back. If the user
 expects code to be covered and it is not, the answer is to ship it in a plugin's package.
 Folders listed in `.guardrails/skills/kfs-package/excluded-plugins.txt` are not KFS plugins (e.g.
-no longer our IP): they are skipped entirely and must not appear in a report.
+no longer our IP): they are skipped entirely and must not appear in a report. So are archived
+plugins, whose code has all been moved into `ZZZ_Archive`; that needs no list entry.
 
 **Ignore `ZZZ_Archive`.** Plugins under a `ZZZ_Archive` folder (in `KFSRockAssemblies` or
 `KFSRockBlocks`) are retired and obsolete by KFS practice. Never test, report or fix them. The

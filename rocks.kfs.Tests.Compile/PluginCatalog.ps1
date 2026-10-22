@@ -121,7 +121,9 @@ function Get-PluginPackage( [string] $PluginFolder ) {
       Missing       shipped files whose source is not on this branch (archived or removed).
 
     Status: "Active" when the plugin ships at least one project or page from our repos;
-    "Obsidian only"; "No KFS code" (e.g. a vendor plugin); or "No package".
+    "Archived" when all of its KFS code has been moved into a ZZZ_Archive folder (a retired
+    plugin: skipped entirely); "Obsidian only"; "No KFS code" (e.g. a vendor plugin); or
+    "No package".
 #>
 function Get-PluginCatalog {
     param(
@@ -153,6 +155,7 @@ function Get-PluginCatalog {
             Dependencies = @()
             External     = @()
             Missing      = @()
+            Archived     = 0
         }
 
         $package = Get-PluginPackage $folder.FullName
@@ -171,6 +174,7 @@ function Get-PluginCatalog {
                 }
                 elseif ( $projects.Archived.ContainsKey( $assembly ) ) {
                     $plugin.Missing += "$relative (project archived: $( $projects.Archived[ $assembly ] ))"
+                    $plugin.Archived++
                 }
                 elseif ( $assembly -match '^(rocks\.kfs|cc\.newspring)\.' ) {
                     $plugin.Missing += "$relative (no project builds it on this branch)"
@@ -187,7 +191,17 @@ function Get-PluginCatalog {
                     $plugin.Pages += $relative
                 }
                 else {
-                    $plugin.Missing += "$relative (not on this branch)"
+                    # Retired blocks move to ZZZ_Archive at the top of their repo, e.g.
+                    # Plugins\rocks_kfs\Domain\Block.ascx -> Plugins\rocks_kfs\ZZZ_Archive\Domain\Block.ascx.
+                    $inRoot = $relative.Substring( "Plugins\".Length )
+                    $root, $rest = $inRoot -split '\\', 2
+                    if ( Test-Path ( Join-Path $pluginsRoot "$root\ZZZ_Archive\$rest" ) ) {
+                        $plugin.Missing += "$relative (archived)"
+                        $plugin.Archived++
+                    }
+                    else {
+                        $plugin.Missing += "$relative (not on this branch)"
+                    }
                 }
             }
             elseif ( $relative -match '^Plugins\\' -and $relative -notmatch "^Plugins\\(?:$blockRootPattern)\\" ) {
@@ -200,6 +214,7 @@ function Get-PluginCatalog {
         $plugin.Dependencies = @( $plugin.Dependencies | Sort-Object -Unique )
 
         $plugin.Status = if ( $plugin.Projects.Count + $plugin.Pages.Count -gt 0 ) { "Active" }
+            elseif ( $plugin.Archived -gt 0 -and $plugin.Archived -eq $plugin.Missing.Count ) { "Archived" }
             elseif ( $plugin.Obsidian.Count -gt 0 ) { "Obsidian only" }
             else { "No KFS code" }
 
