@@ -467,7 +467,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- capture command -%}
   {%- if linkUrlType == 'External Browser' and appPage == '' -%}
   {Binding OpenExternalBrowser}{%- elseif linkUrlType == 'Internal Browser' and appPage == '' -%}
-  {Binding OpenBrowser}{%- elseif linkToUrl != '' or appPage != '' or contentStripped != '' -%}
+  {Binding OpenBrowser}{%- else -%}
   {Binding PushPage}{%- endif -%}{%- endcapture -%}
   {% if authenticatedUser %}{%- capture personToken %}{% if linkToUrl contains '?' %}&{% else %}?{% endif %}rckipid={{ CurrentPerson | PersonTokenCreate }}{% endcapture -%}{% endif %}
   {%- capture linkUrl -%}
@@ -477,11 +477,11 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {{- linkToUrl | Append:personToken | Escape -}}
   {%- elseif appPage != '' -%}
   {{- appPage -}}{% if pageParameters and pageParameters != '' %}{{ pageParameters }}{% endif %}
-  {%- elseif contentStripped != '' %}
+  {%- else -%}
   c9d8bd2d-8f1e-42e6-a4c3-b71b0511e9c7?ContentChannelItemId={{ item.Id -}}
   {%- endif -%}
   {%- endcapture -%}
-  {% assign image = item | Attribute:'Image','Url' %}{% assign imageUrl = item | Attribute:'ImageUrl','RawValue' %}{% assign subtitle = item | Attribute:'Subtitle' %}{% assign cardWidth = item | Attribute:'CardWidth' %}{% assign elevation = item | Attribute:'ShadowDepth' %}{% assign showDetailsButton = item | Attribute:'DisplayDetailsButton' | AsBoolean %}{% assign showTitle = item | Attribute:'ShowTitle' | AsBoolean %}{% assign tagline = item | Attribute:'Tagline' %}{% assign imageAspectRatio = item | Attribute:'ImageAspectRatio' %}
+  {% assign image = item | Attribute:'Image','Url' %}{% assign imageUrl = item | Attribute:'ImageUrl','RawValue' %}{% assign subtitle = item | Attribute:'Subtitle' %}{% assign cardWidth = item | Attribute:'CardWidth' %}{% assign elevation = item | Attribute:'ShadowDepth' %}{% assign showDetailsButton = item | Attribute:'DisplayDetailsButton' | AsBoolean %}{% assign showTitle = item | Attribute:'ShowTitle' | AsBoolean %}{% assign tagline = item | Attribute:'Tagline' %}{% assign imageAspectRatio = item | Attribute:'ImageAspectRatio' %}{%- comment -%} Show Blurb on Card, read once so BOTH card layouts can honour it {%- endcomment -%}{%- assign cardBlurbRaw = item | Attribute:'ShowCardBlurb','RawValue' -%}{%- assign showCardBlurb = true -%}{%- if cardBlurbRaw == 'False' -%}{%- assign showCardBlurb = false -%}{%- endif -%}
   {%- comment -%} ===== Registration Instance: build the card from a registration =====
       Runs only if nothing above already claimed the card. A registration has no
       photo in Rock, so lnImg stays empty and the item's own Image wins if set.
@@ -595,7 +595,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
               {%- if lnMeta != '' -%}
               <Label Text=""{{ lnMeta | Escape }}"" StyleClass=""footnote,text-interface-soft"" />
               {%- endif -%}
-              {%- if lnSummary != '' -%}
+              {%- if lnSummary != '' and showCardBlurb -%}
               <Label Text=""{{ lnSummary | TruncateWords:50 | Escape }}"" StyleClass=""subheadline,text-interface-strong,mt-4"" />
               {%- endif -%}
               {%- if showDetailsButton -%}
