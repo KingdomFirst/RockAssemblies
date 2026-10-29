@@ -460,7 +460,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
     {%- endif -%}
   {%- endcapture -%}
 
-    {%- assign linkUrlType = item | Attribute:""LinktoURLType"" -%}
+    {%- assign linkUrlType = item | Attribute:""LinktoURLType"" -%}{%- if linkUrlType == '' -%}{%- assign linkUrlType = 'Webview' -%}{%- endif -%}
   {%- assign linkToUrl = item | Attribute:""LinktoURL"" -%}{% assign authenticatedUser = item | Attribute:'PassUserAuthentication' | AsBoolean %}
   {%- assign appPage = item | Attribute:""LinktoAppPage"",""RawValue"" -%}{% assign contentStripped = item.Content | StripHtml | Trim %}
   {%- assign pageParameters = item | Attribute:""PageParameters"",""RawValue"" -%}
@@ -535,7 +535,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
 
   {%- if isEvent -%}
   <Rock:StyledBorder StrokeThickness=""0"" Padding=""0"" CornerRadius=""16"" StyleClass=""bg-interface-softest,mx-16,my-8"">
-      <Rock:StyledBorder.Shadow><Shadow Brush=""#000000"" Offset=""0,4"" Radius=""12"" Opacity=""0.15"" /></Rock:StyledBorder.Shadow>
+      <Rock:StyledBorder.Shadow><Shadow Brush=""#000000"" Offset=""0,{{ elevation | Default:'4' }}"" Radius=""{{ elevation | Default:'4' | Times:3 }}"" Opacity=""0.15"" /></Rock:StyledBorder.Shadow>
       <Rock:StyledBorder.GestureRecognizers>
           <TapGestureRecognizer Command=""{Binding PushPage}"" CommandParameter=""a2156601-d477-465e-addf-e745dee935f5?EventOccurrenceGuid={{ occGuid }}"" />
       </Rock:StyledBorder.GestureRecognizers>
@@ -567,7 +567,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
           CornerRadius=""{% if cardWidth == 'Full' %}0{% else %}16{% endif %}""
           StyleClass=""bg-interface-softest{% if cardWidth != 'Full' %},mx-16,my-8{% endif %}"">
       {%- if elevation != '' and elevation != '0' -%}
-      <Rock:StyledBorder.Shadow><Shadow Brush=""#000000"" Offset=""0,4"" Radius=""12"" Opacity=""0.15"" /></Rock:StyledBorder.Shadow>
+      <Rock:StyledBorder.Shadow><Shadow Brush=""#000000"" Offset=""0,{{ elevation | Default:'4' }}"" Radius=""{{ elevation | Default:'4' | Times:3 }}"" Opacity=""0.15"" /></Rock:StyledBorder.Shadow>
       {%- endif -%}
       <Rock:StyledBorder.GestureRecognizers>
           <TapGestureRecognizer Command=""{Binding {{ srcCommand }}}"" CommandParameter=""{{ srcParam }}"" />
@@ -611,7 +611,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
           StyleClass=""bg-interface-softest{% if cardWidth != 'Full' %},mx-16,my-8{% endif %}"">
       {%- if elevation != '' and elevation != '0' -%}
       <Rock:StyledBorder.Shadow>
-          <Shadow Brush=""#000000"" Offset=""0,4"" Radius=""12"" Opacity=""0.15"" />
+          <Shadow Brush=""#000000"" Offset=""0,{{ elevation | Default:'4' }}"" Radius=""{{ elevation | Default:'4' | Times:3 }}"" Opacity=""0.15"" />
       </Rock:StyledBorder.Shadow>
       {%- endif -%}
       <Rock:StyledBorder.GestureRecognizers>
@@ -933,7 +933,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- if imgUrl == '' -%}{% assign imgUrl = img %}{%- endif -%}
 
   {%- assign subMenu = item | Attribute:'OpensSubMenu','RawValue' -%}
-  {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}
+  {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}{%- if linkType == '' -%}{%- assign linkType = 'Webview' -%}{%- endif -%}
   {%- assign linkUrlVal = item | Attribute:'LinktoURL' -%}
   {%- assign appPage = item | Attribute:'LinktoAppPage','RawValue' -%}
   {%- assign pageParams = item | Attribute:'PageParameters' -%}
@@ -1047,7 +1047,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- if imgUrl == '' -%}{% assign imgUrl = img %}{%- endif -%}
 
   {%- assign subMenu = item | Attribute:'OpensSubMenu','RawValue' -%}
-  {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}
+  {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}{%- if linkType == '' -%}{%- assign linkType = 'Webview' -%}{%- endif -%}
   {%- assign linkUrlVal = item | Attribute:'LinktoURL' -%}
   {%- assign appPage = item | Attribute:'LinktoAppPage','RawValue' -%}
   {%- assign pageParams = item | Attribute:'PageParameters' -%}
@@ -1161,7 +1161,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- if imgUrl == '' -%}{% assign imgUrl = img %}{%- endif -%}
 
   {%- assign subMenu = item | Attribute:'OpensSubMenu','RawValue' -%}
-  {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}
+  {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}{%- if linkType == '' -%}{%- assign linkType = 'Webview' -%}{%- endif -%}
   {%- assign linkUrlVal = item | Attribute:'LinktoURL' -%}
   {%- assign appPage = item | Attribute:'LinktoAppPage','RawValue' -%}
   {%- assign pageParams = item | Attribute:'PageParameters' -%}
@@ -1293,7 +1293,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- if imgUrl == '' -%}{% assign imgUrl = img %}{%- endif -%}
 
   {%- assign subMenu = item | Attribute:'OpensSubMenu','RawValue' -%}
-  {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}
+  {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}{%- if linkType == '' -%}{%- assign linkType = 'Webview' -%}{%- endif -%}
   {%- assign linkUrlVal = item | Attribute:'LinktoURL' -%}
   {%- assign appPage = item | Attribute:'LinktoAppPage','RawValue' -%}
   {%- assign pageParams = item | Attribute:'PageParameters' -%}
@@ -1909,7 +1909,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- if imgUrl == '' -%}{% assign imgUrl = img %}{%- endif -%}
 
   {%- assign subMenu = item | Attribute:'OpensSubMenu','RawValue' -%}
-  {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}
+  {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}{%- if linkType == '' -%}{%- assign linkType = 'Webview' -%}{%- endif -%}
   {%- assign linkUrlVal = item | Attribute:'LinktoURL' -%}
   {%- assign appPage = item | Attribute:'LinktoAppPage','RawValue' -%}
   {%- assign pageParams = item | Attribute:'PageParameters' -%}
@@ -8920,7 +8920,7 @@ Contained = side margins', 1006, 0, 'Contained', 0, 0, 'CE0ACC4F-161C-45DF-A908-
                 IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = '97BAEB0F-2E0B-4280-AA5B-C7CAA04C347B' )
                 BEGIN
                     INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
-                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'LinktoURLType', 'Link to URL Type', 'How a tapped link opens', 1009, 0, '', 0, 0, '97BAEB0F-2E0B-4280-AA5B-C7CAA04C347B' );
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'LinktoURLType', 'Link to URL Type', 'How a tapped link opens', 1009, 0, 'Webview', 0, 0, '97BAEB0F-2E0B-4280-AA5B-C7CAA04C347B' );
                 END
                 IF NOT EXISTS ( SELECT 1 FROM [AttributeQualifier] WHERE [Guid] = '37512DB7-4F5B-4505-8A67-5B8EEF285A00' )
                     INSERT INTO [AttributeQualifier] ( [IsSystem], [AttributeId], [Key], [Value], [Guid] )
@@ -9296,7 +9296,7 @@ Contained = side margins', 1006, 0, 'Contained', 0, 0, 'CE0ACC4F-161C-45DF-A908-
                 IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = 'D1CA0756-964F-42C2-9839-ED121F76D986' )
                 BEGIN
                     INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
-                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'LinktoURLType', 'Link to URL Type', '', 1007, 0, '', 0, 0, 'D1CA0756-964F-42C2-9839-ED121F76D986' );
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'LinktoURLType', 'Link to URL Type', '', 1007, 0, 'Webview', 0, 0, 'D1CA0756-964F-42C2-9839-ED121F76D986' );
                 END
                 IF NOT EXISTS ( SELECT 1 FROM [AttributeQualifier] WHERE [Guid] = '75C9FB70-12B0-421A-89C2-C5104FAD5FC8' )
                     INSERT INTO [AttributeQualifier] ( [IsSystem], [AttributeId], [Key], [Value], [Guid] )
