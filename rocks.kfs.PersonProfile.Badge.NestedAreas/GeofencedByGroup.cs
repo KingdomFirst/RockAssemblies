@@ -27,9 +27,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.IO;
 
 using Rock;
 using Rock.Attribute;
+using Rock.Data;
 using Rock.Model;
 using Rock.Badge;
 using Rock.Web;
@@ -53,10 +55,57 @@ namespace rocks.kfs.PersonProfile.Badge
         /// </summary>
         /// <param name="badge">The badge.</param>
         /// <param name="writer">The writer.</param>
-        public override void Render( BadgeCache badge, System.Web.UI.HtmlTextWriter writer )
+        /// <summary>
+        /// Determines if this badge component applies to the given type.
+        /// </summary>
+        /// <param name="type">The entity type name.</param>
+        /// <returns><c>true</c> if the badge applies to the type.</returns>
+        public override bool DoesApplyToEntityType( string type )
         {
-            Guid? groupTypeGuid = GetAttributeValue( badge, "GroupType" ).AsGuid();
-            string badgeColor = GetAttributeValue( badge, "BadgeColor" );
+            return type.IsNullOrWhiteSpace() || typeof( Person ).FullName == type;
+        }
+
+        /*
+            9/30/2026 - GEM
+
+            Moved from the Render( BadgeCache, HtmlTextWriter ) override, which Rock
+            obsoleted in 1.14 and removed in v20, to the Render( BadgeCache, IEntity,
+            TextWriter ) + GetJavaScript pattern used in current Rock versions.
+            Both exist since Rock 1.14, so this compiles on every version we ship.
+            Rock wraps the returned JavaScript itself, so the <script> tag and
+            Sys.Application.add_load (WebForms-only) wrapper are gone.
+
+        */
+
+        /// <inheritdoc/>
+        public override void Render( BadgeCache badge, IEntity entity, TextWriter writer )
+        {
+            if ( !( entity is Person ) )
+            {
+                return;
+            }
+
+            var groupTypeGuid = GetAttributeValue( badge, "GroupType" ).AsGuidOrNull();
+            var badgeColor = GetAttributeValue( badge, "BadgeColor" );
+
+            if ( groupTypeGuid.HasValue && !string.IsNullOrWhiteSpace( badgeColor ) )
+            {
+                writer.Write( string.Format(
+                    "<span class='label badge-geofencing-group badge-id-{0}' style='background-color:{1};display:none' ></span>",
+                    badge.Id, badgeColor.EscapeQuotes() ) );
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override string GetJavaScript( BadgeCache badge, IEntity entity )
+        {
+            var groupTypeGuid = GetAttributeValue( badge, "GroupType" ).AsGuidOrNull();
+            var badgeColor = GetAttributeValue( badge, "BadgeColor" );
+
+            if ( !( entity is Person person ) || !groupTypeGuid.HasValue || string.IsNullOrWhiteSpace( badgeColor ) )
+            {
+                return null;
+            }
 
             var groupNameOrLink = LinkedPageUrl( badge, "GroupDetailPage" );
             if ( !string.IsNullOrWhiteSpace( groupNameOrLink ) )
@@ -68,45 +117,32 @@ namespace rocks.kfs.PersonProfile.Badge
                 groupNameOrLink = @"' + this.GroupName + '";
             }
 
-            if ( groupTypeGuid.HasValue && !String.IsNullOrWhiteSpace( badgeColor ) )
-            {
-                writer.Write( String.Format(
-                    "<span class='label badge-geofencing-group badge-id-{0}' style='background-color:{1};display:none' ></span>",
-                    badge.Id, badgeColor.EscapeQuotes() ) );
+            return string.Format( @"
+$.ajax({{
+    type: 'GET',
+    url: Rock.settings.get('baseUrl') + 'api/rocks.kfs/PersonBadges/NestedGeofencingGroups/{0}/{1}' ,
+    statusCode: {{
+        200: function (data, status, xhr) {{
+            var $badge = $('.badge-geofencing-group.badge-id-{2}');
+            var badgeHtml = '';
 
-                writer.Write( String.Format( @"
-<script>
-Sys.Application.add_load(function () {{
-    $.ajax({{
-            type: 'GET',
-            url: Rock.settings.get('baseUrl') + 'api/rocks.kfs/PersonBadges/NestedGeofencingGroups/{0}/{1}' ,
-            statusCode: {{
-                200: function (data, status, xhr) {{
-                    var $badge = $('.badge-geofencing-group.badge-id-{2}');
-                    var badgeHtml = '';
-
-                    $.each(data, function() {{
-                        if ( badgeHtml != '' ) {{
-                            badgeHtml += ' | ';
-                        }}
-                        badgeHtml += '<span title=""' + this.LeaderNames + '"" data-toggle=""tooltip"">{3}</span>';
-                    }});
-
-                    if (badgeHtml != '') {{
-                        $badge.show('fast');
-                    }} else {{
-                        $badge.hide();
-                    }}
-                    $badge.html(badgeHtml);
-                    $badge.find('span').tooltip();
+            $.each(data, function() {{
+                if ( badgeHtml != '' ) {{
+                    badgeHtml += ' | ';
                 }}
-            }},
-    }});
-}});
-</script>
+                badgeHtml += '<span title=""' + this.LeaderNames + '"" data-toggle=""tooltip"">{3}</span>';
+            }});
 
-", Person.Id.ToString(), groupTypeGuid.ToString(), badge.Id, groupNameOrLink ) );
-            }
+            if (badgeHtml != '') {{
+                $badge.show('fast');
+            }} else {{
+                $badge.hide();
+            }}
+            $badge.html(badgeHtml);
+            $badge.find('span').tooltip();
+        }}
+    }},
+}});", person.Id.ToString(), groupTypeGuid.ToString(), badge.Id, groupNameOrLink );
         }
 
         /// <summary>
