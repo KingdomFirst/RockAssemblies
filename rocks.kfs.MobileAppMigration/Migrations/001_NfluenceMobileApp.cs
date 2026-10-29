@@ -41,7 +41,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             //
             RockMigrationHelper.AddSite( "Nfluence Church App", "Nfluence Church App for Rock", "", "1D501408-CA88-4565-8822-BD318F255A59" );
             Sql( @"UPDATE [Site] SET [SiteType] = 1, [IsSystem] = 0 WHERE [Guid] = '1D501408-CA88-4565-8822-BD318F255A59'" );
-            Sql( @"UPDATE [Site] SET [AdditionalSettings] = N'{""LastDeploymentDate"":""2026-09-17T15:09:59.8529615-06:00"",""LastDeploymentVersionId"":1789679399,""PhoneUpdatePackageUrl"":""https://09c6-2601-8c0-100-6e80-4563-f0d1-18e9-383d.ngrok-free.app:443/GetFile.ashx?id=3061"",""TabletUpdatePackageUrl"":""https://09c6-2601-8c0-100-6e80-4563-f0d1-18e9-383d.ngrok-free.app:443/GetFile.ashx?id=3062"",""ShellType"":2,""TabLocation"":1,""CssStyle"":"""",""ApiKeyId"":1012,""ProfilePageId"":16822,""PersonAttributeCategories"":[0],""BarBackgroundColor"":"""",""IOSEnableBarTransparency"":false,""IOSBarBlurStyle"":0,""MenuButtonColor"":null,""ActivityIndicatorColor"":null,""FlyoutXaml"":""<ListView SeparatorVisibility=\""None\"" \n    HasUnevenRows=\""true\"" \n    ItemsSource=\""{Binding MenuItems}\"">\n\n    <ListView.Header>\n        <StackLayout VerticalOptions=\""FillAndExpand\""\n            Orientation=\""Vertical\"">\n\n            <Rock:LoginStatus Padding=\""20, 70, 20, 50\"" \n                ImageSize=\""120\"" \n                ImageBorderColor=\""rgba(255, 255, 255, 0.4)\"" \n                ImageBorderSize=\""5\"" />\n\n            <BoxView HeightRequest=\""1\"" BackgroundColor=\""rgba(255, 255, 255, 0.2)\""\n                HorizontalOptions=\""FillAndExpand\""/>\n\n        </StackLayout>\n    </ListView.Header>\n\n    <ListView.ItemTemplate>\n        <DataTemplate>\n            <Rock:ViewCell SelectedBackgroundColor=\""rgba(255, 255, 255, 0.2)\"">\n            \n                <StackLayout VerticalOptions=\""FillAndExpand\"" \n                    Orientation=\""Vertical\"">\n\n                    <ContentView StyleClass=\""pt-16, pb-12\"">\n                        <Label StyleClass=\""text-white, ml-32, flyout-menu-item\""\n                            Text=\""{Binding Title}\"" \n                            VerticalOptions=\""Center\"" \n                            HorizontalOptions=\""FillAndExpand\"" />\n                    </ContentView>\n\n                    <BoxView HeightRequest=\""1\""\n                        BackgroundColor=\""rgba(255, 255, 255, 0.4)\""\n                        HorizontalOptions=\""FillAndExpand\"" />\n\n                </StackLayout>\n\n            </Rock:ViewCell>\n        </DataTemplate>\n    </ListView.ItemTemplate>\n\n</ListView>"",""LockedPhoneOrientation"":1,""LockedTabletOrientation"":0,""DownhillSettings"":{""SpacingValues"":{""0"":""0"",""4"":""4"",""8"":""8"",""16"":""16"",""24"":""24"",""48"":""48"",""80"":""80"",""1"":""1"",""2"":""2"",""12"":""12"",""32"":""32"",""64"":""64""},""SpacingUnits"":"""",""FontSizes"":{""xs"":0.75,""sm"":0.875,""base"":1.0,""lg"":1.125,""xl"":1.25,""2xl"":1.5,""3xl"":1.875,""4xl"":2.25,""5xl"":3.0,""6xl"":4.0},""BorderWidths"":[0,1,2,4,8],""Platform"":0,""BorderUnits"":"""",""FontUnits"":"""",""FontSizeDefault"":16.0,""ApplicationColors"":{""Primary"":""#007bff"",""Secondary"":""#6c757d"",""Success"":""#28a745"",""Danger"":""#dc3545"",""Warning"":""#ffc107"",""Info"":""#17a2b8"",""Light"":""#f8f9fa"",""Dark"":""#343a40"",""White"":""#ffffff"",""Brand"":""#007bff"",""InterfaceStrongest"":""#000000"",""InterfaceStronger"":""#1c1c1e"",""InterfaceStrong"":""#5d5d6f"",""InterfaceMedium"":""#8b8ba7"",""InterfaceSoft"":""#d9d9e3"",""InterfaceSofter"":""#f2f2f7"",""InterfaceSoftest"":""#ffffff"",""PrimaryStrong"":""#de5a25"",""PrimarySoft"":""#eeab90"",""SecondaryStrong"":""#53b1fd"",""SecondarySoft"":""#eff8ff"",""BrandStrong"":""#de5a25"",""BrandSoft"":""#eeab90"",""SuccessStrong"":""#248a3d"",""SuccessSoft"":""#d7f4de"",""InfoStrong"":""#007aff"",""InfoSoft"":""#d6eaff"",""DangerStrong"":""#d70015"",""DangerSoft"":""#ffccd1"",""WarningStrong"":""#e58600"",""WarningSoft"":""#ffecd1""},""RadiusBase"":0.0,""TextColor"":""#676767"",""HeadingColor"":""#333333"",""BackgroundColor"":""#ffffff"",""AdditionalCssToParse"":{},""SupplyTailwindCss"":true,""MobileStyleFramework"":2},""NavigationBarActionXaml"":""<Rock:LoginStatusPhoto StyleClass=\""p-8\"" NotLoggedInCommand=\""{Binding PushPage}\"" NotLoggedInPhotoFillColor=\""{AppThemeBinding Light=#4B5563, Dark=#FFFFFF}\""\n NotLoggedInCommandParameter=\""9d8435bd-8583-4325-aefc-af073d0e9020\"" LoggedInCommand=\""{Binding PushPage}\""\n LoggedInCommandParameter=\""9d8435bd-8583-4325-aefc-af073d0e9020\"" ProfilePhotoCircle=\""true\"" ProfilePhotoStrokeWidth=\""1\"" HeightRequest=\""50\"" />"",""HomepageRoutingLogic"":"""",""CampusFilterDataViewId"":null,""CommunicationViewPageId"":16846,""InteractiveExperiencePageId"":null,""SmsConversationPageId"":null,""EnableNotificationsAutomatically"":true,""PushTokenUpdateValue"":"""",""IsDeepLinkingEnabled"":false,""BundleIdentifier"":null,""TeamIdentifier"":null,""PackageName"":null,""CertificateFingerprint"":null,""DeepLinkPathPrefix"":null,""DeepLinkRoutes"":[],""DeepLinkDomains"":null,""IsPackageCompressionEnabled"":true,""Auth0Domain"":"""",""Auth0ClientId"":"""",""Auth0ConnectionStatusValueId"":66,""Auth0RecordStatusValueId"":5,""EntraClientId"":"""",""EntraTenantId"":"""",""EntraAuthenticationComponent"":null}' WHERE [Guid] = '1D501408-CA88-4565-8822-BD318F255A59'" );
+            Sql( @"UPDATE [Site] SET [AdditionalSettings] = N'{""LastDeploymentDate"":""2026-10-29T13:34:59.576643-06:00"",""LastDeploymentVersionId"":1793302499,""PhoneUpdatePackageUrl"":""https://671e-2601-8c0-100-6e80-1c6f-e41b-9d3e-fa13.ngrok-free.app:443/GetFile.ashx?id=3075"",""TabletUpdatePackageUrl"":""https://671e-2601-8c0-100-6e80-1c6f-e41b-9d3e-fa13.ngrok-free.app:443/GetFile.ashx?id=3076"",""ShellType"":2,""TabLocation"":1,""CssStyle"":"""",""ApiKeyId"":1012,""ProfilePageId"":16822,""ChatPageId"":null,""PersonAttributeCategories"":[0],""BarBackgroundColor"":"""",""IOSEnableBarTransparency"":false,""IOSBarBlurStyle"":0,""MenuButtonColor"":null,""ActivityIndicatorColor"":null,""FlyoutXaml"":""<ListView SeparatorVisibility=\""None\"" \n    HasUnevenRows=\""true\"" \n    ItemsSource=\""{Binding MenuItems}\"">\n\n    <ListView.Header>\n        <StackLayout VerticalOptions=\""FillAndExpand\""\n            Orientation=\""Vertical\"">\n\n            <Rock:LoginStatus Padding=\""20, 70, 20, 50\"" \n                ImageSize=\""120\"" \n                ImageBorderColor=\""rgba(255, 255, 255, 0.4)\"" \n                ImageBorderSize=\""5\"" />\n\n            <BoxView HeightRequest=\""1\"" BackgroundColor=\""rgba(255, 255, 255, 0.2)\""\n                HorizontalOptions=\""FillAndExpand\""/>\n\n        </StackLayout>\n    </ListView.Header>\n\n    <ListView.ItemTemplate>\n        <DataTemplate>\n            <Rock:ViewCell SelectedBackgroundColor=\""rgba(255, 255, 255, 0.2)\"">\n            \n                <StackLayout VerticalOptions=\""FillAndExpand\"" \n                    Orientation=\""Vertical\"">\n\n                    <ContentView StyleClass=\""pt-16, pb-12\"">\n                        <Label StyleClass=\""text-white, ml-32, flyout-menu-item\""\n                            Text=\""{Binding Title}\"" \n                            VerticalOptions=\""Center\"" \n                            HorizontalOptions=\""FillAndExpand\"" />\n                    </ContentView>\n\n                    <BoxView HeightRequest=\""1\""\n                        BackgroundColor=\""rgba(255, 255, 255, 0.4)\""\n                        HorizontalOptions=\""FillAndExpand\"" />\n\n                </StackLayout>\n\n            </Rock:ViewCell>\n        </DataTemplate>\n    </ListView.ItemTemplate>\n\n</ListView>"",""LockedPhoneOrientation"":1,""LockedTabletOrientation"":0,""DownhillSettings"":{""SpacingValues"":{""0"":""0"",""4"":""4"",""8"":""8"",""16"":""16"",""24"":""24"",""48"":""48"",""80"":""80"",""1"":""1"",""2"":""2"",""12"":""12"",""32"":""32"",""64"":""64""},""SpacingUnits"":"""",""FontSizes"":{""xs"":0.75,""sm"":0.875,""base"":1.0,""lg"":1.125,""xl"":1.25,""2xl"":1.5,""3xl"":1.875,""4xl"":2.25,""5xl"":3.0,""6xl"":4.0},""BorderWidths"":[0,1,2,4,8],""Platform"":0,""BorderUnits"":"""",""FontUnits"":"""",""FontSizeDefault"":16.0,""ApplicationColors"":{""Primary"":""#007bff"",""Secondary"":""#6c757d"",""Success"":""#28a745"",""Danger"":""#dc3545"",""Warning"":""#ffc107"",""Info"":""#17a2b8"",""Light"":""#f8f9fa"",""Dark"":""#343a40"",""White"":""#ffffff"",""Brand"":""#007bff"",""InterfaceStrongest"":""#000000"",""InterfaceStronger"":""#1c1c1e"",""InterfaceStrong"":""#5d5d6f"",""InterfaceMedium"":""#8b8ba7"",""InterfaceSoft"":""#d9d9e3"",""InterfaceSofter"":""#f2f2f7"",""InterfaceSoftest"":""#ffffff"",""PrimaryStrong"":""#de5a25"",""PrimarySoft"":""#eeab90"",""SecondaryStrong"":""#53b1fd"",""SecondarySoft"":""#eff8ff"",""BrandStrong"":""#de5a25"",""BrandSoft"":""#eeab90"",""SuccessStrong"":""#248a3d"",""SuccessSoft"":""#d7f4de"",""InfoStrong"":""#007aff"",""InfoSoft"":""#d6eaff"",""DangerStrong"":""#d70015"",""DangerSoft"":""#ffccd1"",""WarningStrong"":""#e58600"",""WarningSoft"":""#ffecd1""},""RadiusBase"":0.0,""TextColor"":""#676767"",""HeadingColor"":""#333333"",""BackgroundColor"":""#ffffff"",""AdditionalCssToParse"":{},""SupplyTailwindCss"":true,""MobileStyleFramework"":2},""NavigationBarActionXaml"":""<Rock:LoginStatusPhoto StyleClass=\""p-8\"" NotLoggedInCommand=\""{Binding PushPage}\"" NotLoggedInPhotoFillColor=\""{AppThemeBinding Light=#4B5563, Dark=#FFFFFF}\""\n NotLoggedInCommandParameter=\""9d8435bd-8583-4325-aefc-af073d0e9020\"" LoggedInCommand=\""{Binding PushPage}\""\n LoggedInCommandParameter=\""9d8435bd-8583-4325-aefc-af073d0e9020\"" ProfilePhotoCircle=\""true\"" ProfilePhotoStrokeWidth=\""1\"" HeightRequest=\""50\"" />"",""HomepageRoutingLogic"":"""",""CampusFilterDataViewId"":null,""CommunicationViewPageId"":16846,""InteractiveExperiencePageId"":null,""SmsConversationPageId"":null,""EnableNotificationsAutomatically"":true,""PushTokenUpdateValue"":"""",""IsDeepLinkingEnabled"":false,""BundleIdentifier"":null,""TeamIdentifier"":null,""PackageName"":null,""CertificateFingerprint"":null,""DeepLinkPathPrefix"":null,""DeepLinkRoutes"":[],""DeepLinkDomains"":null,""IsPackageCompressionEnabled"":true,""Auth0Domain"":"""",""Auth0ClientId"":"""",""Auth0ConnectionStatusValueId"":66,""Auth0RecordStatusValueId"":5,""EntraClientId"":"""",""EntraTenantId"":"""",""EntraAuthenticationComponent"":null,""DarkFavIconBinaryFileId"":null}' WHERE [Guid] = '1D501408-CA88-4565-8822-BD318F255A59'" );
 
             //
             // Layouts
@@ -183,6 +183,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Prayer Session", "", "E5B8A1D6-7F39-4BAC-C24B-69A3F4B8EA75", "" );
             RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Group Detail (Public)", "", "F1A6D3B8-4C27-4E95-8D0B-3A71E5C24F60", "" );
             RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Join Group", "", "F2B7E4C9-5D38-4A06-9E1C-4B82F6D35A71", "" );
+            RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Share My Notes", "", "F0425E08-F7A8-4611-A982-827CE67126C0", "" );
 
             // Mobile page settings (AutoRefresh, HideNavigationBar, PageType, ...)
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":true,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'EF0257AD-B5E4-4D53-B7D0-17561941EE1E'" );   // Nfluence Church App Homepage
@@ -242,6 +243,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'E5B8A1D6-7F39-4BAC-C24B-69A3F4B8EA75'" );   // Prayer Session
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'F1A6D3B8-4C27-4E95-8D0B-3A71E5C24F60'" );   // Group Detail (Public)
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'F2B7E4C9-5D38-4A06-9E1C-4B82F6D35A71'" );   // Join Group
+            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'F0425E08-F7A8-4611-A982-827CE67126C0'" );   // Share My Notes
 
             //
             // Blocks
@@ -325,6 +327,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             RockMigrationHelper.AddBlock( true, "E5B8A1D6-7F39-4BAC-C24B-69A3F4B8EA75".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "420DEA5F-9ABC-4E59-A9BD-DCA972657B84".AsGuid(), "Prayer Session", "Main", @"", @"", 0, "88192A3B-4C5D-46E7-F809-1A2B3C4D5E6F" );
             RockMigrationHelper.AddBlock( true, "F1A6D3B8-4C27-4E95-8D0B-3A71E5C24F60".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 0, "F3C8F5DA-6E49-4B17-A02D-5C93A7E46B82" );
             RockMigrationHelper.AddBlock( true, "F2B7E4C9-5D38-4A06-9E1C-4B82F6D35A71".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "8A42E4FA-9FE1-493C-B6D8-7A766D96E912".AsGuid(), "Group Registration", "Main", @"", @"", 0, "F4D9A6EB-7F5A-4C28-B13E-6DA4B8F57C93" );
+            RockMigrationHelper.AddBlock( true, "F0425E08-F7A8-4611-A982-827CE67126C0".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Share My Notes", "Main", @"", @"", 0, "AA5CBF46-CEBC-453B-872D-65E8D53A6E86" );
 
             //
             // Block attribute values
@@ -7765,125 +7768,62 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
     ===========================================================================
     SHARE MY NOTES  -  bottom of the Structured Item Detail page
     ---------------------------------------------------------------------------
-    Rebuilds the sermon outline as plain text with the reader's own typed notes
-    interleaved, and hands it to the native share sheet - which covers Mail,
-    Messages, Notes, copy-to-clipboard and AirDrop, so ""email my notes to
-    myself"" needs nothing else built.
+    A button that pushes the Share My Notes page (share_notes_page.xml), which
+    builds the text and opens the native share sheet.
 
-    WHERE THE TYPED NOTES LIVE
-    The shell auto-saves them via the StructuredContentView block's
-    SaveUserValues action. Rock stores them as a Note row:
+    WHY IT DOESN'T SHARE DIRECTLY
+    It used to build the share text right here. But the shell only sends typed
+    notes to the server every 60 seconds and when the notes block leaves the
+    screen, and this block is rendered once, when the page opens - so it shared
+    the notes as they were on arrival, and new ones only appeared after backing
+    out and coming back. Pushing a page is what takes the notes block off screen
+    and makes the shell save, so the share page sees what was just typed.
 
-        NoteType  'Structured Content User Value'  860C37A0-1A44-4681-B96D-4703813609D2
-        EntityId  the content channel item
-        Text      {""<note block id>"":""what they typed"", ...}
-
-    So the merge is: walk the document's blocks, and where a block is of type
-    'note', look its data.id up in that dictionary.
-
-    NEWLINES
-    The text goes into a XAML ATTRIBUTE, and XML attribute-value normalisation
-    turns a real newline into a space - which would flatten the whole thing onto
-    one line. So line breaks are carried as the marker ~~NL~~ and swapped for
-    &#10; AFTER Escape has run (Escape would otherwise turn the & into &amp;).
-
-    NOT CACHED - CacheDuration is 0 on this block deliberately. Everything it
-    renders is that one person's notes.
+    The label is decided by whether the document HAS note fields, not by whether
+    the reader has typed in them yet - that is the same stale read again.
     ===========================================================================
 {%- endcomment -%}
 {%- assign itemGuid = PageParameter.ItemGuid -%}
-{%- assign noteTypeGuid = '860C37A0-1A44-4681-B96D-4703813609D2' -%}
+{%- assign sharePageGuid = 'f0425e08-f7a8-4611-a982-827ce67126c0' -%}
+{%- assign hasContent = false -%}
+{%- assign hasNoteFields = false -%}
 
 {%- if CurrentPerson and itemGuid != '' and itemGuid != null -%}
-{% sql return:'rows' itemguid:'{{ itemGuid }}' personid:'{{ CurrentPerson.Id }}' notetype:'{{ noteTypeGuid }}' %}
-    SELECT TOP 1
-           i.[Title],
-           i.[StartDateTime],
-           i.[StructuredContent]      AS Doc,
-           ISNULL( n.[Text], '' )     AS UserJson,
-           /* Speaker is a Defined Value on some channels and plain text on others.
-              A Defined Value stores the DefinedValue Guid, so resolve it and fall
-              back to the raw text when it is not a guid. */
-           ISNULL( ( SELECT TOP 1 COALESCE( dv.[Value], av.[Value] ) FROM [AttributeValue] av
-                      JOIN [Attribute] a ON a.[Id] = av.[AttributeId]
-                                        AND a.[Key] = 'Speaker'
-                                        AND a.[EntityTypeQualifierColumn] = 'ContentChannelId'
-                                        AND a.[EntityTypeQualifierValue] = CAST( i.[ContentChannelId] AS NVARCHAR(20) )
-                      LEFT JOIN [DefinedValue] dv
-                             ON TRY_CAST( av.[Value] AS UNIQUEIDENTIFIER ) IS NOT NULL
-                            AND dv.[Guid] = TRY_CAST( av.[Value] AS UNIQUEIDENTIFIER )
-                     WHERE av.[EntityId] = i.[Id] ), '' ) AS Speaker
-    FROM [ContentChannelItem] i
-    LEFT JOIN [Note] n
-           ON n.[EntityId] = i.[Id]
-          AND n.[NoteTypeId] = ( SELECT TOP 1 [Id] FROM [NoteType] WHERE [Guid] = @notetype )
-          AND n.[CreatedByPersonAliasId] IN ( SELECT [Id] FROM [PersonAlias] WHERE [PersonId] = @personid )
-    WHERE i.[Guid] = @itemguid
-{% endsql %}
-
-{%- for r in rows -%}
-    {%- assign doc = r.Doc | FromJSON -%}
-    {%- assign userValues = r.UserJson | FromJSON -%}
-    {%- assign hasNotes = false -%}
-
-    {%- comment -%} build the body once, marking line breaks {%- endcomment -%}
-    {%- capture bodyText -%}
-        {%- for b in doc.blocks -%}
-            {%- if b.type == 'paragraph' -%}
-                {%- assign line = b.data.text | StripHtml | HtmlDecode | Trim -%}
-                {%- if line != '' -%}{{ line }}~~NL~~~~NL~~{%- endif -%}
-            {%- elsif b.type == 'header' -%}
-                {%- assign line = b.data.text | StripHtml | HtmlDecode | Trim -%}
-                {%- if line != '' -%}{{ line }}~~NL~~{%- endif -%}
-            {%- elsif b.type == 'list' -%}
-                {%- for li in b.data.items -%}
-                    {%- assign line = li | StripHtml | HtmlDecode | Trim -%}
-                    {%- if line != '' -%}  - {{ line }}~~NL~~{%- endif -%}
-                {%- endfor -%}
-                ~~NL~~
-            {%- elsif b.type == 'note' -%}
-                {%- assign mine = userValues[b.data.id] | Trim -%}
-                {%- if mine != '' and mine != null -%}
-                    {%- assign hasNotes = true -%}
-                    MY NOTES:~~NL~~{{ mine | Replace:'
-','~~NL~~' }}~~NL~~~~NL~~
-                {%- endif -%}
-            {%- endif -%}
-        {%- endfor -%}
-    {%- endcapture -%}
-
-    {%- capture shareText -%}
-{{ r.Title | Trim }}~~NL~~{{ r.StartDateTime | Date:'MMMM d, yyyy' }}{% if r.Speaker != '' %} - {{ r.Speaker }}{% endif %}~~NL~~~~NL~~{{ bodyText | Trim }}
-    {%- endcapture -%}
-    {%- assign shareText = shareText | Trim | Escape | Replace:'~~NL~~','&#10;' -%}
-
-    {%- comment -%} nothing worth sharing if the document is empty AND they have
-        written nothing {%- endcomment -%}
-    {%- assign bodyCheck = bodyText | Replace:'~~NL~~','' | Trim -%}
-    {%- if bodyCheck != '' -%}
-    <VerticalStackLayout StyleClass=""px-16, pb-24, pt-8"" Spacing=""8"">
-        <BoxView HeightRequest=""1"" StyleClass=""bg-interface-softer"" />
-        <VerticalStackLayout Spacing=""6"" HorizontalOptions=""Center"" StyleClass=""pt-12"">
-            <Rock:Icon IconClass=""share-square"" IconFamily=""FontAwesomeSolid"" FontSize=""22""
-                StyleClass=""text-interface-stronger"" HorizontalOptions=""Center"" />
-            <Label StyleClass=""caption1, font-weight-semi-bold, text-interface-medium""
-                Text=""{% if hasNotes %}SHARE MY NOTES{% else %}SHARE{% endif %}"" HorizontalOptions=""Center"" />
-            <VerticalStackLayout.GestureRecognizers>
-                <TapGestureRecognizer Command=""{Binding ShareContent}"">
-                    <TapGestureRecognizer.CommandParameter>
-                        <Rock:ShareContentParameters
-                            Title=""{{ r.Title | Escape }}""
-                            Text=""{{ shareText }}"" />
-                    </TapGestureRecognizer.CommandParameter>
-                </TapGestureRecognizer>
-            </VerticalStackLayout.GestureRecognizers>
-        </VerticalStackLayout>
-    </VerticalStackLayout>
-    {%- endif -%}
-{%- endfor -%}
+{%- contentchannelitem where:'Guid == ""{{ itemGuid }}""' -%}
+    {%- assign doc = contentchannelitem.StructuredContent | FromJSON -%}
+    {%- for b in doc.blocks -%}
+        {%- if b.type == 'note' -%}
+            {%- assign hasNoteFields = true -%}
+            {%- assign hasContent = true -%}
+        {%- elsif b.type == 'paragraph' or b.type == 'header' -%}
+            {%- assign line = b.data.text | StripHtml | HtmlDecode | Trim -%}
+            {%- if line != '' -%}{%- assign hasContent = true -%}{%- endif -%}
+        {%- elsif b.type == 'list' and b.data.items.size > 0 -%}
+            {%- assign hasContent = true -%}
+        {%- endif -%}
+    {%- endfor -%}
+{%- endcontentchannelitem -%}
 {%- endif -%}
-" );   // Content
-            RockMigrationHelper.AddBlockAttributeValue( "5A9E13C7-6B04-4F82-9D31-72E05CA8F6B1", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"Sql" );   // EnabledLavaCommands
+
+{%- if hasContent -%}
+<VerticalStackLayout StyleClass=""px-16, pb-24, pt-8"" Spacing=""8"">
+    <BoxView HeightRequest=""1"" StyleClass=""bg-interface-softer"" />
+    <VerticalStackLayout Spacing=""6"" HorizontalOptions=""Center"" StyleClass=""pt-12"">
+        <Rock:Icon IconClass=""share-square"" IconFamily=""FontAwesomeSolid"" FontSize=""22""
+            StyleClass=""text-interface-stronger"" HorizontalOptions=""Center"" />
+        <Label StyleClass=""caption1, font-weight-semi-bold, text-interface-medium""
+            Text=""{% if hasNoteFields %}SHARE MY NOTES{% else %}SHARE{% endif %}"" HorizontalOptions=""Center"" />
+        <VerticalStackLayout.GestureRecognizers>
+            <TapGestureRecognizer Command=""{Binding PushPage}"" CommandParameter=""{{ sharePageGuid }}?ItemGuid={{ itemGuid }}"" />
+        </VerticalStackLayout.GestureRecognizers>
+    </VerticalStackLayout>
+</VerticalStackLayout>
+{%- else -%}
+{%- comment -%} a Content block that renders NOTHING shows ""Invalid configuration
+    data"" - emit a no-op {%- endcomment -%}
+<BoxView HeightRequest=""0"" Color=""Transparent"" />
+{%- endif -%}" );   // Content
+            RockMigrationHelper.AddBlockAttributeValue( "5A9E13C7-6B04-4F82-9D31-72E05CA8F6B1", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"RockEntity" );   // EnabledLavaCommands
             RockMigrationHelper.AddBlockAttributeValue( "5A9E13C7-6B04-4F82-9D31-72E05CA8F6B1", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
             RockMigrationHelper.AddBlockAttributeValue( "11A2B3C4-D5E6-4F70-8192-A3B4C5D6E7F8", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"<VerticalStackLayout StyleClass=""px-16, pt-24, pb-16"" Spacing=""14"">
 
@@ -8396,6 +8336,167 @@ Thank you for allowing us to pray for you. Your request has been sent privately 
             RockMigrationHelper.AddBlockAttributeValue( "F4D9A6EB-7F5A-4C28-B13E-6DA4B8F57C93", "C5DFE24D-62EC-46E5-A23F-2789EA95A450", @"0" );   // FamilyOptions
             RockMigrationHelper.AddBlockAttributeValue( "F4D9A6EB-7F5A-4C28-B13E-6DA4B8F57C93", "3190D83F-6EAE-4B77-B2C1-0B0FAD5EC846", @"True" );   // PreventOvercapacityRegistrations
             RockMigrationHelper.AddBlockAttributeValue( "F4D9A6EB-7F5A-4C28-B13E-6DA4B8F57C93", "E75E6654-0A4F-4833-8051-A6E96A36A784", @"True" );   // AutofillForm
+            RockMigrationHelper.AddBlockAttributeValue( "AA5CBF46-CEBC-453B-872D-65E8D53A6E86", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"{%- comment -%}
+    ===========================================================================
+    SHARE MY NOTES PAGE  -  pushed from the bottom of Structured Item Detail
+    ---------------------------------------------------------------------------
+    Rebuilds the sermon outline as plain text with the reader's own typed notes
+    interleaved, shows it as a preview, and hands it to the native share sheet -
+    which covers Mail, Messages, Notes, copy-to-clipboard and AirDrop, so ""email
+    my notes to myself"" needs nothing else built.
+
+    WHY THIS IS A PAGE AND NOT A BUTTON ON THE NOTES PAGE
+    The share text has to be built on the server, and the shell only sends typed
+    notes to the server every 60 seconds and when the notes block leaves the
+    screen (StructuredContentView: _updateTimer, View_Unloaded). A button built
+    when the notes page loaded therefore shared the notes as they were when the
+    page opened. Pushing this page takes the notes block off screen, which makes
+    the shell save, and this page is rendered after that.
+
+    THE WAITFOR
+    The save and this page's own request leave the phone at about the same time,
+    so the query waits briefly before reading the note to let the save land
+    first. If it ever loses that race the preview shows the older notes, and the
+    hint under the preview says to go back and try again.
+
+    WHERE THE TYPED NOTES LIVE
+    The shell auto-saves them via the StructuredContentView block's
+    SaveUserValues action. Rock stores them as a Note row:
+
+        NoteType  'Structured Content User Value'  860C37A0-1A44-4681-B96D-4703813609D2
+        EntityId  the content channel item
+        Text      {""<note block id>"":""what they typed"", ...}
+
+    So the merge is: walk the document's blocks, and where a block is of type
+    'note', look its data.id up in that dictionary.
+
+    NEWLINES
+    The text goes into XAML ATTRIBUTES, and XML attribute-value normalisation
+    turns a real newline into a space - which would flatten the whole thing onto
+    one line. So line breaks are carried as the marker ~~NL~~ and swapped for
+    &#10; AFTER Escape has run (Escape would otherwise turn the & into &amp;).
+
+    NOT CACHED - CacheDuration is 0 on this block deliberately. Everything it
+    renders is that one person's notes.
+    ===========================================================================
+{%- endcomment -%}
+{%- assign itemGuid = PageParameter.ItemGuid -%}
+{%- assign noteTypeGuid = '860C37A0-1A44-4681-B96D-4703813609D2' -%}
+{%- assign rendered = false -%}
+
+{%- if CurrentPerson and itemGuid != '' and itemGuid != null -%}
+{% sql return:'rows' itemguid:'{{ itemGuid }}' personid:'{{ CurrentPerson.Id }}' notetype:'{{ noteTypeGuid }}' %}
+    /* Let the save the shell sent on leaving the notes page land first. */
+    WAITFOR DELAY '00:00:01.500';
+
+    SELECT TOP 1
+           i.[Title],
+           i.[StartDateTime],
+           i.[StructuredContent]      AS Doc,
+           ISNULL( n.[Text], '' )     AS UserJson,
+           /* Speaker is a Defined Value on some channels and plain text on others.
+              A Defined Value stores the DefinedValue Guid, so resolve it and fall
+              back to the raw text when it is not a guid. */
+           ISNULL( ( SELECT TOP 1 COALESCE( dv.[Value], av.[Value] ) FROM [AttributeValue] av
+                      JOIN [Attribute] a ON a.[Id] = av.[AttributeId]
+                                        AND a.[Key] = 'Speaker'
+                                        AND a.[EntityTypeQualifierColumn] = 'ContentChannelId'
+                                        AND a.[EntityTypeQualifierValue] = CAST( i.[ContentChannelId] AS NVARCHAR(20) )
+                      LEFT JOIN [DefinedValue] dv
+                             ON TRY_CAST( av.[Value] AS UNIQUEIDENTIFIER ) IS NOT NULL
+                            AND dv.[Guid] = TRY_CAST( av.[Value] AS UNIQUEIDENTIFIER )
+                     WHERE av.[EntityId] = i.[Id] ), '' ) AS Speaker
+    FROM [ContentChannelItem] i
+    LEFT JOIN [Note] n
+           ON n.[EntityId] = i.[Id]
+          AND n.[NoteTypeId] = ( SELECT TOP 1 [Id] FROM [NoteType] WHERE [Guid] = @notetype )
+          AND n.[CreatedByPersonAliasId] IN ( SELECT [Id] FROM [PersonAlias] WHERE [PersonId] = @personid )
+    /* TRY_CAST so a malformed ItemGuid finds nothing rather than a Lava error. */
+    WHERE i.[Guid] = TRY_CAST( @itemguid AS UNIQUEIDENTIFIER )
+{% endsql %}
+
+{%- for r in rows -%}
+    {%- assign doc = r.Doc | FromJSON -%}
+    {%- assign userValues = r.UserJson | FromJSON -%}
+    {%- assign hasNotes = false -%}
+    {%- assign hasNoteFields = false -%}
+
+    {%- comment -%} build the body once, marking line breaks {%- endcomment -%}
+    {%- capture bodyText -%}
+        {%- for b in doc.blocks -%}
+            {%- if b.type == 'paragraph' -%}
+                {%- assign line = b.data.text | StripHtml | HtmlDecode | Trim -%}
+                {%- if line != '' -%}{{ line }}~~NL~~~~NL~~{%- endif -%}
+            {%- elsif b.type == 'header' -%}
+                {%- assign line = b.data.text | StripHtml | HtmlDecode | Trim -%}
+                {%- if line != '' -%}{{ line }}~~NL~~{%- endif -%}
+            {%- elsif b.type == 'list' -%}
+                {%- for li in b.data.items -%}
+                    {%- assign line = li | StripHtml | HtmlDecode | Trim -%}
+                    {%- if line != '' -%}  - {{ line }}~~NL~~{%- endif -%}
+                {%- endfor -%}
+                ~~NL~~
+            {%- elsif b.type == 'note' -%}
+                {%- assign hasNoteFields = true -%}
+                {%- assign mine = userValues[b.data.id] | Trim -%}
+                {%- if mine != '' and mine != null -%}
+                    {%- assign hasNotes = true -%}
+                    MY NOTES:~~NL~~{{ mine | Replace:'
+','~~NL~~' }}~~NL~~~~NL~~
+                {%- endif -%}
+            {%- endif -%}
+        {%- endfor -%}
+    {%- endcapture -%}
+
+    {%- capture shareText -%}
+{{ r.Title | Trim }}~~NL~~{{ r.StartDateTime | Date:'MMMM d, yyyy' }}{% if r.Speaker != '' %} - {{ r.Speaker }}{% endif %}~~NL~~~~NL~~{{ bodyText | Trim }}
+    {%- endcapture -%}
+    {%- assign shareText = shareText | Trim | Escape | Replace:'~~NL~~','&#10;' -%}
+
+    {%- comment -%} nothing worth sharing if the document is empty AND they have
+        written nothing {%- endcomment -%}
+    {%- assign bodyCheck = bodyText | Replace:'~~NL~~','' | Trim -%}
+    {%- if bodyCheck != '' -%}
+    {%- assign rendered = true -%}
+    <VerticalStackLayout StyleClass=""p-16"" Spacing=""16"">
+        <Button Text=""{% if hasNotes %}Share My Notes{% else %}Share{% endif %}"" StyleClass=""btn, btn-primary""
+            Command=""{Binding ShareContent}"">
+            <Button.CommandParameter>
+                <Rock:ShareContentParameters
+                    Title=""{{ r.Title | Escape }}""
+                    Text=""{{ shareText }}"" />
+            </Button.CommandParameter>
+        </Button>
+
+        {%- comment -%} The hint doubles as the way out if the save ever loses the
+            race with this page: going back and returning always picks it up. {%- endcomment -%}
+        {%- if hasNoteFields and hasNotes == false -%}
+        <Label StyleClass=""footnote, text-interface-medium"" HorizontalTextAlignment=""Center""
+            Text=""You haven't added any notes yet, so only the outline will be shared. If you just typed one, go back and try again in a moment."" />
+        {%- endif -%}
+
+        <VerticalStackLayout Spacing=""8"">
+            <Label StyleClass=""caption1, font-weight-semi-bold, text-interface-medium"" Text=""PREVIEW"" />
+            <Rock:StyledBorder StyleClass=""bg-interface-softest"" CornerRadius=""12"" Padding=""16""
+                StrokeThickness=""1"" Stroke=""{Rock:PaletteColor Interface-Softer}"">
+                <Label StyleClass=""body, text-interface-stronger"" Text=""{{ shareText }}"" />
+            </Rock:StyledBorder>
+        </VerticalStackLayout>
+    </VerticalStackLayout>
+    {%- endif -%}
+{%- endfor -%}
+{%- endif -%}
+
+{%- comment -%} a Content block that renders NOTHING shows ""Invalid configuration
+    data"" - say why instead {%- endcomment -%}
+{%- if rendered == false -%}
+<VerticalStackLayout StyleClass=""p-24"" Spacing=""12"">
+    <Label StyleClass=""body, text-interface-medium"" HorizontalTextAlignment=""Center""
+        Text=""{% if CurrentPerson %}There's nothing to share for this message yet.{% else %}Sign in to share your notes.{% endif %}"" />
+</VerticalStackLayout>
+{%- endif -%}" );   // Content
+            RockMigrationHelper.AddBlockAttributeValue( "AA5CBF46-CEBC-453B-872D-65E8D53A6E86", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"Sql" );   // EnabledLavaCommands
+            RockMigrationHelper.AddBlockAttributeValue( "AA5CBF46-CEBC-453B-872D-65E8D53A6E86", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
 
             //
             // Mobile block settings (ProcessLavaOnServer / ProcessLavaOnClient, CssStyles, ...)
@@ -8471,6 +8572,7 @@ Thank you for allowing us to pray for you. Your request has been sent privately 
             Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = '5A9E13C7-6B04-4F82-9D31-72E05CA8F6B1'" );   // Share My Notes
             Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":""<VerticalStackLayout Spacing=\""14\"" StyleClass=\""p-24\"" VerticalOptions=\""Center\"">\n    <Rock:Icon IconClass=\""wifi-slash\"" IconFamily=\""FontAwesomeSolid\"" FontSize=\""40\"" StyleClass=\""text-interface-soft\"" HorizontalOptions=\""Center\"" />\n    <Label Text=\""You are offline\"" StyleClass=\""title3, bold, text-interface-strongest\"" HorizontalTextAlignment=\""Center\"" />\n    <Label Text=\""Connect to the internet to load this page.\"" StyleClass=\""body, text-interface-medium\"" HorizontalTextAlignment=\""Center\"" />\n</VerticalStackLayout>"",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'F3C8F5DA-6E49-4B17-A02D-5C93A7E46B82'" );   // Content
             Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":""<VerticalStackLayout Spacing=\""14\"" StyleClass=\""p-24\"" VerticalOptions=\""Center\"">\n    <Rock:Icon IconClass=\""wifi-slash\"" IconFamily=\""FontAwesomeSolid\"" FontSize=\""40\"" StyleClass=\""text-interface-soft\"" HorizontalOptions=\""Center\"" />\n    <Label Text=\""You are offline\"" StyleClass=\""title3, bold, text-interface-strongest\"" HorizontalTextAlignment=\""Center\"" />\n    <Label Text=\""Connect to the internet to load this page.\"" StyleClass=\""body, text-interface-medium\"" HorizontalTextAlignment=\""Center\"" />\n</VerticalStackLayout>"",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":false,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'F4D9A6EB-7F5A-4C28-B13E-6DA4B8F57C93'" );   // Group Registration
+            Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":""<VerticalStackLayout Spacing=\""14\"" StyleClass=\""p-24\"" VerticalOptions=\""Center\"">\n    <Rock:Icon IconClass=\""wifi-slash\"" IconFamily=\""FontAwesomeSolid\"" FontSize=\""40\"" StyleClass=\""text-interface-soft\"" HorizontalOptions=\""Center\"" />\n    <Label Text=\""You are offline\"" StyleClass=\""title3, bold, text-interface-strongest\"" HorizontalTextAlignment=\""Center\"" />\n    <Label Text=\""Connect to the internet to load this page.\"" StyleClass=\""body, text-interface-medium\"" HorizontalTextAlignment=\""Center\"" />\n</VerticalStackLayout>"",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'AA5CBF46-CEBC-453B-872D-65E8D53A6E86'" );   // Share My Notes
 
             //
             // Block CSS class (Advanced Settings > CSS Class - not carried by AddBlock)
