@@ -181,6 +181,8 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Prayer - Submit Prayer", "", "C3F6E9B4-5D17-4F8A-A029-47E1D2F6C853", "" );
             RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Prayer - Private Entry", "", "D4A7F0C5-6E28-4A9B-B13A-58F2E3A7D964", "" );
             RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Prayer Session", "", "E5B8A1D6-7F39-4BAC-C24B-69A3F4B8EA75", "" );
+            RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Group Detail (Public)", "", "F1A6D3B8-4C27-4E95-8D0B-3A71E5C24F60", "" );
+            RockMigrationHelper.AddPage( true, "EF0257AD-B5E4-4D53-B7D0-17561941EE1E", "0DB5128F-3D9E-4F0D-91BC-C9B29DAAFBFE", "Join Group", "", "F2B7E4C9-5D38-4A06-9E1C-4B82F6D35A71", "" );
 
             // Mobile page settings (AutoRefresh, HideNavigationBar, PageType, ...)
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":true,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'EF0257AD-B5E4-4D53-B7D0-17561941EE1E'" );   // Nfluence Church App Homepage
@@ -238,6 +240,8 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'C3F6E9B4-5D17-4F8A-A029-47E1D2F6C853'" );   // Prayer - Submit Prayer
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'D4A7F0C5-6E28-4A9B-B13A-58F2E3A7D964'" );   // Prayer - Private Entry
             Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'E5B8A1D6-7F39-4BAC-C24B-69A3F4B8EA75'" );   // Prayer Session
+            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'F1A6D3B8-4C27-4E95-8D0B-3A71E5C24F60'" );   // Group Detail (Public)
+            Sql( @"UPDATE [Page] SET [AdditionalSettingsJson] = N'{""AdditionalPageSettings"":{""LavaEventHandler"":"""",""CssStyles"":"""",""HideNavigationBar"":false,""ShowFullScreen"":false,""AutoRefresh"":false,""PageType"":0,""WebPageUrl"":""""}}' WHERE [Guid] = 'F2B7E4C9-5D38-4A06-9E1C-4B82F6D35A71'" );   // Join Group
 
             //
             // Blocks
@@ -319,6 +323,8 @@ namespace rocks.kfs.MobileAppMigration.Migrations
             RockMigrationHelper.AddBlock( true, "D4A7F0C5-6E28-4A9B-B13A-58F2E3A7D964".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 0, "66F70819-2A3B-44C5-D6E7-F8091A2B3C4D" );
             RockMigrationHelper.AddBlock( true, "D4A7F0C5-6E28-4A9B-B13A-58F2E3A7D964".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "EBB91B46-292E-4784-9E37-38781C714008".AsGuid(), "Prayer Request Details", "Main", @"", @"", 1, "7708192A-3B4C-45D6-E7F8-091A2B3C4D5E" );
             RockMigrationHelper.AddBlock( true, "E5B8A1D6-7F39-4BAC-C24B-69A3F4B8EA75".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "420DEA5F-9ABC-4E59-A9BD-DCA972657B84".AsGuid(), "Prayer Session", "Main", @"", @"", 0, "88192A3B-4C5D-46E7-F809-1A2B3C4D5E6F" );
+            RockMigrationHelper.AddBlock( true, "F1A6D3B8-4C27-4E95-8D0B-3A71E5C24F60".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "7258A210-E936-4260-B573-9FA1193AD9E2".AsGuid(), "Content", "Main", @"", @"", 0, "F3C8F5DA-6E49-4B17-A02D-5C93A7E46B82" );
+            RockMigrationHelper.AddBlock( true, "F2B7E4C9-5D38-4A06-9E1C-4B82F6D35A71".AsGuid(), null, "1D501408-CA88-4565-8822-BD318F255A59".AsGuid(), "8A42E4FA-9FE1-493C-B6D8-7A766D96E912".AsGuid(), "Group Registration", "Main", @"", @"", 0, "F4D9A6EB-7F5A-4C28-B13E-6DA4B8F57C93" );
 
             //
             // Block attribute values
@@ -514,7 +520,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
         {%- assign lnTitle = g.Name -%}
         {%- assign lnSummary = g.Description | StripHtml | HtmlDecode | Trim -%}
         {%- assign srcCommand = 'PushPage' -%}
-        {%- capture srcParam -%}73143e47-3c0e-44bc-8815-0021f88e9f72?GroupGuid={{ g.Guid }}{%- endcapture -%}
+        {%- capture srcParam -%}f1a6d3b8-4c27-4e95-8d0b-3a71e5c24f60?GroupGuid={{ g.Guid }}{%- endcapture -%}
       {%- endfor -%}
     {% endgroup %}
   {%- endif -%}
@@ -8055,6 +8061,341 @@ Thank you for allowing us to pray for you. Your request has been sent privately 
             RockMigrationHelper.AddBlockAttributeValue( "88192A3B-4C5D-46E7-F809-1A2B3C4D5E6F", "AF310A62-C62A-427A-A88E-48AA885CCCE7", @"2b0f4548-8da7-4236-9bf9-5fa3c07d762f|" );   // Template
             RockMigrationHelper.AddBlockAttributeValue( "88192A3B-4C5D-46E7-F809-1A2B3C4D5E6F", "3382895E-1422-417E-84F2-A4750AF2AD70", @"True" );   // CreateInteractionsForPrayers
             RockMigrationHelper.AddBlockAttributeValue( "88192A3B-4C5D-46E7-F809-1A2B3C4D5E6F", "69DF4D6F-730B-4F16-BF47-7FFEAFC2EB2D", @"False" );   // IncludeGroupRequests
+            RockMigrationHelper.AddBlockAttributeValue( "F3C8F5DA-6E49-4B17-A02D-5C93A7E46B82", "5682EDBF-68DA-4B43-A593-6C2B936C2839", @"{%- comment -%}
+    Public Group Detail - the Content block body for the ""Group"" page.
+
+    This is the group equivalent of Event Detail: a read-only, anyone-can-see
+    page reached from the home feed (and, later, from a group finder). It is NOT
+    the My Groups > Group Detail page, which is member context - messages, needs,
+    attendance, the member roster.
+
+    Source of truth for this template is public_group_detail.xml; the installer
+    ADD_PublicGroupDetail.sql is generated from it by build_publicgroup.py.
+
+    WHO CAN SEE WHAT
+
+    The group is resolved with securityenabled:'false', because the whole point
+    of a public page is that a non-member can read it. Security is therefore
+    replaced by an explicit gate, and the gate is the only thing standing between
+    a guessed Guid and someone's data - do not loosen it casually:
+
+        * the group's type must NOT be in denyTypeGuids below, and
+        * the type's purpose must not be a check-in one, and
+        * the group must not be a security role, and
+        * Group.IsPublic must be true, and
+        * Group.IsActive must be true and IsArchived false.
+
+    DENY, NOT ALLOW, AND WHY
+
+    This started as an allow-list of one type. It is a deny-list because the
+    church adds group types often, and every new one would otherwise be invisible
+    until someone remembered to come back here - a failure nobody would notice,
+    because the symptom is a page that quietly says the group is not public.
+
+    The trade is that the failure now runs the other way: a new type is public the
+    moment it exists. That is only safe because IsPublic is still required, and
+    IsPublic is a per-group switch the church sets deliberately. It also means the
+    deny-list has to be right. It is not ""Rock's built-in types"" - Rock ships Small
+    Group, which is the main thing we want to show - it is the built-in types that
+    hold data no visitor should reach: households, relationships, security, and
+    anything to do with check-in.
+
+    IsPublic is 1 on every Family, Known Relationship and Peer Network group in
+    Rock, roughly 3,200 of them here, so IsPublic alone would expose household
+    membership to anyone holding a Guid. The check-in entries matter for the same
+    reason in reverse: those groups are children's class rosters.
+
+    The purpose test catches Check-in Template and Check-in Filter types added
+    later without an edit here. A check-in AREA carries no purpose of its own, so
+    the five on this server are listed by Guid; a new area needs a line adding.
+
+    Two further deliberate narrowings, both easy to reverse if the church wants
+    them reversed:
+
+        * Location shows CITY AND STATE ONLY. Small groups meet in host homes and
+          GroupLocation.Street1 is that host's street address; it is not public
+          information until someone has actually joined.
+        * Leaders show as nick name plus last initial.
+
+    WHAT IS NOT HERE YET
+    No Share action - unlike an event, a group has no public web URL on this
+    server to share to. Add one once there is a group page on the main site.
+{%- endcomment -%}
+
+{%- assign groupGuid = PageParameter.GroupGuid -%}
+
+{%- comment -%}
+    Group types that must never render publicly. Lowercase, comma delimited, with
+    a leading and trailing comma so the lookup below matches whole Guids.
+
+    Everything not listed is public as long as the group itself has IsPublic set.
+{%- endcomment -%}
+{%- comment -%}
+    In list order, so a Guid can be traced back to a name without a query:
+
+      aece949f Security Role        790e3215 Family
+      e0c5a0e2 Known Relationships  8c0e5852 Peer Network
+      3311132b Event Attendees      d1d95777 Communication List
+      3981cf6d Application Group    badd7a6c Campus Team
+      235bae2b Services
+
+    Organization Unit and LMS Class were on this list and were taken off
+    deliberately - Nate, 2026-09-18.
+
+      check-in templates   fedd389a Weekly Service  92435f1d Volunteer
+                           77713830 Service Attendance
+      check-in filters     0572a5fe Age    13a6139d Ability   4f9565a7 Grade
+                           6e7ad783 Check In  2cb16e13 Special Needs
+                           dc7ed2fd Data View
+      check-in areas       caaf4f9b Test   cadb2d12 Nursery/Preschool
+                           e3c8f7d6 Elementary  7a17235b Jr High
+                           9a88743b High School
+{%- endcomment -%}
+{%- assign denyTypeGuids = ',aece949f-704c-483e-a4fb-93d5e4720c4c,790e3215-3b10-442b-af69-616c0dcb998e,e0c5a0e2-b7b3-4ef4-820d-bbf7f9a374ef,8c0e5852-f08f-4327-9aa5-87800a6ab53e,3311132b-268d-44e9-811a-a56a0835e50a,d1d95777-ffa3-cbb3-4a6d-658706daed33,3981cf6d-7d15-4b57-aace-c0e25d28bd49,badd7a6c-1fb3-4e11-a721-6d1377c6958c,235bae2b-5760-4763-aadf-3938f34ba100,fedd389a-616f-4a53-906c-63d8255631c5,92435f1d-e525-4fd2-bec7-4956dc056a2b,77713830-ae5e-4b1a-94fa-e145dff85035,0572a5fe-20a4-4bf1-95cd-c71db5281392,13a6139d-eeec-412d-8572-773eca1939cc,4f9565a7-dd5a-41c3-b4e8-13f0b872b10b,6e7ad783-7614-4721-abc1-35842113ef59,2cb16e13-141f-419f-bacd-8283ab6b3299,dc7ed2fd-5f88-4760-b3c8-494edb1cfc06,caaf4f9b-58b9-45b4-aabc-9188347948b7,cadb2d12-7836-44bc-8eea-3c6ab22fd5e8,e3c8f7d6-5ceb-43bb-802f-66c3e734049e,7a17235b-69ad-439b-bab0-1a0a472db96f,9a88743b-f336-4404-b877-2a623689195d,' -%}
+
+{%- assign joinPageGuid = 'F2B7E4C9-5D38-4A06-9E1C-4B82F6D35A71' -%}
+{%- assign myGroupPageGuid = '73143E47-3C0E-44BC-8815-0021F88E9F72' -%}
+{%- assign appRoot = 'Global' | Attribute:'PublicApplicationRoot' -%}
+
+{%- comment -%} Label^AttributeKey pairs for the details list, in display order. {%- endcomment -%}
+{%- assign detailPairs = 'Topic^Topic,Category^Category,Shared Interest^SharedInterest,Tags^GroupTags,For^Gender,Childcare^Arena_ChildcareProvided' -%}
+
+{%- assign found = false -%}
+{%- assign visible = false -%}
+{%- assign gName = '' -%}
+{%- assign gDescription = '' -%}
+{%- assign gTypeName = '' -%}
+{%- assign gCapacity = 0 -%}
+{%- assign gImageGuid = '' -%}
+{%- assign gSchedule = '' -%}
+{%- assign gCity = '' -%}
+{%- assign gStartDate = '' -%}
+{%- assign activeCount = 0 -%}
+{%- assign leaderNames = '' -%}
+{%- assign myStatus = '' -%}
+{%- assign detailRows = '' -%}
+
+{% group where:'Guid == ""{{ groupGuid }}""' securityenabled:'false' %}
+  {%- for g in groupItems -%}
+    {%- assign found = true -%}
+
+    {%- comment -%}
+        Wrapped in commas on both sides so a whole Guid has to match - a bare
+        ""contains"" on a delimited list is how a substring sneaks through.
+    {%- endcomment -%}
+    {%- capture gTypeLookup -%},{{ g.GroupType.Guid | Downcase }},{%- endcapture -%}
+    {%- assign typeAllowed = true -%}
+    {%- if denyTypeGuids contains gTypeLookup -%}{%- assign typeAllowed = false -%}{%- endif -%}
+
+    {%- comment -%}
+        Catches check-in types added after this was written, which the Guid list
+        cannot. Templates and filters carry a purpose; areas do not, which is why
+        the five on this server are listed by Guid above.
+    {%- endcomment -%}
+    {%- assign gtPurpose = g.GroupType.GroupTypePurposeValue.Value | Downcase -%}
+    {%- if gtPurpose contains 'check-in' -%}{%- assign typeAllowed = false -%}{%- endif -%}
+
+    {%- comment -%} Belt and braces: a security role is never public whatever its type. {%- endcomment -%}
+    {%- if g.IsSecurityRole == true -%}{%- assign typeAllowed = false -%}{%- endif -%}
+
+    {%- if g.IsActive == true and g.IsArchived == false and g.IsPublic == true and typeAllowed -%}
+      {%- assign visible = true -%}
+      {%- assign gName = g.Name -%}
+      {%- assign gDescription = g.Description | StripHtml | HtmlDecode | Trim -%}
+      {%- assign gTypeName = g.GroupType.Name -%}
+      {%- assign gCapacity = g.GroupCapacity -%}
+      {%- assign gImageGuid = g | Attribute:'SmallGroupImage','RawValue' -%}
+      {%- comment -%}
+          Start Date is only worth a row while it is still ahead of the reader -
+          most groups here carry one from years ago, and ""Starting 3/10/2018""
+          reads as a data error rather than as information.
+      {%- endcomment -%}
+      {%- assign startRaw = g | Attribute:'StartDate','RawValue' -%}
+      {%- if startRaw != '' and startRaw != null -%}
+        {%- assign daysToStart = 'Now' | DateDiff:startRaw,'d' -%}
+        {%- if daysToStart and daysToStart > 0 -%}
+          {%- assign gStartDate = startRaw | Date:'MMMM d, yyyy' -%}
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- if g.Schedule -%}{%- assign gSchedule = g.Schedule.FriendlyScheduleText -%}{%- endif -%}
+
+      {%- comment -%} City/State of the first located meeting place - never the street. {%- endcomment -%}
+      {%- for gl in g.GroupLocations -%}
+        {%- if gCity == '' and gl.Location.City and gl.Location.City != '' -%}
+          {%- capture gCity -%}{{ gl.Location.City }}{% if gl.Location.State and gl.Location.State != '' %}, {{ gl.Location.State }}{% endif %}{%- endcapture -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- comment -%}
+          One pass over the roster does three jobs: count active members, collect
+          leader names, and work out whether the viewer is already in the group.
+      {%- endcomment -%}
+      {%- for m in g.Members -%}
+        {%- if m.GroupMemberStatus == 'Active' -%}
+          {%- assign activeCount = activeCount | Plus:1 -%}
+          {%- if m.GroupRole.IsLeader -%}
+            {%- comment -%} Truncate's length counts the ellipsis, so 2 is what gives ""D."" {%- endcomment -%}
+            {%- capture leaderNames -%}{{ leaderNames }}{% if leaderNames != '' %}, {% endif %}{{ m.Person.NickName }} {{ m.Person.LastName | Truncate:2,'.' }}{%- endcapture -%}
+          {%- endif -%}
+        {%- endif -%}
+        {%- if CurrentPerson and m.PersonId == CurrentPerson.Id -%}
+          {%- if m.GroupMemberStatus == 'Active' -%}{%- assign myStatus = 'Active' -%}
+          {%- elseif m.GroupMemberStatus == 'Pending' -%}{%- assign myStatus = 'Pending' -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- comment -%}
+          Detail rows are built here, into a delimited string, rather than in the
+          layout below - the group has to stay in scope to read its attributes,
+          and the group tag closes before the XAML starts.
+
+          Do not write a Lava block tag inside a comment, even as prose. Fluid
+          still tokenises it, so a mention of the group tag opened a block that
+          never closed and the whole template failed to parse.
+      {%- endcomment -%}
+      {%- assign pairList = detailPairs | Split:',' -%}
+      {%- for pair in pairList -%}
+        {%- assign parts = pair | Split:'^' -%}
+        {%- assign pLabel = parts | First -%}
+        {%- assign pKey = parts | Last -%}
+        {%- comment -%}
+            The formatted value, not RawValue - a Boolean already arrives as
+            ""Yes""/""No"" and a Defined Value as its label. ""Childcare: No"" earns its
+            row, so only genuinely empty values are dropped.
+        {%- endcomment -%}
+        {%- assign pValue = g | Attribute:pKey -%}
+        {%- if pValue != '' and pValue != null -%}
+          {%- capture detailRows -%}{{ detailRows }}{{ pLabel }}^{{ pValue | StripHtml | HtmlDecode | Trim }}|{%- endcapture -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+  {%- endfor -%}
+{% endgroup %}
+
+{%- assign openings = 0 -%}
+{%- if gCapacity and gCapacity > 0 -%}
+  {%- assign openings = gCapacity | Minus:activeCount -%}
+  {%- if openings < 0 -%}{%- assign openings = 0 -%}{%- endif -%}
+{%- endif -%}
+
+{% if visible == false %}
+
+<VerticalStackLayout StyleClass=""p-16"" Spacing=""12"">
+    <Rock:Icon IconClass=""user-friends"" IconFamily=""FontAwesomeSolid"" FontSize=""40""
+        StyleClass=""text-interface-soft"" HorizontalOptions=""Center"" />
+    <Label StyleClass=""title3, bold, text-interface-strongest"" HorizontalTextAlignment=""Center""
+        Text=""{% if found %}This group isn't open to the public{% else %}Group not found{% endif %}"" />
+    <Label StyleClass=""body, text-interface-medium"" HorizontalTextAlignment=""Center""
+        Text=""{% if found %}Reach out to the church office if you'd like to know more about it.{% else %}It may have been removed since this link was shared.{% endif %}"" />
+</VerticalStackLayout>
+
+{% else %}
+
+<VerticalStackLayout Spacing=""20"" StyleClass=""p-16"">
+
+    <!-- ===== Hero image ===== -->
+    {% if gImageGuid != '' and gImageGuid != null %}
+        <Rock:Image Source=""{{ appRoot }}GetImage.ashx?Guid={{ gImageGuid }}""
+            Aspect=""AspectFill""
+            HeightRequest=""200"">
+            <Rock:RoundedTransformation CornerRadius=""12"" />
+        </Rock:Image>
+    {% endif %}
+
+    <!-- ===== Name + group type ===== -->
+    <VerticalStackLayout Spacing=""4"">
+        <Label StyleClass=""title1, bold, text-interface-strongest"" Text=""{{ gName | Escape }}"" />
+        <Label StyleClass=""headline, bold"" TextColor=""{Rock:PaletteColor App-Primary-Strong}""
+            Text=""{{ gTypeName | Upcase | Escape }}"" LineBreakMode=""NoWrap"" />
+    </VerticalStackLayout>
+
+    <!-- ===== At a glance: when, where, how many ===== -->
+    <Rock:FieldContainer FieldLayout=""Individual"">
+        {% if gSchedule != '' and gSchedule != null %}
+            <Rock:Literal Label=""Meets"" Text=""{{ gSchedule | Escape }}"" />
+        {% endif %}
+        {% if gStartDate != '' and gStartDate != null %}
+            <Rock:Literal Label=""Starting"" Text=""{{ gStartDate | Escape }}"" />
+        {% endif %}
+        {% if gCity != '' %}
+            <Rock:Literal Label=""Area"" Text=""{{ gCity | Escape }}"" />
+        {% endif %}
+        {% if leaderNames != '' %}
+            <Rock:Literal Label=""Led by"" Text=""{{ leaderNames | Escape }}"" />
+        {% endif %}
+        <Rock:Literal Label=""Size"" Text=""{{ activeCount }} member{% if activeCount != 1 %}s{% endif %}{% if gCapacity and gCapacity > 0 %} &#8226; {% if openings > 0 %}{{ openings }} spot{% if openings != 1 %}s{% endif %} left{% else %}currently full{% endif %}{% endif %}"" />
+    </Rock:FieldContainer>
+
+    <BoxView HeightRequest=""1"" StyleClass=""bg-interface-softer"" />
+
+    <!-- ===== Description ===== -->
+    {% if gDescription != '' %}
+        <VerticalStackLayout Spacing=""8"">
+            <Label StyleClass=""caption1, font-weight-semi-bold, text-interface-medium"" Text=""ABOUT THIS GROUP"" />
+            <Label StyleClass=""body, text-interface-stronger"" Text=""{{ gDescription | Escape }}"" />
+        </VerticalStackLayout>
+    {% endif %}
+
+    <!-- ===== Group details ===== -->
+    {% if detailRows != '' %}
+        <VerticalStackLayout Spacing=""8"">
+            <Label StyleClass=""caption1, font-weight-semi-bold, text-interface-medium"" Text=""DETAILS"" />
+            {%- assign rowList = detailRows | Split:'|' -%}
+            {% for row in rowList %}
+                {%- assign rowParts = row | Split:'^' -%}
+                <Grid ColumnDefinitions=""Auto, *"" ColumnSpacing=""16"">
+                    <Label Grid.Column=""0"" StyleClass=""body, text-interface-strongest"" VerticalOptions=""Center""
+                        Text=""{{ rowParts | First | Escape }}"" />
+                    <Label Grid.Column=""1"" StyleClass=""body, text-interface-medium"" HorizontalTextAlignment=""End"" VerticalOptions=""Center""
+                        Text=""{{ rowParts | Last | Escape }}"" />
+                </Grid>
+                <BoxView HeightRequest=""1"" StyleClass=""bg-interface-softer"" />
+            {% endfor %}
+        </VerticalStackLayout>
+    {% endif %}
+
+    <!-- ===== Call to action =====
+         Three states, because the same link gets shared to people already in the
+         group: a member goes to the real group page, a pending request is told to
+         wait, and everyone else is offered the registration page. -->
+    {% if myStatus == 'Active' %}
+        <VerticalStackLayout Spacing=""8"">
+            <Label StyleClass=""body, text-interface-medium"" HorizontalTextAlignment=""Center"" Text=""You're in this group."" />
+            <Button Text=""Open Group"" StyleClass=""btn, btn-primary""
+                Command=""{Binding PushPage}"" CommandParameter=""{{ myGroupPageGuid }}?GroupGuid={{ groupGuid }}"" />
+        </VerticalStackLayout>
+    {% elseif myStatus == 'Pending' %}
+        <Rock:NotificationBox NotificationType=""Information""
+            Text=""Your request to join is with the group leader. They'll be in touch soon."" />
+    {% elseif gCapacity and gCapacity > 0 and openings == 0 %}
+        <Rock:NotificationBox NotificationType=""Warning""
+            Text=""This group is full right now. Check back later or ask the church office about others."" />
+    {% else %}
+        <Button Text=""Request to Join"" StyleClass=""btn, btn-primary""
+            Command=""{Binding PushPage}"" CommandParameter=""{{ joinPageGuid }}?GroupGuid={{ groupGuid }}"" />
+    {% endif %}
+
+</VerticalStackLayout>
+
+{% endif %}" );   // Content
+            RockMigrationHelper.AddBlockAttributeValue( "F3C8F5DA-6E49-4B17-A02D-5C93A7E46B82", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"RockEntity" );   // EnabledLavaCommands
+            RockMigrationHelper.AddBlockAttributeValue( "F3C8F5DA-6E49-4B17-A02D-5C93A7E46B82", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
+            RockMigrationHelper.AddBlockAttributeValue( "F4D9A6EB-7F5A-4C28-B13E-6DA4B8F57C93", "A7BC77F1-41AF-4360-B08C-3F0E5B2D047A", @"Send Request" );   // SaveButtonText
+            RockMigrationHelper.AddBlockAttributeValue( "F4D9A6EB-7F5A-4C28-B13E-6DA4B8F57C93", "331E7628-20CF-4979-8FB9-0F28DD91BD63", @"1A082EFF-30DA-44B2-8E48-02385C20828E,2C42B2D4-1C5F-4AD5-A9AD-08631B872AC4,4F9565A7-DD5A-41C3-B4E8-13F0B872B10B,7A17235B-69AD-439B-BAB0-1A0A472DB96F,EB8D40E7-A71E-4288-853F-2084AE3CB24D,FAB75EC6-0402-456A-BE34-252097DE4F20,9A88743B-F336-4404-B877-2A623689195D,50FCFB30-F51A-49DF-86F4-2B176EA1820B,5A2A59D4-79BC-4D6A-9830-2C680162A240,181EAC76-7FA5-47B1-8D5D-2D1E25C76A8B,6E7AD783-7614-4721-ABC1-35842113EF59,235BAE2B-5760-4763-AADF-3938F34BA100,CADB2D12-7836-44BC-8EEA-3C6AB22FD5E8,8400497B-C52F-40AE-A529-3FCCB9587101,4BE7FC44-332D-40A8-978E-47B7035D7A0C,DC7ED2FD-5F88-4760-B3C8-494EDB1CFC06,92435F1D-E525-4FD2-BEC7-4956DC056A2B,499B1367-06B3-4538-9D56-56D53F55DCB1,DFDC14A3-D1DC-4342-A012-5CE9E8994B5E,790E3215-3B10-442B-AF69-616C0DCB998E,FEDD389A-616F-4A53-906C-63D8255631C5,D1D95777-FFA3-CBB3-4A6D-658706DAED33,E3C8F7D6-5CEB-43BB-802F-66C3E734049E,6BDD3A27-E178-44FD-A3AC-6C177D59EE18,BADD7A6C-1FB3-4E11-A721-6D1377C6958C,268D4802-24C7-4891-890E-71313BEE17B1,AAB2E9F4-E828-4FEE-8467-73DC9DAB784C,4BBC41E2-0A37-4289-B7A7-756B9FE8F775,13A6139D-EEEC-412D-8572-773ECA1939CC,E2DEEA80-079B-4D06-A458-791FD2F44056,EBAAD951-4181-4729-BA26-7D669ACB3680,2CB16E13-141F-419F-BACD-8283AB6B3299,8C0E5852-F08F-4327-9AA5-87800A6AB53E,CAAF4F9B-58B9-45B4-AABC-9188347948B7,AECE949F-704C-483E-A4FB-93D5E4720C4C,99DCE239-F0F9-4A21-8CF9-9BDD392DB586,DE79D726-EABA-4559-B788-BAB4B5031CD1,E0C5A0E2-B7B3-4EF4-820D-BBF7F9A374EF,3981CF6D-7D15-4B57-AACE-C0E25D28BD49,0572A5FE-20A4-4BF1-95CD-C71DB5281392,2C6F2847-B404-4595-AB35-CE42F2303868,92BEDEAA-79BA-40CB-AE5E-DE63BB0B0381,77713830-AE5E-4B1A-94FA-E145DFF85035,7EE55A72-D3CA-4728-B7B9-E843348C1A36,6C1E114E-F219-4D6F-ADD5-F49049D29644,8C203BFA-A777-4DD1-AC1F-FE5B8EA97F2E" );   // GroupTypes
+            RockMigrationHelper.AddBlockAttributeValue( "F4D9A6EB-7F5A-4C28-B13E-6DA4B8F57C93", "CA828A3D-FD7B-42CD-951D-5A834B77517C", @"<VerticalStackLayout Spacing=""12"" StyleClass=""p-16"">
+    <Rock:Icon IconClass=""check-circle"" IconFamily=""FontAwesomeSolid"" FontSize=""40""
+        StyleClass=""text-primary-strong"" HorizontalOptions=""Center"" />
+    <Label StyleClass=""title3, bold, text-interface-strongest"" HorizontalTextAlignment=""Center""
+        Text=""Request sent"" />
+    <Label StyleClass=""body, text-interface-medium"" HorizontalTextAlignment=""Center""
+        Text=""Thanks for your interest in {{ Group.Name }}. The group leader will be in touch soon."" />
+</VerticalStackLayout>" );   // CompletedTemplate
+            RockMigrationHelper.AddBlockAttributeValue( "F4D9A6EB-7F5A-4C28-B13E-6DA4B8F57C93", "FC8CA904-3E5D-4797-8C95-E032E1E6134E", @"2" );   // GroupMemberStatus
+            RockMigrationHelper.AddBlockAttributeValue( "F4D9A6EB-7F5A-4C28-B13E-6DA4B8F57C93", "C5DFE24D-62EC-46E5-A23F-2789EA95A450", @"0" );   // FamilyOptions
+            RockMigrationHelper.AddBlockAttributeValue( "F4D9A6EB-7F5A-4C28-B13E-6DA4B8F57C93", "3190D83F-6EAE-4B77-B2C1-0B0FAD5EC846", @"True" );   // PreventOvercapacityRegistrations
+            RockMigrationHelper.AddBlockAttributeValue( "F4D9A6EB-7F5A-4C28-B13E-6DA4B8F57C93", "E75E6654-0A4F-4833-8051-A6E96A36A784", @"True" );   // AutofillForm
 
             //
             // Mobile block settings (ProcessLavaOnServer / ProcessLavaOnClient, CssStyles, ...)
@@ -8128,6 +8469,8 @@ Thank you for allowing us to pray for you. Your request has been sent privately 
             Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":3600,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'E6F93A04-7CB5-4D28-A143-90526E8BD7CA'" );   // Strong Church List
             Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":60,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'F70A4B15-8DC6-4E39-B254-A1637F9CE8DB'" );   // Strong Church Episode
             Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":"""",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = '5A9E13C7-6B04-4F82-9D31-72E05CA8F6B1'" );   // Share My Notes
+            Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":""<VerticalStackLayout Spacing=\""14\"" StyleClass=\""p-24\"" VerticalOptions=\""Center\"">\n    <Rock:Icon IconClass=\""wifi-slash\"" IconFamily=\""FontAwesomeSolid\"" FontSize=\""40\"" StyleClass=\""text-interface-soft\"" HorizontalOptions=\""Center\"" />\n    <Label Text=\""You are offline\"" StyleClass=\""title3, bold, text-interface-strongest\"" HorizontalTextAlignment=\""Center\"" />\n    <Label Text=\""Connect to the internet to load this page.\"" StyleClass=\""body, text-interface-medium\"" HorizontalTextAlignment=\""Center\"" />\n</VerticalStackLayout>"",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":true,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'F3C8F5DA-6E49-4B17-A02D-5C93A7E46B82'" );   // Content
+            Sql( @"UPDATE [Block] SET [AdditionalSettings] = N'{""ShowOnTablet"":true,""ShowOnPhone"":true,""RequiresNetwork"":true,""NoNetworkContent"":""<VerticalStackLayout Spacing=\""14\"" StyleClass=\""p-24\"" VerticalOptions=\""Center\"">\n    <Rock:Icon IconClass=\""wifi-slash\"" IconFamily=\""FontAwesomeSolid\"" FontSize=\""40\"" StyleClass=\""text-interface-soft\"" HorizontalOptions=\""Center\"" />\n    <Label Text=\""You are offline\"" StyleClass=\""title3, bold, text-interface-strongest\"" HorizontalTextAlignment=\""Center\"" />\n    <Label Text=\""Connect to the internet to load this page.\"" StyleClass=\""body, text-interface-medium\"" HorizontalTextAlignment=\""Center\"" />\n</VerticalStackLayout>"",""CssStyles"":"""",""CacheDuration"":0,""ProcessLavaOnServer"":false,""ProcessLavaOnClient"":false}' WHERE [Guid] = 'F4D9A6EB-7F5A-4C28-B13E-6DA4B8F57C93'" );   // Group Registration
 
             //
             // Block CSS class (Advanced Settings > CSS Class - not carried by AddBlock)
@@ -8155,6 +8498,7 @@ Thank you for allowing us to pray for you. Your request has been sent privately 
             Sql( @"UPDATE [Block] SET [CssClass] = N'm-16' WHERE [Guid] = '55E6F708-192A-43B4-C5D6-E7F8091A2B3C'" );   // Prayer Request Details
             Sql( @"UPDATE [Block] SET [CssClass] = N'm-16' WHERE [Guid] = '7708192A-3B4C-45D6-E7F8-091A2B3C4D5E'" );   // Prayer Request Details
             Sql( @"UPDATE [Block] SET [CssClass] = N'm-16' WHERE [Guid] = '88192A3B-4C5D-46E7-F809-1A2B3C4D5E6F'" );   // Prayer Session
+            Sql( @"UPDATE [Block] SET [CssClass] = N'm-16' WHERE [Guid] = 'F4D9A6EB-7F5A-4C28-B13E-6DA4B8F57C93'" );   // Group Registration
 
             //
             // Page advanced settings (CSS class, icon, description, keywords, header content)
