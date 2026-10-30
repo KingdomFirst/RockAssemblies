@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\003_NfluenceHomeScreenSync.cs" />
     <Compile Include="OLD\001_AddPagesAndBlocks.cs" />
     <Compile Include="Migrations\001_NfluenceMobileApp.cs" />
     <Compile Include="Migrations\002_NfluenceMobileAppWorkflows.cs" />

@@ -98,16 +98,16 @@ WHERE a.[EntityTypeQualifierColumn] = 'ContentChannelId'
 
 /* ---- everything currently flagged ----------------------------------------- */
 DECLARE @Wanted TABLE ( SourceGuid UNIQUEIDENTIFIER, FeedAttrKey NVARCHAR(50),
-                        SourceName NVARCHAR(250), SourceExpire DATETIME, FK NVARCHAR(100) );
+                        SourceName NVARCHAR(250), SourceStart DATETIME, SourceExpire DATETIME, FK NVARCHAR(100) );
 
 DECLARE @EtEvent INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.EventItem' );
 DECLARE @EtGroup INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.Group' );
 DECLARE @EtReg   INT = ( SELECT TOP 1 [Id] FROM [EntityType] WHERE [Name] = 'Rock.Model.RegistrationInstance' );
 
 /* content channel items - the feed channel itself is excluded, or a flagged card
-   could point at itself */
-INSERT INTO @Wanted ( SourceGuid, FeedAttrKey, SourceName, SourceExpire )
-SELECT i.[Guid], 'LinkedItem', i.[Title], i.[ExpireDateTime]
+   could point at itself. The only source with a start date of its own. */
+INSERT INTO @Wanted ( SourceGuid, FeedAttrKey, SourceName, SourceStart, SourceExpire )
+SELECT i.[Guid], 'LinkedItem', i.[Title], i.[StartDateTime], i.[ExpireDateTime]
 FROM [ContentChannelItem] i
 JOIN [Attribute] a ON a.[Key] = 'AddToHomeScreen'
                   AND a.[EntityTypeQualifierColumn] = 'ContentChannelId'
@@ -168,8 +168,11 @@ WHERE i.[ContentChannelId] = @FeedChannelId
 DECLARE @Expired INT = @@ROWCOUNT;
 
 /* ---- 2. revive a card that was flagged again ------------------------------ */
+/* a source now dated in the future holds the card back until then, as a new card would be */
 UPDATE i
-   SET i.[ExpireDateTime] = w.SourceExpire, i.[ModifiedDateTime] = @Now
+   SET i.[ExpireDateTime] = w.SourceExpire,
+       i.[StartDateTime] = CASE WHEN w.SourceStart > @Now THEN w.SourceStart ELSE i.[StartDateTime] END,
+       i.[ModifiedDateTime] = @Now
 FROM [ContentChannelItem] i
 JOIN @Wanted w ON w.FK = i.[ForeignKey]
 WHERE i.[ContentChannelId] = @FeedChannelId
@@ -191,7 +194,7 @@ INSERT INTO [ContentChannelItem]
 OUTPUT inserted.[Id], inserted.[ForeignKey] INTO @New ( ItemId, FK )
 SELECT @FeedChannelId, @FeedTypeId, LEFT( ISNULL( w.SourceName, '' ), 250 ), '', 0,
        @BaseOrder + ROW_NUMBER() OVER ( ORDER BY w.SourceName ),
-       2, @Now, @Now, w.SourceExpire,
+       2, @Now, CASE WHEN w.SourceStart > @Now THEN w.SourceStart ELSE @Now END, w.SourceExpire,
        NEWID(), w.FK, @Now, @Now
 FROM @Wanted w
 WHERE NOT EXISTS ( SELECT 1 FROM [ContentChannelItem] i
