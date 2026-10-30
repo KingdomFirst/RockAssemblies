@@ -1275,8 +1275,13 @@ namespace rocks.kfs.MobileAppMigration.Migrations
 {%- if isListMode -%}{%- assign fetch = take | Plus:1 -%}{%- endif -%}
 {%- assign renderedCount = 0 -%}
 {%- assign extraCount = 0 -%}
+{%- comment -%} APPROVAL-FILTER: in a channel that requires approval only Approved items are shown, the rule Rock's own blocks use. A channel without approval shows everything. {%- endcomment -%}
+{%- assign listStatusFilter = '' -%}
+{%- contentchannel id:'{{ menuChannelId }}' securityenabled:'false' -%}{%- if contentchannel.RequiresApproval and contentchannel.ContentChannelType.DisableStatus == false -%}{%- assign listStatusFilter = ' && Status == 2' -%}{%- endif -%}{%- endcontentchannel -%}
 {%- capture listBody -%}
-{%- contentchannelitem where:'ContentChannelId == ""{{ menuChannelId }}""' sort:'{{ sortBy }}' limit:'{{ fetch }}' -%}
+{%- comment -%} START-DATE-FILTER: a note stays off the list until its Start Date. {%- endcomment -%}
+{%- assign listNow = 'Now' | Date:'yyyy-MM-ddTHH:mm:ss' -%}
+{%- contentchannelitem where:'ContentChannelId == ""{{ menuChannelId }}""{{ listStatusFilter }} && StartDateTime <= ""{{ listNow }}""' sort:'{{ sortBy }}' limit:'{{ fetch }}' -%}
 {%- for item in contentchannelitemItems -%}
   {%- assign itemMenu = item | Attribute:'Menu','RawValue' -%}
   {%- if isListMode or itemMenu == menuKey -%}
@@ -1444,8 +1449,13 @@ namespace rocks.kfs.MobileAppMigration.Migrations
 {%- if isListMode -%}{%- assign fetch = take | Plus:1 -%}{%- endif -%}
 {%- assign renderedCount = 0 -%}
 {%- assign extraCount = 0 -%}
+{%- comment -%} APPROVAL-FILTER: in a channel that requires approval only Approved items are shown, the rule Rock's own blocks use. A channel without approval shows everything. {%- endcomment -%}
+{%- assign listStatusFilter = '' -%}
+{%- contentchannel id:'{{ menuChannelId }}' securityenabled:'false' -%}{%- if contentchannel.RequiresApproval and contentchannel.ContentChannelType.DisableStatus == false -%}{%- assign listStatusFilter = ' && Status == 2' -%}{%- endif -%}{%- endcontentchannel -%}
 {%- capture listBody -%}
-{%- contentchannelitem where:'ContentChannelId == ""{{ menuChannelId }}""' sort:'{{ sortBy }}' limit:'{{ fetch }}' -%}
+{%- comment -%} START-DATE-FILTER: a note stays off the list until its Start Date. {%- endcomment -%}
+{%- assign listNow = 'Now' | Date:'yyyy-MM-ddTHH:mm:ss' -%}
+{%- contentchannelitem where:'ContentChannelId == ""{{ menuChannelId }}""{{ listStatusFilter }} && StartDateTime <= ""{{ listNow }}""' sort:'{{ sortBy }}' limit:'{{ fetch }}' -%}
 {%- for item in contentchannelitemItems -%}
   {%- assign itemMenu = item | Attribute:'Menu','RawValue' -%}
   {%- if isListMode or itemMenu == menuKey -%}
@@ -2865,10 +2875,15 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
 {%- comment -%} last resort behind every thumbnail; lives in RockWeb/Content/MobileApp {%- endcomment -%}
 {%- assign defaultImg = appRoot | Append:'Content/MobileApp/MediaDefault.png' -%}
 {%- assign takePlusOne = take | Plus:1 -%}
+{%- comment -%} APPROVAL-FILTER: in a channel that requires approval only Approved items are shown, the rule Rock's own blocks use. A channel without approval shows everything. {%- endcomment -%}
+{%- assign seriesStatusFilter = '' -%}
+{%- contentchannel id:'{{ seriesChannelId }}' securityenabled:'false' -%}{%- if contentchannel.RequiresApproval and contentchannel.ContentChannelType.DisableStatus == false -%}{%- assign seriesStatusFilter = ' && Status == 2' -%}{%- endif -%}{%- endcontentchannel -%}
+{%- assign messageStatusFilter = '' -%}
+{%- contentchannel id:'{{ messageChannelId }}' securityenabled:'false' -%}{%- if contentchannel.RequiresApproval and contentchannel.ContentChannelType.DisableStatus == false -%}{%- assign messageStatusFilter = ' && Status == 2' -%}{%- endif -%}{%- endcontentchannel -%}
 
 <VerticalStackLayout Spacing=""0"">
 
-    {% contentchannelitem where:'ContentChannelId == ""{{ seriesChannelId }}""' sort:'StartDateTime desc' limit:'1' %}
+    {% contentchannelitem where:'ContentChannelId == ""{{ seriesChannelId }}""{{ seriesStatusFilter }}' sort:'StartDateTime desc' limit:'1' %}
         {% for hero in contentchannelitemItems %}
             {%- comment -%} hg ends up holding an absolute image URL, not a guid: SeriesImage (Image field, a guid) wrapped in GetImage, else SeriesImageLink (Text field, already a URL). {%- endcomment -%}
 {%- assign hgGuid = hero | Attribute:'SeriesImage','RawValue' -%}
@@ -2894,7 +2909,7 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
 
     <ScrollView Orientation=""Horizontal"" HorizontalScrollBarVisibility=""Never"" StyleClass=""mt-12"">
         <HorizontalStackLayout Spacing=""12"" Padding=""16,0"">
-            {% contentchannelitem where:'ContentChannelId == ""{{ messageChannelId }}""' sort:'StartDateTime desc' limit:'{{ recentCount }}' %}
+            {% contentchannelitem where:'ContentChannelId == ""{{ messageChannelId }}""{{ messageStatusFilter }}' sort:'StartDateTime desc' limit:'{{ recentCount }}' %}
                 {% for msg in contentchannelitemItems %}
 {%- comment -%} thumbnail: Media File thumb -> Image -> Series Image -> MediaDefault {%- endcomment -%}
                     {%- assign img = msg | Attribute:'MediaFile','DefaultThumbnailUrl' -%}
@@ -2933,7 +2948,7 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
         </HorizontalStackLayout>
     </ScrollView>
 
-    {% contentchannelitem where:'ContentChannelId == ""{{ seriesChannelId }}""' sort:'StartDateTime desc' limit:'{{ takePlusOne }}' %}
+    {% contentchannelitem where:'ContentChannelId == ""{{ seriesChannelId }}""{{ seriesStatusFilter }}' sort:'StartDateTime desc' limit:'{{ takePlusOne }}' %}
         {%- comment -%} one series beyond the window tells us whether to offer Show More.
              The window is counted in series FETCHED, not rows drawn, so the cursor
              advances by a fixed amount even when a series has no messages yet. {%- endcomment -%}
@@ -2942,7 +2957,10 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
         {%- if fetched > take -%}{%- assign hasMore = true -%}{%- endif -%}
         {% for series in contentchannelitemItems %}
             {%- if forloop.index0 < take -%}
-            {%- assign childCount = series.ChildItems | Size -%}
+            {%- assign seriesMessages = series.ChildItems | Select:'ChildContentChannelItem' | Sort:'StartDateTime' -%}
+{%- assign liveChildren = '' | Split:',' -%}
+{%- for approvalItem in seriesMessages -%}{%- if approvalItem.Status == 'Approved' or approvalItem.ContentChannel.RequiresApproval == false or approvalItem.ContentChannelType.DisableStatus -%}{%- assign liveChildren = liveChildren | AddToArray:approvalItem -%}{%- endif -%}{%- endfor -%}
+{%- assign childCount = liveChildren | Size -%}
             {%- comment -%} seriesGuid ends up holding an absolute image URL, not a guid: SeriesImage (Image field, a guid) wrapped in GetImage, else SeriesImageLink (Text field, already a URL). {%- endcomment -%}
 {%- assign seriesGuidGuid = series | Attribute:'SeriesImage','RawValue' -%}
 {%- assign seriesGuidLink = series | Attribute:'SeriesImageLink','RawValue' -%}
@@ -2960,8 +2978,8 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
 
                 <ScrollView Orientation=""Horizontal"" HorizontalScrollBarVisibility=""Never"" StyleClass=""mt-12"">
                     <HorizontalStackLayout Spacing=""12"" Padding=""16,0"">
-                        {% for assoc in series.ChildItems %}
-                            {%- assign msg = assoc.ChildContentChannelItem -%}
+                        {% for msg in liveChildren %}
+                            
                             {%- assign img = msg | Attribute:'Image','RawValue' -%}{%- if img != '' and img != null -%}{%- unless img contains 'http' -%}{%- assign img = appRoot | Append:'GetImage.ashx?Guid=' | Append:img -%}{%- endunless -%}{%- endif -%}
                             {%- if img == '' and seriesGuid != '' -%}{%- assign img = seriesGuid -%}{%- endif -%}
                             {%- if img == '' or img == null -%}{%- assign img = defaultImg -%}{%- endif -%}
@@ -3038,10 +3056,15 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
 {%- comment -%} last resort behind every thumbnail; lives in RockWeb/Content/MobileApp {%- endcomment -%}
 {%- assign defaultImg = appRoot | Append:'Content/MobileApp/MediaDefault.png' -%}
 {%- assign takePlusOne = take | Plus:1 -%}
+{%- comment -%} APPROVAL-FILTER: in a channel that requires approval only Approved items are shown, the rule Rock's own blocks use. A channel without approval shows everything. {%- endcomment -%}
+{%- assign seriesStatusFilter = '' -%}
+{%- contentchannel id:'{{ seriesChannelId }}' securityenabled:'false' -%}{%- if contentchannel.RequiresApproval and contentchannel.ContentChannelType.DisableStatus == false -%}{%- assign seriesStatusFilter = ' && Status == 2' -%}{%- endif -%}{%- endcontentchannel -%}
+{%- assign messageStatusFilter = '' -%}
+{%- contentchannel id:'{{ messageChannelId }}' securityenabled:'false' -%}{%- if contentchannel.RequiresApproval and contentchannel.ContentChannelType.DisableStatus == false -%}{%- assign messageStatusFilter = ' && Status == 2' -%}{%- endif -%}{%- endcontentchannel -%}
 
 <VerticalStackLayout Spacing=""0"">
 
-    {% contentchannelitem where:'ContentChannelId == ""{{ seriesChannelId }}""' sort:'StartDateTime desc' limit:'1' %}
+    {% contentchannelitem where:'ContentChannelId == ""{{ seriesChannelId }}""{{ seriesStatusFilter }}' sort:'StartDateTime desc' limit:'1' %}
         {% for hero in contentchannelitemItems %}
             {%- comment -%} hg ends up holding an absolute image URL, not a guid: SeriesImage (Image field, a guid) wrapped in GetImage, else SeriesImageLink (Text field, already a URL). {%- endcomment -%}
 {%- assign hgGuid = hero | Attribute:'SeriesImage','RawValue' -%}
@@ -3067,7 +3090,7 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
 
     <ScrollView Orientation=""Horizontal"" HorizontalScrollBarVisibility=""Never"" StyleClass=""mt-12"">
         <HorizontalStackLayout Spacing=""12"" Padding=""16,0"">
-            {% contentchannelitem where:'ContentChannelId == ""{{ messageChannelId }}""' sort:'StartDateTime desc' limit:'{{ recentCount }}' %}
+            {% contentchannelitem where:'ContentChannelId == ""{{ messageChannelId }}""{{ messageStatusFilter }}' sort:'StartDateTime desc' limit:'{{ recentCount }}' %}
                 {% for msg in contentchannelitemItems %}
 {%- comment -%} thumbnail: Media File thumb -> Image -> Series Image -> MediaDefault {%- endcomment -%}
                     {%- assign img = msg | Attribute:'MediaFile','DefaultThumbnailUrl' -%}
@@ -3106,7 +3129,7 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
         </HorizontalStackLayout>
     </ScrollView>
 
-    {% contentchannelitem where:'ContentChannelId == ""{{ seriesChannelId }}""' sort:'StartDateTime desc' limit:'{{ takePlusOne }}' %}
+    {% contentchannelitem where:'ContentChannelId == ""{{ seriesChannelId }}""{{ seriesStatusFilter }}' sort:'StartDateTime desc' limit:'{{ takePlusOne }}' %}
         {%- comment -%} one series beyond the window tells us whether to offer Show More.
              The window is counted in series FETCHED, not rows drawn, so the cursor
              advances by a fixed amount even when a series has no messages yet. {%- endcomment -%}
@@ -3115,7 +3138,10 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
         {%- if fetched > take -%}{%- assign hasMore = true -%}{%- endif -%}
         {% for series in contentchannelitemItems %}
             {%- if forloop.index0 < take -%}
-            {%- assign childCount = series.ChildItems | Size -%}
+            {%- assign seriesMessages = series.ChildItems | Select:'ChildContentChannelItem' | Sort:'StartDateTime' -%}
+{%- assign liveChildren = '' | Split:',' -%}
+{%- for approvalItem in seriesMessages -%}{%- if approvalItem.Status == 'Approved' or approvalItem.ContentChannel.RequiresApproval == false or approvalItem.ContentChannelType.DisableStatus -%}{%- assign liveChildren = liveChildren | AddToArray:approvalItem -%}{%- endif -%}{%- endfor -%}
+{%- assign childCount = liveChildren | Size -%}
             {%- comment -%} seriesGuid ends up holding an absolute image URL, not a guid: SeriesImage (Image field, a guid) wrapped in GetImage, else SeriesImageLink (Text field, already a URL). {%- endcomment -%}
 {%- assign seriesGuidGuid = series | Attribute:'SeriesImage','RawValue' -%}
 {%- assign seriesGuidLink = series | Attribute:'SeriesImageLink','RawValue' -%}
@@ -3133,8 +3159,8 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
 
                 <ScrollView Orientation=""Horizontal"" HorizontalScrollBarVisibility=""Never"" StyleClass=""mt-12"">
                     <HorizontalStackLayout Spacing=""12"" Padding=""16,0"">
-                        {% for assoc in series.ChildItems %}
-                            {%- assign msg = assoc.ChildContentChannelItem -%}
+                        {% for msg in liveChildren %}
+                            
                             {%- assign img = msg | Attribute:'Image','RawValue' -%}{%- if img != '' and img != null -%}{%- unless img contains 'http' -%}{%- assign img = appRoot | Append:'GetImage.ashx?Guid=' | Append:img -%}{%- endunless -%}{%- endif -%}
                             {%- if img == '' and seriesGuid != '' -%}{%- assign img = seriesGuid -%}{%- endif -%}
                             {%- if img == '' or img == null -%}{%- assign img = defaultImg -%}{%- endif -%}
@@ -3179,7 +3205,11 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
     <BoxView HeightRequest=""24"" Color=""Transparent"" />
 </VerticalStackLayout>
 {% endif %}" );   // CallbackLogic
-            RockMigrationHelper.AddBlockAttributeValue( "C63AD407-B2D3-4DA5-BC49-B34DF3554EE1", "D80CF7C7-F6F4-4E77-97A8-B0842E4AF7FB", @"{%- assign appRoot = 'Global' | Attribute:'PublicApplicationRoot' -%}
+            RockMigrationHelper.AddBlockAttributeValue( "C63AD407-B2D3-4DA5-BC49-B34DF3554EE1", "D80CF7C7-F6F4-4E77-97A8-B0842E4AF7FB", @"{%- comment -%} APPROVAL-FILTER: in a channel that requires approval only Approved items are shown, the rule Rock's own blocks use. A channel without approval shows everything. {%- endcomment -%}
+{%- assign itemIsLive = false -%}
+{%- if Item.Status == 'Approved' or Item.ContentChannel.RequiresApproval == false or Item.ContentChannelType.DisableStatus -%}{%- assign itemIsLive = true -%}{%- endif -%}
+{%- if itemIsLive -%}
+{%- assign appRoot = 'Global' | Attribute:'PublicApplicationRoot' -%}
 {%- assign publicPagesReady = true -%}
 {% comment %} flip to true once /series/{Id} exists — see PRODUCTION-SETUP-CHECKLIST.md {% endcomment %}
 {%- comment -%} bannerGuid ends up holding an absolute image URL, not a guid: SeriesImage (Image field, a guid) wrapped in GetImage, else SeriesImageLink (Text field, already a URL). {%- endcomment -%}
@@ -3192,6 +3222,9 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
 {%- assign summary = Item | Attribute:'Summary' -%}
 {%- assign sermonPageGuid = '4079b24c-d548-4cd0-a833-c5688bbef052' -%}
 {%- assign episodes = Item.ChildItems | Select:'ChildContentChannelItem' | Sort:'StartDateTime' -%}
+{%- assign liveEpisodes = '' | Split:',' -%}
+{%- for approvalItem in episodes -%}{%- if approvalItem.Status == 'Approved' or approvalItem.ContentChannel.RequiresApproval == false or approvalItem.ContentChannelType.DisableStatus -%}{%- assign liveEpisodes = liveEpisodes | AddToArray:approvalItem -%}{%- endif -%}{%- endfor -%}
+{%- assign episodes = liveEpisodes -%}
 {%- if publicPagesReady -%}
     {%- capture shareUri -%}{{ appRoot }}series/{{ Item.Id }}{%- endcapture -%}
 {%- else -%}
@@ -3265,12 +3298,21 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
         {% endfor %}
     </VerticalStackLayout>
     <BoxView HeightRequest=""24"" Color=""Transparent"" />
-</VerticalStackLayout>" );   // ContentTemplate
+</VerticalStackLayout>
+{%- else -%}
+<VerticalStackLayout StyleClass=""p-24"" Spacing=""12"">
+    <Label StyleClass=""body, text-interface-medium"" HorizontalTextAlignment=""Center"" Text=""This series isn't available."" />
+</VerticalStackLayout>
+{%- endif -%}" );   // ContentTemplate
             RockMigrationHelper.AddBlockAttributeValue( "C63AD407-B2D3-4DA5-BC49-B34DF3554EE1", "49913217-BF13-4270-8023-C56BDA52C790", @"e2c598f1-d299-1baa-4873-8b679e3c1998" );   // ContentChannel
             RockMigrationHelper.AddBlockAttributeValue( "C63AD407-B2D3-4DA5-BC49-B34DF3554EE1", "616351D9-41FD-4E84-9378-78140BE30605", @"False" );   // LogInteractions
             RockMigrationHelper.AddBlockAttributeValue( "7B49DE66-B707-417F-8A65-A082508A548B", "21CC1DAD-87A6-4F00-A324-281E6D7190D0", @"f04b6154-1543-4632-89a2-1792f6ced9d6|" );   // ToolboxTemplate
             RockMigrationHelper.AddBlockAttributeValue( "7B49DE66-B707-417F-8A65-A082508A548B", "3755EF28-B0FC-4039-8012-6EDDA4E10FFF", @"de3e57ac-e12b-4249-bb15-64c7a7780ac8|" );   // ConfirmDeclineTemplate
-            RockMigrationHelper.AddBlockAttributeValue( "A67C5D2C-1161-4EBA-8F92-93962EF739F6", "D80CF7C7-F6F4-4E77-97A8-B0842E4AF7FB", @"{%- assign appRoot = 'Global' | Attribute:'PublicApplicationRoot' -%}
+            RockMigrationHelper.AddBlockAttributeValue( "A67C5D2C-1161-4EBA-8F92-93962EF739F6", "D80CF7C7-F6F4-4E77-97A8-B0842E4AF7FB", @"{%- comment -%} APPROVAL-FILTER: in a channel that requires approval only Approved items are shown, the rule Rock's own blocks use. A channel without approval shows everything. {%- endcomment -%}
+{%- assign itemIsLive = false -%}
+{%- if Item.Status == 'Approved' or Item.ContentChannel.RequiresApproval == false or Item.ContentChannelType.DisableStatus -%}{%- assign itemIsLive = true -%}{%- endif -%}
+{%- if itemIsLive -%}
+{%- assign appRoot = 'Global' | Attribute:'PublicApplicationRoot' -%}
 {%- comment -%}
     Sermon Detail 2.0 - Resi media via the ""MediaFile"" Media Element attribute.
     AppendWatches supplies the media urls AND the person's prior watch map (resume).
@@ -3339,6 +3381,9 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
 {%- if seriesGuidGuid != '' and seriesGuidGuid != null -%}{%- assign seriesGuid = seriesGuidGuid -%}
 {%- elsif seriesGuidLink != '' and seriesGuidLink != null -%}{%- assign seriesGuid = seriesGuidLink -%}{%- endif -%}{%- if seriesGuid != '' and seriesGuid != null -%}{%- unless seriesGuid contains 'http' -%}{%- assign seriesGuid = appRoot | Append:'GetImage.ashx?Guid=' | Append:seriesGuid -%}{%- endunless -%}{%- endif -%}
     {%- assign siblings = parentSeries.ChildItems | Select:'ChildContentChannelItem' | Sort:'StartDateTime' -%}
+{%- assign liveSiblings = '' | Split:',' -%}
+{%- for approvalItem in siblings -%}{%- if approvalItem.Status == 'Approved' or approvalItem.ContentChannel.RequiresApproval == false or approvalItem.ContentChannelType.DisableStatus -%}{%- assign liveSiblings = liveSiblings | AddToArray:approvalItem -%}{%- endif -%}{%- endfor -%}
+{%- assign siblings = liveSiblings -%}
 {%- endfor -%}
 {%- assign siblingCount = siblings | Size -%}
 
@@ -3565,7 +3610,12 @@ NEXT: {{ firstDate | Date:'MMM d, yyyy' }}
     {% endif %}
 
     <BoxView HeightRequest=""24"" Color=""Transparent"" />
-</VerticalStackLayout>" );   // ContentTemplate
+</VerticalStackLayout>
+{%- else -%}
+<VerticalStackLayout StyleClass=""p-24"" Spacing=""12"">
+    <Label StyleClass=""body, text-interface-medium"" HorizontalTextAlignment=""Center"" Text=""This message isn't available."" />
+</VerticalStackLayout>
+{%- endif -%}" );   // ContentTemplate
             RockMigrationHelper.AddBlockAttributeValue( "A67C5D2C-1161-4EBA-8F92-93962EF739F6", "45EC896A-6A9F-495E-8F88-1BC800612B2D", @"RockEntity" );   // EnabledLavaCommands
             RockMigrationHelper.AddBlockAttributeValue( "A67C5D2C-1161-4EBA-8F92-93962EF739F6", "49913217-BF13-4270-8023-C56BDA52C790", @"0a63a427-e6b5-2284-45b3-789b293c02ea" );   // ContentChannel
             RockMigrationHelper.AddBlockAttributeValue( "A67C5D2C-1161-4EBA-8F92-93962EF739F6", "616351D9-41FD-4E84-9378-78140BE30605", @"False" );   // LogInteractions
@@ -4779,7 +4829,10 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
 {%- comment -%} take*3+10: the loop drops items with no AudioLink, so the fetch
     needs headroom to still produce a full page of take rendered rows {%- endcomment -%}
 {%- assign fetch = take | Times:3 | Plus:10 -%}
-{%- contentchannelitem where:'ContentChannelId == ""{{ messageChannelId }}""' sort:'StartDateTime desc' limit:'{{ fetch }}' -%}
+{%- comment -%} APPROVAL-FILTER: in a channel that requires approval only Approved items are shown, the rule Rock's own blocks use. A channel without approval shows everything. {%- endcomment -%}
+{%- assign messageStatusFilter = '' -%}
+{%- contentchannel id:'{{ messageChannelId }}' securityenabled:'false' -%}{%- if contentchannel.RequiresApproval and contentchannel.ContentChannelType.DisableStatus == false -%}{%- assign messageStatusFilter = ' && Status == 2' -%}{%- endif -%}{%- endcontentchannel -%}
+{%- contentchannelitem where:'ContentChannelId == ""{{ messageChannelId }}""{{ messageStatusFilter }}' sort:'StartDateTime desc' limit:'{{ fetch }}' -%}
     {%- assign fetched = contentchannelitemItems | Size -%}
     {%- assign shown = 0 -%}
     {%- assign extra = 0 -%}
@@ -4887,7 +4940,10 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
 {%- comment -%} take*3+10: the loop drops items with no AudioLink, so the fetch
     needs headroom to still produce a full page of take rendered rows {%- endcomment -%}
 {%- assign fetch = take | Times:3 | Plus:10 -%}
-{%- contentchannelitem where:'ContentChannelId == ""{{ messageChannelId }}""' sort:'StartDateTime desc' limit:'{{ fetch }}' -%}
+{%- comment -%} APPROVAL-FILTER: in a channel that requires approval only Approved items are shown, the rule Rock's own blocks use. A channel without approval shows everything. {%- endcomment -%}
+{%- assign messageStatusFilter = '' -%}
+{%- contentchannel id:'{{ messageChannelId }}' securityenabled:'false' -%}{%- if contentchannel.RequiresApproval and contentchannel.ContentChannelType.DisableStatus == false -%}{%- assign messageStatusFilter = ' && Status == 2' -%}{%- endif -%}{%- endcontentchannel -%}
+{%- contentchannelitem where:'ContentChannelId == ""{{ messageChannelId }}""{{ messageStatusFilter }}' sort:'StartDateTime desc' limit:'{{ fetch }}' -%}
     {%- assign fetched = contentchannelitemItems | Size -%}
     {%- assign shown = 0 -%}
     {%- assign extra = 0 -%}
@@ -4969,6 +5025,10 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
 {%- assign itemId = PageParameter.ContentChannelItemId -%}
 {%- assign appRoot = 'Global' | Attribute:'PublicApplicationRoot' -%}
 {%- contentchannelitem id:'{{ itemId }}' -%}
+{%- comment -%} APPROVAL-FILTER: in a channel that requires approval only Approved items are shown, the rule Rock's own blocks use. A channel without approval shows everything. {%- endcomment -%}
+{%- assign itemIsLive = false -%}
+{%- if contentchannelitem.Status == 'Approved' or contentchannelitem.ContentChannel.RequiresApproval == false or contentchannelitem.ContentChannelType.DisableStatus -%}{%- assign itemIsLive = true -%}{%- endif -%}
+{%- if itemIsLive -%}
     {%- assign audio = contentchannelitem | Attribute:'AudioLink','RawValue' -%}
     {%- assign speaker = contentchannelitem | Attribute:'Speaker' -%}
     {%- comment -%} artwork: Media File thumbnail -> item image -> parent series image.
@@ -5102,6 +5162,11 @@ AND DATEPART(YEAR,ft.TransactionDateTime) = DATEPART(YEAR,DATEADD(YEAR,-1,GETDAT
     </VerticalStackLayout>
 
 </VerticalStackLayout>
+{%- else -%}
+<VerticalStackLayout StyleClass=""p-24"" Spacing=""12"">
+    <Label StyleClass=""body, text-interface-medium"" HorizontalTextAlignment=""Center"" Text=""This episode isn't available."" />
+</VerticalStackLayout>
+{%- endif -%}
 {%- endcontentchannelitem -%}" );   // Content
             RockMigrationHelper.AddBlockAttributeValue( "B0264469-6A70-46F8-8A13-AC0B3375652A", "24516448-3F1F-4F27-97A1-CFB4F8B277B5", @"RockEntity" );   // EnabledLavaCommands
             RockMigrationHelper.AddBlockAttributeValue( "B0264469-6A70-46F8-8A13-AC0B3375652A", "B31D29A0-3725-4AEB-8360-7D91B9CDFE47", @"True" );   // DynamicContent
