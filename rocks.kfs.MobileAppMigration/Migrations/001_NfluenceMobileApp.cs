@@ -464,7 +464,7 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- endcapture -%}
 
     {%- assign linkUrlType = item | Attribute:""LinktoURLType"" -%}{%- if linkUrlType == '' -%}{%- assign linkUrlType = 'Webview' -%}{%- endif -%}
-  {%- assign linkToUrl = item | Attribute:""LinktoURL"" -%}{% assign authenticatedUser = item | Attribute:'PassUserAuthentication' | AsBoolean %}
+  {%- assign linkToUrl = item | Attribute:""LinktoURL"" -%}
   {%- assign appPage = item | Attribute:""LinktoAppPage"",""RawValue"" -%}{% assign contentStripped = item.Content | StripHtml | Trim %}
   {%- assign pageParameters = item | Attribute:""PageParameters"",""RawValue"" -%}
   {%- capture command -%}
@@ -472,7 +472,21 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {Binding OpenExternalBrowser}{%- elseif linkUrlType == 'Internal Browser' and appPage == '' -%}
   {Binding OpenBrowser}{%- else -%}
   {Binding PushPage}{%- endif -%}{%- endcapture -%}
-  {% if authenticatedUser %}{%- capture personToken %}{% if linkToUrl contains '?' %}&{% else %}?{% endif %}rckipid={{ CurrentPerson | PersonTokenCreate }}{% endcapture -%}{% endif %}
+  {%- comment -%} AUTH-TOKEN: a link to this Rock server - the host of its Public or Internal Application Root - carries the viewer's sign-in token (rckipid), so Rock knows who they are instead of making a duplicate profile. Never added to any other site - the token signs whoever holds the link in as this person. {%- endcomment -%}
+{%- if CurrentPerson and linkToUrl != '' and linkToUrl != null -%}
+{%- assign authHosts = '' | Split:',' -%}
+{%- assign authHost = 'Global' | Attribute:'PublicApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = 'Global' | Attribute:'InternalApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = linkToUrl | Url:'host' | Downcase -%}
+{%- if authHosts contains authHost -%}{%- unless linkToUrl contains 'rckipid=' -%}
+{%- if authToken == '' or authToken == null -%}{%- assign authToken = CurrentPerson | PersonTokenCreate -%}{%- endif -%}
+{%- assign authBase = linkToUrl | Split:'#' | First -%}{%- assign authFragment = '' -%}{%- if linkToUrl contains '#' -%}{%- assign authFragment = linkToUrl | Remove:authBase -%}{%- endif -%}
+{%- capture linkToUrl -%}{{ authBase }}{% if authBase contains '?' %}&{% else %}?{% endif %}rckipid={{ authToken }}{{ authFragment }}{%- endcapture -%}
+{%- endunless -%}{%- endif -%}
+{%- endif -%}
+{%- assign personToken = '' -%}
   {%- capture linkUrl -%}
   {%- if linkToUrl != '' and linkUrlType == 'Webview' -%}
   c543ef2a-df73-4c21-bb01-94f2a6cb6373?url={{ linkToUrl | Append:personToken | UrlEncode -}}
@@ -506,6 +520,20 @@ namespace rocks.kfs.MobileAppMigration.Migrations
         {%- endif -%}
         {%- assign srcCommand = 'OpenBrowser' -%}
         {%- capture srcParam -%}{{ appRoot }}Registration?RegistrationInstanceId={{ ri.Id }}{%- endcapture -%}
+{%- comment -%} AUTH-TOKEN: a link to this Rock server - the host of its Public or Internal Application Root - carries the viewer's sign-in token (rckipid), so Rock knows who they are instead of making a duplicate profile. Never added to any other site - the token signs whoever holds the link in as this person. {%- endcomment -%}
+{%- if CurrentPerson and srcParam != '' and srcParam != null -%}
+{%- assign authHosts = '' | Split:',' -%}
+{%- assign authHost = 'Global' | Attribute:'PublicApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = 'Global' | Attribute:'InternalApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = srcParam | Url:'host' | Downcase -%}
+{%- if authHosts contains authHost -%}{%- unless srcParam contains 'rckipid=' -%}
+{%- if authToken == '' or authToken == null -%}{%- assign authToken = CurrentPerson | PersonTokenCreate -%}{%- endif -%}
+{%- assign authBase = srcParam | Split:'#' | First -%}{%- assign authFragment = '' -%}{%- if srcParam contains '#' -%}{%- assign authFragment = srcParam | Remove:authBase -%}{%- endif -%}
+{%- capture srcParam -%}{{ authBase }}{% if authBase contains '?' %}&amp;{% else %}?{% endif %}rckipid={{ authToken }}{{ authFragment }}{%- endcapture -%}
+{%- endunless -%}{%- endif -%}
+{%- endif -%}
       {%- endfor -%}
     {% endregistrationinstance %}
   {%- endif -%}
@@ -744,6 +772,20 @@ namespace rocks.kfs.MobileAppMigration.Migrations
         {%- assign ctaCommand = 'OpenBrowser' -%}
     {%- endif -%}
     {%- assign ctaParam = linkUrl -%}
+{%- comment -%} AUTH-TOKEN: a link to this Rock server - the host of its Public or Internal Application Root - carries the viewer's sign-in token (rckipid), so Rock knows who they are instead of making a duplicate profile. Never added to any other site - the token signs whoever holds the link in as this person. {%- endcomment -%}
+{%- if CurrentPerson and ctaParam != '' and ctaParam != null -%}
+{%- assign authHosts = '' | Split:',' -%}
+{%- assign authHost = 'Global' | Attribute:'PublicApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = 'Global' | Attribute:'InternalApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = ctaParam | Url:'host' | Downcase -%}
+{%- if authHosts contains authHost -%}{%- unless ctaParam contains 'rckipid=' -%}
+{%- if authToken == '' or authToken == null -%}{%- assign authToken = CurrentPerson | PersonTokenCreate -%}{%- endif -%}
+{%- assign authBase = ctaParam | Split:'#' | First -%}{%- assign authFragment = '' -%}{%- if ctaParam contains '#' -%}{%- assign authFragment = ctaParam | Remove:authBase -%}{%- endif -%}
+{%- capture ctaParam -%}{{ authBase }}{% if authBase contains '?' %}&{% else %}?{% endif %}rckipid={{ authToken }}{{ authFragment }}{%- endcapture -%}
+{%- endunless -%}{%- endif -%}
+{%- endif -%}
 {%- endif -%}
 
 {%- assign shareMode = Item | Attribute:'ShareMode','RawValue' -%}
@@ -938,6 +980,20 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- assign subMenu = item | Attribute:'OpensSubMenu','RawValue' -%}
   {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}{%- if linkType == '' -%}{%- assign linkType = 'Webview' -%}{%- endif -%}
   {%- assign linkUrlVal = item | Attribute:'LinktoURL' -%}
+{%- comment -%} AUTH-TOKEN: a link to this Rock server - the host of its Public or Internal Application Root - carries the viewer's sign-in token (rckipid), so Rock knows who they are instead of making a duplicate profile. Never added to any other site - the token signs whoever holds the link in as this person. {%- endcomment -%}
+{%- if CurrentPerson and linkUrlVal != '' and linkUrlVal != null -%}
+{%- assign authHosts = '' | Split:',' -%}
+{%- assign authHost = 'Global' | Attribute:'PublicApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = 'Global' | Attribute:'InternalApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = linkUrlVal | Url:'host' | Downcase -%}
+{%- if authHosts contains authHost -%}{%- unless linkUrlVal contains 'rckipid=' -%}
+{%- if authToken == '' or authToken == null -%}{%- assign authToken = CurrentPerson | PersonTokenCreate -%}{%- endif -%}
+{%- assign authBase = linkUrlVal | Split:'#' | First -%}{%- assign authFragment = '' -%}{%- if linkUrlVal contains '#' -%}{%- assign authFragment = linkUrlVal | Remove:authBase -%}{%- endif -%}
+{%- capture linkUrlVal -%}{{ authBase }}{% if authBase contains '?' %}&{% else %}?{% endif %}rckipid={{ authToken }}{{ authFragment }}{%- endcapture -%}
+{%- endunless -%}{%- endif -%}
+{%- endif -%}
   {%- assign appPage = item | Attribute:'LinktoAppPage','RawValue' -%}
   {%- assign pageParams = item | Attribute:'PageParameters' -%}
   {%- assign contentStripped = item.Content | StripHtml | Trim -%}
@@ -1052,6 +1108,20 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- assign subMenu = item | Attribute:'OpensSubMenu','RawValue' -%}
   {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}{%- if linkType == '' -%}{%- assign linkType = 'Webview' -%}{%- endif -%}
   {%- assign linkUrlVal = item | Attribute:'LinktoURL' -%}
+{%- comment -%} AUTH-TOKEN: a link to this Rock server - the host of its Public or Internal Application Root - carries the viewer's sign-in token (rckipid), so Rock knows who they are instead of making a duplicate profile. Never added to any other site - the token signs whoever holds the link in as this person. {%- endcomment -%}
+{%- if CurrentPerson and linkUrlVal != '' and linkUrlVal != null -%}
+{%- assign authHosts = '' | Split:',' -%}
+{%- assign authHost = 'Global' | Attribute:'PublicApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = 'Global' | Attribute:'InternalApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = linkUrlVal | Url:'host' | Downcase -%}
+{%- if authHosts contains authHost -%}{%- unless linkUrlVal contains 'rckipid=' -%}
+{%- if authToken == '' or authToken == null -%}{%- assign authToken = CurrentPerson | PersonTokenCreate -%}{%- endif -%}
+{%- assign authBase = linkUrlVal | Split:'#' | First -%}{%- assign authFragment = '' -%}{%- if linkUrlVal contains '#' -%}{%- assign authFragment = linkUrlVal | Remove:authBase -%}{%- endif -%}
+{%- capture linkUrlVal -%}{{ authBase }}{% if authBase contains '?' %}&{% else %}?{% endif %}rckipid={{ authToken }}{{ authFragment }}{%- endcapture -%}
+{%- endunless -%}{%- endif -%}
+{%- endif -%}
   {%- assign appPage = item | Attribute:'LinktoAppPage','RawValue' -%}
   {%- assign pageParams = item | Attribute:'PageParameters' -%}
   {%- assign contentStripped = item.Content | StripHtml | Trim -%}
@@ -1166,6 +1236,20 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- assign subMenu = item | Attribute:'OpensSubMenu','RawValue' -%}
   {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}{%- if linkType == '' -%}{%- assign linkType = 'Webview' -%}{%- endif -%}
   {%- assign linkUrlVal = item | Attribute:'LinktoURL' -%}
+{%- comment -%} AUTH-TOKEN: a link to this Rock server - the host of its Public or Internal Application Root - carries the viewer's sign-in token (rckipid), so Rock knows who they are instead of making a duplicate profile. Never added to any other site - the token signs whoever holds the link in as this person. {%- endcomment -%}
+{%- if CurrentPerson and linkUrlVal != '' and linkUrlVal != null -%}
+{%- assign authHosts = '' | Split:',' -%}
+{%- assign authHost = 'Global' | Attribute:'PublicApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = 'Global' | Attribute:'InternalApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = linkUrlVal | Url:'host' | Downcase -%}
+{%- if authHosts contains authHost -%}{%- unless linkUrlVal contains 'rckipid=' -%}
+{%- if authToken == '' or authToken == null -%}{%- assign authToken = CurrentPerson | PersonTokenCreate -%}{%- endif -%}
+{%- assign authBase = linkUrlVal | Split:'#' | First -%}{%- assign authFragment = '' -%}{%- if linkUrlVal contains '#' -%}{%- assign authFragment = linkUrlVal | Remove:authBase -%}{%- endif -%}
+{%- capture linkUrlVal -%}{{ authBase }}{% if authBase contains '?' %}&{% else %}?{% endif %}rckipid={{ authToken }}{{ authFragment }}{%- endcapture -%}
+{%- endunless -%}{%- endif -%}
+{%- endif -%}
   {%- assign appPage = item | Attribute:'LinktoAppPage','RawValue' -%}
   {%- assign pageParams = item | Attribute:'PageParameters' -%}
   {%- assign contentStripped = item.Content | StripHtml | Trim -%}
@@ -1303,6 +1387,20 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- assign subMenu = item | Attribute:'OpensSubMenu','RawValue' -%}
   {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}{%- if linkType == '' -%}{%- assign linkType = 'Webview' -%}{%- endif -%}
   {%- assign linkUrlVal = item | Attribute:'LinktoURL' -%}
+{%- comment -%} AUTH-TOKEN: a link to this Rock server - the host of its Public or Internal Application Root - carries the viewer's sign-in token (rckipid), so Rock knows who they are instead of making a duplicate profile. Never added to any other site - the token signs whoever holds the link in as this person. {%- endcomment -%}
+{%- if CurrentPerson and linkUrlVal != '' and linkUrlVal != null -%}
+{%- assign authHosts = '' | Split:',' -%}
+{%- assign authHost = 'Global' | Attribute:'PublicApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = 'Global' | Attribute:'InternalApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = linkUrlVal | Url:'host' | Downcase -%}
+{%- if authHosts contains authHost -%}{%- unless linkUrlVal contains 'rckipid=' -%}
+{%- if authToken == '' or authToken == null -%}{%- assign authToken = CurrentPerson | PersonTokenCreate -%}{%- endif -%}
+{%- assign authBase = linkUrlVal | Split:'#' | First -%}{%- assign authFragment = '' -%}{%- if linkUrlVal contains '#' -%}{%- assign authFragment = linkUrlVal | Remove:authBase -%}{%- endif -%}
+{%- capture linkUrlVal -%}{{ authBase }}{% if authBase contains '?' %}&{% else %}?{% endif %}rckipid={{ authToken }}{{ authFragment }}{%- endcapture -%}
+{%- endunless -%}{%- endif -%}
+{%- endif -%}
   {%- assign appPage = item | Attribute:'LinktoAppPage','RawValue' -%}
   {%- assign pageParams = item | Attribute:'PageParameters' -%}
   {%- assign contentStripped = item.Content | StripHtml | Trim -%}
@@ -1477,6 +1575,20 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- assign subMenu = item | Attribute:'OpensSubMenu','RawValue' -%}
   {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}
   {%- assign linkUrlVal = item | Attribute:'LinktoURL' -%}
+{%- comment -%} AUTH-TOKEN: a link to this Rock server - the host of its Public or Internal Application Root - carries the viewer's sign-in token (rckipid), so Rock knows who they are instead of making a duplicate profile. Never added to any other site - the token signs whoever holds the link in as this person. {%- endcomment -%}
+{%- if CurrentPerson and linkUrlVal != '' and linkUrlVal != null -%}
+{%- assign authHosts = '' | Split:',' -%}
+{%- assign authHost = 'Global' | Attribute:'PublicApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = 'Global' | Attribute:'InternalApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = linkUrlVal | Url:'host' | Downcase -%}
+{%- if authHosts contains authHost -%}{%- unless linkUrlVal contains 'rckipid=' -%}
+{%- if authToken == '' or authToken == null -%}{%- assign authToken = CurrentPerson | PersonTokenCreate -%}{%- endif -%}
+{%- assign authBase = linkUrlVal | Split:'#' | First -%}{%- assign authFragment = '' -%}{%- if linkUrlVal contains '#' -%}{%- assign authFragment = linkUrlVal | Remove:authBase -%}{%- endif -%}
+{%- capture linkUrlVal -%}{{ authBase }}{% if authBase contains '?' %}&{% else %}?{% endif %}rckipid={{ authToken }}{{ authFragment }}{%- endcapture -%}
+{%- endunless -%}{%- endif -%}
+{%- endif -%}
   {%- assign appPage = item | Attribute:'LinktoAppPage','RawValue' -%}
   {%- assign pageParams = item | Attribute:'PageParameters' -%}
   {%- assign contentStripped = item.Content | StripHtml | Trim -%}
@@ -1924,6 +2036,20 @@ namespace rocks.kfs.MobileAppMigration.Migrations
   {%- assign subMenu = item | Attribute:'OpensSubMenu','RawValue' -%}
   {%- assign linkType = item | Attribute:'LinktoURLType','RawValue' -%}{%- if linkType == '' -%}{%- assign linkType = 'Webview' -%}{%- endif -%}
   {%- assign linkUrlVal = item | Attribute:'LinktoURL' -%}
+{%- comment -%} AUTH-TOKEN: a link to this Rock server - the host of its Public or Internal Application Root - carries the viewer's sign-in token (rckipid), so Rock knows who they are instead of making a duplicate profile. Never added to any other site - the token signs whoever holds the link in as this person. {%- endcomment -%}
+{%- if CurrentPerson and linkUrlVal != '' and linkUrlVal != null -%}
+{%- assign authHosts = '' | Split:',' -%}
+{%- assign authHost = 'Global' | Attribute:'PublicApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = 'Global' | Attribute:'InternalApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = linkUrlVal | Url:'host' | Downcase -%}
+{%- if authHosts contains authHost -%}{%- unless linkUrlVal contains 'rckipid=' -%}
+{%- if authToken == '' or authToken == null -%}{%- assign authToken = CurrentPerson | PersonTokenCreate -%}{%- endif -%}
+{%- assign authBase = linkUrlVal | Split:'#' | First -%}{%- assign authFragment = '' -%}{%- if linkUrlVal contains '#' -%}{%- assign authFragment = linkUrlVal | Remove:authBase -%}{%- endif -%}
+{%- capture linkUrlVal -%}{{ authBase }}{% if authBase contains '?' %}&{% else %}?{% endif %}rckipid={{ authToken }}{{ authFragment }}{%- endcapture -%}
+{%- endunless -%}{%- endif -%}
+{%- endif -%}
   {%- assign appPage = item | Attribute:'LinktoAppPage','RawValue' -%}
   {%- assign pageParams = item | Attribute:'PageParameters' -%}
   {%- assign contentStripped = item.Content | StripHtml | Trim -%}
@@ -2103,8 +2229,8 @@ namespace rocks.kfs.MobileAppMigration.Migrations
     so it usually resolves straight off Event. The EventCalendarItems loop is a
     fallback for when inheritance has not been primed.
 
-    regToken is deliberately NOT appended to either of these - they point at
-    third-party sites, and rckipid is an impersonation token.
+    regToken is not appended to either of these. They get the sign-in token
+    only when they point at one of Nfluence's Rock sites - AUTH-TOKEN below.
 {%- endcomment -%}
 {%- assign itemLink = Event | Attribute:'ItemLink','RawValue' -%}
 {%- if itemLink == '' or itemLink == null -%}
@@ -2118,6 +2244,34 @@ namespace rocks.kfs.MobileAppMigration.Migrations
 {%- assign detailsUrl = Event.DetailsUrl -%}
 {%- assign detailsUrlText = Event | Attribute:'DetailsUrlButtonText' -%}
 {%- if detailsUrlText == '' or detailsUrlText == null -%}{%- assign detailsUrlText = 'More Information' -%}{%- endif -%}
+{%- comment -%} AUTH-TOKEN: a link to this Rock server - the host of its Public or Internal Application Root - carries the viewer's sign-in token (rckipid), so Rock knows who they are instead of making a duplicate profile. Never added to any other site - the token signs whoever holds the link in as this person. {%- endcomment -%}
+{%- if CurrentPerson and itemLink != '' and itemLink != null -%}
+{%- assign authHosts = '' | Split:',' -%}
+{%- assign authHost = 'Global' | Attribute:'PublicApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = 'Global' | Attribute:'InternalApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = itemLink | Url:'host' | Downcase -%}
+{%- if authHosts contains authHost -%}{%- unless itemLink contains 'rckipid=' -%}
+{%- if authToken == '' or authToken == null -%}{%- assign authToken = CurrentPerson | PersonTokenCreate -%}{%- endif -%}
+{%- assign authBase = itemLink | Split:'#' | First -%}{%- assign authFragment = '' -%}{%- if itemLink contains '#' -%}{%- assign authFragment = itemLink | Remove:authBase -%}{%- endif -%}
+{%- capture itemLink -%}{{ authBase }}{% if authBase contains '?' %}&{% else %}?{% endif %}rckipid={{ authToken }}{{ authFragment }}{%- endcapture -%}
+{%- endunless -%}{%- endif -%}
+{%- endif -%}
+{%- comment -%} AUTH-TOKEN: a link to this Rock server - the host of its Public or Internal Application Root - carries the viewer's sign-in token (rckipid), so Rock knows who they are instead of making a duplicate profile. Never added to any other site - the token signs whoever holds the link in as this person. {%- endcomment -%}
+{%- if CurrentPerson and detailsUrl != '' and detailsUrl != null -%}
+{%- assign authHosts = '' | Split:',' -%}
+{%- assign authHost = 'Global' | Attribute:'PublicApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = 'Global' | Attribute:'InternalApplicationRoot' | Url:'host' | Downcase -%}
+{%- if authHost != '' and authHost != null -%}{%- assign authHosts = authHosts | AddToArray:authHost -%}{%- endif -%}
+{%- assign authHost = detailsUrl | Url:'host' | Downcase -%}
+{%- if authHosts contains authHost -%}{%- unless detailsUrl contains 'rckipid=' -%}
+{%- if authToken == '' or authToken == null -%}{%- assign authToken = CurrentPerson | PersonTokenCreate -%}{%- endif -%}
+{%- assign authBase = detailsUrl | Split:'#' | First -%}{%- assign authFragment = '' -%}{%- if detailsUrl contains '#' -%}{%- assign authFragment = detailsUrl | Remove:authBase -%}{%- endif -%}
+{%- capture detailsUrl -%}{{ authBase }}{% if authBase contains '?' %}&{% else %}?{% endif %}rckipid={{ authToken }}{{ authFragment }}{%- endcapture -%}
+{%- endunless -%}{%- endif -%}
+{%- endif -%}
 {%- assign scheduledDates = EventItemOccurrence.Schedule.iCalendarContent | DatesFromICal:'all' -%}
 {%- assign dateCount = scheduledDates | Size -%}
 {%- assign firstDate = scheduledDates | First -%}
@@ -9136,7 +9290,7 @@ Contained = side margins', 1006, 0, 'Contained', 0, 0, 'CE0ACC4F-161C-45DF-A908-
                 IF @ChannelId IS NOT NULL AND @FieldTypeId IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM [Attribute] WHERE [Guid] = 'F24E8F59-3B62-4FDE-B2A0-AB7B0118B754' )
                 BEGIN
                     INSERT INTO [Attribute] ( [IsSystem], [FieldTypeId], [EntityTypeId], [EntityTypeQualifierColumn], [EntityTypeQualifierValue], [Key], [Name], [Description], [Order], [IsGridColumn], [DefaultValue], [IsMultiValue], [IsRequired], [Guid] )
-                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'PassUserAuthentication', 'Pass User Authentication', 'Appends a person token to the URL. This is used primarily for external links to your Rock web page where you would still like the user to be authenticated to view.', 1012, 0, 'False', 0, 1, 'F24E8F59-3B62-4FDE-B2A0-AB7B0118B754' );
+                    VALUES ( 0, @FieldTypeId, @EntityTypeId, 'ContentChannelId', CAST( @ChannelId AS NVARCHAR(10) ), 'PassUserAuthentication', 'Pass User Authentication', 'No longer used. Links to this Rock server (the address in the Public or Internal Application Root global attribute) always carry the sign-in token, and links to any other site never do.', 1012, 0, 'False', 0, 1, 'F24E8F59-3B62-4FDE-B2A0-AB7B0118B754' );
                 END
                 IF NOT EXISTS ( SELECT 1 FROM [AttributeQualifier] WHERE [Guid] = 'D48BA9BB-FFAE-41C6-B75D-82F3B1921883' )
                     INSERT INTO [AttributeQualifier] ( [IsSystem], [AttributeId], [Key], [Value], [Guid] )
