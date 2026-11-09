@@ -1,5 +1,5 @@
 ﻿// <copyright>
-// Copyright 2020 by Kingdom First Solutions
+// Copyright 2026 by Kingdom First Solutions
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -260,6 +260,12 @@ namespace rocks.kfs.Eventbrite
             var rockContext = new RockContext();
             var group = GetGroupByEBEventId( order.Event_Id, rockContext );
             var ebEvent = order.Event;
+
+            // The expansion should always supply the event; load it by id only if Eventbrite left it out.
+            if ( ebEvent == null && group != null )
+            {
+                ebEvent = eb.GetEventById( order.Event_Id );
+            }
 
             if ( group != null && ebEvent != null )
             {
