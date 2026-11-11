@@ -56,7 +56,7 @@ namespace EventbriteDotNetFramework.Entities
         }
 
         /*
-            11/9/2026 - CLAUDE
+            11/9/2026
 
             Eventbrite now returns an order's "event" as the event id (a string) unless the request
             expands "event", and no longer returns "event_id". RestSharp throws an InvalidCastException
